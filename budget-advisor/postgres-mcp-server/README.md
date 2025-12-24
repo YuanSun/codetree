@@ -10,26 +10,27 @@ A Model Context Protocol (MCP) server that provides access to budget and expense
 
 ## Prerequisites
 
-- Node.js (v18 or higher)
+- Python 3.10 or higher
 - PostgreSQL database with expense data
-- npm or yarn
+- pip or uv
 
 ## Installation
 
-1. Install dependencies:
+1. Create a virtual environment (recommended):
 ```bash
-npm install
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-2. Configure database connection:
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+3. Configure database connection:
 ```bash
 cp .env.example .env
 # Edit .env with your PostgreSQL credentials
-```
-
-3. Build the project:
-```bash
-npm run build
 ```
 
 ## Database Schema
@@ -54,7 +55,12 @@ You can extend this schema with additional columns as needed.
 
 Start the server:
 ```bash
-npm start
+python server.py
+```
+
+Or if you made it executable:
+```bash
+./server.py
 ```
 
 ### Using with Claude Desktop or Other MCP Clients
@@ -65,8 +71,29 @@ Add to your MCP client configuration (e.g., Claude Desktop config):
 {
   "mcpServers": {
     "budget-advisor-postgres": {
-      "command": "node",
-      "args": ["/path/to/budget-advisor/postgres-mcp-server/dist/index.js"],
+      "command": "python",
+      "args": ["/path/to/budget-advisor/postgres-mcp-server/server.py"],
+      "env": {
+        "POSTGRES_HOST": "localhost",
+        "POSTGRES_PORT": "5432",
+        "POSTGRES_DB": "budget",
+        "POSTGRES_USER": "postgres",
+        "POSTGRES_PASSWORD": "your_password"
+      }
+    }
+  }
+}
+```
+
+Alternatively, using `uv` (recommended for better performance):
+
+```json
+{
+  "mcpServers": {
+    "budget-advisor-postgres": {
+      "command": "uv",
+      "args": ["run", "server.py"],
+      "cwd": "/path/to/budget-advisor/postgres-mcp-server",
       "env": {
         "POSTGRES_HOST": "localhost",
         "POSTGRES_PORT": "5432",
@@ -139,9 +166,15 @@ Get monthly expense summary with totals by category.
 
 ## Development
 
-Run in development mode with auto-rebuild:
+The server automatically reloads when you make changes to `server.py`. For debugging, you can run it directly:
+
 ```bash
-npm run dev
+python server.py
+```
+
+Or use the Python debugger:
+```bash
+python -m pdb server.py
 ```
 
 ## Next Steps
