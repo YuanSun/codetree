@@ -1,15 +1,19 @@
-# Dependencies
-node_modules/
-
-# Build output
-dist/
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
 
 # Environment variables
 .env
 
 # Logs
 *.log
-npm-debug.log*
 
 # OS files
 .DS_Store
@@ -20,3 +24,8 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
