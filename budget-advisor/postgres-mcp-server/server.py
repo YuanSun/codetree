@@ -86,16 +86,12 @@ def execute_query(query: str) -> list[dict[str, Any]]:
 def get_weekly_expenses(weeks_back: int = 0) -> list[dict[str, Any]]:
     """Get total expenses for the current or past weeks, grouped by category"""
     query = f"""
-        SELECT
-            category,
-            SUM(amount) as total_amount,
-            COUNT(*) as transaction_count,
-            DATE_TRUNC('week', date) as week_start
-        FROM expenses
-        WHERE date >= DATE_TRUNC('week', CURRENT_DATE - INTERVAL '{weeks_back} weeks')
-          AND date < DATE_TRUNC('week', CURRENT_DATE - INTERVAL '{weeks_back - 1} weeks')
-        GROUP BY category, DATE_TRUNC('week', date)
-        ORDER BY total_amount DESC;
+        Select "typeName", sum("expense") as total_amount, count(*) as transaction_count, DATE_TRUNC('week', date) as week_start
+        from family_budget.dailyexpensevw
+            where date >= DATE_TRUNC('week', CURRENT_DATE - interval '{weeks_back} weeks')
+            and date < DATE_TRUNC('week', CURRENT_DATE - INTERVAL '{weeks_back - 1} weeks')
+        group by "typeName", DATE_TRUNC('week', date)
+        order by total_amount desc;
     """
     return execute_query(query)
 
@@ -109,13 +105,13 @@ def get_monthly_summary(month: Optional[str] = None) -> list[dict[str, Any]]:
 
     query = f"""
         SELECT
-            category,
-            SUM(amount) as total_amount,
+            "typeName",
+            SUM(expense) as total_amount,
             COUNT(*) as transaction_count,
-            AVG(amount) as avg_amount,
-            MIN(amount) as min_amount,
-            MAX(amount) as max_amount
-        FROM expenses
+            AVG(expense) as avg_amount,
+            MIN(expense) as min_amount,
+            MAX(expense) as max_amount
+        FROM family_budget.dailyexpensevw
         WHERE {month_condition}
         GROUP BY category
         ORDER BY total_amount DESC;
