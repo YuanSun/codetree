@@ -164,6 +164,28 @@ Get monthly expense summary with totals by category.
 - Connection pooling is used for efficient database connections
 - Environment variables should be used for sensitive credentials
 
+## Testing
+
+Run the test suite to verify everything works:
+
+```bash
+# Install test dependencies
+pip install -r requirements-dev.txt
+
+# Run all tests
+python3 -m pytest tests/ -v
+
+# Run with coverage
+python3 -m pytest tests/ --cov=server --cov-report=term-missing
+```
+
+The test suite includes:
+- Database connection tests
+- SQL injection protection tests
+- Query execution tests
+- MCP tool endpoint tests
+- Configuration validation tests
+
 ## Development
 
 The server automatically reloads when you make changes to `server.py`. For debugging, you can run it directly:
