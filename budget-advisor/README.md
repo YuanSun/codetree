@@ -57,6 +57,30 @@ cp .env.example .env
 python advisor.py
 ```
 
+## Testing
+
+Run all tests across both components:
+
+```bash
+# Option 1: Using Python test runner (recommended)
+python3 run_all_tests.py
+
+# Option 2: Using Make
+make test
+
+# Run tests for individual components
+make test-mcp       # PostgreSQL MCP Server only
+make test-advisor   # Ollama Advisor only
+
+# Run with coverage
+make test-cov
+```
+
+**Test Results:**
+- PostgreSQL MCP Server: 26 tests
+- Ollama Advisor Agent: 16 tests (1 skipped)
+- **Total: 42 unit tests, all passing ✓**
+
 ## Next Steps
 
 - Add email/SMS notification service
