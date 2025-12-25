@@ -86,11 +86,11 @@ def execute_query(query: str) -> list[dict[str, Any]]:
 def get_weekly_expenses(weeks_back: int = 0) -> list[dict[str, Any]]:
     """Get total expenses for the current or past weeks, grouped by category"""
     query = f"""
-        Select "typeName", sum("expense") as total_amount, count(*) as transaction_count, DATE_TRUNC('week', date) as week_start
+        Select "typeName" as category, sum("expense") as total_amount, count(*) as transaction_count, DATE_TRUNC('week', date) as week_start
         from family_budget.dailyexpensevw
             where date >= DATE_TRUNC('week', CURRENT_DATE - interval '{weeks_back} weeks')
             and date < DATE_TRUNC('week', CURRENT_DATE - INTERVAL '{weeks_back - 1} weeks')
-        group by "typeName", DATE_TRUNC('week', date)
+        group by category, DATE_TRUNC('week', date)
         order by total_amount desc;
     """
     return execute_query(query)
