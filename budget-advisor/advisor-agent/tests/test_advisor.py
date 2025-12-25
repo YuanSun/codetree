@@ -23,6 +23,7 @@ class TestBudgetAdvisor:
         assert advisor.ollama_host == "http://localhost:11434"
         assert advisor.ollama_client is not None
         assert advisor.session is None
+        assert advisor.stdio_context is None
 
     def test_init_default_model(self):
         """Test advisor initialization with default model"""
@@ -248,11 +249,11 @@ class TestIntegration:
         """Test closing advisor with active session"""
         advisor = BudgetAdvisor()
 
-        # Mock session
-        mock_session = AsyncMock()
-        advisor.session = mock_session
+        # Mock stdio context
+        mock_context = AsyncMock()
+        advisor.stdio_context = mock_context
 
         await advisor.close()
 
-        # Verify session was closed
-        assert mock_session.__aexit__.called
+        # Verify context was closed
+        assert mock_context.__aexit__.called
