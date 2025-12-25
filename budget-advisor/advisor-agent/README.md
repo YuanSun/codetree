@@ -69,6 +69,12 @@ Edit `.env` to configure the advisor:
 # Ollama model to use (must be downloaded via 'ollama pull')
 OLLAMA_MODEL=llama3.2
 
+# Ollama server URL (default: http://localhost:11434)
+OLLAMA_HOST=http://localhost:11434
+
+# For remote Ollama (e.g., another Mac on your network):
+# OLLAMA_HOST=http://192.168.1.100:11434
+
 # Path to MCP server script
 MCP_SERVER_SCRIPT=../postgres-mcp-server/server.py
 
@@ -78,6 +84,45 @@ POSTGRES_PORT=5432
 POSTGRES_DB=budget
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=your_password
+```
+
+### Using Remote Ollama Instance
+
+If you want to use Ollama running on another Mac in your network:
+
+**On the Mac running Ollama:**
+
+1. Configure Ollama to accept network connections:
+```bash
+# Set environment variable to listen on all interfaces
+launchctl setenv OLLAMA_HOST 0.0.0.0:11434
+
+# Restart Ollama
+pkill ollama
+ollama serve
+```
+
+Or, for persistent configuration, create/edit `~/.ollama/config`:
+```bash
+export OLLAMA_HOST=0.0.0.0:11434
+```
+
+2. Find your Mac's IP address:
+```bash
+ifconfig | grep "inet " | grep -v 127.0.0.1
+# Or check System Settings > Network
+```
+
+**On the machine running the advisor:**
+
+3. Update `.env` with the remote Ollama URL:
+```bash
+OLLAMA_HOST=http://192.168.1.100:11434  # Replace with your Mac's IP
+```
+
+4. Test the connection:
+```bash
+curl http://192.168.1.100:11434/api/tags
 ```
 
 ## Usage

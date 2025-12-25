@@ -26,14 +26,17 @@ logger = logging.getLogger(__name__)
 
 # Configuration
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
+OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 MCP_SERVER_SCRIPT = os.getenv("MCP_SERVER_SCRIPT", "../postgres-mcp-server/server.py")
 
 
 class BudgetAdvisor:
     """Budget advisor that analyzes expenses using Ollama and MCP"""
 
-    def __init__(self, ollama_model: str = OLLAMA_MODEL):
+    def __init__(self, ollama_model: str = OLLAMA_MODEL, ollama_host: str = OLLAMA_HOST):
         self.ollama_model = ollama_model
+        self.ollama_host = ollama_host
+        self.ollama_client = ollama.Client(host=ollama_host)
         self.session: Optional[ClientSession] = None
 
     async def connect_to_mcp_server(self):
@@ -143,7 +146,8 @@ Keep your advice concise, friendly, and actionable. Focus on practical tips they
 """
 
         # Call Ollama
-        response = ollama.chat(
+        logger.info(f"Connecting to Ollama at {self.ollama_host}...")
+        response = self.ollama_client.chat(
             model=self.ollama_model,
             messages=[
                 {

@@ -18,14 +18,23 @@ class TestBudgetAdvisor:
 
     def test_init(self):
         """Test advisor initialization"""
-        advisor = BudgetAdvisor(ollama_model="llama3.2")
+        advisor = BudgetAdvisor(ollama_model="llama3.2", ollama_host="http://localhost:11434")
         assert advisor.ollama_model == "llama3.2"
+        assert advisor.ollama_host == "http://localhost:11434"
+        assert advisor.ollama_client is not None
         assert advisor.session is None
 
     def test_init_default_model(self):
         """Test advisor initialization with default model"""
         advisor = BudgetAdvisor()
         assert advisor.ollama_model is not None
+        assert advisor.ollama_host is not None
+        assert advisor.ollama_client is not None
+
+    def test_init_custom_host(self):
+        """Test advisor initialization with custom Ollama host"""
+        advisor = BudgetAdvisor(ollama_host="http://192.168.1.100:11434")
+        assert advisor.ollama_host == "http://192.168.1.100:11434"
 
     def test_format_weekly_data_empty(self):
         """Test formatting empty weekly data"""
@@ -92,17 +101,16 @@ class TestBudgetAdvisor:
         assert "Utilities" in result
         assert "$850.00" in result  # Total
 
-    @patch('advisor.ollama.chat')
-    def test_generate_advice(self, mock_ollama):
+    def test_generate_advice(self):
         """Test advice generation"""
         advisor = BudgetAdvisor(ollama_model="test-model")
 
-        # Mock Ollama response
-        mock_ollama.return_value = {
+        # Mock Ollama client response
+        advisor.ollama_client.chat = Mock(return_value={
             'message': {
                 'content': 'Great job on your spending this week!'
             }
-        }
+        })
 
         weekly_data = [{'category': 'Food', 'total_amount': 100, 'transaction_count': 5}]
         monthly_data = [{'category': 'Food', 'total_amount': 400, 'transaction_count': 20, 'avg_amount': 20}]
@@ -110,8 +118,8 @@ class TestBudgetAdvisor:
         advice = advisor.generate_advice(weekly_data, monthly_data)
 
         assert advice == 'Great job on your spending this week!'
-        assert mock_ollama.called
-        call_args = mock_ollama.call_args
+        assert advisor.ollama_client.chat.called
+        call_args = advisor.ollama_client.chat.call_args
 
         # Check that the model was used
         assert call_args.kwargs['model'] == 'test-model'
