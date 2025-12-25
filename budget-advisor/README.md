@@ -15,7 +15,7 @@ This project uses:
 ```
 budget-advisor/
 ├── postgres-mcp-server/    # MCP server for PostgreSQL database access
-├── advisor-agent/          # Ollama-based AI advisor (coming soon)
+├── advisor-agent/          # Ollama-based AI advisor
 └── notification-service/   # Email/SMS notification service (coming soon)
 ```
 
@@ -31,21 +31,41 @@ See [postgres-mcp-server/README.md](postgres-mcp-server/README.md) for setup ins
 
 You'll need to set up your PostgreSQL database with expense data. The MCP server expects an `expenses` table. See the database schema in the MCP server README.
 
-### 3. Custom Queries
+### 2. Advisor Agent
 
-You can provide your own SQL queries to access expense data through the `query_expenses` tool, or use the built-in weekly and monthly summary tools.
+The AI advisor uses Ollama to analyze your expense data and generate personalized financial advice.
+
+See [advisor-agent/README.md](advisor-agent/README.md) for setup and usage instructions.
+
+### 3. Quick Start
+
+```bash
+# 1. Set up PostgreSQL MCP Server
+cd postgres-mcp-server
+pip install -r requirements.txt
+cp .env.example .env
+# Edit .env with your database credentials
+
+# 2. Set up Advisor Agent
+cd ../advisor-agent
+pip install -r requirements.txt
+ollama pull llama3.2  # Download Ollama model
+cp .env.example .env
+# Edit .env with your settings
+
+# 3. Run the advisor
+python advisor.py
+```
 
 ## Next Steps
 
-- Set up your PostgreSQL database with expense data
-- Configure the MCP server with your database credentials
-- Provide custom queries for accessing your specific expense data structure
-- Implement the Ollama-based advisor agent
 - Add email/SMS notification service
+- Implement weekly automation with scheduler
+- Create historical tracking and trends
 
 ## Status
 
 - ✅ PostgreSQL MCP Server implemented
-- ⏳ Ollama advisor agent (pending)
+- ✅ Ollama advisor agent implemented
 - ⏳ Notification service (pending)
 - ⏳ Weekly automation (pending)
