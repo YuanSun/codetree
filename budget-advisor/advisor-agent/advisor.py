@@ -28,6 +28,7 @@ logger = logging.getLogger(__name__)
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 MCP_SERVER_SCRIPT = os.getenv("MCP_SERVER_SCRIPT", "../postgres-mcp-server/server.py")
+PYTHON_CMD = os.getenv("PYTHON_CMD", sys.executable)  # Use current Python by default
 
 
 class BudgetAdvisor:
@@ -54,7 +55,7 @@ class BudgetAdvisor:
         }
 
         server_params = StdioServerParameters(
-            command="python",
+            command=PYTHON_CMD,
             args=[MCP_SERVER_SCRIPT],
             env=db_env
         )
