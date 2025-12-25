@@ -38,6 +38,7 @@ class BudgetAdvisor:
         self.ollama_host = ollama_host
         self.ollama_client = ollama.Client(host=ollama_host)
         self.session: Optional[ClientSession] = None
+        self.stdio_context = None
 
     async def connect_to_mcp_server(self):
         """Connect to the PostgreSQL MCP Server"""
@@ -58,8 +59,9 @@ class BudgetAdvisor:
             env=db_env
         )
 
-        stdio_transport = await stdio_client(server_params)
-        self.read_stream, self.write_stream = stdio_transport
+        # Use async context manager properly
+        self.stdio_context = stdio_client(server_params)
+        self.read_stream, self.write_stream = await self.stdio_context.__aenter__()
         self.session = ClientSession(self.read_stream, self.write_stream)
 
         await self.session.initialize()
@@ -198,8 +200,8 @@ Keep your advice concise, friendly, and actionable. Focus on practical tips they
 
     async def close(self):
         """Close the MCP connection"""
-        if self.session:
-            await self.session.__aexit__(None, None, None)
+        if self.stdio_context:
+            await self.stdio_context.__aexit__(None, None, None)
             logger.info("Disconnected from MCP server")
 
 
