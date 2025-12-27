@@ -9,7 +9,7 @@ import sys
 import json
 import asyncio
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 
 try:
@@ -252,7 +252,6 @@ Only output the JSON, nothing else."""
 
                 elif period_type == "last_month":
                     # Get last month's data
-                    from datetime import datetime, timedelta
                     last_month = (datetime.now().replace(day=1) - timedelta(days=1)).strftime("%Y-%m")
                     monthly_data = await self.get_monthly_summary(month=last_month)
                     data_context.append((f"LAST MONTH ({last_month})", self._format_monthly_data(monthly_data)))
