@@ -175,162 +175,207 @@ class BudgetAdvisor:
             return data
         return []
 
-    async def answer_question(self, question: str) -> str:
-        """Answer a question about expenses using Ollama with intelligent data fetching"""
-        logger.info(f"Answering question: {question}")
+    async def _extract_parameters(self, question: str) -> dict:
+        """
+        Agent 2: Parameter Extraction Agent
+        Extracts specific parameters from the user's question.
+        Returns structured data that can be used to query the MCP server.
+        """
+        logger.debug("Parameter Extraction Agent: Analyzing question...")
 
-        # First, ask Ollama to analyze the question and determine what data to fetch
-        analysis_prompt = f"""You are a financial data analyst. Analyze this user question and determine what expense data is needed to answer it.
+        prompt = f"""Extract specific parameters from this budget question.
 
 USER QUESTION: {question}
 
-Respond with a JSON object specifying what data to fetch:
+Extract and output ONLY a JSON object with these fields:
 {{
-  "time_periods": [
-    {{"type": "current_week" | "current_month" | "last_month" | "specific_month", "value": "2024-07" (for specific_month)}},
-    ...
-  ],
-  "is_comparison": true/false,
-  "categories": ["Food", "Dining", etc] or null for all categories
+  "months": ["2024-07", "2024-08"],  // List of YYYY-MM format months mentioned, or empty array
+  "categories": ["Food", "Dining"],  // Categories mentioned, or null for all
+  "time_scope": "week" | "month",    // Are they asking about weekly or monthly data?
+  "is_comparison": true,             // Are they comparing multiple periods?
+  "current_period": true             // Do they want current week/month?
 }}
 
+Rules:
+- Today is {datetime.now().strftime("%Y-%m-%d")}, current year is {datetime.now().year}
+- Convert month names to YYYY-MM: "July" -> "2024-07", "last month" -> calculate it
+- If "this week" or "this month" -> set current_period: true
+- If comparing (vs, compare, versus) -> is_comparison: true
+
 Examples:
-- "How much did I spend on Food last month?" -> {{"time_periods": [{{"type": "last_month"}}], "is_comparison": false, "categories": ["Food"]}}
-- "What did I spend this week?" -> {{"time_periods": [{{"type": "current_week"}}], "is_comparison": false, "categories": null}}
-- "Compare July and August expenses" -> {{"time_periods": [{{"type": "specific_month", "value": "2024-07"}}, {{"type": "specific_month", "value": "2024-08"}}], "is_comparison": true, "categories": null}}
-- "How does this month compare to last month?" -> {{"time_periods": [{{"type": "current_month"}}, {{"type": "last_month"}}], "is_comparison": true, "categories": null}}
+Q: "Compare July and August expenses"
+A: {{"months": ["2024-07", "2024-08"], "categories": null, "time_scope": "month", "is_comparison": true, "current_period": false}}
 
-Important: For month names (January, February, etc), use the current year and convert to YYYY-MM format.
-Today's date is {datetime.now().strftime("%Y-%m-%d")} so use {datetime.now().year} for the year.
+Q: "How much on Food this week?"
+A: {{"months": [], "categories": ["Food"], "time_scope": "week", "is_comparison": false, "current_period": true}}
 
-Only output the JSON, nothing else."""
+Q: "What did I spend last month?"
+A: {{"months": ["2024-11"], "categories": null, "time_scope": "month", "is_comparison": false, "current_period": false}}
 
-        try:
-            # Get data requirement analysis
-            logger.debug("Analyzing question to determine data requirements...")
-            analysis_response = self.ollama_client.chat(
-                model=self.ollama_model,
-                messages=[{'role': 'user', 'content': analysis_prompt}]
-            )
-
-            import json
-            import re
-            analysis_text = analysis_response['message']['content']
-            # Extract JSON from response (in case model adds extra text)
-            json_match = re.search(r'\{.*\}', analysis_text, re.DOTALL)
-            if json_match:
-                analysis = json.loads(json_match.group())
-                logger.debug(f"Question analysis: {analysis}")
-            else:
-                logger.warning("Could not parse analysis JSON, using defaults")
-                analysis = {
-                    "time_periods": [{"type": "current_week"}],
-                    "is_comparison": False,
-                    "categories": None
-                }
-
-        except Exception as e:
-            logger.warning(f"Error analyzing question: {e}, using default data fetch")
-            analysis = {
-                "time_periods": [{"type": "current_week"}],
-                "is_comparison": False,
-                "categories": None
-            }
-
-        # Fetch the appropriate data based on analysis
-        try:
-            data_context = []
-
-            time_periods = analysis.get("time_periods", [{"type": "current_week"}])
-
-            for period in time_periods:
-                period_type = period.get("type")
-
-                if period_type == "current_week":
-                    weekly_data = await self.get_weekly_expenses(weeks_back=0)
-                    data_context.append(("CURRENT WEEK", self._format_weekly_data(weekly_data)))
-
-                elif period_type == "last_month":
-                    # Get last month's data
-                    last_month = (datetime.now().replace(day=1) - timedelta(days=1)).strftime("%Y-%m")
-                    monthly_data = await self.get_monthly_summary(month=last_month)
-                    data_context.append((f"LAST MONTH ({last_month})", self._format_monthly_data(monthly_data)))
-
-                elif period_type == "current_month":
-                    monthly_data = await self.get_monthly_summary()
-                    current_month = datetime.now().strftime("%Y-%m")
-                    data_context.append((f"CURRENT MONTH ({current_month})", self._format_monthly_data(monthly_data)))
-
-                elif period_type == "specific_month":
-                    # Get specific month's data
-                    month_value = period.get("value")
-                    if month_value:
-                        logger.debug(f"Fetching data for specific month: {month_value}")
-                        monthly_data = await self.get_monthly_summary(month=month_value)
-                        # Parse the month for a friendly name
-                        try:
-                            month_date = datetime.strptime(month_value, "%Y-%m")
-                            month_name = month_date.strftime("%B %Y")  # e.g., "July 2024"
-                        except:
-                            month_name = month_value
-                        data_context.append((f"{month_name.upper()}", self._format_monthly_data(monthly_data)))
-                    else:
-                        logger.warning(f"specific_month type but no value provided: {period}")
-
-            # If no data was fetched, default to current week
-            if not data_context:
-                logger.warning("No data fetched, using default current week")
-                weekly_data = await self.get_weekly_expenses(weeks_back=0)
-                data_context.append(("CURRENT WEEK", self._format_weekly_data(weekly_data)))
-
-        except Exception as e:
-            logger.error(f"Error fetching data: {e}")
-            import traceback
-            traceback.print_exc()
-            return "Sorry, I couldn't fetch your expense data. Please check the database connection."
-
-        # Build context for answering
-        context_text = "\n\n".join([f"{title}:\n{data}" for title, data in data_context])
-
-        # Adjust the prompt based on whether it's a comparison
-        if analysis.get("is_comparison") and len(data_context) > 1:
-            answer_prompt = f"""You are a helpful financial advisor. The user is asking for a comparison between different time periods.
-
-{context_text}
-
-USER QUESTION: {question}
-
-Provide a detailed comparison of the spending across these time periods. Include:
-1. Total spending for each period
-2. Key differences in spending patterns
-3. Categories that increased or decreased
-4. Specific recommendations based on the comparison
-
-Be specific and use actual numbers from the data."""
-        else:
-            answer_prompt = f"""You are a helpful financial advisor with access to the user's expense data.
-Answer their question based on the following data:
-
-{context_text}
-
-USER QUESTION: {question}
-
-Provide a helpful, concise answer based on their actual expense data. Be specific and use actual numbers from the data.
-If the question requires information not available in the data, politely explain what's available."""
-
-        logger.debug(f"Answer prompt length: {len(answer_prompt)} characters")
+ONLY output the JSON, nothing else."""
 
         try:
             response = self.ollama_client.chat(
                 model=self.ollama_model,
-                messages=[{'role': 'user', 'content': answer_prompt}]
+                messages=[{'role': 'user', 'content': prompt}]
+            )
+
+            import re
+            response_text = response['message']['content']
+            json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+
+            if json_match:
+                params = json.loads(json_match.group())
+                logger.debug(f"Extracted parameters: {params}")
+                return params
+            else:
+                logger.warning("Could not parse parameters, using defaults")
+                return {
+                    "months": [],
+                    "categories": None,
+                    "time_scope": "week",
+                    "is_comparison": False,
+                    "current_period": True
+                }
+        except Exception as e:
+            logger.error(f"Parameter extraction failed: {e}")
+            return {
+                "months": [],
+                "categories": None,
+                "time_scope": "week",
+                "is_comparison": False,
+                "current_period": True
+            }
+
+    async def _fetch_data(self, params: dict) -> list:
+        """
+        Agent 3: Query Executor
+        Takes extracted parameters and fetches data from MCP server.
+        Returns list of (label, formatted_data) tuples.
+        """
+        logger.debug("Query Executor: Fetching data based on parameters...")
+        data_context = []
+
+        try:
+            # Handle current period queries
+            if params.get("current_period"):
+                if params["time_scope"] == "week":
+                    logger.debug("Fetching current week data")
+                    weekly_data = await self.get_weekly_expenses(weeks_back=0)
+                    data_context.append(("CURRENT WEEK", self._format_weekly_data(weekly_data)))
+                else:  # month
+                    logger.debug("Fetching current month data")
+                    monthly_data = await self.get_monthly_summary()
+                    current_month = datetime.now().strftime("%Y-%m")
+                    data_context.append((f"CURRENT MONTH ({current_month})", self._format_monthly_data(monthly_data)))
+
+            # Handle specific months
+            months = params.get("months", [])
+            for month in months:
+                logger.debug(f"Fetching data for month: {month}")
+                monthly_data = await self.get_monthly_summary(month=month)
+
+                # Format month label
+                try:
+                    month_date = datetime.strptime(month, "%Y-%m")
+                    month_label = month_date.strftime("%B %Y").upper()  # "JULY 2024"
+                except:
+                    month_label = month.upper()
+
+                data_context.append((month_label, self._format_monthly_data(monthly_data)))
+
+            # Fallback: if no data was fetched, get current week
+            if not data_context:
+                logger.warning("No data fetched, using fallback current week")
+                weekly_data = await self.get_weekly_expenses(weeks_back=0)
+                data_context.append(("CURRENT WEEK", self._format_weekly_data(weekly_data)))
+
+            logger.debug(f"Fetched {len(data_context)} data periods")
+            return data_context
+
+        except Exception as e:
+            logger.error(f"Data fetching failed: {e}")
+            import traceback
+            traceback.print_exc()
+            raise
+
+    async def _generate_answer(self, question: str, data_context: list, is_comparison: bool) -> str:
+        """
+        Agent 4: Answer Generator
+        Takes the original question and fetched data, generates final answer.
+        """
+        logger.debug("Answer Generator: Creating response...")
+
+        # Build context string
+        context_text = "\n\n".join([f"{label}:\n{data}" for label, data in data_context])
+
+        # Choose appropriate prompt based on query type
+        if is_comparison and len(data_context) > 1:
+            prompt = f"""You are a financial advisor analyzing expense data. The user wants a COMPARISON.
+
+{context_text}
+
+USER QUESTION: {question}
+
+Provide a detailed comparison:
+1. Total spending for each period with actual numbers
+2. Key differences in spending patterns
+3. Categories that increased or decreased (with percentages)
+4. Specific actionable recommendations
+
+Be precise with numbers and percentages."""
+        else:
+            prompt = f"""You are a financial advisor analyzing expense data.
+
+{context_text}
+
+USER QUESTION: {question}
+
+Provide a helpful answer based on the data above. Use specific numbers.
+If the data doesn't contain what they're asking for, explain what's available."""
+
+        logger.debug(f"Sending prompt to Ollama ({len(prompt)} chars)")
+
+        try:
+            response = self.ollama_client.chat(
+                model=self.ollama_model,
+                messages=[{'role': 'user', 'content': prompt}]
             )
 
             answer = response['message']['content']
-            logger.info("Answer generated successfully")
+            logger.info(f"Answer generated ({len(answer)} chars)")
             return answer
         except Exception as e:
-            logger.error(f"Error calling Ollama: {e}")
+            logger.error(f"Answer generation failed: {e}")
+            raise
+
+    async def answer_question(self, question: str) -> str:
+        """
+        Main orchestrator: Coordinates the multi-agent pipeline
+        1. Extract parameters from question
+        2. Fetch relevant data from MCP
+        3. Generate answer with context
+        """
+        logger.info(f"Main Agent: Processing question: {question}")
+
+        try:
+            # Agent 2: Extract parameters
+            params = await self._extract_parameters(question)
+
+            # Agent 3: Fetch data based on parameters
+            data_context = await self._fetch_data(params)
+
+            # Agent 4: Generate final answer
+            answer = await self._generate_answer(
+                question=question,
+                data_context=data_context,
+                is_comparison=params.get("is_comparison", False)
+            )
+
+            return answer
+
+        except Exception as e:
+            logger.error(f"Error in question answering pipeline: {e}")
             return f"Sorry, I encountered an error: {str(e)}"
 
     def generate_advice(self, weekly_data: list, monthly_data: list) -> str:
