@@ -97,7 +97,13 @@ class BudgetAdvisor:
 
         logger.debug("Starting MCP session context...")
         try:
+            # First, enter the context to start message processing
             await asyncio.wait_for(self.session.__aenter__(), timeout=10.0)
+            logger.debug("Session context started")
+
+            # Then complete the MCP protocol handshake
+            logger.debug("Completing MCP initialization handshake...")
+            await asyncio.wait_for(self.session.initialize(), timeout=10.0)
             logger.info("Connected to MCP server successfully")
         except asyncio.TimeoutError:
             logger.error("Timeout during MCP session startup")
@@ -170,47 +176,102 @@ class BudgetAdvisor:
         return []
 
     async def answer_question(self, question: str) -> str:
-        """Answer a question about expenses using Ollama with fresh data"""
+        """Answer a question about expenses using Ollama with intelligent data fetching"""
         logger.info(f"Answering question: {question}")
 
-        # Get fresh data for context
+        # First, ask Ollama to analyze the question and determine what data to fetch
+        analysis_prompt = f"""You are a financial data analyst. Analyze this user question and determine what expense data is needed to answer it.
+
+USER QUESTION: {question}
+
+Respond with a JSON object specifying what data to fetch:
+{{
+  "time_period": "current_week" | "current_month" | "last_month" | "custom",
+  "categories": ["Food", "Dining", etc] or null for all categories,
+  "summary_needed": true/false
+}}
+
+Examples:
+- "How much did I spend on Food last month?" -> {{"time_period": "last_month", "categories": ["Food"], "summary_needed": true}}
+- "What did I spend this week?" -> {{"time_period": "current_week", "categories": null, "summary_needed": true}}
+- "Top expenses this month?" -> {{"time_period": "current_month", "categories": null, "summary_needed": true}}
+
+Only output the JSON, nothing else."""
+
         try:
-            weekly_expenses = await self.get_weekly_expenses(weeks_back=0)
-            monthly_summary = await self.get_monthly_summary()
+            # Get data requirement analysis
+            logger.debug("Analyzing question to determine data requirements...")
+            analysis_response = self.ollama_client.chat(
+                model=self.ollama_model,
+                messages=[{'role': 'user', 'content': analysis_prompt}]
+            )
+
+            import json
+            import re
+            analysis_text = analysis_response['message']['content']
+            # Extract JSON from response (in case model adds extra text)
+            json_match = re.search(r'\{.*\}', analysis_text, re.DOTALL)
+            if json_match:
+                analysis = json.loads(json_match.group())
+                logger.debug(f"Question analysis: {analysis}")
+            else:
+                logger.warning("Could not parse analysis JSON, using defaults")
+                analysis = {"time_period": "current_week", "categories": None, "summary_needed": True}
+
+        except Exception as e:
+            logger.warning(f"Error analyzing question: {e}, using default data fetch")
+            analysis = {"time_period": "current_week", "categories": None, "summary_needed": True}
+
+        # Fetch the appropriate data based on analysis
+        try:
+            data_context = []
+
+            if analysis.get("time_period") == "current_week":
+                weekly_data = await self.get_weekly_expenses(weeks_back=0)
+                data_context.append(("CURRENT WEEK", self._format_weekly_data(weekly_data)))
+
+            elif analysis.get("time_period") == "last_month":
+                # Get last month's data
+                from datetime import datetime, timedelta
+                last_month = (datetime.now().replace(day=1) - timedelta(days=1)).strftime("%Y-%m")
+                monthly_data = await self.get_monthly_summary(month=last_month)
+                data_context.append((f"LAST MONTH ({last_month})", self._format_monthly_data(monthly_data)))
+
+            elif analysis.get("time_period") == "current_month":
+                monthly_data = await self.get_monthly_summary()
+                data_context.append(("CURRENT MONTH", self._format_monthly_data(monthly_data)))
+
+            # Default: fetch both for comprehensive context
+            if not data_context:
+                weekly_data = await self.get_weekly_expenses(weeks_back=0)
+                monthly_data = await self.get_monthly_summary()
+                data_context.append(("CURRENT WEEK", self._format_weekly_data(weekly_data)))
+                data_context.append(("CURRENT MONTH", self._format_monthly_data(monthly_data)))
+
         except Exception as e:
             logger.error(f"Error fetching data: {e}")
             return "Sorry, I couldn't fetch your expense data. Please check the database connection."
 
-        # Format the data
-        weekly_summary = self._format_weekly_data(weekly_expenses)
-        monthly_summary = self._format_monthly_data(monthly_summary)
+        # Build context for answering
+        context_text = "\n\n".join([f"{title}:\n{data}" for title, data in data_context])
 
-        prompt = f"""You are a helpful financial advisor with access to the user's expense data.
+        # Now answer the question with the relevant data
+        answer_prompt = f"""You are a helpful financial advisor with access to the user's expense data.
 Answer their question based on the following data:
 
-WEEKLY EXPENSES (Current Week):
-{weekly_summary}
-
-MONTHLY SUMMARY (Current Month):
-{monthly_summary}
+{context_text}
 
 USER QUESTION: {question}
 
 Provide a helpful, concise answer based on their actual expense data. Be specific and use actual numbers from the data.
-If the question requires information not available in the data, politely explain what data you have and what's missing.
-"""
+If the question requires information not available in the data, politely explain what's available."""
 
-        logger.debug(f"Question prompt length: {len(prompt)} characters")
+        logger.debug(f"Answer prompt length: {len(answer_prompt)} characters")
 
         try:
             response = self.ollama_client.chat(
                 model=self.ollama_model,
-                messages=[
-                    {
-                        'role': 'user',
-                        'content': prompt
-                    }
-                ]
+                messages=[{'role': 'user', 'content': answer_prompt}]
             )
 
             answer = response['message']['content']
