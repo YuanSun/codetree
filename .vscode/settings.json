@@ -3,5 +3,8 @@
         "budget-advisor"
     ],
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
+    "python.testing.pytestEnabled": true,
+    "files.watcherExclude": {
+        "**/target": true
+    }
 }
