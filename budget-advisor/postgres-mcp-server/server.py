@@ -93,7 +93,7 @@ def execute_query(query: str) -> list[dict[str, Any]]:
 def get_weekly_expenses(weeks_back: int = 0) -> list[dict[str, Any]]:
     """Get total expenses for the current or past weeks, grouped by category"""
     query = f"""
-        Select "typeName" as category, sum("expense") as total_amount, count(*) as transaction_count, DATE_TRUNC('week', date) as week_start
+        Select "typeName" as category, sum("expense_numeric") as total_amount, count(*) as transaction_count, DATE_TRUNC('week', date) as week_start
         from family_budget.dailyexpensevw
             where date >= DATE_TRUNC('week', CURRENT_DATE - interval '{weeks_back} weeks')
             and date < DATE_TRUNC('week', CURRENT_DATE - INTERVAL '{weeks_back - 1} weeks')
@@ -113,12 +113,12 @@ def get_monthly_summary(month: Optional[str] = None) -> list[dict[str, Any]]:
 
     query = f"""
         SELECT
-            "typeName",
-            SUM(expense) as total_amount,
+            "typeName" as category,
+            SUM(expense_numeric) as total_amount,
             COUNT(*) as transaction_count,
-            AVG(expense) as avg_amount,
-            MIN(expense) as min_amount,
-            MAX(expense) as max_amount
+            AVG(expense_numeric)::numeric(10, 2) as avg_amount,
+            MIN(expense_numeric) as min_amount,
+            MAX(expense_numeric) as max_amount
         FROM family_budget.dailyexpensevw
         WHERE {month_condition}
         GROUP BY category
