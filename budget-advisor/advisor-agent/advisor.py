@@ -186,15 +186,22 @@ USER QUESTION: {question}
 
 Respond with a JSON object specifying what data to fetch:
 {{
-  "time_period": "current_week" | "current_month" | "last_month" | "custom",
-  "categories": ["Food", "Dining", etc] or null for all categories,
-  "summary_needed": true/false
+  "time_periods": [
+    {{"type": "current_week" | "current_month" | "last_month" | "specific_month", "value": "2024-07" (for specific_month)}},
+    ...
+  ],
+  "is_comparison": true/false,
+  "categories": ["Food", "Dining", etc] or null for all categories
 }}
 
 Examples:
-- "How much did I spend on Food last month?" -> {{"time_period": "last_month", "categories": ["Food"], "summary_needed": true}}
-- "What did I spend this week?" -> {{"time_period": "current_week", "categories": null, "summary_needed": true}}
-- "Top expenses this month?" -> {{"time_period": "current_month", "categories": null, "summary_needed": true}}
+- "How much did I spend on Food last month?" -> {{"time_periods": [{{"type": "last_month"}}], "is_comparison": false, "categories": ["Food"]}}
+- "What did I spend this week?" -> {{"time_periods": [{{"type": "current_week"}}], "is_comparison": false, "categories": null}}
+- "Compare July and August expenses" -> {{"time_periods": [{{"type": "specific_month", "value": "2024-07"}}, {{"type": "specific_month", "value": "2024-08"}}], "is_comparison": true, "categories": null}}
+- "How does this month compare to last month?" -> {{"time_periods": [{{"type": "current_month"}}, {{"type": "last_month"}}], "is_comparison": true, "categories": null}}
+
+Important: For month names (January, February, etc), use the current year and convert to YYYY-MM format.
+Today's date is {datetime.now().strftime("%Y-%m-%d")} so use {datetime.now().year} for the year.
 
 Only output the JSON, nothing else."""
 
@@ -216,47 +223,93 @@ Only output the JSON, nothing else."""
                 logger.debug(f"Question analysis: {analysis}")
             else:
                 logger.warning("Could not parse analysis JSON, using defaults")
-                analysis = {"time_period": "current_week", "categories": None, "summary_needed": True}
+                analysis = {
+                    "time_periods": [{"type": "current_week"}],
+                    "is_comparison": False,
+                    "categories": None
+                }
 
         except Exception as e:
             logger.warning(f"Error analyzing question: {e}, using default data fetch")
-            analysis = {"time_period": "current_week", "categories": None, "summary_needed": True}
+            analysis = {
+                "time_periods": [{"type": "current_week"}],
+                "is_comparison": False,
+                "categories": None
+            }
 
         # Fetch the appropriate data based on analysis
         try:
             data_context = []
 
-            if analysis.get("time_period") == "current_week":
-                weekly_data = await self.get_weekly_expenses(weeks_back=0)
-                data_context.append(("CURRENT WEEK", self._format_weekly_data(weekly_data)))
+            time_periods = analysis.get("time_periods", [{"type": "current_week"}])
 
-            elif analysis.get("time_period") == "last_month":
-                # Get last month's data
-                from datetime import datetime, timedelta
-                last_month = (datetime.now().replace(day=1) - timedelta(days=1)).strftime("%Y-%m")
-                monthly_data = await self.get_monthly_summary(month=last_month)
-                data_context.append((f"LAST MONTH ({last_month})", self._format_monthly_data(monthly_data)))
+            for period in time_periods:
+                period_type = period.get("type")
 
-            elif analysis.get("time_period") == "current_month":
-                monthly_data = await self.get_monthly_summary()
-                data_context.append(("CURRENT MONTH", self._format_monthly_data(monthly_data)))
+                if period_type == "current_week":
+                    weekly_data = await self.get_weekly_expenses(weeks_back=0)
+                    data_context.append(("CURRENT WEEK", self._format_weekly_data(weekly_data)))
 
-            # Default: fetch both for comprehensive context
+                elif period_type == "last_month":
+                    # Get last month's data
+                    from datetime import datetime, timedelta
+                    last_month = (datetime.now().replace(day=1) - timedelta(days=1)).strftime("%Y-%m")
+                    monthly_data = await self.get_monthly_summary(month=last_month)
+                    data_context.append((f"LAST MONTH ({last_month})", self._format_monthly_data(monthly_data)))
+
+                elif period_type == "current_month":
+                    monthly_data = await self.get_monthly_summary()
+                    current_month = datetime.now().strftime("%Y-%m")
+                    data_context.append((f"CURRENT MONTH ({current_month})", self._format_monthly_data(monthly_data)))
+
+                elif period_type == "specific_month":
+                    # Get specific month's data
+                    month_value = period.get("value")
+                    if month_value:
+                        logger.debug(f"Fetching data for specific month: {month_value}")
+                        monthly_data = await self.get_monthly_summary(month=month_value)
+                        # Parse the month for a friendly name
+                        try:
+                            month_date = datetime.strptime(month_value, "%Y-%m")
+                            month_name = month_date.strftime("%B %Y")  # e.g., "July 2024"
+                        except:
+                            month_name = month_value
+                        data_context.append((f"{month_name.upper()}", self._format_monthly_data(monthly_data)))
+                    else:
+                        logger.warning(f"specific_month type but no value provided: {period}")
+
+            # If no data was fetched, default to current week
             if not data_context:
+                logger.warning("No data fetched, using default current week")
                 weekly_data = await self.get_weekly_expenses(weeks_back=0)
-                monthly_data = await self.get_monthly_summary()
                 data_context.append(("CURRENT WEEK", self._format_weekly_data(weekly_data)))
-                data_context.append(("CURRENT MONTH", self._format_monthly_data(monthly_data)))
 
         except Exception as e:
             logger.error(f"Error fetching data: {e}")
+            import traceback
+            traceback.print_exc()
             return "Sorry, I couldn't fetch your expense data. Please check the database connection."
 
         # Build context for answering
         context_text = "\n\n".join([f"{title}:\n{data}" for title, data in data_context])
 
-        # Now answer the question with the relevant data
-        answer_prompt = f"""You are a helpful financial advisor with access to the user's expense data.
+        # Adjust the prompt based on whether it's a comparison
+        if analysis.get("is_comparison") and len(data_context) > 1:
+            answer_prompt = f"""You are a helpful financial advisor. The user is asking for a comparison between different time periods.
+
+{context_text}
+
+USER QUESTION: {question}
+
+Provide a detailed comparison of the spending across these time periods. Include:
+1. Total spending for each period
+2. Key differences in spending patterns
+3. Categories that increased or decreased
+4. Specific recommendations based on the comparison
+
+Be specific and use actual numbers from the data."""
+        else:
+            answer_prompt = f"""You are a helpful financial advisor with access to the user's expense data.
 Answer their question based on the following data:
 
 {context_text}
