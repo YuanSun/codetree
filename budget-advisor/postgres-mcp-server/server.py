@@ -100,6 +100,7 @@ def get_weekly_expenses(weeks_back: int = 0) -> list[dict[str, Any]]:
         group by category, DATE_TRUNC('week', date)
         order by total_amount desc;
     """
+    logger.info("Run weekly expense query")
     return execute_query(query)
 
 

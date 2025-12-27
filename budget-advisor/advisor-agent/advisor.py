@@ -37,8 +37,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Set log level for MCP client (can be noisy)
+# Set log level for MCP client and server (can be noisy)
 logging.getLogger('mcp').setLevel(logging.WARNING)
+logging.getLogger('asyncio').setLevel(logging.WARNING)
 
 logger.info(f"Logging initialized at {LOG_LEVEL} level")
 
@@ -91,8 +92,8 @@ class BudgetAdvisor:
         logger.info("Initializing MCP client session...")
         self.session = ClientSession(self.read_stream, self.write_stream)
 
-        # Start the session by entering its context and initializing
-        await self.session.__aenter__()
+        # Initialize the session
+        await self.session.initialize()
 
         logger.info("Connected to MCP server successfully")
 
@@ -302,11 +303,14 @@ Keep your advice concise, friendly, and actionable. Focus on practical tips they
 
     async def close(self):
         """Close the MCP connection"""
-        if self.session:
-            await self.session.__aexit__(None, None, None)
-        if self.stdio_context:
-            await self.stdio_context.__aexit__(None, None, None)
-            logger.info("Disconnected from MCP server")
+        try:
+            if self.session:
+                await self.session.close()
+            if self.stdio_context:
+                await self.stdio_context.__aexit__(None, None, None)
+                logger.info("Disconnected from MCP server")
+        except Exception as e:
+            logger.warning(f"Error during close: {e}")
 
 
 async def interactive_mode():
@@ -323,8 +327,7 @@ async def interactive_mode():
     try:
         # Connect to MCP server
         await advisor.connect_to_mcp_server()
-        print("✓ Connected to your expense database")
-        print()
+        print("\n✓ Connected to your expense database\n", flush=True)
 
         # Chat loop
         while True:
