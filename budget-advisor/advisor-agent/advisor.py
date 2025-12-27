@@ -151,6 +151,57 @@ class BudgetAdvisor:
             return data
         return []
 
+    async def answer_question(self, question: str) -> str:
+        """Answer a question about expenses using Ollama with fresh data"""
+        logger.info(f"Answering question: {question}")
+
+        # Get fresh data for context
+        try:
+            weekly_expenses = await self.get_weekly_expenses(weeks_back=0)
+            monthly_summary = await self.get_monthly_summary()
+        except Exception as e:
+            logger.error(f"Error fetching data: {e}")
+            return "Sorry, I couldn't fetch your expense data. Please check the database connection."
+
+        # Format the data
+        weekly_summary = self._format_weekly_data(weekly_expenses)
+        monthly_summary = self._format_monthly_data(monthly_summary)
+
+        prompt = f"""You are a helpful financial advisor with access to the user's expense data.
+Answer their question based on the following data:
+
+WEEKLY EXPENSES (Current Week):
+{weekly_summary}
+
+MONTHLY SUMMARY (Current Month):
+{monthly_summary}
+
+USER QUESTION: {question}
+
+Provide a helpful, concise answer based on their actual expense data. Be specific and use actual numbers from the data.
+If the question requires information not available in the data, politely explain what data you have and what's missing.
+"""
+
+        logger.debug(f"Question prompt length: {len(prompt)} characters")
+
+        try:
+            response = self.ollama_client.chat(
+                model=self.ollama_model,
+                messages=[
+                    {
+                        'role': 'user',
+                        'content': prompt
+                    }
+                ]
+            )
+
+            answer = response['message']['content']
+            logger.info("Answer generated successfully")
+            return answer
+        except Exception as e:
+            logger.error(f"Error calling Ollama: {e}")
+            return f"Sorry, I encountered an error: {str(e)}"
+
     def generate_advice(self, weekly_data: list, monthly_data: list) -> str:
         """Generate financial advice using Ollama"""
         logger.info(f"Generating advice using {self.ollama_model}...")
@@ -248,8 +299,104 @@ Keep your advice concise, friendly, and actionable. Focus on practical tips they
             logger.info("Disconnected from MCP server")
 
 
-async def main():
-    """Main entry point"""
+async def interactive_mode():
+    """Interactive chat mode - ask questions in real-time"""
+    print("=" * 70)
+    print("Budget Advisor - Interactive Chat Mode")
+    print("=" * 70)
+    print()
+    print("Ask me anything about your budget! Type /help for available commands.")
+    print()
+
+    advisor = BudgetAdvisor()
+
+    try:
+        # Connect to MCP server
+        await advisor.connect_to_mcp_server()
+        print("✓ Connected to your expense database")
+        print()
+
+        # Chat loop
+        while True:
+            try:
+                # Get user input
+                user_input = input("You: ").strip()
+
+                if not user_input:
+                    continue
+
+                # Handle commands
+                if user_input.startswith('/'):
+                    if user_input in ['/quit', '/exit', '/q']:
+                        print("\nGoodbye! 👋")
+                        break
+
+                    elif user_input == '/help':
+                        print("\nAvailable commands:")
+                        print("  /weekly         - Show this week's expenses by category")
+                        print("  /monthly        - Show this month's summary")
+                        print("  /advice         - Get weekly financial advice")
+                        print("  /help           - Show this help message")
+                        print("  /quit or /exit  - Exit the chat")
+                        print("\nOr just ask any question about your budget!")
+                        print()
+                        continue
+
+                    elif user_input == '/weekly':
+                        print("\nAdvisor: Fetching weekly expenses...\n")
+                        weekly_data = await advisor.get_weekly_expenses(weeks_back=0)
+                        print(advisor._format_weekly_data(weekly_data))
+                        print()
+                        continue
+
+                    elif user_input == '/monthly':
+                        print("\nAdvisor: Fetching monthly summary...\n")
+                        monthly_data = await advisor.get_monthly_summary()
+                        print(advisor._format_monthly_data(monthly_data))
+                        print()
+                        continue
+
+                    elif user_input == '/advice':
+                        print("\nAdvisor: Generating personalized advice...\n")
+                        weekly_data = await advisor.get_weekly_expenses(weeks_back=0)
+                        monthly_data = await advisor.get_monthly_summary()
+                        advice = advisor.generate_advice(weekly_data, monthly_data)
+                        print(advice)
+                        print()
+                        continue
+
+                    else:
+                        print(f"\nUnknown command: {user_input}")
+                        print("Type /help for available commands.\n")
+                        continue
+
+                # Regular question - ask the AI
+                print("\nAdvisor: ", end='', flush=True)
+                answer = await advisor.answer_question(user_input)
+                print(answer)
+                print()
+
+            except KeyboardInterrupt:
+                print("\n\nGoodbye! 👋")
+                break
+            except EOFError:
+                print("\n\nGoodbye! 👋")
+                break
+            except Exception as e:
+                logger.error(f"Error in chat loop: {e}")
+                print(f"\nSorry, something went wrong: {e}\n")
+
+    except Exception as e:
+        logger.error(f"Error in interactive mode: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
+    finally:
+        await advisor.close()
+
+
+async def weekly_advice_mode():
+    """One-time weekly advice mode"""
     print("=" * 70)
     print("Budget Advisor - Weekly Financial Advice")
     print("=" * 70)
@@ -282,5 +429,25 @@ async def main():
         await advisor.close()
 
 
+def main():
+    """Main entry point"""
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Budget Advisor - AI-powered financial advice')
+    parser.add_argument(
+        '--mode',
+        choices=['interactive', 'weekly'],
+        default='interactive',
+        help='Mode to run: interactive chat or one-time weekly advice (default: interactive)'
+    )
+
+    args = parser.parse_args()
+
+    if args.mode == 'interactive':
+        asyncio.run(interactive_mode())
+    else:
+        asyncio.run(weekly_advice_mode())
+
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()

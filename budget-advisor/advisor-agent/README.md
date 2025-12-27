@@ -127,12 +127,66 @@ curl http://192.168.1.100:11434/api/tags
 
 ## Usage
 
-### Basic Usage
+The advisor has two modes: **Interactive Chat** (default) and **Weekly Advice**.
 
-Run the advisor to get weekly financial advice:
+### Interactive Chat Mode (Default)
+
+Chat with your budget advisor in real-time! Ask questions about your expenses and get instant answers.
 
 ```bash
 python advisor.py
+# or
+python advisor.py --mode interactive
+```
+
+**Available Commands:**
+- `/weekly` - Show this week's expenses by category
+- `/monthly` - Show this month's summary
+- `/advice` - Get comprehensive weekly financial advice
+- `/help` - Show available commands
+- `/quit` or `/exit` - Exit the chat
+
+**Example Session:**
+
+```
+======================================================================
+Budget Advisor - Interactive Chat Mode
+======================================================================
+
+Ask me anything about your budget! Type /help for available commands.
+
+✓ Connected to your expense database
+
+You: How much did I spend on groceries this week?
+
+Advisor: Based on your current week's data, you spent $125.30 on groceries
+across 4 transactions. This is slightly below your monthly average of $138.50,
+so you're doing well!
+
+You: What are my top 3 spending categories this month?
+
+Advisor: Your top 3 spending categories this month are:
+1. Housing: $1,200.00
+2. Groceries: $542.80
+3. Dining: $389.50
+
+You: /advice
+
+Advisor: Generating personalized advice...
+
+[Full weekly advice displayed]
+
+You: /quit
+
+Goodbye! 👋
+```
+
+### Weekly Advice Mode
+
+Get a one-time weekly financial advice report:
+
+```bash
+python advisor.py --mode weekly
 ```
 
 This will:
@@ -140,9 +194,9 @@ This will:
 2. Fetch your current week's expenses
 3. Fetch your current month's summary
 4. Generate personalized financial advice using Ollama
-5. Display the advice
+5. Display the advice and exit
 
-### Example Output
+### Example Output (Weekly Mode)
 
 ```
 ======================================================================
