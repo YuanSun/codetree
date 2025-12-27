@@ -85,9 +85,6 @@ class BudgetAdvisor:
         logger.info("Initializing MCP client session...")
         self.session = ClientSession(self.read_stream, self.write_stream)
 
-        # Start the session by entering its context and initializing
-        await self.session.__aenter__()
-
         # Complete the MCP protocol handshake
         logger.debug("Completing MCP protocol initialization...")
         await self.session.initialize()
@@ -300,8 +297,6 @@ Keep your advice concise, friendly, and actionable. Focus on practical tips they
 
     async def close(self):
         """Close the MCP connection"""
-        if self.session:
-            await self.session.__aexit__(None, None, None)
         if self.stdio_context:
             await self.stdio_context.__aexit__(None, None, None)
             logger.info("Disconnected from MCP server")
