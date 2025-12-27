@@ -259,12 +259,16 @@ async def call_tool(name: str, arguments: Any) -> list[TextContent]:
         return [TextContent(type="text", text=f"Error: {str(e)}")]
 
 
-# Create SSE transport - use it as ASGI app
+# Create SSE transport
 sse = SseServerTransport("/messages")
 
-async def handle_sse_connection(scope, receive, send):
-    """Handle SSE connection as ASGI app"""
-    async with sse.connect_sse(scope, receive, send) as (read_stream, write_stream):
+async def handle_sse_connection(request):
+    """Handle SSE connection - extract ASGI components from Request"""
+    async with sse.connect_sse(
+        request.scope,
+        request.receive,
+        request._send,
+    ) as (read_stream, write_stream):
         await app.run(
             read_stream,
             write_stream,
