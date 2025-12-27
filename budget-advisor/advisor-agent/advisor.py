@@ -88,6 +88,10 @@ class BudgetAdvisor:
         # Start the session by entering its context and initializing
         await self.session.__aenter__()
 
+        # Complete the MCP protocol handshake
+        logger.debug("Completing MCP protocol initialization...")
+        await self.session.initialize()
+
         logger.info("Connected to MCP server successfully")
 
     async def get_weekly_expenses(self, weeks_back: int = 0) -> dict:
