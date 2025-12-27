@@ -11,6 +11,12 @@ import logging
 from datetime import datetime, timedelta
 from typing import Any, Optional
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    print("Warning: python-dotenv not installed. Environment variables will not be loaded from .env file")
+
 import psycopg2
 from psycopg2 import pool
 from psycopg2.extras import RealDictCursor
@@ -20,7 +26,8 @@ from mcp.server.stdio import stdio_server
 from mcp.types import Tool, TextContent
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, stream=sys.stderr)
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+logging.basicConfig(level=getattr(logging, LOG_LEVEL), format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stderr)
 logger = logging.getLogger(__name__)
 
 # Database configuration from environment variables
@@ -34,7 +41,7 @@ DB_CONFIG = {
 
 # Global connection pool
 connection_pool: Optional[pool.SimpleConnectionPool] = None
-
+logger.info(f'Database config: {DB_CONFIG}')
 
 def init_database():
     """Initialize PostgreSQL connection pool"""
