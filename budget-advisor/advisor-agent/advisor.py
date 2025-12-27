@@ -16,13 +16,25 @@ import ollama
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
-# Configure logging
+# Configure logging with more detail
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+LOG_FORMAT = os.getenv("LOG_FORMAT", '%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s')
+
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    stream=sys.stderr
+    level=getattr(logging, LOG_LEVEL),
+    format=LOG_FORMAT,
+    handlers=[
+        logging.StreamHandler(sys.stderr),
+        # Optional: log to file as well
+        # logging.FileHandler('advisor.log')
+    ]
 )
 logger = logging.getLogger(__name__)
+
+# Set log level for MCP client (can be noisy)
+logging.getLogger('mcp').setLevel(logging.WARNING)
+
+logger.info(f"Logging initialized at {LOG_LEVEL} level")
 
 # Configuration
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
@@ -54,6 +66,10 @@ class BudgetAdvisor:
             "POSTGRES_PASSWORD": os.getenv("POSTGRES_PASSWORD", ""),
         }
 
+        logger.debug(f"Database config: {db_env['POSTGRES_USER']}@{db_env['POSTGRES_HOST']}:{db_env['POSTGRES_PORT']}/{db_env['POSTGRES_DB']}")
+        logger.debug(f"Python command: {PYTHON_CMD}")
+        logger.debug(f"MCP server script: {MCP_SERVER_SCRIPT}")
+
         server_params = StdioServerParameters(
             command=PYTHON_CMD,
             args=[MCP_SERVER_SCRIPT],
@@ -61,10 +77,14 @@ class BudgetAdvisor:
         )
 
         # Use async context manager properly
+        logger.debug("Creating stdio client context...")
         self.stdio_context = stdio_client(server_params)
+        logger.debug("Entering stdio context...")
         self.read_stream, self.write_stream = await self.stdio_context.__aenter__()
+        logger.debug("Creating MCP client session...")
         self.session = ClientSession(self.read_stream, self.write_stream)
 
+        logger.debug("Initializing MCP session...")
         await self.session.initialize()
         logger.info("Connected to MCP server successfully")
 
@@ -74,6 +94,7 @@ class BudgetAdvisor:
             raise RuntimeError("Not connected to MCP server")
 
         logger.info(f"Fetching expenses for week {weeks_back} weeks ago...")
+        logger.debug(f"Calling MCP tool: get_weekly_expenses with args: {{weeks_back: {weeks_back}}}")
 
         result = await self.session.call_tool(
             "get_weekly_expenses",
@@ -83,7 +104,10 @@ class BudgetAdvisor:
         # Parse the JSON response
         if result.content and len(result.content) > 0:
             data = json.loads(result.content[0].text)
+            logger.debug(f"Received {len(data)} expense records")
+            logger.debug(f"Data: {json.dumps(data, indent=2, default=str)}")
             return data
+        logger.warning("No data returned from get_weekly_expenses")
         return []
 
     async def get_monthly_summary(self, month: Optional[str] = None) -> dict:
@@ -92,8 +116,9 @@ class BudgetAdvisor:
             raise RuntimeError("Not connected to MCP server")
 
         logger.info(f"Fetching monthly summary{f' for {month}' if month else ''}...")
-
         args = {"month": month} if month else {}
+        logger.debug(f"Calling MCP tool: get_monthly_summary with args: {args}")
+
         result = await self.session.call_tool(
             "get_monthly_summary",
             arguments=args
@@ -102,7 +127,10 @@ class BudgetAdvisor:
         # Parse the JSON response
         if result.content and len(result.content) > 0:
             data = json.loads(result.content[0].text)
+            logger.debug(f"Received {len(data)} category summaries")
+            logger.debug(f"Data: {json.dumps(data, indent=2, default=str)}")
             return data
+        logger.warning("No data returned from get_monthly_summary")
         return []
 
     async def query_expenses(self, query: str) -> dict:
@@ -126,10 +154,15 @@ class BudgetAdvisor:
     def generate_advice(self, weekly_data: list, monthly_data: list) -> str:
         """Generate financial advice using Ollama"""
         logger.info(f"Generating advice using {self.ollama_model}...")
+        logger.debug(f"Weekly data entries: {len(weekly_data)}")
+        logger.debug(f"Monthly data entries: {len(monthly_data)}")
 
         # Format the data for the prompt
         weekly_summary = self._format_weekly_data(weekly_data)
         monthly_summary = self._format_monthly_data(monthly_data)
+
+        logger.debug(f"Formatted weekly summary:\n{weekly_summary}")
+        logger.debug(f"Formatted monthly summary:\n{monthly_summary}")
 
         prompt = f"""You are a helpful financial advisor. Analyze the following expense data and provide personalized weekly financial advice.
 
@@ -148,21 +181,30 @@ Please provide:
 Keep your advice concise, friendly, and actionable. Focus on practical tips they can implement this week.
 """
 
+        logger.debug(f"Prompt length: {len(prompt)} characters")
+
         # Call Ollama
         logger.info(f"Connecting to Ollama at {self.ollama_host}...")
-        response = self.ollama_client.chat(
-            model=self.ollama_model,
-            messages=[
-                {
-                    'role': 'user',
-                    'content': prompt
-                }
-            ]
-        )
+        logger.debug(f"Using model: {self.ollama_model}")
 
-        advice = response['message']['content']
-        logger.info("Advice generated successfully")
-        return advice
+        try:
+            response = self.ollama_client.chat(
+                model=self.ollama_model,
+                messages=[
+                    {
+                        'role': 'user',
+                        'content': prompt
+                    }
+                ]
+            )
+
+            advice = response['message']['content']
+            logger.info("Advice generated successfully")
+            logger.debug(f"Advice length: {len(advice)} characters")
+            return advice
+        except Exception as e:
+            logger.error(f"Error calling Ollama: {e}")
+            raise
 
     def _format_weekly_data(self, data: list) -> str:
         """Format weekly expense data for the prompt"""
