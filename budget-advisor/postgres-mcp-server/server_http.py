@@ -24,9 +24,20 @@ from starlette.routing import Route
 from starlette.responses import Response
 import uvicorn
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+    logger_initialized = False
+except ImportError:
+    logger_initialized = False
+    print("Warning: python-dotenv not installed. Environment variables will not be loaded from .env file", file=sys.stderr)
+
 # Configure logging
 logging.basicConfig(level=logging.INFO, stream=sys.stderr)
 logger = logging.getLogger(__name__)
+
+if not logger_initialized:
+    logger.info("Loading environment from .env file")
 
 # Database configuration from environment variables
 DB_CONFIG = {
