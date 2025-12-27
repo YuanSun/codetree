@@ -1,0 +1,4 @@
+# HTTP server dependencies (in addition to base requirements.txt)
+starlette>=0.27.0
+uvicorn>=0.23.0
+httpx>=0.24.0
