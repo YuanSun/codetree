@@ -274,6 +274,8 @@ async def handle_sse_connection(request):
             write_stream,
             app.create_initialization_options(),
         )
+    # Return empty response after connection closes
+    return Response(status_code=200)
 
 # Create Starlette application
 starlette_app = Starlette(
