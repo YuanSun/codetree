@@ -19,9 +19,6 @@ from psycopg2.extras import RealDictCursor
 from mcp.server import Server
 from mcp.server.sse import SseServerTransport
 from mcp.types import Tool, TextContent
-from starlette.applications import Starlette
-from starlette.routing import Route
-from starlette.responses import Response
 import uvicorn
 
 try:
@@ -259,34 +256,6 @@ async def call_tool(name: str, arguments: Any) -> list[TextContent]:
         return [TextContent(type="text", text=f"Error: {str(e)}")]
 
 
-# Create SSE transport
-sse = SseServerTransport("/messages")
-
-async def handle_sse_connection(request):
-    """Handle SSE connection - extract ASGI components from Request"""
-    async with sse.connect_sse(
-        request.scope,
-        request.receive,
-        request._send,
-    ) as (read_stream, write_stream):
-        await app.run(
-            read_stream,
-            write_stream,
-            app.create_initialization_options(),
-        )
-    # Return empty response after connection closes
-    return Response(status_code=200)
-
-# Create Starlette application
-starlette_app = Starlette(
-    debug=True,
-    routes=[
-        Route("/sse", endpoint=handle_sse_connection),
-        Route("/messages", endpoint=handle_sse_connection, methods=["GET", "POST"]),
-    ],
-)
-
-
 async def main():
     """Main entry point for HTTP server"""
     logger.info(f"Starting Budget Advisor PostgreSQL MCP Server (HTTP)...")
@@ -295,9 +264,20 @@ async def main():
     # Initialize database
     init_database()
 
-    # Run HTTP server
+    # Create SSE transport
+    sse = SseServerTransport("/messages")
+
+    # Run the SSE transport as the ASGI app directly
+    logger.info("MCP Server ready to accept connections")
+
+    async def handle_sse(scope, receive, send):
+        """ASGI application for MCP over SSE"""
+        async with sse.connect_sse(scope, receive, send) as (read, write):
+            await app.run(read, write, app.create_initialization_options())
+
+    # Run HTTP server with the SSE handler
     config = uvicorn.Config(
-        starlette_app,
+        handle_sse,
         host=SERVER_HOST,
         port=SERVER_PORT,
         log_level="info",
