@@ -81,11 +81,13 @@ class BudgetAdvisor:
         self.stdio_context = stdio_client(server_params)
         logger.debug("Entering stdio context...")
         self.read_stream, self.write_stream = await self.stdio_context.__aenter__()
-        logger.debug("Creating MCP client session...")
+
+        logger.info("Initializing MCP client session...")
         self.session = ClientSession(self.read_stream, self.write_stream)
 
-        logger.debug("Initializing MCP session...")
-        await self.session.initialize()
+        # Start the session by entering its context and initializing
+        await self.session.__aenter__()
+
         logger.info("Connected to MCP server successfully")
 
     async def get_weekly_expenses(self, weeks_back: int = 0) -> dict:
@@ -294,6 +296,8 @@ Keep your advice concise, friendly, and actionable. Focus on practical tips they
 
     async def close(self):
         """Close the MCP connection"""
+        if self.session:
+            await self.session.__aexit__(None, None, None)
         if self.stdio_context:
             await self.stdio_context.__aexit__(None, None, None)
             logger.info("Disconnected from MCP server")
