@@ -259,31 +259,24 @@ async def call_tool(name: str, arguments: Any) -> list[TextContent]:
         return [TextContent(type="text", text=f"Error: {str(e)}")]
 
 
-# Create SSE transport - single instance for all connections
+# Create SSE transport - use it as ASGI app
 sse = SseServerTransport("/messages")
 
-# Create Starlette app for HTTP transport
-async def handle_request(request):
-    """Handle all MCP requests - both SSE and messages"""
-    async with sse.connect_sse(
-        request.scope,
-        request.receive,
-        request._send,
-    ) as (read_stream, write_stream):
+async def handle_sse_connection(scope, receive, send):
+    """Handle SSE connection as ASGI app"""
+    async with sse.connect_sse(scope, receive, send) as (read_stream, write_stream):
         await app.run(
             read_stream,
             write_stream,
             app.create_initialization_options(),
         )
 
-
 # Create Starlette application
 starlette_app = Starlette(
     debug=True,
     routes=[
-        Route("/sse", endpoint=handle_request),
-        Route("/messages", endpoint=handle_request, methods=["GET", "POST"]),
-        Route("/", endpoint=handle_request, methods=["GET", "POST"]),
+        Route("/sse", endpoint=handle_sse_connection),
+        Route("/messages", endpoint=handle_sse_connection, methods=["GET", "POST"]),
     ],
 )
 
