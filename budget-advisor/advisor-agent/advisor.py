@@ -83,13 +83,21 @@ class BudgetAdvisor:
         self.read_stream, self.write_stream = await self.stdio_context.__aenter__()
 
         logger.info("Initializing MCP client session...")
+
+        # Create and start the session using async context manager
+        # This properly handles the bidirectional message loop
         self.session = ClientSession(self.read_stream, self.write_stream)
 
-        # Complete the MCP protocol handshake
-        logger.debug("Completing MCP protocol initialization...")
-        await self.session.initialize()
-
-        logger.info("Connected to MCP server successfully")
+        logger.debug("Starting MCP session context...")
+        try:
+            await asyncio.wait_for(self.session.__aenter__(), timeout=10.0)
+            logger.info("Connected to MCP server successfully")
+        except asyncio.TimeoutError:
+            logger.error("Timeout during MCP session startup")
+            raise RuntimeError("Failed to start MCP session: timeout")
+        except Exception as e:
+            logger.error(f"Error during MCP session startup: {e}")
+            raise
 
     async def get_weekly_expenses(self, weeks_back: int = 0) -> dict:
         """Get weekly expense data from MCP server"""
@@ -297,6 +305,11 @@ Keep your advice concise, friendly, and actionable. Focus on practical tips they
 
     async def close(self):
         """Close the MCP connection"""
+        if self.session:
+            try:
+                await self.session.__aexit__(None, None, None)
+            except Exception as e:
+                logger.warning(f"Error closing session: {e}")
         if self.stdio_context:
             await self.stdio_context.__aexit__(None, None, None)
             logger.info("Disconnected from MCP server")
