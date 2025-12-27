@@ -163,8 +163,8 @@ class TestWeeklyExpenses:
         call_args = mock_execute.call_args[0][0]
         assert 'DATE_TRUNC' in call_args
         assert 'category' in call_args
-        assert 'SUM(amount)' in call_args
-        assert 'GROUP BY category' in call_args
+        assert 'sum(\"expense\")' in call_args
+        assert 'group by category' in call_args
 
 
 class TestMonthlySummary:
@@ -209,10 +209,10 @@ class TestMonthlySummary:
         server.get_monthly_summary()
 
         call_args = mock_execute.call_args[0][0]
-        assert 'SUM(amount)' in call_args
-        assert 'AVG(amount)' in call_args
-        assert 'MIN(amount)' in call_args
-        assert 'MAX(amount)' in call_args
+        assert 'SUM(expense)' in call_args
+        assert 'AVG(expense)' in call_args
+        assert 'MIN(expense)' in call_args
+        assert 'MAX(expense)' in call_args
         assert 'GROUP BY category' in call_args
 
 

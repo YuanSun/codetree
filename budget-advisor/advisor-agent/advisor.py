@@ -12,6 +12,12 @@ import logging
 from datetime import datetime
 from typing import Optional
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    print("Warning: python-dotenv not installed. Environment variables will not be loaded from .env file")
+
 import ollama
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
@@ -31,8 +37,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Set log level for MCP client (can be noisy)
+# Set log level for MCP client and server (can be noisy)
 logging.getLogger('mcp').setLevel(logging.WARNING)
+logging.getLogger('asyncio').setLevel(logging.WARNING)
 
 logger.info(f"Logging initialized at {LOG_LEVEL} level")
 
@@ -329,8 +336,7 @@ async def interactive_mode():
     try:
         # Connect to MCP server
         await advisor.connect_to_mcp_server()
-        print("✓ Connected to your expense database")
-        print()
+        print("\n✓ Connected to your expense database\n", flush=True)
 
         # Chat loop
         while True:

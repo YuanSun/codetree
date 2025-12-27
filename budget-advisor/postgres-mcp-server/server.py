@@ -11,6 +11,12 @@ import logging
 from datetime import datetime, timedelta
 from typing import Any, Optional
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    print("Warning: python-dotenv not installed. Environment variables will not be loaded from .env file")
+
 import psycopg2
 from psycopg2 import pool
 from psycopg2.extras import RealDictCursor
@@ -20,7 +26,8 @@ from mcp.server.stdio import stdio_server
 from mcp.types import Tool, TextContent
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, stream=sys.stderr)
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+logging.basicConfig(level=getattr(logging, LOG_LEVEL), format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stderr)
 logger = logging.getLogger(__name__)
 
 # Database configuration from environment variables
@@ -34,7 +41,7 @@ DB_CONFIG = {
 
 # Global connection pool
 connection_pool: Optional[pool.SimpleConnectionPool] = None
-
+logger.info(f'Database config: {DB_CONFIG}')
 
 def init_database():
     """Initialize PostgreSQL connection pool"""
@@ -86,17 +93,14 @@ def execute_query(query: str) -> list[dict[str, Any]]:
 def get_weekly_expenses(weeks_back: int = 0) -> list[dict[str, Any]]:
     """Get total expenses for the current or past weeks, grouped by category"""
     query = f"""
-        SELECT
-            category,
-            SUM(amount) as total_amount,
-            COUNT(*) as transaction_count,
-            DATE_TRUNC('week', date) as week_start
-        FROM expenses
-        WHERE date >= DATE_TRUNC('week', CURRENT_DATE - INTERVAL '{weeks_back} weeks')
-          AND date < DATE_TRUNC('week', CURRENT_DATE - INTERVAL '{weeks_back - 1} weeks')
-        GROUP BY category, DATE_TRUNC('week', date)
-        ORDER BY total_amount DESC;
+        Select "typeName" as category, sum("expense") as total_amount, count(*) as transaction_count, DATE_TRUNC('week', date) as week_start
+        from family_budget.dailyexpensevw
+            where date >= DATE_TRUNC('week', CURRENT_DATE - interval '{weeks_back} weeks')
+            and date < DATE_TRUNC('week', CURRENT_DATE - INTERVAL '{weeks_back - 1} weeks')
+        group by category, DATE_TRUNC('week', date)
+        order by total_amount desc;
     """
+    logger.info("Run weekly expense query")
     return execute_query(query)
 
 
@@ -109,13 +113,13 @@ def get_monthly_summary(month: Optional[str] = None) -> list[dict[str, Any]]:
 
     query = f"""
         SELECT
-            category,
-            SUM(amount) as total_amount,
+            "typeName",
+            SUM(expense) as total_amount,
             COUNT(*) as transaction_count,
-            AVG(amount) as avg_amount,
-            MIN(amount) as min_amount,
-            MAX(amount) as max_amount
-        FROM expenses
+            AVG(expense) as avg_amount,
+            MIN(expense) as min_amount,
+            MAX(expense) as max_amount
+        FROM family_budget.dailyexpensevw
         WHERE {month_condition}
         GROUP BY category
         ORDER BY total_amount DESC;
