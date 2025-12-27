@@ -264,14 +264,14 @@ async def main():
     # Initialize database
     init_database()
 
-    # Create SSE transport
-    sse = SseServerTransport("/messages")
-
     # Run the SSE transport as the ASGI app directly
     logger.info("MCP Server ready to accept connections")
 
     async def handle_sse(scope, receive, send):
         """ASGI application for MCP over SSE"""
+        # Create a new SSE transport for each connection
+        sse = SseServerTransport("/messages")
+
         async with sse.connect_sse(scope, receive, send) as (read, write):
             await app.run(read, write, app.create_initialization_options())
 
