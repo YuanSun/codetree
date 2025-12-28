@@ -264,20 +264,55 @@ async def main():
     # Initialize database
     init_database()
 
-    # Run the SSE transport as the ASGI app directly
+    # Create SSE transport (shared instance for routing)
+    # The endpoint parameter tells the transport where to expect POST messages
+    sse = SseServerTransport("/messages")
+
     logger.info("MCP Server ready to accept connections")
 
-    async def handle_sse(scope, receive, send):
-        """ASGI application for MCP over SSE"""
-        # Create a new SSE transport for each connection
-        sse = SseServerTransport("/messages")
+    async def asgi_app(scope, receive, send):
+        """
+        ASGI application that routes requests to appropriate handlers.
 
-        async with sse.connect_sse(scope, receive, send) as (read, write):
-            await app.run(read, write, app.create_initialization_options())
+        MCP over SSE uses a bidirectional communication pattern:
+        - GET /sse: SSE stream for server → client messages (responses, notifications)
+        - POST /messages: HTTP POST for client → server requests (initialize, tool calls)
 
-    # Run HTTP server with the SSE handler
+        This solves the problem that SSE is unidirectional (server → client only).
+        Client sends requests via POST, receives responses via the SSE stream.
+        """
+        path = scope.get("path", "/")
+        method = scope.get("method", "GET")
+
+        logger.info(f"Incoming request: {method} {path}")
+
+        if method == "GET" and path == "/sse":
+            # Handle SSE connection (server → client stream)
+            logger.info("Handling SSE connection (GET /sse)")
+            async with sse.connect_sse(scope, receive, send) as (read, write):
+                await app.run(read, write, app.create_initialization_options())
+
+        elif method == "POST" and path == "/messages":
+            # Handle incoming message (client → server request)
+            logger.info("Handling POST message (POST /messages)")
+            await sse.handle_post_message(scope, receive, send)
+
+        else:
+            # Unknown endpoint
+            logger.warning(f"Unknown endpoint: {method} {path}")
+            await send({
+                "type": "http.response.start",
+                "status": 404,
+                "headers": [[b"content-type", b"text/plain"]],
+            })
+            await send({
+                "type": "http.response.body",
+                "body": b"Not Found. Use GET /sse or POST /messages",
+            })
+
+    # Run HTTP server with the ASGI router
     config = uvicorn.Config(
-        handle_sse,
+        asgi_app,
         host=SERVER_HOST,
         port=SERVER_PORT,
         log_level="info",
