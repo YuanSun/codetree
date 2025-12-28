@@ -9,12 +9,7 @@ import os
 import sys
 import asyncio
 import logging
-from datetime import datetime, timedelta
-from typing import Any, Optional
-
-import psycopg2
-from psycopg2 import pool
-from psycopg2.extras import RealDictCursor
+from typing import Any
 
 from mcp.server import Server
 from mcp.server.sse import SseServerTransport
@@ -29,6 +24,15 @@ except ImportError:
     logger_initialized = False
     print("Warning: python-dotenv not installed. Environment variables will not be loaded from .env file", file=sys.stderr)
 
+# Import shared database operations
+from db_operations import (
+    init_database,
+    close_all_connections,
+    execute_query,
+    get_weekly_expenses,
+    get_monthly_summary,
+)
+
 # Configure logging
 logging.basicConfig(level=logging.INFO, stream=sys.stderr)
 logger = logging.getLogger(__name__)
@@ -36,100 +40,9 @@ logger = logging.getLogger(__name__)
 if not logger_initialized:
     logger.info("Loading environment from .env file")
 
-# Database configuration from environment variables
-DB_CONFIG = {
-    "host": os.getenv("POSTGRES_HOST", "localhost"),
-    "port": int(os.getenv("POSTGRES_PORT", "5432")),
-    "database": os.getenv("POSTGRES_DB", "budget"),
-    "user": os.getenv("POSTGRES_USER", "postgres"),
-    "password": os.getenv("POSTGRES_PASSWORD", ""),
-}
-
 # Server configuration
 SERVER_HOST = os.getenv("SERVER_HOST", "0.0.0.0")
 SERVER_PORT = int(os.getenv("SERVER_PORT", "8080"))
-
-# Connection pool
-connection_pool = None
-
-
-def init_database():
-    """Initialize database connection pool"""
-    global connection_pool
-    try:
-        connection_pool = pool.SimpleConnectionPool(
-            1,  # minconn
-            10,  # maxconn
-            **DB_CONFIG
-        )
-        logger.info("Database connection pool initialized")
-    except Exception as e:
-        logger.error(f"Failed to initialize database pool: {e}")
-        raise
-
-
-def get_db_connection():
-    """Get a connection from the pool"""
-    return connection_pool.getconn()
-
-
-def release_db_connection(conn):
-    """Return a connection to the pool"""
-    connection_pool.putconn(conn)
-
-
-def execute_query(query: str) -> list[dict[str, Any]]:
-    """Execute a SELECT query and return results"""
-    # Security: Only allow SELECT queries
-    if not query.strip().upper().startswith("SELECT"):
-        raise ValueError("Only SELECT queries are allowed")
-
-    conn = get_db_connection()
-    try:
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute(query)
-            results = cur.fetchall()
-            return [dict(row) for row in results]
-    finally:
-        release_db_connection(conn)
-
-
-def get_weekly_expenses(weeks_back: int = 0) -> list[dict[str, Any]]:
-    """Get total expenses for the current or past weeks, grouped by category"""
-    query = f"""
-        Select "typeName" as category, sum("expense_numeric") as total_amount, count(*) as transaction_count, DATE_TRUNC('week', date) as week_start
-        from family_budget.dailyexpensevw
-            where date >= DATE_TRUNC('week', CURRENT_DATE - interval '{weeks_back} weeks')
-            and date < DATE_TRUNC('week', CURRENT_DATE - INTERVAL '{weeks_back - 1} weeks')
-        group by category, DATE_TRUNC('week', date)
-        order by total_amount desc;
-    """
-    logger.info("Run weekly expense query")
-    return execute_query(query)
-
-
-def get_monthly_summary(month: Optional[str] = None) -> list[dict[str, Any]]:
-    """Get monthly expense summary with totals by category"""
-    if month:
-        month_condition = f"DATE_TRUNC('month', date) = DATE_TRUNC('month', '{month}-01'::date)"
-    else:
-        month_condition = "DATE_TRUNC('month', date) = DATE_TRUNC('month', CURRENT_DATE)"
-
-    query = f"""
-        SELECT
-            "typeName" as category,
-            SUM(expense_numeric) as total_amount,
-            COUNT(*) as transaction_count,
-            AVG(expense_numeric)::numeric(10, 2) as avg_amount,
-            MIN(expense_numeric) as min_amount,
-            MAX(expense_numeric) as max_amount
-        FROM family_budget.dailyexpensevw
-        WHERE {month_condition}
-        GROUP BY category
-        ORDER BY total_amount DESC;
-    """
-    return execute_query(query)
-
 
 # Create MCP server instance
 app = Server("budget-advisor-postgres")
@@ -287,6 +200,4 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         logger.info("Server stopped by user")
     finally:
-        if connection_pool:
-            connection_pool.closeall()
-            logger.info("Database connections closed")
+        close_all_connections()

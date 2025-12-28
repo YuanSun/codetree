@@ -1,0 +1,145 @@
+"""
+Shared database operations for Budget Advisor MCP Server.
+Contains database connection pooling and query functions used by both
+stdio (server.py) and HTTP (server_http.py) MCP servers.
+"""
+
+import os
+import logging
+from typing import Any, Optional
+from psycopg2 import pool
+from psycopg2.extras import RealDictCursor
+
+logger = logging.getLogger(__name__)
+
+# Database configuration from environment variables
+DB_CONFIG = {
+    "host": os.getenv("POSTGRES_HOST", "localhost"),
+    "port": int(os.getenv("POSTGRES_PORT", "5432")),
+    "database": os.getenv("POSTGRES_DB", "budget"),
+    "user": os.getenv("POSTGRES_USER", "postgres"),
+    "password": os.getenv("POSTGRES_PASSWORD", ""),
+}
+
+# Connection pool (initialized by init_database)
+connection_pool = None
+
+
+def init_database():
+    """Initialize database connection pool"""
+    global connection_pool
+    try:
+        connection_pool = pool.SimpleConnectionPool(
+            1,  # minconn
+            10,  # maxconn
+            **DB_CONFIG
+        )
+        logger.info("Database connection pool initialized")
+    except Exception as e:
+        logger.error(f"Failed to initialize database pool: {e}")
+        raise
+
+
+def get_connection():
+    """Get a connection from the pool"""
+    if connection_pool is None:
+        raise RuntimeError("Database pool not initialized. Call init_database() first.")
+    return connection_pool.getconn()
+
+
+def release_connection(conn):
+    """Return a connection to the pool"""
+    if connection_pool is not None:
+        connection_pool.putconn(conn)
+
+
+def close_all_connections():
+    """Close all database connections in the pool"""
+    global connection_pool
+    if connection_pool:
+        connection_pool.closeall()
+        logger.info("Database connections closed")
+        connection_pool = None
+
+
+def execute_query(query: str) -> list[dict[str, Any]]:
+    """
+    Execute a SELECT query and return results.
+
+    Args:
+        query: SQL query to execute (only SELECT queries allowed)
+
+    Returns:
+        List of dictionaries representing query results
+
+    Raises:
+        ValueError: If query is not a SELECT statement
+    """
+    # Security: Only allow SELECT queries
+    if not query.strip().upper().startswith("SELECT"):
+        raise ValueError("Only SELECT queries are allowed")
+
+    conn = None
+    try:
+        conn = get_connection()
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(query)
+            results = cursor.fetchall()
+            # Convert RealDictRow to regular dict
+            return [dict(row) for row in results]
+    finally:
+        if conn:
+            release_connection(conn)
+
+
+def get_weekly_expenses(weeks_back: int = 0) -> list[dict[str, Any]]:
+    """
+    Get total expenses for the current or past weeks, grouped by category.
+
+    Args:
+        weeks_back: Number of weeks back from current week (0 = current week, 1 = last week, etc.)
+
+    Returns:
+        List of expense records with category, total_amount, transaction_count, and week_start
+    """
+    query = f"""
+        Select "typeName" as category, sum("expense_numeric") as total_amount, count(*) as transaction_count, DATE_TRUNC('week', date) as week_start
+        from family_budget.dailyexpensevw
+            where date >= DATE_TRUNC('week', CURRENT_DATE - interval '{weeks_back} weeks')
+            and date < DATE_TRUNC('week', CURRENT_DATE - INTERVAL '{weeks_back - 1} weeks')
+        group by category, DATE_TRUNC('week', date)
+        order by total_amount desc;
+    """
+    logger.info("Run weekly expense query")
+    return execute_query(query)
+
+
+def get_monthly_summary(month: Optional[str] = None) -> list[dict[str, Any]]:
+    """
+    Get monthly expense summary with totals by category.
+
+    Args:
+        month: Month in YYYY-MM format (e.g., '2024-07'). If not provided, uses current month.
+
+    Returns:
+        List of expense summaries with category, total_amount, transaction_count, avg_amount, min_amount, max_amount
+    """
+    if month:
+        month_condition = f"DATE_TRUNC('month', date) = DATE_TRUNC('month', '{month}-01'::date)"
+    else:
+        month_condition = "DATE_TRUNC('month', date) = DATE_TRUNC('month', CURRENT_DATE)"
+
+    query = f"""
+        SELECT
+            "typeName" as category,
+            SUM(expense_numeric) as total_amount,
+            COUNT(*) as transaction_count,
+            AVG(expense_numeric)::numeric(10, 2) as avg_amount,
+            MIN(expense_numeric) as min_amount,
+            MAX(expense_numeric) as max_amount
+        FROM family_budget.dailyexpensevw
+        WHERE {month_condition}
+        GROUP BY category
+        ORDER BY total_amount DESC;
+    """
+    return execute_query(query)
