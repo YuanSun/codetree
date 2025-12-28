@@ -4,13 +4,18 @@ This guide shows you how to manually test the Budget Advisor HTTP MCP server.
 
 ## Prerequisites
 
-1. Start the HTTP MCP server:
+1. Configure the server port (optional):
+   - Copy `.env.example` to `.env`: `cp .env.example .env`
+   - Edit `.env` and set `SERVER_PORT` to your desired port (default: 8080)
+   - Example: `SERVER_PORT=8888` if port 8080 is already in use
+
+2. Start the HTTP MCP server:
    ```bash
    cd budget-advisor/postgres-mcp-server
    python3.11 server_http.py
    ```
 
-2. Make sure the server is running on `http://localhost:8080`
+3. Note the port number from the server logs (default: `http://localhost:8080`)
 
 ## Testing Methods
 

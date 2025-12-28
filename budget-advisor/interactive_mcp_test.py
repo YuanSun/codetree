@@ -5,16 +5,25 @@ Allows you to call MCP tools interactively.
 """
 
 import asyncio
+import os
 import sys
 import json
 from mcp import ClientSession
 from mcp.client.sse import sse_client
 
+# Load environment variables
+try:
+    from dotenv import load_dotenv
+    load_dotenv("postgres-mcp-server/.env")
+except ImportError:
+    pass
+
 
 async def interactive_test():
     """Interactive MCP testing."""
 
-    server_url = "http://localhost:8080"
+    server_port = os.getenv("SERVER_PORT", "8080")
+    server_url = f"http://localhost:{server_port}"
 
     print(f"🔗 Connecting to MCP server at {server_url}...")
 
