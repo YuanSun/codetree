@@ -5,15 +5,24 @@ Tests the server by connecting as an MCP client and calling tools.
 """
 
 import asyncio
+import os
 import sys
 from mcp import ClientSession
 from mcp.client.sse import sse_client
+
+# Load environment variables
+try:
+    from dotenv import load_dotenv
+    load_dotenv("postgres-mcp-server/.env")
+except ImportError:
+    pass
 
 
 async def test_mcp_server():
     """Test the HTTP MCP server by connecting and calling tools."""
 
-    server_url = "http://localhost:8080"
+    server_port = os.getenv("SERVER_PORT", "8080")
+    server_url = f"http://localhost:{server_port}"
 
     print(f"Connecting to MCP server at {server_url}...")
 

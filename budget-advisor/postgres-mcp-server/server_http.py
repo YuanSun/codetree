@@ -46,8 +46,8 @@ DB_CONFIG = {
 }
 
 # Server configuration
-SERVER_HOST = os.getenv("MCP_SERVER_HOST", "0.0.0.0")
-SERVER_PORT = int(os.getenv("MCP_SERVER_PORT", "8080"))
+SERVER_HOST = os.getenv("SERVER_HOST", "0.0.0.0")
+SERVER_PORT = int(os.getenv("SERVER_PORT", "8080"))
 
 # Connection pool
 connection_pool = None
