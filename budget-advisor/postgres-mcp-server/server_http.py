@@ -95,80 +95,40 @@ def execute_query(query: str) -> list[dict[str, Any]]:
 
 
 def get_weekly_expenses(weeks_back: int = 0) -> list[dict[str, Any]]:
-    """Get weekly expense summary by category"""
-    # Calculate the start and end of the target week
-    today = datetime.now().date()
-    start_of_week = today - timedelta(days=today.weekday() + (weeks_back * 7))
-    end_of_week = start_of_week + timedelta(days=6)
-
-    query = """
-        SELECT
-            category,
-            SUM(amount) as total_amount,
-            COUNT(*) as transaction_count,
-            AVG(amount) as avg_amount
-        FROM expenses
-        WHERE date >= %s AND date <= %s
-        GROUP BY category
-        ORDER BY total_amount DESC
+    """Get total expenses for the current or past weeks, grouped by category"""
+    query = f"""
+        Select "typeName" as category, sum("expense_numeric") as total_amount, count(*) as transaction_count, DATE_TRUNC('week', date) as week_start
+        from family_budget.dailyexpensevw
+            where date >= DATE_TRUNC('week', CURRENT_DATE - interval '{weeks_back} weeks')
+            and date < DATE_TRUNC('week', CURRENT_DATE - INTERVAL '{weeks_back - 1} weeks')
+        group by category, DATE_TRUNC('week', date)
+        order by total_amount desc;
     """
-
-    conn = get_db_connection()
-    try:
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute(query, (start_of_week, end_of_week))
-            results = cur.fetchall()
-            return [dict(row) for row in results]
-    finally:
-        release_db_connection(conn)
+    logger.info("Run weekly expense query")
+    return execute_query(query)
 
 
 def get_monthly_summary(month: Optional[str] = None) -> list[dict[str, Any]]:
-    """Get monthly expense summary by category"""
+    """Get monthly expense summary with totals by category"""
     if month:
-        # Parse YYYY-MM format
-        try:
-            year, month_num = map(int, month.split("-"))
-            start_date = datetime(year, month_num, 1).date()
-            # Calculate last day of month
-            if month_num == 12:
-                end_date = datetime(year + 1, 1, 1).date() - timedelta(days=1)
-            else:
-                end_date = datetime(year, month_num + 1, 1).date() - timedelta(days=1)
-        except (ValueError, AttributeError):
-            raise ValueError("Month must be in YYYY-MM format")
+        month_condition = f"DATE_TRUNC('month', date) = DATE_TRUNC('month', '{month}-01'::date)"
     else:
-        # Current month
-        today = datetime.now().date()
-        start_date = today.replace(day=1)
-        # Last day of current month
-        if today.month == 12:
-            end_date = datetime(today.year + 1, 1, 1).date() - timedelta(days=1)
-        else:
-            end_date = today.replace(month=today.month + 1, day=1) - timedelta(days=1)
+        month_condition = "DATE_TRUNC('month', date) = DATE_TRUNC('month', CURRENT_DATE)"
 
-    query = """
+    query = f"""
         SELECT
-            category,
-            SUM(amount) as total_amount,
+            "typeName" as category,
+            SUM(expense_numeric) as total_amount,
             COUNT(*) as transaction_count,
-            AVG(amount) as avg_amount,
-            MIN(amount) as min_amount,
-            MAX(amount) as max_amount
-        FROM expenses
-        WHERE date >= %s AND date <= %s
+            AVG(expense_numeric)::numeric(10, 2) as avg_amount,
+            MIN(expense_numeric) as min_amount,
+            MAX(expense_numeric) as max_amount
+        FROM family_budget.dailyexpensevw
+        WHERE {month_condition}
         GROUP BY category
-        ORDER BY total_amount DESC
+        ORDER BY total_amount DESC;
     """
-
-    conn = get_db_connection()
-    try:
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute(query, (start_date, end_date))
-            results = cur.fetchall()
-            return [dict(row) for row in results]
-    finally:
-        release_db_connection(conn)
+    return execute_query(query)
 
 
 # Create MCP server instance
