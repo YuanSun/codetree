@@ -609,6 +609,29 @@ async def weekly_advice_mode():
         await advisor.close()
 
 
+async def prompt_mode(prompt: str):
+    """One-time prompt mode for programmatic access"""
+    advisor = BudgetAdvisor()
+
+    try:
+        # Connect to MCP server
+        await advisor.connect_to_mcp_server()
+
+        # Process the prompt
+        answer = await advisor.answer_question(prompt)
+
+        # Output only the answer (for easy parsing by caller)
+        print(answer)
+
+    except Exception as e:
+        logger.error(f"Error processing prompt: {e}")
+        import traceback
+        traceback.print_exc(file=sys.stderr)
+        sys.exit(1)
+    finally:
+        await advisor.close()
+
+
 def main():
     """Main entry point"""
     import argparse
@@ -620,10 +643,18 @@ def main():
         default='interactive',
         help='Mode to run: interactive chat or one-time weekly advice (default: interactive)'
     )
+    parser.add_argument(
+        '--prompt',
+        type=str,
+        help='Process a single prompt and exit (for programmatic access)'
+    )
 
     args = parser.parse_args()
 
-    if args.mode == 'interactive':
+    # Prompt mode takes precedence
+    if args.prompt:
+        asyncio.run(prompt_mode(args.prompt))
+    elif args.mode == 'interactive':
         asyncio.run(interactive_mode())
     else:
         asyncio.run(weekly_advice_mode())
