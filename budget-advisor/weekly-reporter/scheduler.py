@@ -6,7 +6,6 @@ Runs weekly expense reports on a schedule (e.g., every Monday morning).
 
 import os
 import sys
-import asyncio
 import logging
 from datetime import datetime
 import schedule
@@ -52,9 +51,12 @@ class ReportScheduler:
         logger.info(f"⏰ Scheduled report triggered at {datetime.now()}")
 
         try:
-            # Run the async reporter in a new event loop
-            asyncio.run(self.reporter.run_once())
-            logger.info("✅ Scheduled report completed successfully")
+            # Run the reporter (now synchronous)
+            success = self.reporter.send_weekly_report()
+            if success:
+                logger.info("✅ Scheduled report completed successfully")
+            else:
+                logger.error("❌ Scheduled report failed")
         except Exception as e:
             logger.error(f"❌ Scheduled report failed: {e}", exc_info=True)
 
