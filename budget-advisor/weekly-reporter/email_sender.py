@@ -55,7 +55,10 @@ class EmailSender:
         Send weekly expense report via email.
 
         Args:
-            to_email: Recipient email address
+            to_email: Recipient email address(es). Can be:
+                     - Single email: "user@example.com"
+                     - Multiple emails: "user1@example.com, user2@example.com"
+                     - Semicolon-separated: "user1@example.com; user2@example.com"
             subject: Email subject
             analysis: Analysis text from advisor agent
             week_info: Optional week information to include
@@ -64,11 +67,19 @@ class EmailSender:
             True if email sent successfully, False otherwise
         """
         try:
+            # Parse multiple email addresses
+            # Support both comma and semicolon separated
+            recipients = self._parse_email_addresses(to_email)
+
+            if not recipients:
+                logger.error("No valid email addresses provided")
+                return False
+
             # Create message
             msg = MIMEMultipart('alternative')
             msg['Subject'] = subject
             msg['From'] = self.from_email
-            msg['To'] = to_email
+            msg['To'] = ', '.join(recipients)  # Display all recipients in To field
             msg['Date'] = datetime.now().strftime('%a, %d %b %Y %H:%M:%S %z')
 
             # Create body
@@ -82,7 +93,10 @@ class EmailSender:
             msg.attach(part2)
 
             # Send email
-            logger.info(f"Sending email to {to_email}...")
+            if len(recipients) == 1:
+                logger.info(f"Sending email to {recipients[0]}...")
+            else:
+                logger.info(f"Sending email to {len(recipients)} recipients: {', '.join(recipients)}")
 
             if self.use_tls:
                 # TLS connection (port 587)
@@ -96,12 +110,44 @@ class EmailSender:
                     server.login(self.smtp_user, self.smtp_password)
                     server.send_message(msg)
 
-            logger.info(f"✓ Email sent successfully to {to_email}")
+            if len(recipients) == 1:
+                logger.info(f"✓ Email sent successfully to {recipients[0]}")
+            else:
+                logger.info(f"✓ Email sent successfully to {len(recipients)} recipients")
             return True
 
         except Exception as e:
             logger.error(f"Failed to send email: {e}")
             return False
+
+    def _parse_email_addresses(self, email_string: str) -> list[str]:
+        """
+        Parse email addresses from a string.
+        Supports comma-separated and semicolon-separated formats.
+
+        Args:
+            email_string: Email address(es) as string
+
+        Returns:
+            List of email addresses
+        """
+        import re
+
+        # Split by comma or semicolon
+        emails = re.split(r'[,;]', email_string)
+
+        # Clean up whitespace and filter empty strings
+        emails = [email.strip() for email in emails if email.strip()]
+
+        # Basic validation - check for @ symbol
+        valid_emails = []
+        for email in emails:
+            if '@' in email and '.' in email:
+                valid_emails.append(email)
+            else:
+                logger.warning(f"Skipping invalid email address: {email}")
+
+        return valid_emails
 
     def _create_text_body(self, analysis: str, week_info: Optional[str] = None) -> str:
         """Create plain text email body"""
