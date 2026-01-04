@@ -117,10 +117,93 @@ class EmailSender:
 
         return body
 
+    def _markdown_to_html(self, text: str) -> str:
+        """
+        Convert common markdown formatting to HTML.
+        Handles: **bold**, *italic*, numbered lists, bullet lists, headers
+        """
+        import re
+
+        # Escape HTML characters first
+        text = text.replace('&', '&amp;')
+        text = text.replace('<', '&lt;')
+        text = text.replace('>', '&gt;')
+
+        # Convert headers (# Header, ## Header, etc.)
+        text = re.sub(r'^### (.+)$', r'<h3>\1</h3>', text, flags=re.MULTILINE)
+        text = re.sub(r'^## (.+)$', r'<h2>\1</h2>', text, flags=re.MULTILINE)
+        text = re.sub(r'^# (.+)$', r'<h1>\1</h1>', text, flags=re.MULTILINE)
+
+        # Convert **bold** to <strong>
+        text = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
+
+        # Convert *italic* to <em>
+        text = re.sub(r'\*(.+?)\*', r'<em>\1</em>', text)
+
+        # Convert bullet lists (- item or * item) and numbered lists
+        lines = text.split('\n')
+        in_list = False
+        list_type = None  # Track whether we're in 'ul' or 'ol'
+        result_lines = []
+
+        for line in lines:
+            # Check if line is a bullet point
+            if re.match(r'^[\-\*]\s+', line):
+                if not in_list or list_type != 'ul':
+                    # Close previous list if different type
+                    if in_list and list_type == 'ol':
+                        result_lines.append('</ol>')
+                    if not in_list or list_type != 'ul':
+                        result_lines.append('<ul>')
+                        in_list = True
+                        list_type = 'ul'
+                # Remove the bullet marker and wrap in <li>
+                item = re.sub(r'^[\-\*]\s+', '', line)
+                result_lines.append(f'  <li>{item}</li>')
+            # Check if line is a numbered list
+            elif re.match(r'^\d+\.\s+', line):
+                if not in_list or list_type != 'ol':
+                    # Close previous list if different type
+                    if in_list and list_type == 'ul':
+                        result_lines.append('</ul>')
+                    if not in_list or list_type != 'ol':
+                        result_lines.append('<ol>')
+                        in_list = True
+                        list_type = 'ol'
+                # Remove the number and wrap in <li>
+                item = re.sub(r'^\d+\.\s+', '', line)
+                result_lines.append(f'  <li>{item}</li>')
+            else:
+                # Not a list item
+                if in_list:
+                    result_lines.append(f'</{list_type}>')
+                    in_list = False
+                    list_type = None
+                result_lines.append(line)
+
+        # Close any open list
+        if in_list:
+            result_lines.append(f'</{list_type}>')
+
+        text = '\n'.join(result_lines)
+
+        # Convert double newlines to paragraph breaks
+        text = re.sub(r'\n\n+', '</p><p>', text)
+        text = f'<p>{text}</p>'
+
+        # Convert single newlines to <br> (but not inside lists or headers)
+        text = re.sub(r'(?<!</li>)\n(?!<)', '<br>', text)
+
+        # Clean up empty paragraphs
+        text = re.sub(r'<p>\s*</p>', '', text)
+        text = re.sub(r'<p>\s*<br>\s*</p>', '', text)
+
+        return text
+
     def _create_html_body(self, analysis: str, week_info: Optional[str] = None) -> str:
         """Create HTML email body"""
-        # Convert plain text analysis to HTML with basic formatting
-        analysis_html = analysis.replace('\n', '<br>')
+        # Convert markdown analysis to HTML with proper formatting
+        analysis_html = self._markdown_to_html(analysis)
 
         html = f"""
         <html>
@@ -152,6 +235,38 @@ class EmailSender:
                 padding: 20px;
                 border-radius: 5px;
                 box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+              }}
+              .analysis h1 {{
+                color: #2E7D32;
+                font-size: 24px;
+                margin-top: 20px;
+                margin-bottom: 10px;
+              }}
+              .analysis h2 {{
+                color: #388E3C;
+                font-size: 20px;
+                margin-top: 15px;
+                margin-bottom: 8px;
+              }}
+              .analysis h3 {{
+                color: #43A047;
+                font-size: 18px;
+                margin-top: 12px;
+                margin-bottom: 6px;
+              }}
+              .analysis ul, .analysis ol {{
+                margin: 10px 0;
+                padding-left: 25px;
+              }}
+              .analysis li {{
+                margin: 5px 0;
+              }}
+              .analysis strong {{
+                color: #1B5E20;
+                font-weight: 600;
+              }}
+              .analysis p {{
+                margin: 10px 0;
               }}
               .footer {{
                 text-align: center;
