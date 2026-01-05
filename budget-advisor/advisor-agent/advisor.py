@@ -200,7 +200,8 @@ Rules:
 - Today is {datetime.now().strftime("%Y-%m-%d")}, current year is {datetime.now().year}
 - Convert month names to YYYY-MM: "July" -> "2024-07", "last month" -> calculate it
 - If "this week" or "this month" -> set current_period: true
-- If comparing (vs, compare, versus) -> is_comparison: true
+- If comparing (vs, versus, compare, comparing, "this week versus last week", "current vs previous") -> is_comparison: true
+- If mentions BOTH current and previous period (e.g., "this week and last week") -> is_comparison: true
 
 Examples:
 Q: "Compare July and August expenses"
@@ -211,6 +212,12 @@ A: {{"months": [], "categories": ["Food"], "time_scope": "week", "is_comparison"
 
 Q: "What did I spend last month?"
 A: {{"months": ["2024-11"], "categories": null, "time_scope": "month", "is_comparison": false, "current_period": false}}
+
+Q: "Compare this week versus last week"
+A: {{"months": [], "categories": null, "time_scope": "week", "is_comparison": true, "current_period": true}}
+
+Q: "Weekly expense report comparing THIS WEEK versus LAST WEEK"
+A: {{"months": [], "categories": null, "time_scope": "week", "is_comparison": true, "current_period": true}}
 
 ONLY output the JSON, nothing else."""
 
@@ -263,6 +270,12 @@ ONLY output the JSON, nothing else."""
                     logger.debug("Fetching current week data")
                     weekly_data = await self.get_weekly_expenses(weeks_back=0)
                     data_context.append(("CURRENT WEEK", self._format_weekly_data(weekly_data)))
+
+                    # If this is a comparison query for weekly data, also fetch previous week
+                    if params.get("is_comparison"):
+                        logger.debug("Comparison requested - also fetching previous week data")
+                        prev_weekly_data = await self.get_weekly_expenses(weeks_back=1)
+                        data_context.append(("PREVIOUS WEEK", self._format_weekly_data(prev_weekly_data)))
                 else:  # month
                     logger.debug("Fetching current month data")
                     monthly_data = await self.get_monthly_summary()
