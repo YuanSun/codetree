@@ -70,15 +70,24 @@ class WeeklyReporter:
         week_info = f"Week of {week_start.strftime('%B %d')} - {week_end.strftime('%B %d, %Y')}"
 
         # Prompt for the advisor agent
-        prompt = """Please provide a weekly expense report with the following:
+        # Be explicit about fetching BOTH current and previous week data
+        prompt = """Please provide a weekly expense report comparing THIS WEEK versus LAST WEEK.
 
+Fetch data for:
+- Current week (this week's expenses)
+- Previous week (last week's expenses for comparison)
+
+Include in your report:
 1. Total spending for this week
-2. Breakdown by category with amounts and transaction counts
-3. Comparison with previous week if data is available
+2. Breakdown by category with amounts and transaction counts (as a table)
+3. Comparison with previous week showing:
+   - Total spending change (amount and percentage)
+   - Category-by-category comparison
+   - Which categories increased or decreased
 4. Any unusual or noteworthy spending patterns
-5. Recommendations and advice for managing expenses next week
+5. Specific recommendations and advice for managing expenses next week
 
-Please be concise but informative."""
+Please format the spending breakdown as a markdown table for easy reading."""
 
         try:
             # Call advisor.py with the prompt
