@@ -166,7 +166,7 @@ class EmailSender:
     def _markdown_to_html(self, text: str) -> str:
         """
         Convert common markdown formatting to HTML.
-        Handles: **bold**, *italic*, numbered lists, bullet lists, headers
+        Handles: **bold**, *italic*, numbered lists, bullet lists, headers, tables
         """
         import re
 
@@ -174,6 +174,12 @@ class EmailSender:
         text = text.replace('&', '&amp;')
         text = text.replace('<', '&lt;')
         text = text.replace('>', '&gt;')
+
+        # Remove orphaned trailing asterisks (not paired for italic/bold)
+        text = re.sub(r'\*(\s*)$', r'\1', text, flags=re.MULTILINE)
+
+        # Convert markdown tables to HTML tables
+        text = self._convert_tables(text)
 
         # Convert headers (# Header, ## Header, etc.)
         text = re.sub(r'^### (.+)$', r'<h3>\1</h3>', text, flags=re.MULTILINE)
@@ -183,8 +189,8 @@ class EmailSender:
         # Convert **bold** to <strong>
         text = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
 
-        # Convert *italic* to <em>
-        text = re.sub(r'\*(.+?)\*', r'<em>\1</em>', text)
+        # Convert *italic* to <em> (only matched pairs)
+        text = re.sub(r'\*([^\*\n]+?)\*', r'<em>\1</em>', text)
 
         # Convert bullet lists (- item or * item) and numbered lists
         lines = text.split('\n')
@@ -192,9 +198,15 @@ class EmailSender:
         list_type = None  # Track whether we're in 'ul' or 'ol'
         result_lines = []
 
-        for line in lines:
-            # Check if line is a bullet point
-            if re.match(r'^[\-\*]\s+', line):
+        for i, line in enumerate(lines):
+            stripped = line.strip()
+
+            # Skip completely empty lines inside lists
+            if not stripped and in_list:
+                continue
+
+            # Check if line is a bullet point (including indented)
+            if re.match(r'^\s*[\-\*]\s+', line):
                 if not in_list or list_type != 'ul':
                     # Close previous list if different type
                     if in_list and list_type == 'ol':
@@ -204,7 +216,7 @@ class EmailSender:
                         in_list = True
                         list_type = 'ul'
                 # Remove the bullet marker and wrap in <li>
-                item = re.sub(r'^[\-\*]\s+', '', line)
+                item = re.sub(r'^\s*[\-\*]\s+', '', line)
                 result_lines.append(f'  <li>{item}</li>')
             # Check if line is a numbered list
             elif re.match(r'^\d+\.\s+', line):
@@ -225,7 +237,9 @@ class EmailSender:
                     result_lines.append(f'</{list_type}>')
                     in_list = False
                     list_type = None
-                result_lines.append(line)
+                # Only add non-empty lines or lines between content
+                if stripped or (result_lines and not result_lines[-1].startswith('</')):
+                    result_lines.append(line)
 
         # Close any open list
         if in_list:
@@ -237,14 +251,99 @@ class EmailSender:
         text = re.sub(r'\n\n+', '</p><p>', text)
         text = f'<p>{text}</p>'
 
-        # Convert single newlines to <br> (but not inside lists or headers)
-        text = re.sub(r'(?<!</li>)\n(?!<)', '<br>', text)
+        # Convert remaining single newlines to <br>
+        text = text.replace('\n', '<br>\n')
 
-        # Clean up empty paragraphs
+        # Clean up empty paragraphs and extra breaks
         text = re.sub(r'<p>\s*</p>', '', text)
         text = re.sub(r'<p>\s*<br>\s*</p>', '', text)
 
+        # Remove ALL breaks around block-level elements (tables, lists, etc.)
+        # This is more aggressive but ensures clean HTML
+        block_tags = ['ul', 'ol', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'li', 'h1', 'h2', 'h3']
+        for tag in block_tags:
+            # Remove <br> before opening tags
+            text = re.sub(rf'<br>\s*<{tag}[>\s]', rf'<{tag}>', text)
+            text = re.sub(rf'<br>\s*<{tag}>', rf'<{tag}>', text)
+            # Remove <br> after closing tags
+            text = re.sub(rf'</{tag}>\s*<br>', rf'</{tag}>', text)
+
+        # Remove <br> after any closing tag followed by whitespace and another tag
+        text = re.sub(r'(<[^>]+>)\s*<br>\s*\n\s*(<[^>]+>)', r'\1\n\2', text)
+
+        # Remove excessive whitespace and breaks
+        text = re.sub(r'(<br>\s*){2,}', '<br>', text)  # Multiple consecutive <br> to single
+
         return text
+
+    def _convert_tables(self, text: str) -> str:
+        """
+        Convert markdown tables to HTML tables.
+
+        Example markdown table:
+        | Header 1 | Header 2 |
+        |----------|----------|
+        | Cell 1   | Cell 2   |
+        """
+        import re
+
+        lines = text.split('\n')
+        result_lines = []
+        in_table = False
+        table_rows = []
+
+        for i, line in enumerate(lines):
+            # Check if this line looks like a table row (contains pipes)
+            if '|' in line and line.strip().startswith('|'):
+                # Check if next line is a separator (|----|)
+                is_header = False
+                if i + 1 < len(lines):
+                    next_line = lines[i + 1].strip()
+                    if re.match(r'^\|[\s\-\|:]+\|$', next_line):
+                        is_header = True
+
+                if not in_table:
+                    # Start a new table
+                    in_table = True
+                    table_rows = []
+                    result_lines.append('<table>')
+
+                # Parse the row
+                cells = [cell.strip() for cell in line.split('|')[1:-1]]  # Remove first/last empty
+
+                if is_header:
+                    # This is a header row
+                    result_lines.append('  <thead>')
+                    result_lines.append('    <tr>')
+                    for cell in cells:
+                        result_lines.append(f'      <th>{cell}</th>')
+                    result_lines.append('    </tr>')
+                    result_lines.append('  </thead>')
+                    result_lines.append('  <tbody>')
+                elif re.match(r'^[\s\-\|:]+$', line.strip()):
+                    # This is a separator line, skip it
+                    continue
+                else:
+                    # This is a data row
+                    result_lines.append('    <tr>')
+                    for cell in cells:
+                        result_lines.append(f'      <td>{cell}</td>')
+                    result_lines.append('    </tr>')
+            else:
+                # Not a table row
+                if in_table:
+                    # Close the table
+                    result_lines.append('  </tbody>')
+                    result_lines.append('</table>')
+                    in_table = False
+                result_lines.append(line)
+
+        # Close table if still open
+        if in_table:
+            result_lines.append('  </tbody>')
+            result_lines.append('</table>')
+
+        return '\n'.join(result_lines)
 
     def _create_html_body(self, analysis: str, week_info: Optional[str] = None) -> str:
         """Create HTML email body"""
@@ -313,6 +412,32 @@ class EmailSender:
               }}
               .analysis p {{
                 margin: 10px 0;
+              }}
+              .analysis table {{
+                width: 100%;
+                border-collapse: collapse;
+                margin: 15px 0;
+                background-color: white;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+              }}
+              .analysis table th {{
+                background-color: #4CAF50;
+                color: white;
+                padding: 12px;
+                text-align: left;
+                font-weight: 600;
+                border: 1px solid #45a049;
+              }}
+              .analysis table td {{
+                padding: 10px 12px;
+                border: 1px solid #ddd;
+                color: #333;
+              }}
+              .analysis table tr:nth-child(even) {{
+                background-color: #f9f9f9;
+              }}
+              .analysis table tr:hover {{
+                background-color: #f1f1f1;
               }}
               .footer {{
                 text-align: center;
