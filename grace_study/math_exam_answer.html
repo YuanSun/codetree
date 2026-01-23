@@ -3,83 +3,93 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Answer Key</title>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <title>Answer Key: Berry Business</title>
     <style>
         body {
             font-family: sans-serif;
             max-width: 800px;
             margin: 40px auto;
             padding: 20px;
-            background: #f9f9f9;
+            line-height: 1.6;
         }
 
-        .key-item {
-            background: white;
-            padding: 20px;
+        .answer-block {
             border-bottom: 1px solid #ddd;
-            margin-bottom: 15px;
-            border-radius: 5px;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
         }
 
         .answer {
             color: #d35400;
             font-weight: bold;
-            margin-top: 10px;
-            display: block;
+        }
+
+        .calc {
+            background: #f4f4f4;
+            padding: 10px;
+            font-family: monospace;
+            border-radius: 4px;
         }
     </style>
 </head>
 
 <body>
-    <h1>Answer Key</h1>
+    <h1>Case Study Answer Key</h1>
 
-    <div class="key-item">
-        <strong>1. Fractions</strong>
-        <p>Convert to common denominator (12):</p>
-        <ul>
-            <li>$$ \frac{2}{3} = \frac{8}{12} $$</li>
-            <li>$$ \frac{3}{4} = \frac{9}{12} $$</li>
-            <li>$$ \frac{7}{12} = \frac{7}{12} $$</li>
-        </ul>
-        <span class="answer">Order: $$ \frac{7}{12}, \frac{2}{3}, \frac{3}{4} $$</span>
+    <div class="answer-block">
+        <h3>Q1: Unit Prices</h3>
+        <div class="calc">
+            Strawberries: $12.50 ÷ 2.5 = $5.00 / kg<br>
+            Spinach: $6.40 ÷ 0.8 = $8.00 / kg<br>
+            Orange Juice: $4.50 ÷ 1.5 = $3.00 / Liter<br>
+            Coconut Water: $8.00 ÷ 2.0 = $4.00 / Liter
+        </div>
     </div>
 
-    <div class="key-item">
-        <strong>2. Mystery Number</strong>
-        <p>Square numbers between 20 and 50 are: 25, 36, 49.</p>
-        <p>Must be ODD: 25 or 49.</p>
-        <span class="answer">Answer: 25 OR 49</span>
+    <div class="answer-block">
+        <h3>Q2: Batch Cost (Sunrise Zing)</h3>
+        <p>Recipe A Ingredients:</p>
+        <div class="calc">
+            Strawberries: 0.5 kg × $5.00 = $2.50<br>
+            Orange Juice: 0.2 L × $3.00 = $0.60<br>
+            Banana: 1 × $0.45 = $0.45<br>
+            ---------------------------<br>
+            Total Batch Cost = $3.55
+        </div>
     </div>
 
-    <div class="key-item">
-        <strong>3. Decimal Division ($$ 627 \div 12 $$)</strong>
-        <p>12 goes into 62 five times (60), remainder 2.</p>
-        <p>Bring down 7 (27). 12 goes into 27 twice (24), remainder 3.</p>
-        <p>Add decimal. Bring down 0 (30). 12 goes into 30 twice (24), remainder 6.</p>
-        <p>Bring down 0 (60). 12 goes into 60 five times (60).</p>
-        <span class="answer">Answer: 52.25</span>
+    <div class="answer-block">
+        <h3>Q3: Cost Per Cup</h3>
+        <p>Batch makes 4 cups.</p>
+        <div class="calc">
+            $3.55 ÷ 4 = $0.8875
+        </div>
+        <p><em>(Rounding: Since this is money, she might round to $0.89. However, for internal accounting, keeping
+                precise decimals is better. Let's assume she uses <strong>$0.89</strong>).</em></p>
     </div>
 
-    <div class="key-item">
-        <strong>4. Decomposition</strong>
-        <span class="answer">$$ 40 + 5 + 0.3 + 0.009 $$</span>
-        <p><em>Also acceptable: $$ (4 \times 10) + (5 \times 1) + (3 \times \frac{1}{10}) + (9 \times \frac{1}{1000})
-                $$</em></p>
+    <div class="answer-block">
+        <h3>Q4: Revenue & Profit (Sunrise Zing)</h3>
+        <p>From Chart: 32 Cups sold.</p>
+        <div class="calc">
+            A) Revenue: 32 cups × $3.50 = $112.00<br>
+            B) Total Cost: 32 cups × $0.89 = $28.48<br>
+            C) Profit: $112.00 - $28.48 = $83.52
+        </div>
     </div>
 
-    <div class="key-item">
-        <strong>5. Geometry</strong>
-        <span class="answer">A) Square-based Pyramid (Pyramide à base carrée)</span>
-        <span class="answer">B) 5 Vertices</span>
-    </div>
-
-    <div class="key-item">
-        <strong>6. Graph</strong>
-        <p>Bob raised $45. Diana raised $25.</p>
-        <p>$$ 45 - 25 = 20 $$</p>
-        <span class="answer">Answer: $20</span>
+    <div class="answer-block">
+        <h3>Q5: The Green Machine Strategy (Hard!)</h3>
+        <p><strong>Goal:</strong> Make $83.52 profit on Green Machines.</p>
+        <p><strong>Data:</strong> 24 Cups sold. Cost is $1.40/cup.</p>
+        <div class="calc">
+            1. Total Cost for 24 cups: 24 × $1.40 = $33.60<br>
+            2. Required Revenue: Total Cost + Target Profit<br>
+            $33.60 + $83.52 = $117.12<br>
+            3. Price Per Cup: Revenue ÷ Cups<br>
+            $117.12 ÷ 24 = $4.88
+        </div>
+        <span class="answer">Answer: They must charge $4.88 per cup.</span>
     </div>
 
 </body>
