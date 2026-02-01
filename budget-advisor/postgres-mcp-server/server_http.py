@@ -33,6 +33,8 @@ from db_operations import (
     get_monthly_summary,
     get_monthly_grouped_expenses,
     get_monthly_detailed_expenses,
+    get_valid_type_names,
+    get_expenses_by_category,
 )
 
 # Configure logging
@@ -133,6 +135,28 @@ async def list_tools() -> list[Tool]:
                 },
                 "required": ["target_year", "target_month"]
             }
+        ),
+        Tool(
+            name="get_expenses_by_category",
+            description="Get all expenses for a specific category (typeName), year, and month. Validates category against MerchantType table. Returns all matching expense records.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "target_year": {
+                        "type": "number",
+                        "description": "Target year (e.g., 2024)"
+                    },
+                    "target_month": {
+                        "type": "number",
+                        "description": "Target month (1-12)"
+                    },
+                    "type_name": {
+                        "type": "string",
+                        "description": "Expense category/type name (e.g., 'Food', 'Transportation/Gas', 'Housing (Rent/Mortgage)'). Must be a valid type from MerchantType table."
+                    }
+                },
+                "required": ["target_year", "target_month", "type_name"]
+            }
         )
     ]
 
@@ -168,6 +192,14 @@ async def call_tool(name: str, arguments: Any) -> list[TextContent]:
             if not target_year or not target_month:
                 raise ValueError("target_year and target_month parameters are required")
             results = get_monthly_detailed_expenses(int(target_year), int(target_month))
+
+        elif name == "get_expenses_by_category":
+            target_year = arguments.get("target_year")
+            target_month = arguments.get("target_month")
+            type_name = arguments.get("type_name")
+            if not target_year or not target_month or not type_name:
+                raise ValueError("target_year, target_month, and type_name parameters are required")
+            results = get_expenses_by_category(int(target_year), int(target_month), type_name)
 
         else:
             raise ValueError(f"Unknown tool: {name}")
