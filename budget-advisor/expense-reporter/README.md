@@ -93,14 +93,22 @@ Check your email provider's SMTP settings and configure accordingly.
 In `.env`, set when you want to receive reports:
 
 ```bash
-# Send report every Monday at 9:00 AM
-REPORT_SCHEDULE_DAY=monday
-REPORT_SCHEDULE_TIME=09:00
+# Weekly Report Configuration
+WEEKLY_REPORT_ENABLED=true          # Enable/disable weekly reports
+WEEKLY_REPORT_DAY=monday            # Day of week (monday-sunday)
+WEEKLY_REPORT_TIME=09:00            # Time in HH:MM format (24-hour)
+
+# Monthly Report Configuration
+MONTHLY_REPORT_ENABLED=true         # Enable/disable monthly reports
+MONTHLY_REPORT_TIME=09:00           # Time in HH:MM format (24-hour)
+                                     # Runs on 1st of each month
 ```
 
-Valid days: `monday`, `tuesday`, `wednesday`, `thursday`, `friday`, `saturday`, `sunday`
-
-Time format: `HH:MM` (24-hour format)
+**Configuration Options:**
+- Valid days: `monday`, `tuesday`, `wednesday`, `thursday`, `friday`, `saturday`, `sunday`
+- Time format: `HH:MM` (24-hour format)
+- Monthly reports automatically run on the 1st of each month
+- You can enable/disable each report type independently
 
 ### 4. Ensure Dependencies are Running
 
@@ -370,8 +378,11 @@ Check your email inbox for the monthly report with comparison table and pie char
 | `FROM_EMAIL` | Sender email address | `your-email@gmail.com` |
 | `SMTP_USE_TLS` | Use TLS encryption | `true` or `false` |
 | `REPORT_TO_EMAIL` | Recipient email address | `recipient@example.com` |
-| `REPORT_SCHEDULE_DAY` | Day to send report | `monday` through `sunday` |
-| `REPORT_SCHEDULE_TIME` | Time to send report | `09:00` (24-hour format) |
+| `WEEKLY_REPORT_ENABLED` | Enable weekly reports | `true` or `false` |
+| `WEEKLY_REPORT_DAY` | Day to send weekly report | `monday` through `sunday` |
+| `WEEKLY_REPORT_TIME` | Time to send weekly report | `09:00` (24-hour format) |
+| `MONTHLY_REPORT_ENABLED` | Enable monthly reports | `true` or `false` |
+| `MONTHLY_REPORT_TIME` | Time to send monthly report (on 1st) | `09:00` (24-hour format) |
 | `LOG_LEVEL` | Logging verbosity | `DEBUG`, `INFO`, `WARNING`, `ERROR` |
 
 ## Advanced Usage

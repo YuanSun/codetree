@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Scheduler for Budget Advisor Weekly Reporter.
-Runs weekly expense reports on a schedule (e.g., every Monday morning).
+Scheduler for Budget Advisor Expense Reporter.
+Runs weekly and monthly expense reports on a schedule.
 """
 
 import os
@@ -11,7 +11,7 @@ from datetime import datetime
 import schedule
 import time
 
-from weekly_reporter import WeeklyReporter
+from expense_reporter import ExpenseReporter
 
 try:
     from dotenv import load_dotenv
@@ -30,47 +30,99 @@ logger = logging.getLogger(__name__)
 
 
 class ReportScheduler:
-    """Scheduler for weekly expense reports"""
+    """Scheduler for weekly and monthly expense reports"""
 
-    def __init__(self, to_email: str, schedule_day: str = "monday", schedule_time: str = "09:00"):
+    def __init__(
+        self,
+        to_email: str,
+        weekly_enabled: bool = True,
+        weekly_day: str = "monday",
+        weekly_time: str = "09:00",
+        monthly_enabled: bool = True,
+        monthly_time: str = "09:00"
+    ):
         """
         Initialize report scheduler.
 
         Args:
             to_email: Email address to send reports to
-            schedule_day: Day of week to send report (default: monday)
-            schedule_time: Time to send report in HH:MM format (default: 09:00)
+            weekly_enabled: Whether to enable weekly reports (default: True)
+            weekly_day: Day of week to send weekly report (default: monday)
+            weekly_time: Time to send weekly report in HH:MM format (default: 09:00)
+            monthly_enabled: Whether to enable monthly reports (default: True)
+            monthly_time: Time to send monthly report in HH:MM format (default: 09:00)
         """
         self.to_email = to_email
-        self.schedule_day = schedule_day.lower()
-        self.schedule_time = schedule_time
-        self.reporter = WeeklyReporter(to_email)
+        self.weekly_enabled = weekly_enabled
+        self.weekly_day = weekly_day.lower()
+        self.weekly_time = weekly_time
+        self.monthly_enabled = monthly_enabled
+        self.monthly_time = monthly_time
+        self.reporter = ExpenseReporter(to_email)
 
-    def run_report_job(self):
+    def run_weekly_report_job(self):
         """Job function that runs the weekly report"""
-        logger.info(f"⏰ Scheduled report triggered at {datetime.now()}")
+        logger.info(f"⏰ Scheduled weekly report triggered at {datetime.now()}")
 
         try:
-            # Run the reporter (now synchronous)
             success = self.reporter.send_weekly_report()
             if success:
-                logger.info("✅ Scheduled report completed successfully")
+                logger.info("✅ Weekly report completed successfully")
             else:
-                logger.error("❌ Scheduled report failed")
+                logger.error("❌ Weekly report failed")
         except Exception as e:
-            logger.error(f"❌ Scheduled report failed: {e}", exc_info=True)
+            logger.error(f"❌ Weekly report failed: {e}", exc_info=True)
+
+    def run_monthly_report_job(self):
+        """Job function that runs the monthly report"""
+        logger.info(f"⏰ Scheduled monthly report triggered at {datetime.now()}")
+
+        try:
+            # Send report for previous month (default behavior)
+            success = self.reporter.send_monthly_report()
+            if success:
+                logger.info("✅ Monthly report completed successfully")
+            else:
+                logger.error("❌ Monthly report failed")
+        except Exception as e:
+            logger.error(f"❌ Monthly report failed: {e}", exc_info=True)
 
     def start(self):
         """Start the scheduler"""
-        logger.info("Starting Budget Advisor Weekly Reporter Scheduler")
-        logger.info(f"Report will be sent to: {self.to_email}")
-        logger.info(f"Schedule: Every {self.schedule_day.capitalize()} at {self.schedule_time}")
+        logger.info("=" * 70)
+        logger.info("Starting Budget Advisor Expense Reporter Scheduler")
+        logger.info("=" * 70)
+        logger.info(f"Report recipient: {self.to_email}")
+        logger.info("")
 
-        # Schedule the job
-        schedule_func = getattr(schedule.every(), self.schedule_day)
-        schedule_func.at(self.schedule_time).do(self.run_report_job)
+        jobs_scheduled = 0
+
+        # Schedule weekly job
+        if self.weekly_enabled:
+            schedule_func = getattr(schedule.every(), self.weekly_day)
+            schedule_func.at(self.weekly_time).do(self.run_weekly_report_job)
+            logger.info(f"📅 Weekly Report: Every {self.weekly_day.capitalize()} at {self.weekly_time}")
+            jobs_scheduled += 1
+        else:
+            logger.info("📅 Weekly Report: Disabled")
+
+        # Schedule monthly job (runs on the 1st of each month)
+        if self.monthly_enabled:
+            # Schedule for the 1st day of every month
+            schedule.every().month.at(self.monthly_time).do(self.run_monthly_report_job)
+            logger.info(f"📅 Monthly Report: 1st of each month at {self.monthly_time}")
+            jobs_scheduled += 1
+        else:
+            logger.info("📅 Monthly Report: Disabled")
+
+        logger.info("")
+
+        if jobs_scheduled == 0:
+            logger.error("❌ No jobs scheduled. Enable at least one report type.")
+            sys.exit(1)
 
         logger.info("✓ Scheduler started. Press Ctrl+C to stop.")
+        logger.info("=" * 70)
 
         # Run scheduler loop
         try:
@@ -78,6 +130,7 @@ class ReportScheduler:
                 schedule.run_pending()
                 time.sleep(60)  # Check every minute
         except KeyboardInterrupt:
+            logger.info("")
             logger.info("Scheduler stopped by user")
 
 
@@ -85,28 +138,51 @@ def main():
     """Main entry point"""
     # Get configuration from environment
     to_email = os.getenv("REPORT_TO_EMAIL")
-    schedule_day = os.getenv("REPORT_SCHEDULE_DAY", "monday")
-    schedule_time = os.getenv("REPORT_SCHEDULE_TIME", "09:00")
+
+    # Weekly report configuration
+    weekly_enabled = os.getenv("WEEKLY_REPORT_ENABLED", "true").lower() == "true"
+    weekly_day = os.getenv("WEEKLY_REPORT_DAY", "monday")
+    weekly_time = os.getenv("WEEKLY_REPORT_TIME", "09:00")
+
+    # Monthly report configuration
+    monthly_enabled = os.getenv("MONTHLY_REPORT_ENABLED", "true").lower() == "true"
+    monthly_time = os.getenv("MONTHLY_REPORT_TIME", "09:00")
 
     if not to_email:
         logger.error("Error: REPORT_TO_EMAIL environment variable not set")
         sys.exit(1)
 
-    # Validate schedule day
-    valid_days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
-    if schedule_day.lower() not in valid_days:
-        logger.error(f"Error: Invalid REPORT_SCHEDULE_DAY. Must be one of: {', '.join(valid_days)}")
-        sys.exit(1)
+    # Validate weekly schedule day
+    if weekly_enabled:
+        valid_days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+        if weekly_day.lower() not in valid_days:
+            logger.error(f"Error: Invalid WEEKLY_REPORT_DAY. Must be one of: {', '.join(valid_days)}")
+            sys.exit(1)
 
-    # Validate schedule time format
-    try:
-        datetime.strptime(schedule_time, "%H:%M")
-    except ValueError:
-        logger.error(f"Error: Invalid REPORT_SCHEDULE_TIME format. Must be HH:MM (e.g., 09:00)")
-        sys.exit(1)
+        # Validate weekly schedule time format
+        try:
+            datetime.strptime(weekly_time, "%H:%M")
+        except ValueError:
+            logger.error(f"Error: Invalid WEEKLY_REPORT_TIME format. Must be HH:MM (e.g., 09:00)")
+            sys.exit(1)
+
+    # Validate monthly schedule time format
+    if monthly_enabled:
+        try:
+            datetime.strptime(monthly_time, "%H:%M")
+        except ValueError:
+            logger.error(f"Error: Invalid MONTHLY_REPORT_TIME format. Must be HH:MM (e.g., 09:00)")
+            sys.exit(1)
 
     # Start scheduler
-    scheduler = ReportScheduler(to_email, schedule_day, schedule_time)
+    scheduler = ReportScheduler(
+        to_email=to_email,
+        weekly_enabled=weekly_enabled,
+        weekly_day=weekly_day,
+        weekly_time=weekly_time,
+        monthly_enabled=monthly_enabled,
+        monthly_time=monthly_time
+    )
     scheduler.start()
 
 
