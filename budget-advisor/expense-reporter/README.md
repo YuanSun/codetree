@@ -1,25 +1,27 @@
-# Budget Advisor - Weekly Reporter
+# Budget Advisor - Expense Reporter
 
-Automatically generates weekly expense analysis using the advisor agent and sends email reports.
+Automatically generates weekly and monthly expense analysis using the advisor agent and sends email reports.
 
 ## Features
 
 - 📊 **Weekly Analysis**: Leverages the existing advisor-agent to analyze weekly expenses
+- 📅 **Monthly Reviews**: Comprehensive month-over-month comparison with visual charts
 - 📧 **Email Reports**: Sends formatted HTML and plain text email reports
-- ⏰ **Automated Scheduling**: Runs on a schedule (e.g., every Monday morning)
-- 🎨 **Beautiful Formatting**: Professional HTML email templates
+- 📈 **Visual Charts**: Pie charts showing category breakdowns in monthly reports
+- ⏰ **Automated Scheduling**: Runs on a schedule (weekly/monthly)
+- 🎨 **Beautiful Formatting**: Professional HTML email templates with tables
 - ⚙️ **Configurable**: Easy configuration via environment variables
 
 ## Architecture
 
 ```
-weekly-reporter/
-├── email_sender.py       # SMTP email sending functionality
-├── weekly_reporter.py    # Main reporter that uses advisor-agent
-├── scheduler.py          # Automated scheduling
-├── requirements.txt      # Python dependencies
-├── .env.example          # Configuration template
-└── README.md            # This file
+expense-reporter/
+├── email_sender.py        # SMTP email sending functionality
+├── expense_reporter.py    # Main reporter that uses advisor-agent
+├── scheduler.py           # Automated scheduling
+├── requirements.txt       # Python dependencies
+├── .env.example           # Configuration template
+└── README.md             # This file
 ```
 
 **Dependencies:**
@@ -32,9 +34,14 @@ weekly-reporter/
 ### 1. Install Dependencies
 
 ```bash
-cd budget-advisor/weekly-reporter
+cd budget-advisor/expense-reporter
 pip install -r requirements.txt
 ```
+
+**Dependencies:**
+- `schedule` - For automated scheduling
+- `python-dotenv` - For environment variable management
+- `matplotlib` - For generating pie charts in monthly reports
 
 ### 2. Configure Email
 
@@ -105,13 +112,13 @@ Make sure these components are set up and running:
 
 ## Usage
 
-### Run Once (Manual Test)
+### Run Weekly Report (Manual Test)
 
-Test the reporter by running it once:
+Test the weekly reporter by running it once:
 
 ```bash
-cd budget-advisor/weekly-reporter
-python3.11 weekly_reporter.py
+cd budget-advisor/expense-reporter
+python3.11 expense_reporter.py --mode weekly
 ```
 
 This will:
@@ -119,18 +126,39 @@ This will:
 2. Generate weekly expense analysis
 3. Send email report to `REPORT_TO_EMAIL`
 
+### Run Monthly Report
+
+Generate and send a monthly review report:
+
+```bash
+cd budget-advisor/expense-reporter
+# Send report for previous month (default)
+python3.11 expense_reporter.py --mode monthly
+
+# Send report for specific month
+python3.11 expense_reporter.py --mode monthly --year 2026 --month 1
+```
+
+This will:
+1. Call advisor agent to generate monthly review with month-over-month comparison
+2. Parse the review to extract category spending data
+3. Generate a pie chart showing category breakdown
+4. Format email with comparison table and chart
+5. Send HTML email to `REPORT_TO_EMAIL`
+
 ### Run on Schedule
 
 Start the scheduler to send reports automatically:
 
 ```bash
-cd budget-advisor/weekly-reporter
+cd budget-advisor/expense-reporter
 python3.11 scheduler.py
 ```
 
 The scheduler will:
 - Run continuously in the background
-- Send reports on the configured day/time
+- Send weekly reports on the configured day/time
+- Send monthly reports on the 1st of each month (if configured)
 - Log all activities
 
 **Keep it running:**
@@ -148,15 +176,15 @@ Create a systemd service file `/etc/systemd/system/budget-reporter.service`:
 
 ```ini
 [Unit]
-Description=Budget Advisor Weekly Reporter
+Description=Budget Advisor Expense Reporter
 After=network.target
 
 [Service]
 Type=simple
 User=your-username
-WorkingDirectory=/path/to/codetree/budget-advisor/weekly-reporter
+WorkingDirectory=/path/to/codetree/budget-advisor/expense-reporter
 Environment=PATH=/usr/local/bin:/usr/bin:/bin
-ExecStart=/usr/local/bin/python3.11 /path/to/codetree/budget-advisor/weekly-reporter/scheduler.py
+ExecStart=/usr/local/bin/python3.11 /path/to/codetree/budget-advisor/expense-reporter/scheduler.py
 Restart=always
 RestartSec=10
 
@@ -174,18 +202,23 @@ sudo systemctl status budget-reporter
 
 ### Using cron (Alternative)
 
-Add to crontab for weekly Monday 9 AM execution:
+Add to crontab for automated execution:
 
 ```bash
 crontab -e
 
-# Add this line:
-0 9 * * 1 cd /path/to/codetree/budget-advisor/weekly-reporter && /usr/local/bin/python3.11 weekly_reporter.py
+# Weekly report every Monday at 9 AM
+0 9 * * 1 cd /path/to/codetree/budget-advisor/expense-reporter && /usr/local/bin/python3.11 expense_reporter.py --mode weekly
+
+# Monthly report on the 1st of each month at 9 AM
+0 9 1 * * cd /path/to/codetree/budget-advisor/expense-reporter && /usr/local/bin/python3.11 expense_reporter.py --mode monthly
 ```
 
 ## Email Report Format
 
-The email report includes:
+### Weekly Report
+
+The weekly email report includes:
 
 1. **Week Information**: Date range for the analyzed week
 2. **Expense Summary**:
@@ -198,11 +231,31 @@ The email report includes:
    - Unusual expenses
 4. **Recommendations**: AI-generated advice for the upcoming week
 
+### Monthly Report
+
+The monthly email report includes:
+
+1. **Month Information**: Month and year being reviewed
+2. **Pie Chart**: Visual breakdown of expenses by category
+3. **Comparison Table**: Month-over-month comparison with columns:
+   - Category name
+   - Current month spending
+   - Previous month spending
+   - Dollar change (Δ)
+   - Percentage change
+4. **Analysis & Insights**:
+   - Spending trends
+   - Categories with significant changes
+   - Notable patterns
+5. **Recommendations**: AI-generated advice for the upcoming month
+
 **Email Features:**
-- Professional HTML formatting with styling
+- Professional HTML formatting with gradient headers
 - Plain text fallback for compatibility
 - Mobile-friendly responsive design
 - Clear sections and visual hierarchy
+- Inline charts and formatted tables
+- Color-coded positive/negative changes
 
 ## Troubleshooting
 
@@ -261,7 +314,7 @@ tail -f scheduler.log
 ### Test Email Sending
 
 ```bash
-cd budget-advisor/weekly-reporter
+cd budget-advisor/expense-reporter
 python3.11 << EOF
 import asyncio
 from email_sender import create_email_sender_from_env
@@ -280,10 +333,31 @@ EOF
 ### Test Weekly Report Generation
 
 ```bash
-python3.11 weekly_reporter.py
+python3.11 expense_reporter.py --mode weekly
 ```
 
-Check your email inbox for the report.
+Check your email inbox for the weekly report.
+
+### Test Monthly Report Generation
+
+```bash
+# Run interactive test script
+python3.11 test_monthly_email.py
+```
+
+This will:
+1. Generate a monthly review for January 2026
+2. Create a pie chart from the category data
+3. Send a formatted email with table and chart
+4. Prompt for confirmation before sending
+
+Or test directly:
+
+```bash
+python3.11 expense_reporter.py --mode monthly --year 2026 --month 1
+```
+
+Check your email inbox for the monthly report with comparison table and pie chart.
 
 ## Configuration Reference
 

@@ -6,8 +6,11 @@ Sends weekly expense analysis reports via email using SMTP.
 import os
 import smtplib
 import logging
+import base64
+import io
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.image import MIMEImage
 from datetime import datetime
 from typing import Optional
 
@@ -118,6 +121,95 @@ class EmailSender:
 
         except Exception as e:
             logger.error(f"Failed to send email: {e}")
+            return False
+
+    def send_monthly_report(
+        self,
+        to_email: str,
+        subject: str,
+        review: str,
+        month_info: str,
+        category_data: dict
+    ) -> bool:
+        """
+        Send monthly expense review report via email.
+
+        Args:
+            to_email: Recipient email address(es)
+            subject: Email subject
+            review: Monthly review text from advisor agent
+            month_info: Month information (e.g., "January 2026")
+            category_data: Dictionary mapping category names to amounts for pie chart
+
+        Returns:
+            True if email sent successfully, False otherwise
+        """
+        try:
+            # Parse multiple email addresses
+            recipients = self._parse_email_addresses(to_email)
+
+            if not recipients:
+                logger.error("No valid email addresses provided")
+                return False
+
+            # Create message with inline images support
+            msg = MIMEMultipart('related')
+            msg['Subject'] = subject
+            msg['From'] = self.from_email
+            msg['To'] = ', '.join(recipients)
+            msg['Date'] = datetime.now().strftime('%a, %d %b %Y %H:%M:%S %z')
+
+            # Create alternative part for text/html
+            msg_alternative = MIMEMultipart('alternative')
+            msg.attach(msg_alternative)
+
+            # Create text body
+            text_body = self._create_monthly_text_body(review, month_info)
+            part1 = MIMEText(text_body, 'plain')
+            msg_alternative.attach(part1)
+
+            # Generate pie chart
+            chart_cid = 'category_pie_chart'
+            chart_image = self._generate_pie_chart(category_data, month_info)
+
+            # Create HTML body
+            html_body = self._create_monthly_html_body(review, month_info, chart_cid)
+            part2 = MIMEText(html_body, 'html')
+            msg_alternative.attach(part2)
+
+            # Attach the pie chart image
+            if chart_image:
+                img = MIMEImage(chart_image)
+                img.add_header('Content-ID', f'<{chart_cid}>')
+                img.add_header('Content-Disposition', 'inline', filename='category_chart.png')
+                msg.attach(img)
+
+            # Send email
+            if len(recipients) == 1:
+                logger.info(f"Sending monthly report email to {recipients[0]}...")
+            else:
+                logger.info(f"Sending monthly report email to {len(recipients)} recipients: {', '.join(recipients)}")
+
+            if self.use_tls:
+                with smtplib.SMTP(self.smtp_host, self.smtp_port) as server:
+                    server.starttls()
+                    server.login(self.smtp_user, self.smtp_password)
+                    server.send_message(msg)
+            else:
+                with smtplib.SMTP_SSL(self.smtp_host, self.smtp_port) as server:
+                    server.login(self.smtp_user, self.smtp_password)
+                    server.send_message(msg)
+
+            if len(recipients) == 1:
+                logger.info(f"✓ Monthly report email sent successfully to {recipients[0]}")
+            else:
+                logger.info(f"✓ Monthly report email sent successfully to {len(recipients)} recipients")
+            return True
+
+        except Exception as e:
+            logger.error(f"Failed to send monthly report email: {e}")
+            import traceback
+            traceback.print_exc()
             return False
 
     def _parse_email_addresses(self, email_string: str) -> list[str]:
@@ -461,6 +553,283 @@ class EmailSender:
         html += f"""
               <div class="analysis">
                 {analysis_html}
+              </div>
+            </div>
+            <div class="footer">
+              Generated on {datetime.now().strftime('%Y-%m-%d at %H:%M:%S')}
+            </div>
+          </body>
+        </html>
+        """
+
+        return html
+
+    def _create_monthly_text_body(self, review: str, month_info: str) -> str:
+        """Create plain text email body for monthly report"""
+        body = "Budget Advisor - Monthly Expense Review\n"
+        body += "=" * 50 + "\n\n"
+        body += f"{month_info}\n\n"
+        body += review + "\n\n"
+        body += "=" * 50 + "\n"
+        body += f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+        return body
+
+    def _generate_pie_chart(self, category_data: dict, month_info: str) -> Optional[bytes]:
+        """
+        Generate a pie chart from category data.
+
+        Args:
+            category_data: Dictionary mapping category names to amounts
+            month_info: Month information for chart title
+
+        Returns:
+            PNG image data as bytes, or None if generation fails
+        """
+        try:
+            import matplotlib
+            matplotlib.use('Agg')  # Use non-interactive backend
+            import matplotlib.pyplot as plt
+
+            if not category_data:
+                logger.warning("No category data provided for pie chart")
+                return None
+
+            # Sort by amount (descending) and take top categories
+            sorted_data = sorted(category_data.items(), key=lambda x: x[1], reverse=True)
+
+            # If there are many categories, group smaller ones as "Other"
+            max_categories = 10
+            if len(sorted_data) > max_categories:
+                main_categories = sorted_data[:max_categories]
+                other_amount = sum(amount for _, amount in sorted_data[max_categories:])
+                categories = [cat for cat, _ in main_categories] + ['Other']
+                amounts = [amt for _, amt in main_categories] + [other_amount]
+            else:
+                categories = [cat for cat, _ in sorted_data]
+                amounts = [amt for _, amt in sorted_data]
+
+            # Create pie chart
+            fig, ax = plt.subplots(figsize=(10, 7))
+
+            # Define color palette
+            colors = plt.cm.Set3(range(len(categories)))
+
+            wedges, texts, autotexts = ax.pie(
+                amounts,
+                labels=categories,
+                autopct='%1.1f%%',
+                startangle=90,
+                colors=colors,
+                textprops={'fontsize': 10}
+            )
+
+            # Make percentage text bold and white
+            for autotext in autotexts:
+                autotext.set_color('white')
+                autotext.set_fontweight('bold')
+                autotext.set_fontsize(9)
+
+            # Make labels bold
+            for text in texts:
+                text.set_fontweight('bold')
+                text.set_fontsize(9)
+
+            ax.set_title(f'Expense Breakdown by Category - {month_info}',
+                        fontsize=14, fontweight='bold', pad=20)
+
+            # Equal aspect ratio ensures that pie is drawn as a circle
+            ax.axis('equal')
+
+            # Save to bytes buffer
+            buf = io.BytesIO()
+            plt.tight_layout()
+            plt.savefig(buf, format='png', dpi=100, bbox_inches='tight')
+            plt.close(fig)
+
+            buf.seek(0)
+            return buf.read()
+
+        except ImportError:
+            logger.warning("matplotlib not available, skipping pie chart generation")
+            return None
+        except Exception as e:
+            logger.error(f"Failed to generate pie chart: {e}")
+            import traceback
+            traceback.print_exc()
+            return None
+
+    def _create_monthly_html_body(self, review: str, month_info: str, chart_cid: str) -> str:
+        """Create HTML email body for monthly report with formatted table and chart"""
+        # Convert markdown review to HTML
+        review_html = self._markdown_to_html(review)
+
+        html = f"""
+        <html>
+          <head>
+            <style>
+              body {{
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+              }}
+              .header {{
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 30px 20px;
+                text-align: center;
+              }}
+              .header h1 {{
+                margin: 0 0 10px 0;
+                font-size: 28px;
+              }}
+              .header p {{
+                margin: 0;
+                font-size: 16px;
+                opacity: 0.9;
+              }}
+              .content {{
+                padding: 20px;
+                background-color: #f5f5f5;
+              }}
+              .month-info {{
+                background-color: #e3f2fd;
+                padding: 15px;
+                margin-bottom: 20px;
+                border-left: 4px solid #2196F3;
+                font-size: 16px;
+                font-weight: bold;
+                color: #1565C0;
+              }}
+              .review {{
+                background-color: white;
+                padding: 25px;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                margin-bottom: 20px;
+              }}
+              .review h1 {{
+                color: #5e35b1;
+                font-size: 24px;
+                margin-top: 20px;
+                margin-bottom: 10px;
+                border-bottom: 2px solid #5e35b1;
+                padding-bottom: 8px;
+              }}
+              .review h2 {{
+                color: #7e57c2;
+                font-size: 20px;
+                margin-top: 18px;
+                margin-bottom: 10px;
+              }}
+              .review h3 {{
+                color: #9575cd;
+                font-size: 18px;
+                margin-top: 15px;
+                margin-bottom: 8px;
+              }}
+              .review ul, .review ol {{
+                margin: 12px 0;
+                padding-left: 30px;
+              }}
+              .review li {{
+                margin: 8px 0;
+                line-height: 1.6;
+              }}
+              .review strong {{
+                color: #4527a0;
+                font-weight: 600;
+              }}
+              .review p {{
+                margin: 12px 0;
+                line-height: 1.8;
+              }}
+              .review table {{
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+                background-color: white;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                font-size: 14px;
+              }}
+              .review table th {{
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 14px 12px;
+                text-align: left;
+                font-weight: 600;
+                border: none;
+              }}
+              .review table th:nth-child(2),
+              .review table th:nth-child(3),
+              .review table th:nth-child(4),
+              .review table th:nth-child(5) {{
+                text-align: right;
+              }}
+              .review table td {{
+                padding: 12px;
+                border: 1px solid #e0e0e0;
+                color: #333;
+              }}
+              .review table td:nth-child(2),
+              .review table td:nth-child(3),
+              .review table td:nth-child(4),
+              .review table td:nth-child(5) {{
+                text-align: right;
+                font-family: 'Courier New', monospace;
+              }}
+              .review table tr:nth-child(even) {{
+                background-color: #fafafa;
+              }}
+              .review table tr:hover {{
+                background-color: #f0f0f0;
+              }}
+              .review table tr:last-child {{
+                font-weight: bold;
+                background-color: #e8eaf6;
+                border-top: 2px solid #5e35b1;
+              }}
+              .chart-container {{
+                background-color: white;
+                padding: 25px;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                text-align: center;
+                margin-bottom: 20px;
+              }}
+              .chart-container h2 {{
+                color: #5e35b1;
+                font-size: 22px;
+                margin-bottom: 20px;
+              }}
+              .chart-container img {{
+                max-width: 100%;
+                height: auto;
+                border-radius: 4px;
+              }}
+              .footer {{
+                text-align: center;
+                padding: 15px;
+                font-size: 12px;
+                color: #777;
+                background-color: #f5f5f5;
+              }}
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>📊 Budget Advisor</h1>
+              <p>Monthly Expense Review</p>
+            </div>
+            <div class="content">
+              <div class="month-info">📅 {month_info}</div>
+
+              <div class="chart-container">
+                <h2>Expense Breakdown</h2>
+                <img src="cid:{chart_cid}" alt="Category Expense Chart" />
+              </div>
+
+              <div class="review">
+                {review_html}
               </div>
             </div>
             <div class="footer">
