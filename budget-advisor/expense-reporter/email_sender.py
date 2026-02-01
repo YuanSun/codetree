@@ -265,63 +265,68 @@ class EmailSender:
         lines = text.split('\n')
         result_lines = []
         in_comparison_table = False
-        table_buffer = []
 
         for i, line in enumerate(lines):
+            # Skip all "=====" separator lines (they don't render well on mobile)
+            if line.strip() and all(c == '=' for c in line.strip()):
+                continue
+
             # Detect start of comparison table
             if 'Expense Overview' in line and ('vs.' in line or 'vs ' in line):
                 in_comparison_table = True
-                table_buffer = []
-                result_lines.append(line)  # Keep the title
+                # Add title as heading instead of plain text
+                result_lines.append(f'<h2 style="color: #5e35b1; margin-top: 20px; margin-bottom: 15px;">{line.strip()}</h2>')
                 continue
 
-            # Skip separator lines at start
-            if in_comparison_table and line.strip() and all(c in '=-' for c in line.strip()):
+            # Skip separator lines (-----)
+            if in_comparison_table and line.strip() and all(c in '-' for c in line.strip()):
                 continue
 
             # Detect table header (contains "Category" and month names)
             if in_comparison_table and 'Category' in line and ('Jan' in line or 'Feb' in line or 'Mar' in line or 'Apr' in line or 'May' in line or 'Jun' in line or 'Jul' in line or 'Aug' in line or 'Sep' in line or 'Oct' in line or 'Nov' in line or 'Dec' in line or 'Change' in line):
-                # Parse header columns
-                parts = line.split()
-                # Start HTML table
-                result_lines.append('<table>')
-                result_lines.append('  <thead>')
-                result_lines.append('    <tr>')
-                result_lines.append(f'      <th style="text-align: left;">Category</th>')
+                # Extract header parts using regex to handle variable whitespace
+                # The format is: Category    2026 Jan    2025 Dec    Δ (Change)    % Change
+                header_match = re.search(r'Category\s+(\d{4}\s+\w+)\s+(\d{4}\s+\w+)\s+.*Change.*%\s*Change', line)
 
-                # Find column positions
-                for part in parts[1:]:
-                    if part != 'Δ' and part != '(Change)' and part != '%':
-                        result_lines.append(f'      <th style="text-align: right;">{part}</th>')
+                if header_match:
+                    current_month = header_match.group(1)
+                    prev_month = header_match.group(2)
 
-                result_lines.append('    </tr>')
-                result_lines.append('  </thead>')
-                result_lines.append('  <tbody>')
+                    # Start HTML table
+                    result_lines.append('<table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px;">')
+                    result_lines.append('  <thead>')
+                    result_lines.append('    <tr>')
+                    result_lines.append('      <th style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; text-align: left; border: none;">Category</th>')
+                    result_lines.append(f'      <th style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; text-align: right; border: none;">{current_month}</th>')
+                    result_lines.append(f'      <th style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; text-align: right; border: none;">{prev_month}</th>')
+                    result_lines.append('      <th style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; text-align: right; border: none;">Change</th>')
+                    result_lines.append('      <th style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; text-align: right; border: none;">%</th>')
+                    result_lines.append('    </tr>')
+                    result_lines.append('  </thead>')
+                    result_lines.append('  <tbody>')
                 continue
 
-            # Detect data rows (after header, before end marker)
+            # Detect data rows (after header, before TOTAL)
             if in_comparison_table and line.strip() and not all(c in '=-' for c in line.strip()):
                 # Check if it's the TOTAL row
                 if line.strip().startswith('TOTAL'):
                     result_lines.append('  </tbody>')
                     result_lines.append('  <tfoot>')
-                    result_lines.append('    <tr style="font-weight: bold; background-color: #e8eaf6;">')
+                    result_lines.append('    <tr style="font-weight: bold; background-color: #e8eaf6; border-top: 2px solid #5e35b1;">')
 
                     # Parse TOTAL row
-                    parts = line.split()
-                    result_lines.append(f'      <td>TOTAL</td>')
-
-                    # Extract amounts and changes
-                    amounts = re.findall(r'\$[\d,]+\.\d{2}', line)
-                    changes = re.findall(r'[+\-−][\d,]+\.\d{2}', line)
+                    amounts = re.findall(r'\$\s*[\d,]+\.\d{2}', line)
+                    changes = re.findall(r'[+\-−]\s*[\d,]+\.\d{2}', line)
                     percentages = re.findall(r'[+\-−]?\d+%', line)
 
+                    result_lines.append('      <td style="padding: 12px; border: 1px solid #e0e0e0;">TOTAL</td>')
+
                     for amount in amounts:
-                        result_lines.append(f'      <td style="text-align: right;">{amount}</td>')
+                        result_lines.append(f'      <td style="padding: 12px; border: 1px solid #e0e0e0; text-align: right; font-family: \'Courier New\', monospace;">{amount.strip()}</td>')
                     for change in changes:
-                        result_lines.append(f'      <td style="text-align: right;">{change}</td>')
+                        result_lines.append(f'      <td style="padding: 12px; border: 1px solid #e0e0e0; text-align: right; font-family: \'Courier New\', monospace;">{change.strip()}</td>')
                     for pct in percentages:
-                        result_lines.append(f'      <td style="text-align: right;">{pct}</td>')
+                        result_lines.append(f'      <td style="padding: 12px; border: 1px solid #e0e0e0; text-align: right; font-family: \'Courier New\', monospace;">{pct}</td>')
 
                     result_lines.append('    </tr>')
                     result_lines.append('  </tfoot>')
@@ -330,62 +335,63 @@ class EmailSender:
                     continue
 
                 # Regular data row
-                result_lines.append('    <tr>')
-
                 # Parse the category name (everything before the first $)
                 dollar_pos = line.find('$')
                 if dollar_pos > 0:
                     category = line[:dollar_pos].strip()
                     rest = line[dollar_pos:]
 
-                    result_lines.append(f'      <td>{category}</td>')
+                    result_lines.append('    <tr>')
+                    result_lines.append(f'      <td style="padding: 10px; border: 1px solid #e0e0e0;">{category}</td>')
 
                     # Extract all dollar amounts
-                    amounts = re.findall(r'\$[\d,]+\.\d{2}', rest)
-                    # Extract changes (with + or -)
-                    changes = re.findall(r'[+\-−][\d,]+\.\d{2}', rest)
+                    amounts = re.findall(r'\$\s*[\d,]+\.\d{2}', rest)
+                    # Count dashes for missing values
+                    dash_count = rest.count('–')
+
+                    # Current month amount
+                    if len(amounts) >= 1:
+                        result_lines.append(f'      <td style="padding: 10px; border: 1px solid #e0e0e0; text-align: right; font-family: \'Courier New\', monospace;">{amounts[0].strip()}</td>')
+                    else:
+                        result_lines.append('      <td style="padding: 10px; border: 1px solid #e0e0e0; text-align: right;">–</td>')
+
+                    # Previous month amount
+                    if len(amounts) >= 2:
+                        result_lines.append(f'      <td style="padding: 10px; border: 1px solid #e0e0e0; text-align: right; font-family: \'Courier New\', monospace;">{amounts[1].strip()}</td>')
+                    else:
+                        result_lines.append('      <td style="padding: 10px; border: 1px solid #e0e0e0; text-align: right;">–</td>')
+
+                    # Extract changes (with + or - or −)
+                    changes = re.findall(r'[+\-−]\s*[\d,]+\.\d{2}', rest)
+                    if changes:
+                        result_lines.append(f'      <td style="padding: 10px; border: 1px solid #e0e0e0; text-align: right; font-family: \'Courier New\', monospace;">{changes[0].strip()}</td>')
+                    else:
+                        result_lines.append('      <td style="padding: 10px; border: 1px solid #e0e0e0; text-align: right;">–</td>')
+
                     # Extract percentages or special markers
-                    percentages = re.findall(r'[+\-−]?\d+%|NEW|REMOVED', rest)
-                    # Handle dash markers
-                    dashes = rest.count('–')
-
-                    # Add amounts
-                    for amount in amounts:
-                        result_lines.append(f'      <td style="text-align: right;">{amount}</td>')
-
-                    # Fill in dashes for missing amounts
-                    if len(amounts) < 2:
-                        for _ in range(2 - len(amounts)):
-                            result_lines.append(f'      <td style="text-align: right;">–</td>')
-
-                    # Add changes
-                    for change in changes:
-                        result_lines.append(f'      <td style="text-align: right;">{change}</td>')
-                    if len(changes) == 0:
-                        result_lines.append(f'      <td style="text-align: right;">–</td>')
-
-                    # Add percentages
-                    for pct in percentages:
-                        if pct == 'NEW':
-                            result_lines.append(f'      <td style="text-align: right; color: #2e7d32; font-weight: bold;">{pct}</td>')
-                        elif pct == 'REMOVED':
-                            result_lines.append(f'      <td style="text-align: right; color: #c62828; font-weight: bold;">{pct}</td>')
+                    if 'NEW' in rest:
+                        result_lines.append('      <td style="padding: 10px; border: 1px solid #e0e0e0; text-align: right; color: #2e7d32; font-weight: bold;">NEW</td>')
+                    elif 'REMOVED' in rest:
+                        result_lines.append('      <td style="padding: 10px; border: 1px solid #e0e0e0; text-align: right; color: #c62828; font-weight: bold;">REMOVED</td>')
+                    else:
+                        percentages = re.findall(r'[+\-−]?\d+%', rest)
+                        if percentages:
+                            result_lines.append(f'      <td style="padding: 10px; border: 1px solid #e0e0e0; text-align: right; font-family: \'Courier New\', monospace;">{percentages[0]}</td>')
                         else:
-                            result_lines.append(f'      <td style="text-align: right;">{pct}</td>')
-                    if len(percentages) == 0:
-                        result_lines.append(f'      <td style="text-align: right;">–</td>')
+                            result_lines.append('      <td style="padding: 10px; border: 1px solid #e0e0e0; text-align: right;">–</td>')
 
                     result_lines.append('    </tr>')
                 else:
                     # No dollar sign found, might be end of table
-                    if '</table>' not in '\n'.join(result_lines[-5:]):
+                    if in_comparison_table:
                         result_lines.append('  </tbody>')
                         result_lines.append('</table>')
-                    in_comparison_table = False
+                        in_comparison_table = False
                     result_lines.append(line)
             else:
                 # Not in table
-                result_lines.append(line)
+                if not in_comparison_table:
+                    result_lines.append(line)
 
         # Close table if still open
         if in_comparison_table:
@@ -931,15 +937,15 @@ class EmailSender:
                 text-align: right;
                 font-family: 'Courier New', monospace;
               }}
-              .review table tr:nth-child(even) {{
-                background-color: #fafafa;
+              .review table tbody tr:nth-child(odd) {{
+                background-color: #ffffff;
               }}
-              .review table tr:hover {{
-                background-color: #f0f0f0;
+              .review table tbody tr:nth-child(even) {{
+                background-color: #f9f9f9;
               }}
-              .review table tr:last-child {{
+              .review table tfoot tr {{
                 font-weight: bold;
-                background-color: #e8eaf6;
+                background-color: #e8eaf6 !important;
                 border-top: 2px solid #5e35b1;
               }}
               .chart-container {{
