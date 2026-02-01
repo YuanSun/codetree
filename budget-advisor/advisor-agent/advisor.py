@@ -157,6 +157,28 @@ class BudgetAdvisor:
         logger.warning("No data returned from get_monthly_summary")
         return []
 
+    async def get_monthly_grouped_expenses(self, target_year: int, target_month: int) -> dict:
+        """Get monthly grouped expenses from MCP server"""
+        if not self.session:
+            raise RuntimeError("Not connected to MCP server")
+
+        logger.info(f"Fetching grouped monthly expenses for {target_year}-{target_month:02d}...")
+        logger.debug(f"Calling MCP tool: get_monthly_grouped_expenses with args: {{target_year: {target_year}, target_month: {target_month}}}")
+
+        result = await self.session.call_tool(
+            "get_monthly_grouped_expenses",
+            arguments={"target_year": target_year, "target_month": target_month}
+        )
+
+        # Parse the JSON response
+        if result.content and len(result.content) > 0:
+            data = json.loads(result.content[0].text)
+            logger.debug(f"Received {len(data)} expense categories")
+            logger.debug(f"Data: {json.dumps(data, indent=2, default=str)}")
+            return data
+        logger.warning("No data returned from get_monthly_grouped_expenses")
+        return []
+
     async def query_expenses(self, query: str) -> dict:
         """Execute custom SQL query via MCP server"""
         if not self.session:
@@ -481,6 +503,205 @@ Keep your advice concise, friendly, and actionable. Focus on practical tips they
         lines.append(f"\nTotal Monthly Spending: ${total:.2f}")
         return "\n".join(lines)
 
+    async def generate_monthly_review(self, target_year: int, target_month: int) -> str:
+        """
+        Generate monthly expense review comparing current month with previous month.
+
+        Args:
+            target_year: Year of the month to review (e.g., 2026)
+            target_month: Month to review (1-12, e.g., 1 for January)
+
+        Returns:
+            Formatted monthly review report with comparison table and analysis
+        """
+        logger.info(f"Generating monthly review for {target_year}-{target_month:02d}")
+
+        # Calculate previous month
+        if target_month == 1:
+            prev_year = target_year - 1
+            prev_month = 12
+        else:
+            prev_year = target_year
+            prev_month = target_month - 1
+
+        # Fetch data for both months
+        current_month_data = await self.get_monthly_grouped_expenses(target_year, target_month)
+        prev_month_data = await self.get_monthly_grouped_expenses(prev_year, prev_month)
+
+        # Build comparison table
+        report = self._build_monthly_comparison_report(
+            current_month_data, prev_month_data,
+            target_year, target_month,
+            prev_year, prev_month
+        )
+
+        # Generate AI analysis
+        analysis = await self._generate_monthly_analysis(
+            current_month_data, prev_month_data,
+            target_year, target_month,
+            prev_year, prev_month
+        )
+
+        return f"{report}\n\n{analysis}"
+
+    def _build_monthly_comparison_report(
+        self,
+        current_data: list,
+        prev_data: list,
+        current_year: int,
+        current_month: int,
+        prev_year: int,
+        prev_month: int
+    ) -> str:
+        """Build formatted comparison table"""
+        from calendar import month_name
+
+        # Create dictionaries for easier lookup
+        current_dict = {item['typeName']: float(item['total_expense']) for item in current_data}
+        prev_dict = {item['typeName']: float(item['total_expense']) for item in prev_data}
+
+        # Get all unique categories
+        all_categories = sorted(set(current_dict.keys()) | set(prev_dict.keys()))
+
+        # Build report header
+        current_label = f"{current_year} {month_name[current_month][:3]}"
+        prev_label = f"{prev_year} {month_name[prev_month][:3]}"
+
+        lines = []
+        lines.append("=" * 100)
+        lines.append(f"Expense Overview – {current_label} vs. {prev_label}")
+        lines.append("=" * 100)
+        lines.append("")
+
+        # Table header
+        lines.append(f"{'Category':<35} {current_label:>12} {prev_label:>12} {'Δ (Change)':>15} {'% Change':>10}")
+        lines.append("-" * 100)
+
+        # Calculate totals
+        current_total = sum(current_dict.values())
+        prev_total = sum(prev_dict.values())
+
+        # Build rows for each category
+        for category in all_categories:
+            current_val = current_dict.get(category, 0)
+            prev_val = prev_dict.get(category, 0)
+
+            # Format values
+            current_str = f"${current_val:,.2f}" if current_val > 0 else "–"
+            prev_str = f"${prev_val:,.2f}" if prev_val > 0 else "–"
+
+            # Calculate change
+            if current_val > 0 and prev_val > 0:
+                delta = current_val - prev_val
+                pct_change = (delta / prev_val) * 100
+                delta_str = f"{'+' if delta >= 0 else ''}{delta:,.2f}"
+                pct_str = f"{'+' if pct_change >= 0 else ''}{pct_change:.0f}%"
+            elif current_val > 0 and prev_val == 0:
+                delta_str = f"+{current_val:,.2f}"
+                pct_str = "NEW"
+            elif current_val == 0 and prev_val > 0:
+                delta_str = f"−{prev_val:,.2f}"
+                pct_str = "REMOVED"
+            else:
+                delta_str = "–"
+                pct_str = "–"
+
+            lines.append(f"{category:<35} {current_str:>12} {prev_str:>12} {delta_str:>15} {pct_str:>10}")
+
+        # Add totals
+        lines.append("-" * 100)
+        total_delta = current_total - prev_total
+        total_pct = (total_delta / prev_total * 100) if prev_total > 0 else 0
+        delta_str = f"{'+' if total_delta >= 0 else ''}{total_delta:,.2f}"
+        pct_str = f"{'+' if total_pct >= 0 else ''}{total_pct:.0f}%"
+
+        lines.append(f"{'TOTAL':<35} ${current_total:>11,.2f} ${prev_total:>11,.2f} {delta_str:>15} {pct_str:>10}")
+        lines.append("=" * 100)
+
+        return "\n".join(lines)
+
+    async def _generate_monthly_analysis(
+        self,
+        current_data: list,
+        prev_data: list,
+        current_year: int,
+        current_month: int,
+        prev_year: int,
+        prev_month: int
+    ) -> str:
+        """Generate AI analysis of monthly comparison"""
+        from calendar import month_name
+
+        current_label = f"{current_year} {month_name[current_month]}"
+        prev_label = f"{prev_year} {month_name[prev_month]}"
+
+        # Prepare data summary for AI
+        current_dict = {item['typeName']: float(item['total_expense']) for item in current_data}
+        prev_dict = {item['typeName']: float(item['total_expense']) for item in prev_data}
+
+        current_total = sum(current_dict.values())
+        prev_total = sum(prev_dict.values())
+
+        # Find top increases and decreases
+        changes = []
+        for category in set(current_dict.keys()) | set(prev_dict.keys()):
+            current_val = current_dict.get(category, 0)
+            prev_val = prev_dict.get(category, 0)
+            if prev_val > 0:
+                delta = current_val - prev_val
+                pct_change = (delta / prev_val) * 100
+                changes.append({
+                    'category': category,
+                    'delta': delta,
+                    'pct_change': pct_change,
+                    'current': current_val,
+                    'prev': prev_val
+                })
+
+        # Sort by absolute delta
+        changes.sort(key=lambda x: abs(x['delta']), reverse=True)
+        top_changes = changes[:5]
+
+        prompt = f"""You are a financial advisor analyzing monthly expense changes.
+
+CURRENT MONTH: {current_label}
+- Total Spending: ${current_total:,.2f}
+- Number of Categories: {len([c for c in current_dict.values() if c > 0])}
+
+PREVIOUS MONTH: {prev_label}
+- Total Spending: ${prev_total:,.2f}
+- Number of Categories: {len([c for c in prev_dict.values() if c > 0])}
+
+OVERALL CHANGE:
+- Dollar Change: ${current_total - prev_total:+,.2f}
+- Percentage Change: {((current_total - prev_total) / prev_total * 100) if prev_total > 0 else 0:+.1f}%
+
+TOP 5 CATEGORY CHANGES:
+"""
+        for i, change in enumerate(top_changes, 1):
+            prompt += f"{i}. {change['category']}: ${change['current']:,.2f} vs ${change['prev']:,.2f} ({change['pct_change']:+.0f}%)\n"
+
+        prompt += """
+
+Please provide:
+1. Overall Assessment: Brief summary of spending pattern changes
+2. Key Insights: Top 3-4 notable changes and what they might indicate
+3. Categories Needing Attention: Which categories should be reviewed or monitored
+4. Recommendations: 2-3 specific actionable suggestions for next month
+5. Positive Notes: Any encouraging trends or good financial habits observed
+
+Keep your analysis concise, actionable, and friendly. Use markdown formatting for clarity."""
+
+        try:
+            response = self.ollama_client.chat(
+                model=self.ollama_model,
+                messages=[{'role': 'user', 'content': prompt}]
+            )
+            return response['message']['content']
+        except Exception as e:
+            logger.error(f"Error generating monthly analysis: {e}")
+            return "Unable to generate detailed analysis at this time."
+
     async def close(self):
         """Close the MCP connection"""
         if self.session:
@@ -529,6 +750,7 @@ async def interactive_mode():
                         print("  /weekly         - Show this week's expenses by category")
                         print("  /monthly        - Show this month's summary")
                         print("  /advice         - Get weekly financial advice")
+                        print("  /monthly-review - Generate monthly expense review with comparison")
                         print("  /help           - Show this help message")
                         print("  /quit or /exit  - Exit the chat")
                         print("\nOr just ask any question about your budget!")
@@ -555,6 +777,28 @@ async def interactive_mode():
                         monthly_data = await advisor.get_monthly_summary()
                         advice = advisor.generate_advice(weekly_data, monthly_data)
                         print(advice)
+                        print()
+                        continue
+
+                    elif user_input == '/monthly-review':
+                        print("\nAdvisor: Generating monthly expense review...\n")
+                        # Default to previous month for review
+                        today = datetime.now()
+                        if today.day <= 3:
+                            # First 3 days of month - review previous month
+                            if today.month == 1:
+                                review_year = today.year - 1
+                                review_month = 12
+                            else:
+                                review_year = today.year
+                                review_month = today.month - 1
+                        else:
+                            # Review current month
+                            review_year = today.year
+                            review_month = today.month
+
+                        review = await advisor.generate_monthly_review(review_year, review_month)
+                        print(review)
                         print()
                         continue
 
@@ -645,6 +889,55 @@ async def prompt_mode(prompt: str):
         await advisor.close()
 
 
+async def monthly_review_mode(target_year: Optional[int] = None, target_month: Optional[int] = None):
+    """Monthly review mode - compare current month with previous month"""
+    # Default to previous month (for beginning of month review)
+    if target_year is None or target_month is None:
+        today = datetime.now()
+        # If it's the first 3 days of the month, review the previous month
+        if today.day <= 3:
+            if today.month == 1:
+                target_year = today.year - 1
+                target_month = 12
+            else:
+                target_year = today.year
+                target_month = today.month - 1
+        else:
+            # Otherwise review current month so far
+            target_year = today.year
+            target_month = today.month
+
+    from calendar import month_name
+    month_label = f"{target_year} {month_name[target_month]}"
+
+    print("=" * 100)
+    print(f"Budget Advisor - Monthly Expense Review: {month_label}")
+    print("=" * 100)
+    print()
+
+    advisor = BudgetAdvisor()
+
+    try:
+        # Connect to MCP server
+        await advisor.connect_to_mcp_server()
+
+        # Generate monthly review
+        review = await advisor.generate_monthly_review(target_year, target_month)
+
+        # Display the review
+        print(review)
+        print()
+        print("=" * 100)
+
+    except Exception as e:
+        logger.error(f"Error generating monthly review: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
+    finally:
+        await advisor.close()
+
+
 def main():
     """Main entry point"""
     import argparse
@@ -652,14 +945,26 @@ def main():
     parser = argparse.ArgumentParser(description='Budget Advisor - AI-powered financial advice')
     parser.add_argument(
         '--mode',
-        choices=['interactive', 'weekly'],
+        choices=['interactive', 'weekly', 'monthly-review'],
         default='interactive',
-        help='Mode to run: interactive chat or one-time weekly advice (default: interactive)'
+        help='Mode to run: interactive chat, one-time weekly advice, or monthly review (default: interactive)'
     )
     parser.add_argument(
         '--prompt',
         type=str,
         help='Process a single prompt and exit (for programmatic access)'
+    )
+    parser.add_argument(
+        '--year',
+        type=int,
+        help='Year for monthly review (default: auto-detect)'
+    )
+    parser.add_argument(
+        '--month',
+        type=int,
+        choices=range(1, 13),
+        metavar='1-12',
+        help='Month for monthly review (1-12, default: auto-detect)'
     )
 
     args = parser.parse_args()
@@ -667,6 +972,8 @@ def main():
     # Prompt mode takes precedence
     if args.prompt:
         asyncio.run(prompt_mode(args.prompt))
+    elif args.mode == 'monthly-review':
+        asyncio.run(monthly_review_mode(args.year, args.month))
     elif args.mode == 'interactive':
         asyncio.run(interactive_mode())
     else:
