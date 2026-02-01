@@ -202,3 +202,56 @@ def get_monthly_detailed_expenses(target_year: int, target_month: int) -> list[d
     """
     logger.info(f"Fetching detailed monthly expenses for {target_year}-{target_month:02d}")
     return execute_query(query)
+
+
+def get_valid_type_names() -> list[str]:
+    """
+    Get list of valid expense type names (categories) from MerchantType table.
+
+    Returns:
+        List of valid typeName strings
+    """
+    query = """
+        SELECT "typeName"
+        FROM family_budget."MerchantType"
+        ORDER BY "typeName";
+    """
+    results = execute_query(query)
+    return [row['typeName'] for row in results]
+
+
+def get_expenses_by_category(target_year: int, target_month: int, type_name: str) -> list[dict[str, Any]]:
+    """
+    Get all expenses for a specific category (typeName), year, and month.
+    Validates that the typeName exists in MerchantType table before querying.
+
+    Args:
+        target_year: Year (e.g., 2024)
+        target_month: Month (1-12)
+        type_name: Category name (must exist in MerchantType table)
+
+    Returns:
+        List of all expense records matching the category, year, and month
+
+    Raises:
+        ValueError: If type_name is not a valid category
+    """
+    # Validate typeName
+    valid_types = get_valid_type_names()
+    if type_name not in valid_types:
+        raise ValueError(
+            f"Invalid typeName: '{type_name}'. Valid types are: {', '.join(valid_types)}"
+        )
+
+    # Query expenses for this category
+    query = f"""
+        SELECT *
+        FROM family_budget.dailyexpensevw
+        WHERE
+            "typeName" = '{type_name}'
+            AND EXTRACT(YEAR FROM "date") = {target_year}
+            AND EXTRACT(MONTH FROM "date") = {target_month}
+        ORDER BY "date";
+    """
+    logger.info(f"Fetching {type_name} expenses for {target_year}-{target_month:02d}")
+    return execute_query(query)
