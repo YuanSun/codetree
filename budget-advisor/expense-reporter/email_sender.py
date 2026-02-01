@@ -335,6 +335,12 @@ class EmailSender:
                     continue
 
                 # Regular data row
+                # Check if this row has content (not just dashes and spaces)
+                # Skip rows that are all dashes like "Travel – – – –"
+                if line.count('–') >= 3 and line.count('$') == 0:
+                    # Skip this row - it's likely an empty category
+                    continue
+
                 # Parse the category name (everything before the first $)
                 dollar_pos = line.find('$')
                 if dollar_pos > 0:
@@ -381,13 +387,6 @@ class EmailSender:
                             result_lines.append('      <td style="padding: 10px; border: 1px solid #e0e0e0; text-align: right;">–</td>')
 
                     result_lines.append('    </tr>')
-                else:
-                    # No dollar sign found, might be end of table
-                    if in_comparison_table:
-                        result_lines.append('  </tbody>')
-                        result_lines.append('</table>')
-                        in_comparison_table = False
-                    result_lines.append(line)
             else:
                 # Not in table
                 if not in_comparison_table:
@@ -410,16 +409,16 @@ class EmailSender:
         # First, convert monthly comparison table format to HTML
         text = self._convert_monthly_comparison_table(text)
 
-        # Escape HTML characters (but preserve our generated tables)
-        # Split by table tags to avoid escaping HTML inside tables
-        parts = re.split(r'(<table>.*?</table>)', text, flags=re.DOTALL)
+        # Escape HTML characters (but preserve our generated tables and h2 tags)
+        # Split by HTML tags to avoid escaping generated HTML
+        parts = re.split(r'(<table[^>]*>.*?</table>|<h2[^>]*>.*?</h2>)', text, flags=re.DOTALL)
         escaped_parts = []
         for part in parts:
-            if part.startswith('<table>'):
-                # Keep table HTML as-is
+            if part.startswith('<table') or part.startswith('<h2'):
+                # Keep HTML tags as-is
                 escaped_parts.append(part)
             else:
-                # Escape HTML in non-table parts
+                # Escape HTML in non-HTML parts
                 part = part.replace('&', '&amp;')
                 part = part.replace('<', '&lt;')
                 part = part.replace('>', '&gt;')
