@@ -124,6 +124,15 @@ async def list_tools() -> list[Tool]:
             },
         ),
         Tool(
+            name="get_expense_categories",
+            description="Get list of all valid expense categories (typeNames) from the MerchantType table. Use this to discover available categories before querying expenses by category.",
+            inputSchema={
+                "type": "object",
+                "properties": {},
+                "required": [],
+            },
+        ),
+        Tool(
             name="get_expenses_by_category",
             description="Get all expenses for a specific category (typeName), year, and month. Validates category against MerchantType table. Returns all matching expense records.",
             inputSchema={
@@ -179,6 +188,11 @@ async def call_tool(name: str, arguments: Any) -> list[TextContent]:
             if not target_year or not target_month:
                 raise ValueError("target_year and target_month parameters are required")
             results = get_monthly_detailed_expenses(int(target_year), int(target_month))
+
+        elif name == "get_expense_categories":
+            # Returns list of valid category names
+            category_names = get_valid_type_names()
+            results = [{"typeName": name} for name in category_names]
 
         elif name == "get_expenses_by_category":
             target_year = arguments.get("target_year")

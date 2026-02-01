@@ -2,7 +2,7 @@
 
 ## Overview
 
-Added three new tools to the Budget Advisor MCP Server for querying monthly expense data with year and month parameters, including a validated category-based query tool.
+Added four new tools to the Budget Advisor MCP Server for querying monthly expense data with year and month parameters, including category discovery and validated category-based queries.
 
 ## Tools Added
 
@@ -121,7 +121,54 @@ result = await session.call_tool(
 
 ---
 
-### 3. `get_expenses_by_category`
+### 3. `get_expense_categories`
+
+**Description**: Get list of all valid expense categories (typeNames) from the MerchantType table. Use this to discover available categories before querying expenses.
+
+**Parameters**: None
+
+**Returns**: List of all valid expense category names
+
+**SQL Query**:
+```sql
+SELECT "typeName"
+FROM family_budget."MerchantType"
+ORDER BY "typeName";
+```
+
+**Example Usage**:
+```python
+# Get all available expense categories
+result = await session.call_tool("get_expense_categories")
+```
+
+**Example Response**:
+```json
+[
+  {"typeName": "Book & Education"},
+  {"typeName": "Clothing"},
+  {"typeName": "Entertainment"},
+  {"typeName": "Food"},
+  {"typeName": "Housing (Rent/Mortgage)"},
+  {"typeName": "Life Consumption"},
+  {"typeName": "Medical Care"},
+  {"typeName": "Recreation"},
+  {"typeName": "Restaurant"},
+  {"typeName": "Self-Care"},
+  {"typeName": "Transportation/Gas"},
+  ...
+]
+```
+
+**Use Cases**:
+- Discover what expense categories exist in the database
+- Validate category names before querying
+- Build dynamic UIs that show available categories
+- Help AI understand what categories it can query
+
+---
+
+### 4. `get_expenses_by_category`
 
 **Description**: Get all expenses for a specific category (typeName) with validation against the MerchantType table.
 
@@ -232,9 +279,13 @@ dec_details = await session.call_tool("get_monthly_detailed_expenses",
     {"target_year": 2024, "target_month": 12})
 ```
 
-### 4. Category-Specific Analysis
+### 4. Category Discovery and Querying
 ```python
-# Get all Food expenses for January 2024
+# First, discover available categories
+categories = await session.call_tool("get_expense_categories")
+print("Available categories:", [c['typeName'] for c in categories])
+
+# Then query expenses for a specific category
 food_expenses = await session.call_tool("get_expenses_by_category", {
     "target_year": 2024,
     "target_month": 1,
@@ -247,8 +298,9 @@ total = sum(item['expense_numeric'] for item in food_expenses)
 
 ### 5. AI Advisor Queries
 The AI advisor can now answer questions like:
+- "What expense categories do I have?" (uses `get_expense_categories`)
 - "Compare my spending in October 2024 vs November 2024"
-- "Show me all my restaurant expenses in December 2024"
+- "Show me all my restaurant expenses in December 2024" (uses `get_expenses_by_category`)
 - "What were my total expenses by category in July 2024?"
 - "List all transactions at Whole Foods in January 2024"
 - "How much did I spend on Food in January 2024?" (uses `get_expenses_by_category`)
@@ -266,6 +318,9 @@ Run the test scripts to verify functionality:
 ```bash
 # Test database functions directly
 python3 test_db_functions.py
+
+# Test category discovery
+python3 test_expense_categories.py
 
 # Test category query with validation
 python3 test_category_query.py
