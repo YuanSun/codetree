@@ -74,7 +74,13 @@ class ReportScheduler:
             logger.error(f"❌ Weekly report failed: {e}", exc_info=True)
 
     def run_monthly_report_job(self):
-        """Job function that runs the monthly report"""
+        """Job function that checks if it's the 1st of month and runs the monthly report"""
+        today = datetime.now()
+
+        # Only run on the 1st day of the month
+        if today.day != 1:
+            return
+
         logger.info(f"⏰ Scheduled monthly report triggered at {datetime.now()}")
 
         try:
@@ -106,10 +112,10 @@ class ReportScheduler:
         else:
             logger.info("📅 Weekly Report: Disabled")
 
-        # Schedule monthly job (runs on the 1st of each month)
+        # Schedule monthly job (runs daily but only executes on the 1st of each month)
         if self.monthly_enabled:
-            # Schedule for the 1st day of every month
-            schedule.every().month.at(self.monthly_time).do(self.run_monthly_report_job)
+            # Schedule to check daily at specified time, will only run on 1st of month
+            schedule.every().day.at(self.monthly_time).do(self.run_monthly_report_job)
             logger.info(f"📅 Monthly Report: 1st of each month at {self.monthly_time}")
             jobs_scheduled += 1
         else:
