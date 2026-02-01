@@ -143,3 +143,62 @@ def get_monthly_summary(month: Optional[str] = None) -> list[dict[str, Any]]:
         ORDER BY total_amount DESC;
     """
     return execute_query(query)
+
+
+def get_monthly_grouped_expenses(target_year: int, target_month: int) -> list[dict[str, Any]]:
+    """
+    Get grouped monthly expenses by category for a specific year and month.
+
+    Args:
+        target_year: Year (e.g., 2024)
+        target_month: Month (1-12)
+
+    Returns:
+        List of expense records with typeName and total_expense, ordered by total descending
+    """
+    query = f"""
+        SELECT
+            "typeName",
+            SUM("expense_numeric") AS total_expense
+        FROM family_budget.dailyexpensevw
+        WHERE
+            EXTRACT(YEAR FROM "date") = {target_year}
+            AND EXTRACT(MONTH FROM "date") = {target_month}
+        GROUP BY "typeName"
+        ORDER BY total_expense DESC;
+    """
+    logger.info(f"Fetching grouped monthly expenses for {target_year}-{target_month:02d}")
+    return execute_query(query)
+
+
+def get_monthly_detailed_expenses(target_year: int, target_month: int) -> list[dict[str, Any]]:
+    """
+    Get detailed transaction-level monthly expenses for a specific year and month.
+
+    Args:
+        target_year: Year (e.g., 2024)
+        target_month: Month (1-12)
+
+    Returns:
+        List of detailed expense records with all transaction information, ordered by typeName and date
+    """
+    query = f"""
+        SELECT
+            "typeName",
+            "date",
+            "expense",
+            "merchantName",
+            "merchantCity",
+            "merchantStateOrProvince",
+            "merchantCountry",
+            "comment",
+            "attachment",
+            "expense_numeric"
+        FROM family_budget.dailyexpensevw
+        WHERE
+            EXTRACT(YEAR FROM "date") = {target_year}
+            AND EXTRACT(MONTH FROM "date") = {target_month}
+        ORDER BY "typeName", "date";
+    """
+    logger.info(f"Fetching detailed monthly expenses for {target_year}-{target_month:02d}")
+    return execute_query(query)

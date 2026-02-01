@@ -27,6 +27,8 @@ from db_operations import (
     execute_query,
     get_weekly_expenses,
     get_monthly_summary,
+    get_monthly_grouped_expenses,
+    get_monthly_detailed_expenses,
 )
 
 # Configure logging
@@ -83,6 +85,42 @@ async def list_tools() -> list[Tool]:
                 },
             },
         ),
+        Tool(
+            name="get_monthly_grouped_expenses",
+            description="Get grouped monthly expenses by category for a specific year and month. Returns total expenses per category.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "target_year": {
+                        "type": "number",
+                        "description": "Target year (e.g., 2024)",
+                    },
+                    "target_month": {
+                        "type": "number",
+                        "description": "Target month (1-12)",
+                    },
+                },
+                "required": ["target_year", "target_month"],
+            },
+        ),
+        Tool(
+            name="get_monthly_detailed_expenses",
+            description="Get detailed transaction-level expenses for a specific year and month. Returns all transaction details including merchant info, dates, amounts, and comments.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "target_year": {
+                        "type": "number",
+                        "description": "Target year (e.g., 2024)",
+                    },
+                    "target_month": {
+                        "type": "number",
+                        "description": "Target month (1-12)",
+                    },
+                },
+                "required": ["target_year", "target_month"],
+            },
+        ),
     ]
 
 
@@ -103,6 +141,20 @@ async def call_tool(name: str, arguments: Any) -> list[TextContent]:
         elif name == "get_monthly_summary":
             month = arguments.get("month")
             results = get_monthly_summary(month)
+
+        elif name == "get_monthly_grouped_expenses":
+            target_year = arguments.get("target_year")
+            target_month = arguments.get("target_month")
+            if not target_year or not target_month:
+                raise ValueError("target_year and target_month parameters are required")
+            results = get_monthly_grouped_expenses(int(target_year), int(target_month))
+
+        elif name == "get_monthly_detailed_expenses":
+            target_year = arguments.get("target_year")
+            target_month = arguments.get("target_month")
+            if not target_year or not target_month:
+                raise ValueError("target_year and target_month parameters are required")
+            results = get_monthly_detailed_expenses(int(target_year), int(target_month))
 
         else:
             raise ValueError(f"Unknown tool: {name}")
