@@ -208,5 +208,5 @@ __marimo__/
 
 .vscode/*
 
-.sse-bridge/*
-.grace_study/*
+sse-bridge/*
+grace_study/*
