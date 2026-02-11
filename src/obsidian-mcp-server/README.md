@@ -27,7 +27,7 @@ Model Context Protocol (MCP) server for Obsidian vault integration. Connect your
 ### 1. Install Dependencies
 
 ```bash
-cd budget-advisor/obsidian-mcp-server
+cd src/obsidian-mcp-server
 pip install -r requirements.txt
 ```
 
@@ -72,7 +72,7 @@ You should receive a JSON response with vault information.
 ### Start the MCP Server
 
 ```bash
-cd budget-advisor/obsidian-mcp-server
+cd src/obsidian-mcp-server
 python3.11 server.py
 ```
 
@@ -87,7 +87,7 @@ Add to your Antigravity MCP configuration:
   "mcpServers": {
     "obsidian": {
       "command": "python3.11",
-      "args": ["/path/to/codetree/budget-advisor/obsidian-mcp-server/server.py"],
+      "args": ["/path/to/codetree/src/obsidian-mcp-server/server.py"],
       "env": {
         "OBSIDIAN_API_KEY": "your-api-key-here",
         "OBSIDIAN_VAULT_PATH": "/Users/yourusername/Documents/ObsidianVault",
