@@ -3,7 +3,7 @@
     "obsidian": {
       "command": "python3.11",
       "args": [
-        "/path/to/codetree/budget-advisor/obsidian-mcp-server/server.py"
+        "/path/to/codetree/src/obsidian-mcp-server/server.py"
       ],
       "env": {
         "OBSIDIAN_API_KEY": "01c2cf1ab381fe6b6094122def7523adbb9afa636c6b801d836acbb343a49f0d",
