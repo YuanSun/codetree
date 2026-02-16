@@ -1,3 +1,6 @@
 schedule>=1.2.0
 python-dotenv>=1.0.0
 matplotlib>=3.5.0
+ollama >= 0.6.1
+mcp>=1.26.0
+psycopg2>=2.9.11
