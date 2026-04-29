@@ -214,3 +214,5 @@ grace_study/*
 
 # Custom config files containing secrets
 antigravity-config.json
+
+.idea/
