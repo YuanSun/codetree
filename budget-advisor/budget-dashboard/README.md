@@ -5,8 +5,8 @@ A quick Streamlit page over the `family_budget` Postgres data used by the rest o
 ## Features
 
 - **Data Table**: browse `dailyexpensevw` / `incomevw` with date, category, and name filters; download as CSV.
-- **Upload Attachment**: pick an existing expense row and attach a receipt/document to it (stored on local disk, path saved in `DailyExpense.attachment`).
-- **Pivot Table**: Excel-style pivot over expenses or income — pick Rows/Columns/Value/Aggregation.
+- **Upload Attachment**: filter by date, category, name, amount range, and attachment status, then click a row directly in the table to select it and attach a receipt/document (stored on local disk, path saved in `DailyExpense.attachment`).
+- **Pivot Table**: Excel-style pivot over expenses or income — pick Rows/Columns/Value/Aggregation — plus a bar/line/area chart of the top N rows underneath for a quick visual read.
 
 ## Setup
 
