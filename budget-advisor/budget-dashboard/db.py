@@ -168,6 +168,40 @@ def get_income_types() -> list[str]:
     return df["typeName"].tolist()
 
 
+def get_balance_years() -> list[int]:
+    """
+    Discover which family_budget.balance_{year}_vw views exist by introspecting
+    the schema, rather than assuming a fixed year range.
+    """
+    df = _query_df(
+        """
+        SELECT table_name
+        FROM information_schema.views
+        WHERE table_schema = 'family_budget' AND table_name ~ '^balance_[0-9]{4}_vw$'
+        ORDER BY table_name;
+        """
+    )
+    return sorted(int(name.split("_")[1]) for name in df["table_name"])
+
+
+def fetch_balance(year: int) -> pd.DataFrame:
+    """
+    Fetch the monthly expense/income/balance breakdown from
+    family_budget.balance_{year}_vw. The view name can't be parameterized
+    like a normal query value, so validate year is a plain 4-digit int
+    before interpolating it (it should also only ever come from
+    get_balance_years(), which reads real view names from the schema).
+    """
+    if not isinstance(year, int) or not (1000 <= year <= 9999):
+        raise ValueError(f"Invalid year: {year!r}")
+    query = f"""
+        SELECT month, expense, income, balance
+        FROM family_budget.balance_{year}_vw
+        ORDER BY month;
+    """
+    return _query_df(query)
+
+
 def update_expense_fields(row_id: str, date_value, amount: float, comment: str) -> None:
     """
     Update the editable fields that belong directly to DailyExpense (not the
