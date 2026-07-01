@@ -144,7 +144,11 @@ if chart_type == "Pie":
                 alt.Tooltip("percentage:Q", format=".1%", title="percentage"),
             ],
         )
-        .properties(width=chart_size, height=chart_size)
+        .properties(
+            width=chart_size,
+            height=chart_size,
+            autosize=alt.AutoSizeParams(type="pad", contains="padding"),
+        )
         .configure_view(strokeWidth=0)
     )
     st.altair_chart(pie_chart, width="stretch")
