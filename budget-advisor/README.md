@@ -16,6 +16,7 @@ This project uses:
 budget-advisor/
 ├── postgres-mcp-server/    # MCP server for PostgreSQL database access
 ├── advisor-agent/          # Ollama-based AI advisor
+├── budget-dashboard/       # Streamlit page: data table, receipt uploads, pivot views
 └── notification-service/   # Email/SMS notification service (coming soon)
 ```
 
@@ -37,7 +38,13 @@ The AI advisor uses Ollama to analyze your expense data and generate personalize
 
 See [advisor-agent/README.md](advisor-agent/README.md) for setup and usage instructions.
 
-### 3. Quick Start
+### 3. Budget Dashboard
+
+A Streamlit page for browsing expenses/income in a table, uploading receipts against existing rows, and building pivot-table style summaries.
+
+See [budget-dashboard/README.md](budget-dashboard/README.md) for setup instructions.
+
+### 4. Quick Start
 
 ```bash
 # 1. Set up PostgreSQL MCP Server
@@ -91,5 +98,6 @@ make test-cov
 
 - ✅ PostgreSQL MCP Server implemented
 - ✅ Ollama advisor agent implemented
+- ✅ Budget dashboard (Streamlit) implemented
 - ⏳ Notification service (pending)
 - ⏳ Weekly automation (pending)
