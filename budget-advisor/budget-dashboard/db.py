@@ -34,6 +34,26 @@ psycopg2.extensions.register_type(
     )
 )
 
+
+def _parse_money(value: Optional[str]) -> Optional[float]:
+    """Parse a Postgres `money`-formatted string (e.g. '$1,234.56', '-$5.00', '($5.00)') to a float."""
+    if value is None:
+        return None
+    cleaned = value.replace("$", "").replace(",", "").strip()
+    if cleaned.startswith("(") and cleaned.endswith(")"):
+        cleaned = "-" + cleaned[1:-1]
+    return float(cleaned)
+
+
+# Postgres MONEY columns (e.g. balance_{year}_vw's expense/income/balance) come
+# back from psycopg2 as raw locale-formatted strings like '$1,234.56' rather
+# than numbers -- psycopg2 has no built-in numeric adapter for `money` the way
+# it does for NUMERIC. Cast them to float at the driver level too, for the
+# same reasons as DEC2FLOAT above.
+psycopg2.extensions.register_type(
+    psycopg2.extensions.new_type((790,), "MONEY2FLOAT", lambda value, curs: _parse_money(value))
+)
+
 DB_CONFIG = {
     "host": os.getenv("POSTGRES_HOST", "localhost"),
     "port": int(os.getenv("POSTGRES_PORT", "5432")),
