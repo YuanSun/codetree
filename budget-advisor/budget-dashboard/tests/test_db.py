@@ -90,3 +90,13 @@ class TestUpdateIncomeAttachment:
             assert False, "expected NotImplementedError"
         except NotImplementedError:
             pass
+
+
+class TestUpdateExpenseFields:
+    def test_issues_parameterized_update(self):
+        with patch.object(db, "_execute") as mock_execute:
+            db.update_expense_fields(7, "2024-01-15", 42.5, "corrected amount")
+            mock_execute.assert_called_once_with(
+                'UPDATE family_budget."DailyExpense" SET date = %s, expense_numeric = %s, comment = %s WHERE id = %s;',
+                ("2024-01-15", 42.5, "corrected amount", 7),
+            )

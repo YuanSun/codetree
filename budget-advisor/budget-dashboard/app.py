@@ -4,9 +4,12 @@ from datetime import date
 import streamlit as st
 from dotenv import load_dotenv
 
+import auth
+
 load_dotenv()
 
 st.set_page_config(page_title="Budget Dashboard", page_icon="\U0001F4CA", layout="wide")
+auth.render_login_sidebar()
 
 st.title("Budget Dashboard")
 st.markdown(
@@ -17,6 +20,7 @@ Use the sidebar to navigate:
 
 - **Data Table** — browse expenses/income with filters
 - **Upload Attachment** — attach a receipt/document to an existing expense row
+- **Edit Entry** — modify an existing expense row's date/amount/comment (admin only)
 - **Pivot Table** — Excel-style pivot/aggregation over expenses or income
 """
 )

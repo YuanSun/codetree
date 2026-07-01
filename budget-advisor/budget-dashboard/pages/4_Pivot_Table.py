@@ -1,14 +1,17 @@
 from datetime import date, timedelta
 
+import altair as alt
 import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
 
+import auth
 import db
 
 load_dotenv()
 
 st.set_page_config(page_title="Pivot Table", page_icon="\U0001F5C3", layout="wide")
+auth.render_login_sidebar()
 st.title("Pivot Table")
 
 dataset = st.radio("Dataset", ["Expenses", "Income"], horizontal=True)
@@ -93,6 +96,8 @@ pivot_chart = pd.pivot_table(
 
 if isinstance(pivot_chart.columns, pd.MultiIndex):
     pivot_chart.columns = [" / ".join(str(c) for c in col) for col in pivot_chart.columns]
+else:
+    pivot_chart.columns = [str(c) for c in pivot_chart.columns]
 
 pivot_chart.index = pivot_chart.index.map(lambda idx: " / ".join(str(v) for v in idx) if isinstance(idx, tuple) else str(idx))
 
@@ -101,15 +106,42 @@ pivot_chart = pivot_chart.loc[row_total.sort_values(ascending=False).index]
 
 col1, col2 = st.columns(2)
 with col1:
-    chart_type = st.selectbox("Chart type", ["Bar", "Line", "Area"])
+    chart_type = st.selectbox("Chart type", ["Bar", "Line", "Area", "Pie"])
 with col2:
     top_n = st.slider("Show top N rows", min_value=5, max_value=max(5, len(pivot_chart)), value=min(15, len(pivot_chart)))
 
 chart_data = pivot_chart.head(top_n)
+row_order = list(chart_data.index)
+series_names = list(chart_data.columns)
 
-if chart_type == "Bar":
-    st.bar_chart(chart_data)
-elif chart_type == "Line":
-    st.line_chart(chart_data)
+if chart_type == "Pie":
+    if len(series_names) > 1:
+        pie_series = st.selectbox("Series to chart", options=series_names)
+    else:
+        pie_series = series_names[0]
+    pie_data = chart_data[[pie_series]].reset_index()
+    pie_data.columns = ["row_label", "value"]
+    pie_chart = (
+        alt.Chart(pie_data)
+        .mark_arc()
+        .encode(
+            theta=alt.Theta("value:Q"),
+            color=alt.Color("row_label:N", sort=row_order, title=", ".join(rows)),
+            tooltip=["row_label", "value"],
+        )
+    )
+    st.altair_chart(pie_chart, use_container_width=True)
 else:
-    st.area_chart(chart_data)
+    melted = chart_data.reset_index(names="row_label").melt(id_vars="row_label", var_name="series", value_name="value")
+    mark = {"Bar": "bar", "Line": "line", "Area": "area"}[chart_type]
+    encoding = {
+        "x": alt.X("row_label:N", sort=row_order, title=", ".join(rows)),
+        "y": alt.Y("value:Q", title=f"{aggfunc}({value_col})"),
+        "tooltip": ["row_label", "series", "value"],
+    }
+    if len(series_names) > 1:
+        encoding["color"] = alt.Color("series:N", title=", ".join(columns))
+        if chart_type == "Bar":
+            encoding["xOffset"] = "series:N"
+    chart = getattr(alt.Chart(melted), f"mark_{mark}")().encode(**encoding)
+    st.altair_chart(chart, use_container_width=True)

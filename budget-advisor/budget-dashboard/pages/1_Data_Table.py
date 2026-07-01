@@ -3,11 +3,13 @@ from datetime import date, timedelta
 import streamlit as st
 from dotenv import load_dotenv
 
+import auth
 import db
 
 load_dotenv()
 
 st.set_page_config(page_title="Data Table", page_icon="\U0001F4CB", layout="wide")
+auth.render_login_sidebar()
 st.title("Data Table")
 
 dataset = st.radio("Dataset", ["Expenses", "Income"], horizontal=True)
