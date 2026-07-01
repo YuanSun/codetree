@@ -158,6 +158,17 @@ def get_income_types() -> list[str]:
     return df["typeName"].tolist()
 
 
+def update_expense_fields(row_id: int, date_value, amount: float, comment: str) -> None:
+    """
+    Update the editable fields that belong directly to DailyExpense (not the
+    shared merchant lookup tables): date, expense_numeric, comment.
+    """
+    _execute(
+        'UPDATE family_budget."DailyExpense" SET date = %s, expense_numeric = %s, comment = %s WHERE id = %s;',
+        (date_value, amount, comment, row_id),
+    )
+
+
 def update_expense_attachment(row_id: int, path: str) -> None:
     _execute(
         'UPDATE family_budget."DailyExpense" SET attachment = %s WHERE id = %s;',
