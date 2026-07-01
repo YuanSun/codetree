@@ -56,7 +56,7 @@ if not selected_positions:
 selected_row = df.iloc[selected_positions[0]]
 
 st.divider()
-st.subheader(f"Expense #{int(selected_row.id)} — {selected_row.merchantName}")
+st.subheader(f"Expense #{selected_row.id} — {selected_row.merchantName}")
 
 with st.form("edit_entry_form"):
     new_date = st.date_input("Date", value=selected_row.date)
@@ -65,6 +65,6 @@ with st.form("edit_entry_form"):
     submitted = st.form_submit_button("Save changes", type="primary", disabled=role != "admin")
 
 if submitted:
-    db.update_expense_fields(int(selected_row.id), new_date, new_amount, new_comment)
-    st.success(f"Updated expense #{int(selected_row.id)}.")
+    db.update_expense_fields(selected_row.id, new_date, new_amount, new_comment)
+    st.success(f"Updated expense #{selected_row.id}.")
     st.rerun()

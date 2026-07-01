@@ -77,13 +77,13 @@ if not selected_positions:
 selected_row = df.iloc[selected_positions[0]]
 
 st.divider()
-st.subheader(f"Expense #{int(selected_row.id)} — {selected_row.date} — {selected_row.merchantName}")
+st.subheader(f"Expense #{selected_row.id} — {selected_row.date} — {selected_row.merchantName}")
 st.write(f"Current attachment: `{selected_row.attachment or '(none)'}`")
 
 uploaded_file = st.file_uploader("Choose a document", type=None)
 
 if st.button("Upload and attach", type="primary", disabled=uploaded_file is None):
-    relative_path = db.save_uploaded_file(uploaded_file, int(selected_row.id), category="expense")
-    db.update_expense_attachment(int(selected_row.id), relative_path)
-    st.success(f"Attached `{relative_path}` to expense #{int(selected_row.id)}.")
+    relative_path = db.save_uploaded_file(uploaded_file, selected_row.id, category="expense")
+    db.update_expense_attachment(selected_row.id, relative_path)
+    st.success(f"Attached `{relative_path}` to expense #{selected_row.id}.")
     st.rerun()

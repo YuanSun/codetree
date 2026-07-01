@@ -58,13 +58,16 @@ class TestBuildFilterClause:
         assert params == ("%Costco%",)
 
 
+UUID_ID = "8cfecc1a-513c-428e-924e-20d51f0e6bd6"
+
+
 class TestSaveUploadedFile:
     def test_writes_file_and_returns_relative_path(self, tmp_path):
         with patch.object(db, "ATTACHMENT_STORAGE_DIR", str(tmp_path)):
             uploaded = FakeUploadedFile("receipt.pdf", b"hello world")
-            relative_path = db.save_uploaded_file(uploaded, row_id=42, category="expense")
+            relative_path = db.save_uploaded_file(uploaded, row_id=UUID_ID, category="expense")
 
-            assert relative_path.startswith(os.path.join("expense", "42"))
+            assert relative_path.startswith(os.path.join("expense", UUID_ID))
             assert relative_path.endswith("receipt.pdf")
 
             absolute_path = os.path.join(str(tmp_path), relative_path)
@@ -76,17 +79,17 @@ class TestSaveUploadedFile:
 class TestUpdateExpenseAttachment:
     def test_issues_parameterized_update(self):
         with patch.object(db, "_execute") as mock_execute:
-            db.update_expense_attachment(7, "expense/7/receipt.pdf")
+            db.update_expense_attachment(UUID_ID, f"expense/{UUID_ID}/receipt.pdf")
             mock_execute.assert_called_once_with(
                 'UPDATE family_budget."DailyExpense" SET attachment = %s WHERE id = %s;',
-                ("expense/7/receipt.pdf", 7),
+                (f"expense/{UUID_ID}/receipt.pdf", UUID_ID),
             )
 
 
 class TestUpdateIncomeAttachment:
     def test_raises_not_implemented(self):
         try:
-            db.update_income_attachment(1, "some/path")
+            db.update_income_attachment(UUID_ID, "some/path")
             assert False, "expected NotImplementedError"
         except NotImplementedError:
             pass
@@ -95,8 +98,8 @@ class TestUpdateIncomeAttachment:
 class TestUpdateExpenseFields:
     def test_issues_parameterized_update(self):
         with patch.object(db, "_execute") as mock_execute:
-            db.update_expense_fields(7, "2024-01-15", 42.5, "corrected amount")
+            db.update_expense_fields(UUID_ID, "2024-01-15", 42.5, "corrected amount")
             mock_execute.assert_called_once_with(
                 'UPDATE family_budget."DailyExpense" SET date = %s, expense_numeric = %s, comment = %s WHERE id = %s;',
-                ("2024-01-15", 42.5, "corrected amount", 7),
+                ("2024-01-15", 42.5, "corrected amount", UUID_ID),
             )
