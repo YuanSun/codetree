@@ -15,7 +15,8 @@ st.title("Upload Attachment")
 st.markdown("Attach a receipt/document to an existing **expense** row.")
 st.caption(
     "Note: income rows have no attachment column in family_budget.Incomes today, "
-    "so only expenses are supported here."
+    "so only expenses are supported here. Attachments are stored as raw bytes "
+    "(`bytea`) directly in the database, not as files on disk."
 )
 
 col1, col2, col3, col4 = st.columns(4)
@@ -48,9 +49,9 @@ if min_amount:
 if max_amount:
     df = df[df["expense_numeric"] <= max_amount]
 if attachment_status == "Missing only":
-    df = df[df["attachment"].isna() | (df["attachment"] == "")]
+    df = df[df["attachment_size"].isna() | (df["attachment_size"] == 0)]
 elif attachment_status == "Has attachment":
-    df = df[df["attachment"].notna() & (df["attachment"] != "")]
+    df = df[df["attachment_size"].notna() & (df["attachment_size"] > 0)]
 
 df = df.reset_index(drop=True)
 
@@ -78,12 +79,23 @@ selected_row = df.iloc[selected_positions[0]]
 
 st.divider()
 st.subheader(f"Expense #{selected_row.id} — {selected_row.date} — {selected_row.merchantName}")
-st.write(f"Current attachment: `{selected_row.attachment or '(none)'}`")
+
+has_attachment = selected_row.attachment_size and selected_row.attachment_size > 0
+if has_attachment:
+    st.write(f"Current attachment: {int(selected_row.attachment_size):,} bytes")
+    existing_bytes = db.get_expense_attachment(selected_row.id)
+    if existing_bytes:
+        st.download_button(
+            "Download current attachment",
+            data=existing_bytes,
+            file_name=f"expense_{selected_row.id}_attachment",
+        )
+else:
+    st.write("Current attachment: (none)")
 
 uploaded_file = st.file_uploader("Choose a document", type=None)
 
 if st.button("Upload and attach", type="primary", disabled=uploaded_file is None):
-    relative_path = db.save_uploaded_file(uploaded_file, selected_row.id, category="expense")
-    db.update_expense_attachment(selected_row.id, relative_path)
-    st.success(f"Attached `{relative_path}` to expense #{selected_row.id}.")
+    db.update_expense_attachment(selected_row.id, uploaded_file.getvalue())
+    st.success(f"Attached `{uploaded_file.name}` ({uploaded_file.size:,} bytes) to expense #{selected_row.id}.")
     st.rerun()

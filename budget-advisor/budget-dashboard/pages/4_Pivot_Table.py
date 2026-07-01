@@ -125,13 +125,19 @@ if chart_type == "Pie":
 
     chart_size = st.slider("Chart size (px)", min_value=250, max_value=900, value=450, step=25)
     outer_radius = chart_size * 0.4
+    legend_columns = min(4, max(1, len(pie_data) // 4 + 1))
 
     pie_chart = (
         alt.Chart(pie_data)
         .mark_arc(outerRadius=outer_radius)
         .encode(
             theta=alt.Theta("value:Q", stack=True),
-            color=alt.Color("row_label:N", sort=row_order, title=", ".join(rows)),
+            color=alt.Color(
+                "row_label:N",
+                sort=row_order,
+                title=", ".join(rows),
+                legend=alt.Legend(orient="bottom", columns=legend_columns, labelLimit=160, symbolLimit=0),
+            ),
             tooltip=[
                 "row_label",
                 "value",
@@ -139,8 +145,9 @@ if chart_type == "Pie":
             ],
         )
         .properties(width=chart_size, height=chart_size)
+        .configure_view(strokeWidth=0)
     )
-    st.altair_chart(pie_chart, width="content")
+    st.altair_chart(pie_chart, width="stretch")
 else:
     melted = chart_data.reset_index(names="row_label").melt(id_vars="row_label", var_name="series", value_name="value")
     mark = {"Bar": "bar", "Line": "line", "Area": "area"}[chart_type]

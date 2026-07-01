@@ -11,8 +11,6 @@ UI and must not build SQL via string interpolation.
 """
 
 import os
-import re
-import uuid
 import logging
 from typing import Any, Optional
 
@@ -43,8 +41,6 @@ DB_CONFIG = {
     "user": os.getenv("POSTGRES_USER", "postgres"),
     "password": os.getenv("POSTGRES_PASSWORD", ""),
 }
-
-ATTACHMENT_STORAGE_DIR = os.getenv("ATTACHMENT_STORAGE_DIR", "./uploads")
 
 _connection_pool: Optional[pool.SimpleConnectionPool] = None
 
@@ -135,7 +131,7 @@ def fetch_expenses(filters: Optional[dict[str, Any]] = None) -> pd.DataFrame:
     query = f"""
         SELECT id, date, expense, "merchantName", "typeName", "merchantCity",
                "merchantStateOrProvince", "merchantCountry", comment,
-               attachment, expense_numeric
+               octet_length(attachment) AS attachment_size, expense_numeric
         FROM family_budget.dailyexpensevw
         {clause}
         ORDER BY date DESC, id DESC;
@@ -183,14 +179,27 @@ def update_expense_fields(row_id: str, date_value, amount: float, comment: str) 
     )
 
 
-def update_expense_attachment(row_id: str, path: str) -> None:
+def update_expense_attachment(row_id: str, file_bytes: bytes) -> None:
+    """Store the uploaded file's raw bytes directly in the bytea attachment column."""
     _execute(
         'UPDATE family_budget."DailyExpense" SET attachment = %s WHERE id = %s;',
-        (path, row_id),
+        (psycopg2.Binary(file_bytes), row_id),
     )
 
 
-def update_income_attachment(row_id: str, path: str) -> None:
+def get_expense_attachment(row_id: str) -> Optional[bytes]:
+    """Fetch the raw attachment bytes for a single expense row, if any."""
+    conn = _get_pool().getconn()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute('SELECT attachment FROM family_budget."DailyExpense" WHERE id = %s;', (row_id,))
+            row = cursor.fetchone()
+        return bytes(row[0]) if row and row[0] is not None else None
+    finally:
+        _get_pool().putconn(conn)
+
+
+def update_income_attachment(row_id: str, file_bytes: bytes) -> None:
     """
     incomevw does not expose an attachment column (Incomes has no such
     column today); this raises until/unless Incomes gains one. Kept as a
@@ -200,33 +209,3 @@ def update_income_attachment(row_id: str, path: str) -> None:
     raise NotImplementedError(
         "family_budget.Incomes has no attachment column; only expenses support attachments today."
     )
-
-
-_SAFE_CHARS = re.compile(r"[^A-Za-z0-9._-]+")
-
-
-def _sanitize_filename(filename: str) -> str:
-    """Strip directory components and unsafe characters from a filename."""
-    base = os.path.basename(filename or "upload")
-    base = _SAFE_CHARS.sub("_", base)
-    return base or "upload"
-
-
-def save_uploaded_file(uploaded_file, row_id: str, category: str = "expense") -> str:
-    """
-    Persist an uploaded file under ATTACHMENT_STORAGE_DIR/{category}/{row_id}/
-    and return the relative path to store in the attachment column.
-    """
-    safe_name = _sanitize_filename(uploaded_file.name)
-    unique_name = f"{uuid.uuid4().hex[:8]}_{safe_name}"
-
-    target_dir = os.path.join(ATTACHMENT_STORAGE_DIR, category, str(row_id))
-    os.makedirs(target_dir, exist_ok=True)
-
-    relative_path = os.path.join(category, str(row_id), unique_name)
-    absolute_path = os.path.join(ATTACHMENT_STORAGE_DIR, relative_path)
-
-    with open(absolute_path, "wb") as f:
-        f.write(uploaded_file.getbuffer())
-
-    return relative_path
