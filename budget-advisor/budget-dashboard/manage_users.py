@@ -30,7 +30,7 @@ def add_user(username: str, role: str) -> None:
         sys.exit(1)
 
     users = [u for u in load_users() if u.get("username") != username]
-    users.append({"username": username, "password_hash": hash_password(username, password), "role": role})
+    users.append({"username": username, "password_hash": hash_password(password), "role": role})
     save_users(users)
     print(f"Saved user '{username}' with role '{role}' to {USERS_FILE}")
 

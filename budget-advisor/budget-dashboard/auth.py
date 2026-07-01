@@ -19,8 +19,14 @@ _DEFAULT_USERS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "
 USERS_FILE = os.getenv("DASHBOARD_USERS_FILE", _DEFAULT_USERS_FILE)
 
 
-def hash_password(username: str, password: str) -> str:
-    return hashlib.sha256(f"{username}:{password}".encode("utf-8")).hexdigest()
+def hash_password(password: str) -> str:
+    """
+    Plain SHA-256 of the password (no per-user salt), matching what you'd
+    get from a standalone `sha256sum` / `hashlib.sha256` on the password
+    alone -- so users.json entries can be built either via manage_users.py
+    or by hashing a password with any standard SHA-256 tool.
+    """
+    return hashlib.sha256(password.encode("utf-8")).hexdigest()
 
 
 def load_users() -> list[dict]:
@@ -34,7 +40,7 @@ def verify_login(username: str, password: str) -> Optional[str]:
     """Return the user's role if credentials are valid, else None."""
     if not username or not password:
         return None
-    expected_hash = hash_password(username, password)
+    expected_hash = hash_password(password)
     for user in load_users():
         if user.get("username") == username and user.get("password_hash") == expected_hash:
             return user.get("role", "user")
