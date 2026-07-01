@@ -14,6 +14,8 @@ A quick Streamlit page over the `family_budget` Postgres data used by the rest o
 
 ```bash
 cd budget-dashboard
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
 # Edit .env with your database credentials
@@ -27,6 +29,30 @@ streamlit run app.py
 ```
 
 Then open the URL Streamlit prints (defaults to http://localhost:8501).
+
+## Deploying on macOS (e.g. a Mac Studio running Postgres)
+
+Once the one-time setup above is done (venv created, `.env` configured, at least one admin user added), install it as a `launchd` service so it starts automatically at login/boot and restarts itself if it ever crashes:
+
+```bash
+bash deploy/install_macos_service.sh
+```
+
+This creates `~/Library/LaunchAgents/com.budgetdashboard.streamlit.plist`, loads it, and prints the local and LAN URLs. It runs on port 8501 and binds to `0.0.0.0`, so it's reachable from other devices on your home network (e.g. your phone) at `http://<mac-lan-ip>:8501` — macOS may prompt you to allow incoming connections the first time, which you'll need to accept.
+
+Useful commands afterward:
+```bash
+# Restart after pulling new code / editing .env
+launchctl kickstart -k "gui/$(id -u)/com.budgetdashboard.streamlit"
+
+# Tail logs
+tail -f ~/Library/Logs/budget-dashboard.log ~/Library/Logs/budget-dashboard.error.log
+
+# Stop and remove the service entirely
+bash deploy/uninstall_macos_service.sh
+```
+
+This only makes the app reachable on your local network, not the public internet — there's no HTTPS and the built-in login (see Auth below) isn't hardened for internet-facing exposure. If you want access away from home, put it behind a VPN (e.g. Tailscale) rather than forwarding the port on your router.
 
 ## Notes
 
