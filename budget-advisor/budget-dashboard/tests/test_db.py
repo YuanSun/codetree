@@ -2,6 +2,9 @@ import os
 import sys
 from unittest.mock import MagicMock, patch
 
+import pandas as pd
+import pytest
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import db
@@ -97,3 +100,27 @@ class TestUpdateExpenseFields:
                 'UPDATE family_budget."DailyExpense" SET date = %s, expense_numeric = %s, comment = %s WHERE id = %s;',
                 ("2024-01-15", 42.5, "corrected amount", UUID_ID),
             )
+
+
+class TestGetBalanceYears:
+    def test_extracts_years_from_view_names(self):
+        fake_df = pd.DataFrame({"table_name": ["balance_2024_vw", "balance_2026_vw", "balance_2025_vw"]})
+        with patch.object(db, "_query_df", return_value=fake_df):
+            assert db.get_balance_years() == [2024, 2025, 2026]
+
+    def test_returns_empty_list_when_no_views(self):
+        with patch.object(db, "_query_df", return_value=pd.DataFrame({"table_name": []})):
+            assert db.get_balance_years() == []
+
+
+class TestFetchBalance:
+    def test_queries_the_year_specific_view(self):
+        with patch.object(db, "_query_df") as mock_query_df:
+            db.fetch_balance(2026)
+            args, _ = mock_query_df.call_args
+            assert "family_budget.balance_2026_vw" in args[0]
+
+    @pytest.mark.parametrize("bad_year", ["2026", "2026; DROP TABLE x;--", 26, 20260, None])
+    def test_rejects_non_plain_year_values(self, bad_year):
+        with pytest.raises(ValueError):
+            db.fetch_balance(bad_year)
