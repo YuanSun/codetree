@@ -39,10 +39,14 @@ if selected_types:
 
 if dataset == "Expenses":
     df = db.fetch_expenses(filters)
-    total = df["expense_numeric"].sum() if not df.empty else 0
+    value_col = "expense_numeric"
+    dimension_cols = ["typeName", "merchantName", "merchantCity", "merchantStateOrProvince", "merchantCountry"]
 else:
     df = db.fetch_income(filters)
-    total = df["income_numeric"].sum() if not df.empty else 0
+    value_col = "income_numeric"
+    dimension_cols = ["typeName", "sourceName", "sourceCity", "sourceStateOrProvince", "sourceCountry"]
+
+total = df[value_col].sum() if not df.empty else 0
 
 st.caption(f"{len(df)} rows — total {total:,.2f}")
 st.dataframe(df, width="stretch", hide_index=True)
@@ -53,3 +57,31 @@ st.download_button(
     file_name=f"{dataset.lower()}.csv",
     mime="text/csv",
 )
+
+st.divider()
+st.subheader("Group by")
+
+col1, col2 = st.columns(2)
+with col1:
+    group_cols = st.multiselect("Group by column(s)", options=dimension_cols)
+with col2:
+    aggfunc = st.selectbox("Aggregation", options=["sum", "count", "mean", "min", "max"])
+
+if group_cols and not df.empty:
+    grouped = (
+        df.groupby(group_cols)[value_col]
+        .agg(aggfunc)
+        .reset_index()
+        .sort_values(value_col, ascending=False)
+    )
+    st.dataframe(grouped, width="stretch", hide_index=True)
+    st.download_button(
+        "Download grouped CSV",
+        data=grouped.to_csv(index=False).encode("utf-8"),
+        file_name=f"{dataset.lower()}_grouped.csv",
+        mime="text/csv",
+    )
+elif group_cols:
+    st.info("No rows to group.")
+else:
+    st.caption("Pick at least one column above to see a grouped summary.")
