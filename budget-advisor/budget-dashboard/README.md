@@ -5,7 +5,7 @@ A quick Streamlit page over the `family_budget` Postgres data used by the rest o
 ## Features
 
 - **Overview** (`app.py`, the landing page): this month's expense/income totals, plus a **Yearly Balance** section — pick a year and see the monthly expense/income/balance breakdown (table + bar+line chart) from `family_budget.balance_{year}_vw`. Which years show up is discovered automatically from the schema, so adding a new `balance_2027_vw` view next year just works.
-- **Data Table**: browse `dailyexpensevw` / `incomevw` with date, category, and name filters; download as CSV.
+- **Data Table**: browse `dailyexpensevw` / `incomevw` with date, category, and name filters; download as CSV. Also has a **Group by** section below — pick one or more columns and an aggregation function (sum/count/mean/min/max) to summarize the currently filtered rows, sorted descending; downloadable as its own CSV.
 - **Upload Attachment**: filter by date, category, name, amount range, and attachment status, then click a row directly in the table to select it and attach a receipt/document. The file's raw bytes are stored directly in `DailyExpense.attachment` (a `bytea` column) — not on disk. Open to any logged-in or logged-out user.
 - **Edit Entry** *(admin only)*: click a row and edit its date, amount, or comment. Merchant/category/location aren't editable here since they live in shared lookup tables used by other rows.
 - **Pivot Table**: Excel-style pivot over expenses or income — pick Rows/Columns/Value/Aggregation — plus a Bar/Line/Area/Pie chart of the top N rows underneath for a quick visual read.
