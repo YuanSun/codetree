@@ -73,7 +73,7 @@ pivot = pd.pivot_table(
     margins_name="Total",
 )
 
-st.dataframe(pivot, use_container_width=True)
+st.dataframe(pivot, width="stretch")
 
 st.download_button(
     "Download CSV",
@@ -131,7 +131,7 @@ if chart_type == "Pie":
     )
     arc = base.mark_arc(outerRadius=120)
     labels = base.mark_text(radius=140, size=12).encode(text="percentage_label:N")
-    st.altair_chart(arc + labels, use_container_width=True)
+    st.altair_chart(arc + labels, width="stretch")
 else:
     melted = chart_data.reset_index(names="row_label").melt(id_vars="row_label", var_name="series", value_name="value")
     mark = {"Bar": "bar", "Line": "line", "Area": "area"}[chart_type]
@@ -145,4 +145,4 @@ else:
         if chart_type == "Bar":
             encoding["xOffset"] = "series:N"
     chart = getattr(alt.Chart(melted), f"mark_{mark}")().encode(**encoding)
-    st.altair_chart(chart, use_container_width=True)
+    st.altair_chart(chart, width="stretch")

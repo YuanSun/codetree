@@ -18,9 +18,23 @@ from typing import Any, Optional
 
 import pandas as pd
 import psycopg2
+import psycopg2.extensions
 from psycopg2 import pool
 
 logger = logging.getLogger(__name__)
+
+# Postgres NUMERIC/DECIMAL columns (expense_numeric, income_numeric) come back
+# as decimal.Decimal by default, which pandas stores as an opaque object dtype
+# that Altair can't map to a vegalite type (it silently falls back to
+# "nominal", breaking numeric encodings like pie/bar charts). Cast them to
+# float at the driver level so every DataFrame gets proper numeric dtypes.
+psycopg2.extensions.register_type(
+    psycopg2.extensions.new_type(
+        psycopg2.extensions.DECIMAL.values,
+        "DEC2FLOAT",
+        lambda value, curs: float(value) if value is not None else None,
+    )
+)
 
 DB_CONFIG = {
     "host": os.getenv("POSTGRES_HOST", "localhost"),
