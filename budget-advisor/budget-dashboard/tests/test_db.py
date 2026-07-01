@@ -10,6 +10,23 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import db
 
 
+class TestParseMoney:
+    def test_parses_plain_amount(self):
+        assert db._parse_money("$1,234.56") == 1234.56
+
+    def test_parses_negative_amount(self):
+        assert db._parse_money("-$5.00") == -5.00
+
+    def test_parses_parenthesized_negative_amount(self):
+        assert db._parse_money("($5.00)") == -5.00
+
+    def test_parses_amount_without_currency_symbol(self):
+        assert db._parse_money("1234.56") == 1234.56
+
+    def test_returns_none_for_none(self):
+        assert db._parse_money(None) is None
+
+
 class TestBuildFilterClause:
     def test_no_filters_returns_empty_clause(self):
         clause, params = db._build_filter_clause({}, "date", "typeName", "merchantName", "merchantCountry")
