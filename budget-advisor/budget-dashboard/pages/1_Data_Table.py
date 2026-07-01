@@ -45,7 +45,7 @@ else:
     total = df["income_numeric"].sum() if not df.empty else 0
 
 st.caption(f"{len(df)} rows — total {total:,.2f}")
-st.dataframe(df, use_container_width=True, hide_index=True)
+st.dataframe(df, width="stretch", hide_index=True)
 
 st.download_button(
     "Download CSV",

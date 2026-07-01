@@ -15,7 +15,8 @@ from typing import Optional
 
 import streamlit as st
 
-USERS_FILE = os.getenv("DASHBOARD_USERS_FILE", "./users.json")
+_DEFAULT_USERS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "users.json")
+USERS_FILE = os.getenv("DASHBOARD_USERS_FILE", _DEFAULT_USERS_FILE)
 
 
 def hash_password(username: str, password: str) -> str:
