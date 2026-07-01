@@ -121,14 +121,26 @@ if chart_type == "Pie":
         pie_series = series_names[0]
     pie_data = chart_data[[pie_series]].reset_index()
     pie_data.columns = ["row_label", "value"]
-    pie_data["percentage"] = pie_data["value"] / pie_data["value"].sum() * 100
+    pie_data["percentage"] = pie_data["value"] / pie_data["value"].sum()
 
-    pie_chart = alt.Chart(pie_data).mark_arc(outerRadius=120).encode(
-        theta=alt.Theta("value:Q", stack=True),
-        color=alt.Color("row_label:N", sort=row_order, title=", ".join(rows)),
-        tooltip=["row_label", "value", alt.Tooltip("percentage:Q", format=".1f", title="percentage")],
+    chart_size = st.slider("Chart size (px)", min_value=250, max_value=900, value=450, step=25)
+    outer_radius = chart_size * 0.4
+
+    pie_chart = (
+        alt.Chart(pie_data)
+        .mark_arc(outerRadius=outer_radius)
+        .encode(
+            theta=alt.Theta("value:Q", stack=True),
+            color=alt.Color("row_label:N", sort=row_order, title=", ".join(rows)),
+            tooltip=[
+                "row_label",
+                "value",
+                alt.Tooltip("percentage:Q", format=".1%", title="percentage"),
+            ],
+        )
+        .properties(width=chart_size, height=chart_size)
     )
-    st.altair_chart(pie_chart, width="stretch")
+    st.altair_chart(pie_chart, width="content")
 else:
     melted = chart_data.reset_index(names="row_label").melt(id_vars="row_label", var_name="series", value_name="value")
     mark = {"Bar": "bar", "Line": "line", "Area": "area"}[chart_type]

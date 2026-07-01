@@ -172,7 +172,7 @@ def get_income_types() -> list[str]:
     return df["typeName"].tolist()
 
 
-def update_expense_fields(row_id: int, date_value, amount: float, comment: str) -> None:
+def update_expense_fields(row_id: str, date_value, amount: float, comment: str) -> None:
     """
     Update the editable fields that belong directly to DailyExpense (not the
     shared merchant lookup tables): date, expense_numeric, comment.
@@ -183,14 +183,14 @@ def update_expense_fields(row_id: int, date_value, amount: float, comment: str) 
     )
 
 
-def update_expense_attachment(row_id: int, path: str) -> None:
+def update_expense_attachment(row_id: str, path: str) -> None:
     _execute(
         'UPDATE family_budget."DailyExpense" SET attachment = %s WHERE id = %s;',
         (path, row_id),
     )
 
 
-def update_income_attachment(row_id: int, path: str) -> None:
+def update_income_attachment(row_id: str, path: str) -> None:
     """
     incomevw does not expose an attachment column (Incomes has no such
     column today); this raises until/unless Incomes gains one. Kept as a
@@ -212,7 +212,7 @@ def _sanitize_filename(filename: str) -> str:
     return base or "upload"
 
 
-def save_uploaded_file(uploaded_file, row_id: int, category: str = "expense") -> str:
+def save_uploaded_file(uploaded_file, row_id: str, category: str = "expense") -> str:
     """
     Persist an uploaded file under ATTACHMENT_STORAGE_DIR/{category}/{row_id}/
     and return the relative path to store in the attachment column.
