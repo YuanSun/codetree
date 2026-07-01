@@ -7,26 +7,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import db
 
 
-class FakeUploadedFile:
-    def __init__(self, name: str, content: bytes):
-        self.name = name
-        self._content = content
-
-    def getbuffer(self):
-        return self._content
-
-
-class TestSanitizeFilename:
-    def test_strips_directory_components(self):
-        assert db._sanitize_filename("../../etc/passwd") == "passwd"
-
-    def test_replaces_unsafe_characters(self):
-        assert db._sanitize_filename("my receipt (1).pdf") == "my_receipt_1_.pdf"
-
-    def test_falls_back_when_empty(self):
-        assert db._sanitize_filename("") == "upload"
-
-
 class TestBuildFilterClause:
     def test_no_filters_returns_empty_clause(self):
         clause, params = db._build_filter_clause({}, "date", "typeName", "merchantName", "merchantCountry")
@@ -61,35 +41,49 @@ class TestBuildFilterClause:
 UUID_ID = "8cfecc1a-513c-428e-924e-20d51f0e6bd6"
 
 
-class TestSaveUploadedFile:
-    def test_writes_file_and_returns_relative_path(self, tmp_path):
-        with patch.object(db, "ATTACHMENT_STORAGE_DIR", str(tmp_path)):
-            uploaded = FakeUploadedFile("receipt.pdf", b"hello world")
-            relative_path = db.save_uploaded_file(uploaded, row_id=UUID_ID, category="expense")
-
-            assert relative_path.startswith(os.path.join("expense", UUID_ID))
-            assert relative_path.endswith("receipt.pdf")
-
-            absolute_path = os.path.join(str(tmp_path), relative_path)
-            assert os.path.exists(absolute_path)
-            with open(absolute_path, "rb") as f:
-                assert f.read() == b"hello world"
-
-
 class TestUpdateExpenseAttachment:
-    def test_issues_parameterized_update(self):
-        with patch.object(db, "_execute") as mock_execute:
-            db.update_expense_attachment(UUID_ID, f"expense/{UUID_ID}/receipt.pdf")
+    def test_issues_parameterized_update_with_binary_wrapped_bytes(self):
+        with patch.object(db, "_execute") as mock_execute, patch.object(
+            db.psycopg2, "Binary", side_effect=lambda b: b
+        ):
+            db.update_expense_attachment(UUID_ID, b"%PDF-1.4 fake receipt bytes")
             mock_execute.assert_called_once_with(
                 'UPDATE family_budget."DailyExpense" SET attachment = %s WHERE id = %s;',
-                (f"expense/{UUID_ID}/receipt.pdf", UUID_ID),
+                (b"%PDF-1.4 fake receipt bytes", UUID_ID),
             )
+
+
+class TestGetExpenseAttachment:
+    def _mock_pool(self, fetchone_result):
+        mock_cursor = MagicMock()
+        mock_cursor.fetchone.return_value = fetchone_result
+        mock_cursor.__enter__.return_value = mock_cursor
+        mock_conn = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        mock_pool = MagicMock()
+        mock_pool.getconn.return_value = mock_conn
+        return mock_pool
+
+    def test_returns_bytes_when_attachment_present(self):
+        mock_pool = self._mock_pool((memoryview(b"file contents"),))
+        with patch.object(db, "_get_pool", return_value=mock_pool):
+            assert db.get_expense_attachment(UUID_ID) == b"file contents"
+
+    def test_returns_none_when_attachment_missing(self):
+        mock_pool = self._mock_pool((None,))
+        with patch.object(db, "_get_pool", return_value=mock_pool):
+            assert db.get_expense_attachment(UUID_ID) is None
+
+    def test_returns_none_when_row_missing(self):
+        mock_pool = self._mock_pool(None)
+        with patch.object(db, "_get_pool", return_value=mock_pool):
+            assert db.get_expense_attachment(UUID_ID) is None
 
 
 class TestUpdateIncomeAttachment:
     def test_raises_not_implemented(self):
         try:
-            db.update_income_attachment(UUID_ID, "some/path")
+            db.update_income_attachment(UUID_ID, b"some bytes")
             assert False, "expected NotImplementedError"
         except NotImplementedError:
             pass
