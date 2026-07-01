@@ -78,3 +78,38 @@ st.download_button(
     file_name=f"{dataset.lower()}_pivot.csv",
     mime="text/csv",
 )
+
+st.divider()
+st.subheader("Chart")
+
+pivot_chart = pd.pivot_table(
+    df,
+    index=rows,
+    columns=columns or None,
+    values=value_col,
+    aggfunc=aggfunc,
+    fill_value=0,
+)
+
+if isinstance(pivot_chart.columns, pd.MultiIndex):
+    pivot_chart.columns = [" / ".join(str(c) for c in col) for col in pivot_chart.columns]
+
+pivot_chart.index = pivot_chart.index.map(lambda idx: " / ".join(str(v) for v in idx) if isinstance(idx, tuple) else str(idx))
+
+row_total = pivot_chart.sum(axis=1)
+pivot_chart = pivot_chart.loc[row_total.sort_values(ascending=False).index]
+
+col1, col2 = st.columns(2)
+with col1:
+    chart_type = st.selectbox("Chart type", ["Bar", "Line", "Area"])
+with col2:
+    top_n = st.slider("Show top N rows", min_value=5, max_value=max(5, len(pivot_chart)), value=min(15, len(pivot_chart)))
+
+chart_data = pivot_chart.head(top_n)
+
+if chart_type == "Bar":
+    st.bar_chart(chart_data)
+elif chart_type == "Line":
+    st.line_chart(chart_data)
+else:
+    st.area_chart(chart_data)
