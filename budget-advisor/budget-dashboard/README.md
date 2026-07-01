@@ -28,6 +28,8 @@ streamlit run app.py
 
 Then open the URL Streamlit prints (defaults to http://localhost:8501).
 
+`.streamlit/config.toml` sets `server.headless = true`, so it won't automatically pop open a browser tab each time you start it.
+
 ## Notes
 
 - Attachments are only supported for expenses. `family_budget.Incomes` has no `attachment` column today, so the Upload Attachment page only works against expenses.
