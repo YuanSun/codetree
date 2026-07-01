@@ -32,7 +32,8 @@ Then open the URL Streamlit prints (defaults to http://localhost:8501).
 - Attachments are only supported for expenses. `family_budget.Incomes` has no `attachment` column today, so the Upload Attachment page only works against expenses.
 - Uploaded files are stored under `ATTACHMENT_STORAGE_DIR` (default `./uploads`), organized as `uploads/expense/{row_id}/{file}`. This directory is gitignored.
 - This app connects directly to Postgres with its own connection pool (`db.py`) — it does not share a process with `postgres-mcp-server`, but can point at the same database via the same env var names.
-- **Auth**: `auth.py` gates the Edit Entry page behind a login stored in a local `users.json` (gitignored, path from `DASHBOARD_USERS_FILE`). Manage accounts with `python manage_users.py add|remove|list` — this hashes passwords for you rather than storing them in plaintext. It's a lightweight, personal-use login, not intended for internet-facing deployment.
+- **Auth**: `auth.py` gates the Edit Entry page behind a login stored in a local `users.json` (gitignored, defaults next to this app; override with `DASHBOARD_USERS_FILE`). Manage accounts with `python manage_users.py add|remove|list` — this hashes passwords for you rather than storing them in plaintext. It's a lightweight, personal-use login, not intended for internet-facing deployment.
+  - `password_hash` is a **plain SHA-256 of the password** (`{"username": "...", "password_hash": "...", "role": "admin"}`) — no per-user salt — so you can also build entries by hand with any SHA-256 tool, e.g. `printf '%s' 'yourpassword' | sha256sum` (make sure there's no trailing newline, which `sha256sum` alone would include).
 - `update_expense_fields` in `db.py` writes directly to `DailyExpense.expense_numeric`; if your schema treats `expense` (the raw text amount) as independently significant rather than derived, you may want to extend that function to keep both in sync.
 
 ## Testing

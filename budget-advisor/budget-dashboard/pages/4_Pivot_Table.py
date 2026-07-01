@@ -122,16 +122,13 @@ if chart_type == "Pie":
     pie_data = chart_data[[pie_series]].reset_index()
     pie_data.columns = ["row_label", "value"]
     pie_data["percentage"] = pie_data["value"] / pie_data["value"].sum() * 100
-    pie_data["percentage_label"] = pie_data["percentage"].map(lambda p: f"{p:.1f}%")
 
-    base = alt.Chart(pie_data).encode(
+    pie_chart = alt.Chart(pie_data).mark_arc(outerRadius=120).encode(
         theta=alt.Theta("value:Q", stack=True),
         color=alt.Color("row_label:N", sort=row_order, title=", ".join(rows)),
         tooltip=["row_label", "value", alt.Tooltip("percentage:Q", format=".1f", title="percentage")],
     )
-    arc = base.mark_arc(outerRadius=120)
-    labels = base.mark_text(radius=140, size=12).encode(text="percentage_label:N")
-    st.altair_chart(arc + labels, width="stretch")
+    st.altair_chart(pie_chart, width="stretch")
 else:
     melted = chart_data.reset_index(names="row_label").melt(id_vars="row_label", var_name="series", value_name="value")
     mark = {"Bar": "bar", "Line": "line", "Area": "area"}[chart_type]

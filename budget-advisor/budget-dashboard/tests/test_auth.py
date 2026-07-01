@@ -1,3 +1,4 @@
+import hashlib
 import json
 import os
 import sys
@@ -10,13 +11,18 @@ import auth
 
 class TestHashPassword:
     def test_same_input_produces_same_hash(self):
-        assert auth.hash_password("alice", "secret") == auth.hash_password("alice", "secret")
+        assert auth.hash_password("secret") == auth.hash_password("secret")
 
-    def test_different_username_changes_hash(self):
-        assert auth.hash_password("alice", "secret") != auth.hash_password("bob", "secret")
+    def test_different_password_changes_hash(self):
+        assert auth.hash_password("secret") != auth.hash_password("other")
 
     def test_does_not_store_plaintext(self):
-        assert "secret" not in auth.hash_password("alice", "secret")
+        assert "secret" not in auth.hash_password("secret")
+
+    def test_matches_plain_sha256(self):
+        # Anyone should be able to build users.json entries with a standalone
+        # SHA-256 tool (e.g. `sha256sum`), not just manage_users.py.
+        assert auth.hash_password("secret") == hashlib.sha256(b"secret").hexdigest()
 
 
 class TestVerifyLogin:
@@ -26,13 +32,13 @@ class TestVerifyLogin:
         return str(path)
 
     def test_valid_credentials_return_role(self, tmp_path):
-        users = [{"username": "alice", "password_hash": auth.hash_password("alice", "secret"), "role": "admin"}]
+        users = [{"username": "alice", "password_hash": auth.hash_password("secret"), "role": "admin"}]
         users_file = self._write_users(tmp_path, users)
         with patch.object(auth, "USERS_FILE", users_file):
             assert auth.verify_login("alice", "secret") == "admin"
 
     def test_wrong_password_returns_none(self, tmp_path):
-        users = [{"username": "alice", "password_hash": auth.hash_password("alice", "secret"), "role": "admin"}]
+        users = [{"username": "alice", "password_hash": auth.hash_password("secret"), "role": "admin"}]
         users_file = self._write_users(tmp_path, users)
         with patch.object(auth, "USERS_FILE", users_file):
             assert auth.verify_login("alice", "wrong") is None
