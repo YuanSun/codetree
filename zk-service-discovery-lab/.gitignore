@@ -1,0 +1,13 @@
+# Maven
+client/target/
+
+# macOS
+.DS_Store
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+
+# Docker
+docker-compose.override.yml
