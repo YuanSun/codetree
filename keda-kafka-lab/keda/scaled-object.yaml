@@ -1,0 +1,62 @@
+# keda/scaled-object.yaml
+#
+# This is the heart of the lab — it instructs KEDA to:
+#   1. Watch consumer group lag on 'orders-topic' for the 'orders-consumer-group'
+#   2. Scale the 'order-consumer' Deployment between 0 and 10 replicas
+#   3. Add one replica per 10,000 messages of lag (lagThreshold)
+#   4. Use asymmetric cooldowns: fast scale-up, slow scale-down
+#
+# This mirrors a production pattern where you want quick reaction to burst
+# but don't want to thrash pods during temporary lag spikes.
+
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: order-consumer-scaler
+  namespace: lab
+  annotations:
+    # Documents intent alongside the manifest (good practice)
+    keda.sh/description: "Scale order consumers based on Kafka lag"
+spec:
+  # ── Target ────────────────────────────────────────────────────────────────
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: order-consumer # must match deployment name exactly
+
+  # ── Replica bounds ────────────────────────────────────────────────────────
+  minReplicaCount: 0 # scale-to-zero when no lag
+  maxReplicaCount: 10 # cap at 10 (one per partition)
+
+  # ── Timing (asymmetric cooldowns) ────────────────────────────────────────
+  pollingInterval: 15 # seconds: how often KEDA checks lag
+  cooldownPeriod:
+    300 # seconds (5 min): how long to wait before
+    # scaling DOWN after lag clears.
+    # Scale-UP happens on the very next poll
+    # (effectively immediate — no separate
+    # scale-up cooldown in KEDA v2).
+
+  # ── Trigger ───────────────────────────────────────────────────────────────
+  triggers:
+    - type: kafka
+      metadata:
+        # Kafka connection
+        bootstrapServers: 172.21.0.1:9092
+
+        # What to watch
+        consumerGroup: orders-consumer-group
+        topic: orders-topic
+
+        # Scaling formula:
+        #   desiredReplicas = ceil(totalLag / lagThreshold)
+        #
+        # With lagThreshold=10000 and 10 partitions:
+        #   - 5,000 lag  → 1 replica
+        #   - 50,000 lag → 5 replicas
+        #   - 100,000+   → 10 replicas (capped by maxReplicaCount)
+        lagThreshold: "10000"
+
+        # offsetResetPolicy controls what happens when the consumer group
+        # doesn't exist yet (first deploy). "latest" means don't backfill.
+        offsetResetPolicy: latest
