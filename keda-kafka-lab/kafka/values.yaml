@@ -1,0 +1,52 @@
+# kafka/values.yaml
+# Minimal Confluent Platform config for local KEDA lab.
+# Resources are deliberately small to fit inside an 8 GB Minikube node.
+
+cp-zookeeper:
+  enabled: true
+  servers: 1
+  imageTag: 7.5.0
+  heapOptions: "-Xms256M -Xmx256M"
+  resources:
+    requests:
+      cpu: 100m
+      memory: 384Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  persistence:
+    enabled: false   # no PVC needed for local lab
+
+cp-kafka:
+  enabled: true
+  brokers: 1         # single broker is enough to demo lag
+  imageTag: 7.5.0
+  heapOptions: "-Xms512M -Xmx512M"
+  resources:
+    requests:
+      cpu: 200m
+      memory: 768Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+  persistence:
+    enabled: false
+  configurationOverrides:
+    # Expose consumer group lag metadata
+    "offsets.topic.replication.factor": "1"
+    "transaction.state.log.replication.factor": "1"
+    "transaction.state.log.min.isr": "1"
+    # Faster lag propagation for demo purposes
+    "group.initial.rebalance.delay.ms": "0"
+
+# Disable components not needed for this lab
+cp-schema-registry:
+  enabled: false
+cp-kafka-rest:
+  enabled: false
+cp-kafka-connect:
+  enabled: false
+cp-ksql-server:
+  enabled: false
+cp-control-center:
+  enabled: false

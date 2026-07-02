@@ -1,0 +1,53 @@
+# apps/consumer/deployment.yaml
+#
+# The Deployment that KEDA will scale.
+# Starts with 0 replicas — KEDA owns replica count from here.
+# Do NOT manually set replicas after deploying the ScaledObject.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-consumer
+  namespace: lab
+  labels:
+    app: order-consumer
+spec:
+  replicas: 0 # KEDA takes over; this initial value is overridden immediately
+  selector:
+    matchLabels:
+      app: order-consumer
+  template:
+    metadata:
+      labels:
+        app: order-consumer
+    spec:
+      containers:
+        - name: consumer
+          # Using the official Confluent image so we have kafka-console-consumer
+          # available without building a custom image.
+          image: confluentinc/cp-kafka:7.5.0
+          command:
+            - /bin/bash
+            - -c
+            - |
+              echo "Consumer starting on partition assignment for group: orders-consumer-group"
+              kafka-console-consumer \
+                --bootstrap-server 172.21.0.1:9092 \
+                --topic orders-topic \
+                --group orders-consumer-group \
+                --consumer-property enable.auto.commit=true \
+                --consumer-property auto.commit.interval.ms=1000 \
+                --max-messages 999999999 \
+                2>&1 | \
+              # Simulate slow processing: sleep 10ms per message (~100 msg/s per pod)
+              awk '{print; system("sleep 0.01")}'
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          env:
+            - name: KAFKA_HEAP_OPTS
+              value: "-Xms64M -Xmx128M"

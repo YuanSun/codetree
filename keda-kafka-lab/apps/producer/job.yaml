@@ -1,0 +1,48 @@
+# apps/producer/job.yaml
+#
+# A Kubernetes Job that blasts 100,000 messages onto orders-topic.
+# This creates ~100,000 messages of lag (consumers start at 0 replicas),
+# which will push KEDA to scale up to ~10 replicas.
+#
+# Re-run this job to generate more load:
+#   kubectl delete job order-producer -n lab && kubectl apply -f apps/producer/job.yaml
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: order-producer
+  namespace: lab
+spec:
+  template:
+    metadata:
+      labels:
+        app: order-producer
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: producer
+          image: confluentinc/cp-kafka:7.5.0
+          command:
+            - /bin/bash
+            - -c
+            - |
+              echo "▶ Producing 100,000 messages to orders-topic..."
+              # seq generates message numbers; kafka-console-producer writes them
+              seq 1 100000 | \
+                kafka-console-producer \
+                  --bootstrap-server 172.21.0.1:9092 \
+                  --topic orders-topic \
+                  --producer-property acks=1 \
+                  --producer-property batch.size=65536 \
+                  --producer-property linger.ms=5
+              echo "✅ Done producing"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          env:
+            - name: KAFKA_HEAP_OPTS
+              value: "-Xms64M -Xmx128M"
