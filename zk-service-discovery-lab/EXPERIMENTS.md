@@ -80,6 +80,24 @@ does it sit there thinking it's still registered? (It's the latter — this is t
 operational trap. A process can be running and completely unaware it's been
 deregistered.)
 
+**Observed nuance (worth watching for):** the resumed process doesn't necessarily
+even print `Session LOST`. `kill -STOP` freezes *every* thread in the JVM, including
+Curator's own `SendThread`/`EventThread` -- the machinery that would normally notice
+the disconnect and correctly classify it as a real session expiry. On resume, that
+state machine only sees "before" and "after," not the gap in between, so its
+SUSPENDED-vs-LOST-vs-RECONNECTED classification can be wrong: in one run, the
+watcher correctly showed the instance as `LEFT` (server-side expiry, confirmed via
+`04-inspect-znodes.sh`), while the resumed process's own connection listener printed
+`RECONNECTED -- same session resumed, znode intact` -- despite connecting with a
+brand-new session ID and the znode being genuinely, permanently gone. The client's
+self-report was simply incorrect. There is no live-recovery path once this happens:
+the process must be killed and restarted (with a fresh instance ID) to re-register.
+This is the same underlying phenomenon as "a long GC pause can look like a crash to
+ZooKeeper," just sharper than the hypothesis above assumes -- it's not only the
+server's failure detection that can be fooled by a stalled JVM, the client's own
+diagnosis of its connection state can be fooled too. Treat the watcher/server-side
+view as ground truth, never the client's self-reported connection state.
+
 ---
 
 ## Experiment 4 — Single ensemble node failure (no quorum loss)
