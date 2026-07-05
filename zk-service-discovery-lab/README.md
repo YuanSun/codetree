@@ -69,3 +69,32 @@ handles the JSON serialization, ephemeral-node lifecycle, and reconnection edge
 cases for you — which lets the experiments focus on the ZK *behavior* rather than
 serialization boilerplate. Experiment 1 has you inspect the raw znode directly with
 zkCli anyway, so you still see exactly what Curator wrote under the hood.
+
+## Bonus: config-override demo (a second, different ZK use case)
+
+Service discovery (above) uses **ephemeral** znodes tied to a client's session.
+Dynamic configuration -- the pattern behind tools like Spring Cloud Zookeeper
+Config, or any internal "edit config on a website, apps pick it up live" system --
+uses **persistent** znodes plus a watch, and is a genuinely different mechanic
+worth seeing side by side with service discovery in the same ensemble.
+
+```bash
+# Terminal A: watch a config profile (leave running)
+cd client && ./gradlew run -PmainClass=com.ryanlab.zkconfig.ConfigWatcher --args="orders-service prod"
+
+# Terminal B: stands in for the "admin website" -- just edits the znode directly
+cd client && ./gradlew run -PmainClass=com.ryanlab.zkconfig.ConfigWriter --args="orders-service prod db.pool.size 20"
+cd client && ./gradlew run -PmainClass=com.ryanlab.zkconfig.ConfigWriter --args="orders-service prod db.pool.size 50"
+cd client && ./gradlew run -PmainClass=com.ryanlab.zkconfig.ConfigWriter --args="orders-service prod feature.newCheckout true"
+```
+
+Watch Terminal A print `ADDED`/`CHANGED` lines live as each write lands, with no
+restart and no polling -- that live-diff mechanism is exactly what
+`@RefreshScope` rides on top of in a real Spring app. The whole profile is stored
+as one JSON blob at `/config/orders-service/prod` (a **persistent** node, unlike
+`ServiceRegistrar`'s ephemeral ones -- config must outlive the writer process
+exiting). Inspect it directly any time with:
+
+```bash
+docker exec -it zk1 zkCli.sh -server localhost:2181 get /config/orders-service/prod
+```
