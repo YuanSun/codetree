@@ -1,0 +1,33 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'com.ryanlab'
+version = '1.0.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    curatorVersion = '5.5.0'
+}
+
+dependencies {
+    implementation "org.apache.curator:curator-framework:${curatorVersion}"
+    implementation "org.apache.curator:curator-recipes:${curatorVersion}"
+    implementation "org.apache.curator:curator-x-discovery:${curatorVersion}"
+    implementation 'org.slf4j:slf4j-simple:2.0.9'
+}
+
+// Lets you run a class directly with:
+//   ./gradlew run -PmainClass=com.ryanlab.zkdiscovery.ServiceRegistrar --args="orders-service 9101"
+application {
+    mainClass = (project.findProperty('mainClass') ?: 'com.ryanlab.zkdiscovery.ServiceWatcher').toString()
+}

@@ -9,7 +9,7 @@ import java.util.UUID;
 
 /**
  * Usage:
- *   mvn exec:java -Dexec.mainClass=com.ryanlab.zkdiscovery.ServiceRegistrar -Dexec.args="orders-service 9101"
+ *   ./gradlew run -PmainClass=com.ryanlab.zkdiscovery.ServiceRegistrar --args="orders-service 9101"
  *
  * Run several of these (different ports, e.g. 9101, 9102, 9103) in separate terminals
  * to simulate multiple instances of the same service registering themselves.

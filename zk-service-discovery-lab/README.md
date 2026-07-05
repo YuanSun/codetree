@@ -38,7 +38,7 @@ timeout expired without a heartbeat.
 ## Prerequisites
 
 - Docker Desktop (for the ensemble)
-- Java 11+ and Maven (for the client)
+- Java 11+ (for the client — the bundled Gradle wrapper downloads Gradle itself, no separate install needed)
 - `nc` (netcat) — pre-installed on macOS
 
 ## Quickstart
