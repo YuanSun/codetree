@@ -172,6 +172,24 @@ Mitigations real systems use for this (worth trying as a follow-up exercise):
   which, as Experiment 3 showed, may never arrive, or may arrive with the wrong
   verdict.
 
+**Implemented:** the second bullet above (canary/heartbeat freshness) is now built
+into `ServiceRegistrar`/`ServiceWatcher`, specifically *because* the first and third
+bullets would not have caught this exact bug -- the read never threw, and the
+connection-state listener never fired, so there was nothing to catch on that side.
+`ServiceRegistrar` now refreshes a heartbeat timestamp into its own znode payload
+every 3s via `discovery.updateService(...)`. `ServiceWatcher` independently compares
+that timestamp's age against wall-clock time on every poll and prints a
+`STALE DATA WARNING` if it's older than 9s (also now added: a connection-state
+listener for visibility, and a try/catch around the poll so a real failure logs
+clearly instead of crashing silently). This check is deliberately independent of
+whether the read call "succeeded" -- it inspects the freshness of the data itself,
+which is the only thing that actually would have caught the bug above.
+
+To retest: reproduce the Experiment 5 sequence again (kill 2 followers, wait, bring
+them back) with a `ServiceWatcher` that was already running through the whole
+outage, and see whether `STALE DATA WARNING` now appears where the old watcher gave
+no signal at all.
+
 ---
 
 ## Experiment 6 — Leader failure and re-election

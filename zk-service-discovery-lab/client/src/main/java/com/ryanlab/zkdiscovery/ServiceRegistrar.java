@@ -15,8 +15,16 @@ import java.util.UUID;
  * to simulate multiple instances of the same service registering themselves.
  *
  * Print the PID on startup -- you'll need it for the kill scripts.
+ *
+ * The registered znode's payload carries a heartbeat timestamp, refreshed every
+ * HEARTBEAT_INTERVAL_MS via discovery.updateService(). This lets a watcher verify
+ * data freshness independently of whether its own read call threw an exception --
+ * see EXPERIMENTS.md's "silently stale watcher" finding for why that distinction
+ * matters (a client's read can succeed while still returning stale data).
  */
 public class ServiceRegistrar {
+
+    private static final long HEARTBEAT_INTERVAL_MS = 3000;
 
     public static void main(String[] args) throws Exception {
         if (args.length < 2) {
@@ -55,14 +63,15 @@ public class ServiceRegistrar {
             }
         });
 
-        ServiceDiscovery<Void> discovery = DiscoveryFactory.buildServiceDiscovery(client);
+        ServiceDiscovery<String> discovery = DiscoveryFactory.buildServiceDiscovery(client);
         discovery.start();
 
-        ServiceInstance<Void> thisInstance = ServiceInstance.<Void>builder()
+        ServiceInstance<String> thisInstance = ServiceInstance.<String>builder()
                 .name(serviceName)
                 .id(instanceId)
                 .address("127.0.0.1")
                 .port(port)
+                .payload(String.valueOf(System.currentTimeMillis()))
                 .build();
 
         discovery.registerService(thisInstance);
@@ -84,12 +93,22 @@ public class ServiceRegistrar {
             }
         }));
 
-        // Keep alive. A SIGSTOP on this process pauses the JVM entirely, including
-        // the background thread that sends ZK heartbeats -- that's what triggers
-        // the session-timeout experiment even though the process is technically "alive."
+        // Keep alive, refreshing the heartbeat payload on the znode itself. A SIGSTOP
+        // on this process pauses the JVM entirely, including this loop -- that's what
+        // triggers the session-timeout experiment even though the process is
+        // technically "alive," and it's also what makes the heartbeat go stale from a
+        // watcher's point of view even in scenarios where the session itself survives.
         while (true) {
-            Thread.sleep(5000);
-            System.out.println("[" + timestamp() + "] still alive (pid " + pid + ")");
+            Thread.sleep(HEARTBEAT_INTERVAL_MS);
+            ServiceInstance<String> refreshed = ServiceInstance.<String>builder()
+                    .name(serviceName)
+                    .id(instanceId)
+                    .address("127.0.0.1")
+                    .port(port)
+                    .payload(String.valueOf(System.currentTimeMillis()))
+                    .build();
+            discovery.updateService(refreshed);
+            System.out.println("[" + timestamp() + "] still alive (pid " + pid + "), heartbeat refreshed");
         }
     }
 

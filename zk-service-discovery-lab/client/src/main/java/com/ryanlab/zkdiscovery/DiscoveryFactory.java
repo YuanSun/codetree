@@ -32,8 +32,11 @@ public class DiscoveryFactory {
         return client;
     }
 
-    public static ServiceDiscovery<Void> buildServiceDiscovery(CuratorFramework client) {
-        ServiceDiscovery<Void> discovery = ServiceDiscoveryBuilder.builder(Void.class)
+    // Payload is a String rather than Void so instances can carry a heartbeat
+    // timestamp -- see ServiceRegistrar/ServiceWatcher for why a client's own
+    // "did my read throw?" signal isn't sufficient proof its view is current.
+    public static ServiceDiscovery<String> buildServiceDiscovery(CuratorFramework client) {
+        ServiceDiscovery<String> discovery = ServiceDiscoveryBuilder.builder(String.class)
                 .client(client)
                 .basePath(BASE_PATH)
                 .build();
