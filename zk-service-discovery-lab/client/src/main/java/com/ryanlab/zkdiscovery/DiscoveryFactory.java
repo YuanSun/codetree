@@ -11,7 +11,7 @@ public class DiscoveryFactory {
 
     // All three ensemble nodes, addressed via the host-mapped ports from docker-compose.yml.
     // Curator will round-robin/failover across these automatically.
-    public static final String ZK_CONNECT_STRING = "localhost:2181,localhost:2182,localhost:2183";
+    public static final String ZK_CONNECT_STRING = "localhost:2191,localhost:2182,localhost:2183";
 
     public static final String BASE_PATH = "/services";
 

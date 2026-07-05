@@ -9,7 +9,7 @@ docker compose up -d
 echo "Waiting for nodes to come up..."
 sleep 8
 
-for port in 2181 2182 2183; do
+for port in 2191 2182 2183; do
   echo -n "zk on :$port -> "
   RESPONSE=$(echo ruok | nc -w 2 localhost $port || echo "NO RESPONSE")
   echo "$RESPONSE"
