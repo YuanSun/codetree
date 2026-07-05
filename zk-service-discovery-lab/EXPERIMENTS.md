@@ -139,6 +139,39 @@ un-writable — discovery calls should start failing or hanging.
 **Record:** exact error/behavior in the watcher when quorum is lost. Then time how
 long it takes to recover once you restart the two nodes and the ensemble resyncs.
 
+**Observed nuance -- the most important one in this lab:** a `ServiceWatcher` that
+was already running *before* the outage and stays running *through* the entire
+kill-two-followers -> quorum lost -> restart-two-followers -> quorum restored cycle
+can end up **silently stale**: it keeps polling every 2s, prints no errors, never
+logs a connection-state change, and yet stops reflecting reality -- a brand new
+`ServiceRegistrar` instance that is confirmed present via `04-inspect-znodes.sh`
+(and thus confirmed correctly replicated across the ensemble) simply never appears
+in that watcher's `current instances` output. Killing that watcher process and
+starting a fresh one fixes it immediately -- the fresh process sees the instance
+right away. So the underlying ZK data was never wrong; only that one long-lived
+client's view of it was.
+
+This is a sharper, real-infrastructure version of the Experiment 3 finding: you
+cannot rely on "the process is still running and printing normal-looking output"
+as a signal that a ZK client's view of the world is current. This is a genuine
+production risk, not just a lab curiosity -- a silently stale service-discovery
+watcher is *more* dangerous than a crashed one, because it passes every
+process-liveness check (still running, still consuming CPU, still logging) while
+serving membership data frozen at the moment of some earlier outage. A crashed
+process gets restarted by a supervisor; a zombie one doesn't, because nothing
+signals it's broken.
+
+Mitigations real systems use for this (worth trying as a follow-up exercise):
+- Actively check `client.getState()` / connection health on a timer, rather than
+  inferring health from "my poll loop is still executing."
+- Canary reads or writes: periodically touch a known heartbeat znode and verify
+  round-trip freshness; force-rebuild the client if the canary goes stale.
+- Track "time since last *verified* successful refresh" and treat the whole local
+  view as untrustworthy (fail closed) past some staleness threshold.
+- React defensively the moment `SUSPENDED` fires instead of waiting for `LOST` --
+  which, as Experiment 3 showed, may never arrive, or may arrive with the wrong
+  verdict.
+
 ---
 
 ## Experiment 6 — Leader failure and re-election
