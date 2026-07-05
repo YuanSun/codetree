@@ -1,12 +1,10 @@
-version: "3.8"
-
 services:
   zk1:
     image: zookeeper:3.9
     hostname: zk1
     container_name: zk1
     ports:
-      - "2181:2181"
+      - "2191:2181"   # host 2191 to avoid clashing with other local ZK/Kafka setups on 2181
       - "7001:7000"   # AdminServer (four-letter-word API also works on 2181)
     environment:
       ZOO_MY_ID: 1

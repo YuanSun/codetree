@@ -3,8 +3,9 @@
 echo "Checking role of each ensemble member (leader vs follower)..."
 echo ""
 
+PORTS=(2191 2182 2183)
 for i in 1 2 3; do
-  port=$((2180 + i))
+  port=${PORTS[$((i - 1))]}
   echo "--- zk$i (localhost:$port) ---"
   STATE=$(echo mntr | nc -w 2 localhost $port 2>/dev/null | grep "zk_server_state" || echo "unreachable")
   echo "$STATE"
