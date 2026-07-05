@@ -21,6 +21,15 @@ import java.util.UUID;
  * data freshness independently of whether its own read call threw an exception --
  * see EXPERIMENTS.md's "silently stale watcher" finding for why that distinction
  * matters (a client's read can succeed while still returning stale data).
+ *
+ * Self-healing registration: this process registers once at startup, but a broken
+ * connection (even an ordinary leader re-election, not just SIGSTOP) can outlast the
+ * session timeout and get the ephemeral znode deleted server-side while the process
+ * itself keeps running -- a live process with a dead registration that never
+ * recovers on its own. See EXPERIMENTS.md's Experiment 3/6 findings. To fix that at
+ * the source rather than requiring a manual restart, this process defensively
+ * re-registers itself on every RECONNECTED/CONNECTED event, catching
+ * NodeExistsException as the harmless "it was fine all along" case.
  */
 public class ServiceRegistrar {
 
@@ -49,20 +58,6 @@ public class ServiceRegistrar {
         System.out.println("(kill -CONT " + pid + "  -> resume from hang)");
 
         CuratorFramework client = DiscoveryFactory.buildCuratorClient();
-
-        client.getConnectionStateListenable().addListener((c, newState) -> {
-            System.out.println("[" + timestamp() + "] Connection state changed: " + newState);
-            if (newState == ConnectionState.LOST) {
-                System.out.println("[" + timestamp() + "] Session LOST -- ZK has expired this session."
-                        + " Ephemeral znode is gone. This process cannot re-register without restarting.");
-            } else if (newState == ConnectionState.SUSPENDED) {
-                System.out.println("[" + timestamp() + "] Session SUSPENDED -- connection dropped,"
-                        + " but session hasn't timed out yet. Ephemeral znode may still be alive.");
-            } else if (newState == ConnectionState.RECONNECTED) {
-                System.out.println("[" + timestamp() + "] RECONNECTED -- same session resumed, znode intact.");
-            }
-        });
-
         ServiceDiscovery<String> discovery = DiscoveryFactory.buildServiceDiscovery(client);
         discovery.start();
 
@@ -78,6 +73,28 @@ public class ServiceRegistrar {
         System.out.println("[" + timestamp() + "] Registered. Znode path: /services/" + serviceName + "/" + instanceId);
         System.out.println("Inspect it directly with:");
         System.out.println("  docker exec -it zk1 zkCli.sh -server localhost:2181 get /services/" + serviceName + "/" + instanceId);
+
+        client.getConnectionStateListenable().addListener((c, newState) -> {
+            System.out.println("[" + timestamp() + "] Connection state changed: " + newState);
+            if (newState == ConnectionState.LOST) {
+                System.out.println("[" + timestamp() + "] Session LOST -- ZK has expired this session."
+                        + " Ephemeral znode is gone. Will re-register once reconnected.");
+            } else if (newState == ConnectionState.SUSPENDED) {
+                System.out.println("[" + timestamp() + "] Session SUSPENDED -- connection dropped,"
+                        + " but session hasn't timed out yet. Ephemeral znode may still be alive.");
+            } else if (newState == ConnectionState.RECONNECTED || newState == ConnectionState.CONNECTED) {
+                System.out.println("[" + timestamp() + "] " + newState + " -- re-registering defensively"
+                        + " (a prior finding showed RECONNECTED does not guarantee the znode survived).");
+                try {
+                    discovery.registerService(thisInstance);
+                    System.out.println("[" + timestamp() + "] Re-registration attempt completed.");
+                } catch (org.apache.zookeeper.KeeperException.NodeExistsException alreadyThere) {
+                    System.out.println("[" + timestamp() + "] Znode already present -- no action needed.");
+                } catch (Exception e) {
+                    System.out.println("[" + timestamp() + "] Re-registration attempt failed: " + e);
+                }
+            }
+        });
 
         // Graceful shutdown: explicitly unregister before closing.
         // This is what does NOT happen on kill -9 -- that's the whole point of the experiment.
@@ -107,8 +124,16 @@ public class ServiceRegistrar {
                     .port(port)
                     .payload(String.valueOf(System.currentTimeMillis()))
                     .build();
-            discovery.updateService(refreshed);
-            System.out.println("[" + timestamp() + "] still alive (pid " + pid + "), heartbeat refreshed");
+            try {
+                discovery.updateService(refreshed);
+                System.out.println("[" + timestamp() + "] still alive (pid " + pid + "), heartbeat refreshed");
+            } catch (Exception e) {
+                // A transient connection hiccup here must not crash this process --
+                // that would silently turn a recoverable blip into a permanent
+                // deregistration, exactly the failure mode this class defends against.
+                System.out.println("[" + timestamp() + "] still alive (pid " + pid
+                        + "), heartbeat refresh failed (" + e.getClass().getSimpleName() + ") -- will retry next tick.");
+            }
         }
     }
 

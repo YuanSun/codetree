@@ -98,6 +98,21 @@ server's failure detection that can be fooled by a stalled JVM, the client's own
 diagnosis of its connection state can be fooled too. Treat the watcher/server-side
 view as ground truth, never the client's self-reported connection state.
 
+**Implemented -- self-healing registration:** the same orphan-process pattern was
+also reproduced via real infrastructure (not just `SIGSTOP`) during Experiment 6 --
+killing the leader disrupted both registrars' connections for long enough that both
+sessions expired, both znodes were deleted server-side, and both processes kept
+running indefinitely without ever re-registering, requiring a manual restart to
+recover. `ServiceRegistrar` now defensively re-registers itself on every
+`RECONNECTED`/`CONNECTED` event, catching `NodeExistsException` as the harmless
+"it was fine all along" case, rather than relying on the (proven unreliable)
+connection-state self-report to decide whether recovery is needed. This should
+close the loop for the leader-kill scenario and for real quorum-loss-driven
+expiry -- though not necessarily for a true `SIGSTOP`, since a fully frozen JVM
+can't run this listener callback either until it resumes, at which point it should
+now fire correctly. Worth re-running Experiment 6 (and this SIGSTOP experiment) to
+confirm the registrar now recovers automatically instead of needing a restart.
+
 ---
 
 ## Experiment 4 — Single ensemble node failure (no quorum loss)
