@@ -1,5 +1,6 @@
-# Maven
-client/target/
+# Gradle
+client/build/
+client/.gradle/
 
 # macOS
 .DS_Store

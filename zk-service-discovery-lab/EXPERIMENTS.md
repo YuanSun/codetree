@@ -12,13 +12,13 @@ Then in three separate terminals:
 
 ```bash
 # Terminal A: watcher (leave running throughout)
-cd client && mvn exec:java -Dexec.mainClass=com.ryanlab.zkdiscovery.ServiceWatcher -Dexec.args="orders-service"
+cd client && ./gradlew -q run -PmainClass=com.ryanlab.zkdiscovery.ServiceWatcher --args="orders-service"
 
 # Terminal B: instance 1
-cd client && mvn exec:java -Dexec.mainClass=com.ryanlab.zkdiscovery.ServiceRegistrar -Dexec.args="orders-service 9101"
+cd client && ./gradlew -q run -PmainClass=com.ryanlab.zkdiscovery.ServiceRegistrar --args="orders-service 9101"
 
 # Terminal C: instance 2
-cd client && mvn exec:java -Dexec.mainClass=com.ryanlab.zkdiscovery.ServiceRegistrar -Dexec.args="orders-service 9102"
+cd client && ./gradlew -q run -PmainClass=com.ryanlab.zkdiscovery.ServiceRegistrar --args="orders-service 9102"
 ```
 
 Note the PIDs Terminal B and C print on startup — you'll need them below.

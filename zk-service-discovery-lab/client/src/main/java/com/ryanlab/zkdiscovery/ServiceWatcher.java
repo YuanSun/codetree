@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 /**
  * Usage:
- *   mvn exec:java -Dexec.mainClass=com.ryanlab.zkdiscovery.ServiceWatcher -Dexec.args="orders-service"
+ *   ./gradlew run -PmainClass=com.ryanlab.zkdiscovery.ServiceWatcher --args="orders-service"
  *
  * Polls every 2 seconds and prints instance IDs currently registered, plus a diff
  * against the previous poll so joins/leaves are obvious without reading closely.
