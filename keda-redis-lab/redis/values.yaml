@@ -1,0 +1,26 @@
+# redis/values.yaml
+# Minimal Bitnami Redis config for local KEDA lab.
+# Single standalone master, no auth, no persistence — resources are
+# deliberately small to fit inside a k3d node.
+
+architecture: standalone
+
+auth:
+  enabled: false # no password — keeps the lab's KEDA trigger config simple
+
+master:
+  persistence:
+    enabled: false # no PVC needed for local lab
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+replica:
+  replicaCount: 0 # single node is enough to demo queue-depth scaling
+
+metrics:
+  enabled: false

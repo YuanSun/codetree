@@ -1,0 +1,54 @@
+# apps/producer/job.yaml
+#
+# A Kubernetes Job that runs the Python producer (producer.py) to push
+# 20,000 jobs onto the 'orders-queue' Redis list. This creates backlog
+# (consumers start at 0 replicas), which pushes KEDA to scale up.
+#
+# Re-run this job to add more backlog:
+#   kubectl delete job order-producer -n lab && kubectl apply -f apps/producer/job.yaml
+#
+# producer.py itself ships in a ConfigMap (created by scripts/04-deploy-app.sh)
+# so the Python source lives in one place: apps/producer/producer.py.
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: order-producer
+  namespace: lab
+spec:
+  template:
+    metadata:
+      labels:
+        app: order-producer
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: producer
+          image: python:3.11-slim
+          command:
+            - /bin/bash
+            - -c
+            - |
+              pip install --quiet --no-cache-dir redis==5.0.8
+              python3 /app/producer.py
+          env:
+            - name: REDIS_HOST
+              value: redis-master.redis.svc.cluster.local
+            - name: QUEUE_KEY
+              value: orders-queue
+            - name: NUM_JOBS
+              value: "20000"
+          volumeMounts:
+            - name: producer-script
+              mountPath: /app
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+      volumes:
+        - name: producer-script
+          configMap:
+            name: redis-producer-script

@@ -1,0 +1,57 @@
+# apps/consumer/deployment.yaml
+#
+# The Deployment that KEDA will scale.
+# Starts with 0 replicas — KEDA owns replica count from here.
+# Do NOT manually set replicas after deploying the ScaledObject.
+#
+# consumer.py ships in a ConfigMap (created by scripts/04-deploy-app.sh) so
+# the Python source lives in one place: apps/consumer/consumer.py.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-consumer
+  namespace: lab
+  labels:
+    app: order-consumer
+spec:
+  replicas: 0 # KEDA takes over; this initial value is overridden immediately
+  selector:
+    matchLabels:
+      app: order-consumer
+  template:
+    metadata:
+      labels:
+        app: order-consumer
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: consumer
+          image: python:3.11-slim
+          command:
+            - /bin/bash
+            - -c
+            - |
+              pip install --quiet --no-cache-dir redis==5.0.8
+              python3 /app/consumer.py
+          env:
+            - name: REDIS_HOST
+              value: redis-master.redis.svc.cluster.local
+            - name: QUEUE_KEY
+              value: orders-queue
+            - name: PROCESS_SECONDS
+              value: "0.05"
+          volumeMounts:
+            - name: consumer-script
+              mountPath: /app
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+      volumes:
+        - name: consumer-script
+          configMap:
+            name: redis-consumer-script
