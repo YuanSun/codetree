@@ -3,6 +3,12 @@
 # Single standalone master, no auth, no persistence — resources are
 # deliberately small to fit inside a k3d node.
 
+# Bitnami stopped publishing versioned tags to the free docker.io/bitnami
+# repos in 2025 — only `latest` exists now, so the chart's pinned default
+# tag 404s. Track `latest` instead of a specific version.
+image:
+  tag: latest
+
 architecture: standalone
 
 auth:
