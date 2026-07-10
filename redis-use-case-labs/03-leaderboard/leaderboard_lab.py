@@ -49,11 +49,6 @@ def demo_basics():
     r.delete(BOARD_KEY)
 
 
-def concurrent_zincrby(player: str, updates: int):
-    for _ in range(updates):
-        r.zincrby(BOARD_KEY, random.choice([10, -5, 25, 50]), player)
-
-
 def demo_race(naive_python: bool, players: int = 5, threads_per_player: int = 4, updates: int = 50):
     r.delete(BOARD_KEY)
     names = [f"player-{i}" for i in range(players)]

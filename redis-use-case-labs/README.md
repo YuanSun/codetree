@@ -41,3 +41,27 @@ Tear down with `docker compose down` when you're done.
 Run them in order 1 → 6. Locks (#2) show up again inside the cache stampede fix
 in #1; sorted sets (#3) reappear as the sliding-window log in #4; streams (#5)
 are the durable answer to the message-loss problem you'll see in Pub/Sub (#6).
+
+## Automated tests
+
+Each lab's README walks you through the demos narratively (printed output you
+read and interpret). The `tests/` directory backs the same behavior with real
+assertions — useful if you tweak a lab's code and want to confirm the
+concurrency guarantee still holds, rather than eyeballing a diff table.
+
+```bash
+./scripts/test.sh
+```
+
+or manually:
+
+```bash
+docker compose up -d --wait
+pip install -r requirements-dev.txt
+pytest tests/ -v
+```
+
+Each test file mirrors a lab (`test_cache.py`, `test_lock.py`, ...) and asserts
+the same claims the READMEs describe narratively — e.g. `test_lock.py` proves
+`safe_increment` never loses an update across concurrent threads while
+`naive_increment` does.
