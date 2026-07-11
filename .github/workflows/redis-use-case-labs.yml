@@ -1,0 +1,40 @@
+name: redis-use-case-labs tests
+
+on:
+  push:
+    paths:
+      - "redis-use-case-labs/**"
+      - ".github/workflows/redis-use-case-labs.yml"
+  pull_request:
+    paths:
+      - "redis-use-case-labs/**"
+      - ".github/workflows/redis-use-case-labs.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        working-directory: redis-use-case-labs
+        run: pip install -r requirements-dev.txt
+
+      - name: Run tests
+        working-directory: redis-use-case-labs
+        run: pytest -v
