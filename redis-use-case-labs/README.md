@@ -1,5 +1,7 @@
 # Redis Use-Case Labs
 
+[![tests](https://github.com/YuanSun/codetree/actions/workflows/redis-use-case-labs.yml/badge.svg?branch=main)](https://github.com/YuanSun/codetree/actions/workflows/redis-use-case-labs.yml)
+
 Six small, self-contained labs, each isolating one classic Redis pattern so you can
 run it, break it, and watch it fail before fixing it. Companion to `../keda-redis-lab`
 (which covers Redis as a KEDA autoscaling trigger) and `../redis-playground`
@@ -35,6 +37,21 @@ Every lab connects to `localhost:6379` and cleans up its own keys on exit
 `leaderboard:`, `ratelimit:`, `events:`, `chat:`).
 
 Tear down with `docker compose down` when you're done.
+
+### Makefile shortcuts
+
+```bash
+make up      # docker compose up -d --wait
+make demo    # start Redis, install deps, run every lab's non-interactive demo in sequence
+make test    # start Redis, install dev deps, run the pytest suite
+make down    # tear down
+make clean   # remove __pycache__ / .pytest_cache
+```
+
+`make demo` is the fastest way to see all six patterns without reading a
+README first — it runs `scripts/demo-tour.sh`, which walks through each
+lab's automated commands back to back (Pub/Sub's interactive subscribe/
+publish is skipped; run that one yourself in two terminals).
 
 ## Suggested order
 
