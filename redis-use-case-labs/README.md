@@ -65,3 +65,7 @@ Each test file mirrors a lab (`test_cache.py`, `test_lock.py`, ...) and asserts
 the same claims the READMEs describe narratively — e.g. `test_lock.py` proves
 `safe_increment` never loses an update across concurrent threads while
 `naive_increment` does.
+
+A GitHub Actions workflow (`.github/workflows/redis-use-case-labs.yml`) runs
+this same suite against a Redis service container on every push/PR that
+touches this directory.
