@@ -1,0 +1,30 @@
+name: obsidian-vault-retrieval tests
+
+on:
+  push:
+    paths:
+      - "obsidian-vault-retrieval/**"
+      - ".github/workflows/obsidian-vault-retrieval.yml"
+  pull_request:
+    paths:
+      - "obsidian-vault-retrieval/**"
+      - ".github/workflows/obsidian-vault-retrieval.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        working-directory: obsidian-vault-retrieval
+        run: pip install -e ".[dev]"
+
+      - name: Run tests
+        working-directory: obsidian-vault-retrieval
+        run: pytest -v

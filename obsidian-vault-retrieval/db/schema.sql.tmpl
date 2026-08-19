@@ -1,0 +1,36 @@
+-- Schema template for the vault retrieval service.
+-- {embedding_dim} is substituted by scripts/init_db.py from the
+-- EMBEDDING_DIM setting so the vector column matches the served model
+-- (768 for nomic-embed-text, 384 for bge-small, etc).
+
+CREATE EXTENSION IF NOT EXISTS vector;
+
+CREATE TABLE IF NOT EXISTS notes (
+    id            BIGSERIAL PRIMARY KEY,
+    path          TEXT NOT NULL UNIQUE,
+    title         TEXT,
+    folder        TEXT,
+    tags          TEXT[] NOT NULL DEFAULT '{{}}',
+    content_hash  TEXT NOT NULL,
+    mtime         DOUBLE PRECISION NOT NULL,
+    indexed_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS chunks (
+    id            BIGSERIAL PRIMARY KEY,
+    note_id       BIGINT NOT NULL REFERENCES notes(id) ON DELETE CASCADE,
+    chunk_index   INT NOT NULL,
+    section_title TEXT,
+    header_path   TEXT,
+    content       TEXT NOT NULL,
+    embedding     vector({embedding_dim}) NOT NULL,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS notes_folder_idx ON notes (folder);
+CREATE INDEX IF NOT EXISTS notes_tags_idx ON notes USING gin (tags);
+CREATE INDEX IF NOT EXISTS chunks_note_id_idx ON chunks (note_id);
+
+-- HNSW cosine index — good default for tens of thousands of chunks.
+CREATE INDEX IF NOT EXISTS chunks_embedding_idx
+    ON chunks USING hnsw (embedding vector_cosine_ops);
