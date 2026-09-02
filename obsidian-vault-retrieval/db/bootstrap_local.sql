@@ -1,6 +1,6 @@
--- One-time bootstrap for using an existing local Postgres instance
--- (instead of the bundled docker-compose Postgres) to hold the vault
--- embedding index.
+-- One-time bootstrap for an existing Postgres instance (local, or
+-- reachable elsewhere on your network) to hold the vault embedding
+-- index.
 --
 -- Creates the `vault` role/database and installs the pgvector extension.
 -- Must be run as a superuser — pgvector's extension isn't marked

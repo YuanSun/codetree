@@ -3,23 +3,37 @@ name = "vault-retrieval"
 version = "0.1.0"
 description = "Obsidian vault embedding & retrieval service (indexer + query API + MCP wrapper)"
 requires-python = ">=3.11"
-dependencies = [
+# No base dependencies: install the extra(s) for whichever piece a given
+# machine actually runs. In particular, `mcp` is deliberately the only
+# thing a client machine (e.g. a laptop running just the stdio wrapper)
+# needs to pull in — no FastAPI, no psycopg, no watchdog.
+dependencies = []
+
+[project.optional-dependencies]
+indexer = [
+    "psycopg[binary]>=3.1",
+    "pgvector>=0.3.6",
+    "httpx>=0.27",
+    "pyyaml>=6.0",
+    "watchdog>=4.0",
+]
+api = [
     "fastapi>=0.115",
     "uvicorn[standard]>=0.30",
     "psycopg[binary]>=3.1",
     "pgvector>=0.3.6",
     "httpx>=0.27",
     "pydantic>=2.7",
-    "pyyaml>=6.0",
-    "watchdog>=4.0",
+]
+mcp = [
     # Pinned below 2.0: that release reworked the low-level Server API and
     # dropped/relocated FastMCP at the time this was written.
     "mcp>=1.20.0,<2.0.0",
+    "httpx>=0.27",
 ]
-
-[project.optional-dependencies]
 dev = [
     "pytest>=8.0",
+    "pyyaml>=6.0",
 ]
 
 [project.scripts]

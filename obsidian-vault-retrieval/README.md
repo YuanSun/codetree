@@ -38,13 +38,20 @@ vector DB needed.
    footprint is intentionally this one small process, not a
    reimplementation of search.
 
+Nothing here requires running on one machine. A natural split: Postgres,
+the indexer, LM Studio, and the query API all live on a machine that's
+on and reachable (e.g. a desktop), while a laptop only runs the MCP
+wrapper — a few-KB Python process with no local index, no embedding
+model, nothing to keep in sync — pointed at that machine's API over the
+LAN.
+
 ## Why this stack
 
-- **Storage: pgvector**, in the same local Postgres instance already used
-  elsewhere in this repo (see `budget-advisor/`) — a dedicated vector DB
-  (Qdrant, Chroma, ...) isn't warranted at tens of thousands of chunks. A
-  docker-compose Postgres is also available if you'd rather keep this
-  fully isolated; see Setup below.
+- **Storage: pgvector**, in a Postgres instance already running on your
+  network (e.g. the same one used elsewhere in this repo for
+  `budget-advisor`) — no separate container, no dedicated vector DB
+  (Qdrant, Chroma, ...) needed at tens of thousands of chunks. See Setup
+  below.
 - **Embeddings: local, via an OpenAI-compatible endpoint** (LM Studio,
   Ollama's OpenAI shim, ...). LM Studio's chat models (`gpt-oss-20b`,
   `qwen3-vl-30b`) don't serve embeddings — point `EMBEDDING_API_URL` at a
@@ -60,38 +67,34 @@ vector DB needed.
 
 ### 1. Postgres
 
-Two options — pick one:
-
-**Option A: your existing local Postgres (default).** If you're already
-running Postgres locally (e.g. for `budget-advisor`), reuse that instance
-instead of standing up a second one. Needs the pgvector extension for
-your Postgres version:
+Use whichever Postgres you already have running — no dedicated container
+for this project. Needs the pgvector extension for that Postgres's
+version:
 
 ```bash
 brew install pgvector   # Homebrew Postgres
 ```
 
 Then create the `vault` role/database and install the extension
-(one-time, needs superuser):
+(one-time, needs superuser — run this on whichever machine Postgres is
+actually on):
 
 ```bash
 psql -U postgres -f db/bootstrap_local.sql
+# or, from another machine on the network:
+psql -U postgres -h <postgres-host> -f db/bootstrap_local.sql
 ```
 
-`DATABASE_URL` in `.env.example` already points at this
-(`postgresql://vault:vault@localhost:5432/vault`) — change the password
-in both the script and `.env` if you want something less default-y.
-
-**Option B: the bundled docker-compose Postgres**, fully isolated from
-any local instance:
-
-```bash
-docker compose up -d postgres
-```
-
-Runs on host port `5433` (not `5432`) precisely so it doesn't clash with
-Option A. If you use this, set `DATABASE_URL` in `.env` to port `5433`
-instead of the default.
+`DATABASE_URL` in `.env.example` defaults to
+`postgresql://vault:vault@localhost:5432/vault` — change the password,
+and change `localhost` to Postgres's actual address if the
+indexer/API run on a different machine than Postgres does. If that's the
+case, Postgres also needs to actually accept the connection:
+- `postgresql.conf`: `listen_addresses = '*'` (or the specific LAN
+  interface)
+- `pg_hba.conf`: an entry allowing the `vault` role to connect from your
+  network's address range, e.g. `host vault vault 192.168.1.0/24 scram-sha-256`
+- restart Postgres after editing either file
 
 ### 2. Configure
 
@@ -105,9 +108,12 @@ model LM Studio is serving embeddings from.
 
 ### 3. Install and initialize the schema
 
+On the machine running the indexer and query API (install both extras
+together — the API also embeds queries, same code path as the indexer):
+
 ```bash
 python -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev]"
+pip install -e ".[indexer,api]"
 set -a; source .env; set +a
 python scripts/init_db.py
 ```
@@ -133,6 +139,14 @@ python -m vault_retrieval.indexer.cli watch
 uvicorn vault_retrieval.api.main:app --host 127.0.0.1 --port 8756
 ```
 
+`127.0.0.1` is fine if MCP clients run on this same machine. If they run
+elsewhere (e.g. a laptop, per the split described in Architecture
+above), bind to the LAN interface instead so it's actually reachable:
+
+```bash
+uvicorn vault_retrieval.api.main:app --host 0.0.0.0 --port 8756
+```
+
 ```bash
 curl -s localhost:8756/search -X POST -H 'content-type: application/json' \
   -d '{"query": "spaced repetition", "top_k": 3}' | jq
@@ -140,9 +154,20 @@ curl -s localhost:8756/search -X POST -H 'content-type: application/json' \
 
 ### 6. Point an MCP client at the wrapper
 
+This is the one piece of the service meant to run on a different,
+lighter machine than everything else — e.g. a laptop that has no
+Postgres, no LM Studio, and never runs the indexer. Install just the
+`mcp` extra there:
+
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install -e ".[mcp]"
+```
+
 The wrapper only needs `API_BASE_URL` (and `VAULT_PATH`, currently
 unused by the wrapper itself but required by shared config loading) —
-run it against the same `.env`, or export the handful of vars directly.
+set `API_BASE_URL` to wherever the query API actually lives (its LAN
+IP, if that's a different machine), not necessarily `127.0.0.1`.
 
 Zed (`~/.config/zed/settings.json`):
 
@@ -153,7 +178,7 @@ Zed (`~/.config/zed/settings.json`):
       "command": {
         "path": "/path/to/obsidian-vault-retrieval/.venv/bin/python",
         "args": ["-m", "vault_retrieval.mcp.server"],
-        "env": { "API_BASE_URL": "http://127.0.0.1:8756", "VAULT_PATH": "/path/to/vault" }
+        "env": { "API_BASE_URL": "http://<api-host>:8756", "VAULT_PATH": "/path/to/vault" }
       }
     }
   }
@@ -194,7 +219,6 @@ until run against the real vault.
 
 ```
 obsidian-vault-retrieval/
-├── docker-compose.yml       # pgvector Postgres for local dev
 ├── db/schema.sql.tmpl        # schema, templated on EMBEDDING_DIM
 ├── db/bootstrap_local.sql     # one-time role/db/extension setup for local Postgres
 ├── scripts/init_db.py          # one-shot schema setup
