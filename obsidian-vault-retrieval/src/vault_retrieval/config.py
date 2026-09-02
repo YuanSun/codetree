@@ -50,7 +50,10 @@ def get_settings() -> Settings:
 
     database_url = os.environ.get(
         "DATABASE_URL",
-        "postgresql://vault:vault@localhost:5433/vault",
+        # Defaults to a local Postgres instance on the standard port. Using
+        # the bundled docker-compose Postgres instead? Override this to
+        # port 5433 (see docker-compose.yml).
+        "postgresql://vault:vault@localhost:5432/vault",
     )
 
     api_host = os.environ.get("API_HOST", "127.0.0.1")

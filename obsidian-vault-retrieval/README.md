@@ -40,9 +40,11 @@ vector DB needed.
 
 ## Why this stack
 
-- **Storage: pgvector.** Already running Postgres elsewhere in this repo
-  (see `budget-advisor/`); at tens of thousands of chunks a dedicated
-  vector DB (Qdrant, Chroma, ...) isn't warranted.
+- **Storage: pgvector**, in the same local Postgres instance already used
+  elsewhere in this repo (see `budget-advisor/`) — a dedicated vector DB
+  (Qdrant, Chroma, ...) isn't warranted at tens of thousands of chunks. A
+  docker-compose Postgres is also available if you'd rather keep this
+  fully isolated; see Setup below.
 - **Embeddings: local, via an OpenAI-compatible endpoint** (LM Studio,
   Ollama's OpenAI shim, ...). LM Studio's chat models (`gpt-oss-20b`,
   `qwen3-vl-30b`) don't serve embeddings — point `EMBEDDING_API_URL` at a
@@ -58,12 +60,38 @@ vector DB needed.
 
 ### 1. Postgres
 
+Two options — pick one:
+
+**Option A: your existing local Postgres (default).** If you're already
+running Postgres locally (e.g. for `budget-advisor`), reuse that instance
+instead of standing up a second one. Needs the pgvector extension for
+your Postgres version:
+
+```bash
+brew install pgvector   # Homebrew Postgres
+```
+
+Then create the `vault` role/database and install the extension
+(one-time, needs superuser):
+
+```bash
+psql -U postgres -f db/bootstrap_local.sql
+```
+
+`DATABASE_URL` in `.env.example` already points at this
+(`postgresql://vault:vault@localhost:5432/vault`) — change the password
+in both the script and `.env` if you want something less default-y.
+
+**Option B: the bundled docker-compose Postgres**, fully isolated from
+any local instance:
+
 ```bash
 docker compose up -d postgres
 ```
 
-Uses host port `5433` (not `5432`) to avoid clashing with any other local
-Postgres. See `docker-compose.yml`.
+Runs on host port `5433` (not `5432`) precisely so it doesn't clash with
+Option A. If you use this, set `DATABASE_URL` in `.env` to port `5433`
+instead of the default.
 
 ### 2. Configure
 
@@ -168,7 +196,8 @@ until run against the real vault.
 obsidian-vault-retrieval/
 ├── docker-compose.yml       # pgvector Postgres for local dev
 ├── db/schema.sql.tmpl        # schema, templated on EMBEDDING_DIM
-├── scripts/init_db.py         # one-shot schema setup
+├── db/bootstrap_local.sql     # one-time role/db/extension setup for local Postgres
+├── scripts/init_db.py          # one-shot schema setup
 ├── src/vault_retrieval/
 │   ├── config.py                # shared env-based settings
 │   ├── chunker.py                # H2/H3 section chunking + frontmatter
