@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Creates the pgvector schema (extension, tables, indexes) if missing.
 
-Run once after `docker compose up -d postgres` (or against any Postgres
-with the pgvector extension available):
+Run once against any reachable Postgres with the pgvector extension
+already installed (see db/bootstrap_local.sql for one-time setup):
 
     python scripts/init_db.py
 """

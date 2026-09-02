@@ -50,7 +50,10 @@ def get_settings() -> Settings:
 
     database_url = os.environ.get(
         "DATABASE_URL",
-        "postgresql://vault:vault@localhost:5433/vault",
+        # Defaults to Postgres on this machine, standard port. Running the
+        # indexer/API on a different host than Postgres? Point this at
+        # that host instead — see db/bootstrap_local.sql for one-time setup.
+        "postgresql://vault:vault@localhost:5432/vault",
     )
 
     api_host = os.environ.get("API_HOST", "127.0.0.1")
