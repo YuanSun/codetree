@@ -40,7 +40,9 @@ the most talented ones.
 See [talent-vs-luck/README.md](talent-vs-luck/README.md) for more details.
 Includes `simulation/`, a fully vectorized NumPy Monte Carlo model for fast
 batch statistics, and `spatial_sim/`, a Pygame recreation of the paper's
-literal 2D grid mechanic with a live dashboard.
+literal 2D grid mechanic with a live dashboard where you can click any
+agent to inspect it. Both save a numeric JSON report and a self-contained,
+interactive HTML report letting you browse any agent's full life story.
 
 ## Structure
 

@@ -4,11 +4,15 @@ Examples:
     python -m simulation.run_experiment
     python -m simulation.run_experiment --seed 42 --plot out.png
     python -m simulation.run_experiment --n-agents 5000 --event-rate 0.3
+    python -m simulation.run_experiment --seed 42 --report out.json --html-report out.html
 """
 from __future__ import annotations
 
 import argparse
+import datetime
 import json
+
+from common.report import save_interactive_report, save_numeric_report
 
 from .model import SimulationConfig, run_simulation
 from .stats import summarize
@@ -23,6 +27,13 @@ def parse_args(argv=None) -> argparse.Namespace:
     parser.add_argument("--event-rate", type=float, default=0.5, help="P(any event) per agent per step")
     parser.add_argument("--seed", type=int, default=None)
     parser.add_argument("--plot", type=str, default=None, help="path to save a summary figure (PNG)")
+    parser.add_argument("--report", type=str, default=None, help="path to save a numeric JSON report")
+    parser.add_argument(
+        "--html-report",
+        type=str,
+        default=None,
+        help="path to save an interactive HTML report (browse every agent's life story)",
+    )
     return parser.parse_args(argv)
 
 
@@ -42,6 +53,24 @@ def main(argv=None) -> None:
     if args.plot:
         _plot(result, args.plot)
         print(f"saved figure to {args.plot}")
+
+    meta = {
+        "implementation": "vectorized simulation",
+        "n_agents": config.n_agents,
+        "n_steps": config.n_steps,
+        "seed": config.seed,
+        "generated_at": datetime.datetime.now().isoformat(timespec="seconds"),
+    }
+
+    if args.report:
+        save_numeric_report(args.report, result.talent, result.capital, result.life_events, meta)
+        print(f"saved numeric report to {args.report}")
+
+    if args.html_report:
+        save_interactive_report(
+            args.html_report, result.talent, result.capital, result.life_events, result.capital_history, meta
+        )
+        print(f"saved interactive report to {args.html_report}")
 
 
 def _plot(result, path: str) -> None:

@@ -27,4 +27,4 @@ jobs:
 
       - name: Run tests
         working-directory: talent-vs-luck
-        run: python -m pytest simulation/tests spatial_sim/tests -v
+        run: python -m pytest simulation/tests spatial_sim/tests common/tests -v

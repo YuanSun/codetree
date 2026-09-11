@@ -17,10 +17,16 @@ literal spatial mechanic, see ``../spatial_sim``.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Optional
+from dataclasses import dataclass, field
+from typing import List, Optional
 
 import numpy as np
+
+# One event in an agent's life: which step it happened on, what kind of
+# event it was, whether a lucky one was seized, and the capital it left
+# them with. "lucky_missed" records a lucky opportunity the agent's
+# talent roll failed to capitalize on -- still part of their story.
+LifeEvent = dict
 
 
 @dataclass
@@ -44,6 +50,7 @@ class SimulationResult:
     capital_history: np.ndarray  # (n_steps + 1, n_agents)
     lucky_events: np.ndarray  # (n_agents,) count of seized lucky events
     unlucky_events: np.ndarray  # (n_agents,) count of unlucky hits
+    life_events: List[List[LifeEvent]] = field(default_factory=list)  # per-agent chronological event log
 
 
 def sample_talent(rng: np.random.Generator, n_agents: int, mean: float, std: float) -> np.ndarray:
@@ -60,6 +67,7 @@ def run_simulation(config: SimulationConfig) -> SimulationResult:
     history[0] = capital
     lucky_events = np.zeros(config.n_agents, dtype=int)
     unlucky_events = np.zeros(config.n_agents, dtype=int)
+    life_events: List[List[LifeEvent]] = [[] for _ in range(config.n_agents)]
 
     for step in range(1, config.n_steps + 1):
         has_event = rng.random(config.n_agents) < config.event_rate
@@ -70,11 +78,37 @@ def run_simulation(config: SimulationConfig) -> SimulationResult:
         # paper's stand-in for talent as the ability to recognize and
         # exploit an opportunity, rather than a guarantee of success.
         seizes = is_lucky & (rng.random(config.n_agents) < talent)
+        lucky_missed = is_lucky & ~seizes
+
+        before = capital.copy()
         capital[seizes] *= config.lucky_multiplier
         capital[is_unlucky] *= config.unlucky_multiplier
 
         lucky_events += seizes
         unlucky_events += is_unlucky
+        _record_events(life_events, step, "lucky_seized", seizes, before, capital)
+        _record_events(life_events, step, "lucky_missed", lucky_missed, before, capital)
+        _record_events(life_events, step, "unlucky", is_unlucky, before, capital)
+
         history[step] = capital
 
-    return SimulationResult(talent, capital, history, lucky_events, unlucky_events)
+    return SimulationResult(talent, capital, history, lucky_events, unlucky_events, life_events)
+
+
+def _record_events(
+    life_events: List[List[LifeEvent]],
+    step: int,
+    event_type: str,
+    mask: np.ndarray,
+    before: np.ndarray,
+    after: np.ndarray,
+) -> None:
+    for idx in np.flatnonzero(mask):
+        life_events[idx].append(
+            {
+                "step": step,
+                "type": event_type,
+                "capital_before": float(before[idx]),
+                "capital_after": float(after[idx]),
+            }
+        )

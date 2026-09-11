@@ -50,3 +50,36 @@ def test_gini_of_all_to_one_agent_approaches_one():
     values = np.zeros(100)
     values[0] = 1.0
     assert gini(values) > 0.95
+
+
+def test_life_events_counts_match_lucky_and_unlucky_totals():
+    config = SimulationConfig(n_agents=300, seed=4)
+    result = run_simulation(config)
+    for i, events in enumerate(result.life_events):
+        seized = sum(1 for e in events if e["type"] == "lucky_seized")
+        unlucky = sum(1 for e in events if e["type"] == "unlucky")
+        assert seized == result.lucky_events[i]
+        assert unlucky == result.unlucky_events[i]
+
+
+def test_life_events_are_chronological_and_replay_to_final_capital():
+    config = SimulationConfig(n_agents=300, seed=4)
+    result = run_simulation(config)
+    for i, events in enumerate(result.life_events):
+        steps = [e["step"] for e in events]
+        assert steps == sorted(steps)
+        if events:
+            assert events[-1]["capital_after"] == result.capital[i]
+        for e in events:
+            assert 1 <= e["step"] <= config.n_steps
+            if e["type"] == "lucky_missed":
+                assert e["capital_before"] == e["capital_after"]
+
+
+def test_lucky_missed_events_are_recorded_for_low_talent_agents():
+    # A zero-talent agent can never seize a lucky event -- every lucky
+    # encounter it has must show up as "lucky_missed".
+    config = SimulationConfig(n_agents=50, talent_mean=0.0, talent_std=0.0, event_rate=0.9, seed=5)
+    result = run_simulation(config)
+    assert any(e["type"] == "lucky_missed" for events in result.life_events for e in events)
+    assert not any(e["type"] == "lucky_seized" for events in result.life_events for e in events)

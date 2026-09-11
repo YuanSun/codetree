@@ -1,0 +1,4 @@
+# Generated run reports (numeric JSON + interactive HTML) -- run artifacts, not source.
+reports/
+*.report.json
+*.report.html

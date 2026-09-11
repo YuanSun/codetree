@@ -13,8 +13,8 @@ for a faster, non-spatial approximation of the same model.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Optional
+from dataclasses import dataclass
+from typing import List, Optional
 
 import numpy as np
 
@@ -46,6 +46,10 @@ class World:
         self.step_count = 0
         self.lucky_events = np.zeros(self.n_agents, dtype=int)
         self.unlucky_events = np.zeros(self.n_agents, dtype=int)
+        # Per-agent chronological event log and capital trajectory, kept
+        # for reporting ("what did agent #42 actually experience?").
+        self.life_events: List[List[dict]] = [[] for _ in range(self.n_agents)]
+        self.capital_history: List[np.ndarray] = [self.capital.copy()]
 
     def _random_walk(self, pos: np.ndarray) -> np.ndarray:
         moves = self._rng.integers(-1, 2, size=pos.shape)  # each axis in {-1, 0, 1}
@@ -68,13 +72,31 @@ class World:
 
         roll = self._rng.random(self.n_agents)
         seizes = lucky_hit & (roll < self.talent)
+        lucky_missed = lucky_hit & ~seizes
+
+        before = self.capital.copy()
         self.capital[seizes] *= 2.0
         self.capital[unlucky_hit] *= 0.5
 
         self.lucky_events += seizes
         self.unlucky_events += unlucky_hit
+        self._record_events("lucky_seized", seizes, before)
+        self._record_events("lucky_missed", lucky_missed, before)
+        self._record_events("unlucky", unlucky_hit, before)
+
+    def _record_events(self, event_type: str, mask: np.ndarray, before: np.ndarray) -> None:
+        for idx in np.flatnonzero(mask):
+            self.life_events[idx].append(
+                {
+                    "step": self.step_count,
+                    "type": event_type,
+                    "capital_before": float(before[idx]),
+                    "capital_after": float(self.capital[idx]),
+                }
+            )
 
     def step(self) -> None:
+        self.step_count += 1
         self.move_particles()
         self.apply_collisions()
-        self.step_count += 1
+        self.capital_history.append(self.capital.copy())
