@@ -24,6 +24,24 @@ A standalone service that embeds an Obsidian vault into pgvector so multiple AI 
 
 See [obsidian-vault-retrieval/README.md](obsidian-vault-retrieval/README.md) for more details. Distinct from `obsidian-mcp-server/`, which wraps Obsidian's Local REST API plugin for live CRUD + keyword search rather than semantic search over an embedded index.
 
+### Talent vs Luck
+
+A code implementation of the agent-based model from Pluchino, Biondo &
+Rapisarda (2018), *"Talent vs. Luck: The Role of Randomness in Success and
+Failure"* (arXiv:1802.07068) — normally-distributed talent plus random
+lucky/unlucky events over a 40-year career produces a heavily unequal,
+Pareto-like wealth distribution, and the wealthiest agents are usually not
+the most talented ones.
+
+- **Location**: `talent-vs-luck/`
+- **Status**: Both implementations complete and tested
+- **Tech Stack**: Python, NumPy, Pygame, Matplotlib
+
+See [talent-vs-luck/README.md](talent-vs-luck/README.md) for more details.
+Includes `simulation/`, a fully vectorized NumPy Monte Carlo model for fast
+batch statistics, and `spatial_sim/`, a Pygame recreation of the paper's
+literal 2D grid mechanic with a live dashboard.
+
 ## Structure
 
 Each subdirectory contains a self-contained project with its own documentation and dependencies.
