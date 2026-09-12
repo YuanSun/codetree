@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import datetime
 import json
+import random
 
 from common.report import save_interactive_report, save_numeric_report
 
@@ -25,7 +26,13 @@ def parse_args(argv=None) -> argparse.Namespace:
     parser.add_argument("--talent-mean", type=float, default=0.6)
     parser.add_argument("--talent-std", type=float, default=0.1)
     parser.add_argument("--event-rate", type=float, default=0.5, help="P(any event) per agent per step")
-    parser.add_argument("--seed", type=int, default=None)
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="omit for a fresh random run each time (the seed actually used is always printed and "
+        "saved to reports, so you can pass it back later to reproduce any run you liked)",
+    )
     parser.add_argument("--plot", type=str, default=None, help="path to save a summary figure (PNG)")
     parser.add_argument("--report", type=str, default=None, help="path to save a numeric JSON report")
     parser.add_argument(
@@ -39,13 +46,20 @@ def parse_args(argv=None) -> argparse.Namespace:
 
 def main(argv=None) -> None:
     args = parse_args(argv)
+    # A fixed --seed is deterministic *by design* (that's the point of a seed --
+    # same seed always replays the same run). Omitting it gives a fresh random
+    # run each time; we still generate and report the seed actually used so an
+    # interesting random run can be reproduced later with --seed <printed value>.
+    seed = args.seed if args.seed is not None else random.SystemRandom().randrange(2**31)
+    if args.seed is None:
+        print(f"no --seed given; using a fresh random seed: {seed} (pass --seed {seed} to reproduce this exact run)")
     config = SimulationConfig(
         n_agents=args.n_agents,
         n_steps=args.n_steps,
         talent_mean=args.talent_mean,
         talent_std=args.talent_std,
         event_rate=args.event_rate,
-        seed=args.seed,
+        seed=seed,
     )
     result = run_simulation(config)
     print(json.dumps(summarize(result), indent=2))

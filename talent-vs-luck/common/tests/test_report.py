@@ -129,6 +129,9 @@ def test_save_interactive_report_embeds_agent_data(tmp_path):
     for i in range(talent.size):
         assert f'"id":{i},' in html
     assert '"talent_histogram"' in html
-    assert '"pareto_exponent"' in html  # drives the capital rank-size fit line
+    assert '"capital_histogram_linear"' in html  # neutral default view, no log transform
+    assert '"pareto_exponent"' in html  # drives the opt-in capital rank-size fit line
+    assert 'data-view="linear"' in html
+    assert 'data-view="loglog"' in html
     assert 'id="talent-chart"' in html
     assert 'id="capital-chart"' in html
