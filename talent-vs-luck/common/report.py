@@ -28,6 +28,30 @@ def _round(value: float, sig: int = 6) -> float:
     return float(f"{value:.{sig}g}")
 
 
+def _histogram(values: np.ndarray, bins: int = 30, log: bool = False) -> dict:
+    """Bin edges + counts for a population histogram, JSON-ready.
+
+    `log`-spaced bins are used for capital, which spans many orders of
+    magnitude; linear bins for talent, which doesn't.
+    """
+    values = np.asarray(values, dtype=float)
+    if log:
+        values = values[values > 0]
+        if values.size == 0:
+            return {"edges": [], "counts": [], "log": True}
+        lo, hi = np.log10(values.min()), np.log10(values.max())
+        if lo == hi:
+            lo, hi = lo - 0.5, hi + 0.5
+        edges = np.logspace(lo, hi, bins + 1)
+    else:
+        lo, hi = float(values.min()), float(values.max())
+        if lo == hi:
+            lo, hi = lo - 0.5, hi + 0.5
+        edges = np.linspace(lo, hi, bins + 1)
+    counts, edges = np.histogram(values, bins=edges)
+    return {"edges": [_round(float(e)) for e in edges], "counts": [int(c) for c in counts], "log": log}
+
+
 def _agent_rows(talent: np.ndarray, capital: np.ndarray, life_events: Optional[Sequence] = None) -> List[dict]:
     n = capital.size
     order = np.argsort(-capital)
@@ -122,6 +146,8 @@ def save_interactive_report(
         "agents": rows,
         "history": history_by_agent,
         "events": events_by_agent,
+        "talent_histogram": _histogram(talent, bins=30, log=False),
+        "capital_histogram": _histogram(capital, bins=30, log=True),
     }
 
     json_blob = json.dumps(data, separators=(",", ":")).replace("</script>", "<\\/script>")
@@ -258,12 +284,51 @@ _HTML_TEMPLATE = """<!doctype html>
   ul#timeline li .when { flex: none; color: var(--text-dim); font-variant-numeric: tabular-nums; min-width: 128px; }
   ul#timeline li.lucky .what { color: var(--lucky); }
   ul#timeline li.unlucky .what { color: var(--unlucky); }
+  .dist-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    max-width: 1400px;
+    margin-bottom: 16px;
+  }
+  @media (max-width: 900px) {
+    .dist-grid { grid-template-columns: 1fr; }
+  }
+  .dist-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  canvas.dist-chart { width: 100%; height: 140px; display: block; cursor: crosshair; }
+  .dist-caption { font-size: 12px; color: var(--text-dim); margin-top: 8px; }
+  #chart-tooltip {
+    position: fixed;
+    display: none;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 5px 9px;
+    border-radius: 6px;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 50;
+    white-space: nowrap;
+  }
 </style>
 </head>
 <body>
 <h1>Talent vs Luck — run report</h1>
 <p class="meta-line" id="meta-line"></p>
 <div class="summary-grid" id="summary-grid"></div>
+
+<div class="dist-grid">
+  <section class="panel">
+    <div class="dist-title" id="talent-dist-title">Talent distribution</div>
+    <canvas id="talent-chart" class="dist-chart"></canvas>
+    <div class="dist-caption" id="talent-dist-caption"></div>
+  </section>
+  <section class="panel">
+    <div class="dist-title" id="capital-dist-title">Final capital distribution</div>
+    <canvas id="capital-chart" class="dist-chart"></canvas>
+    <div class="dist-caption" id="capital-dist-caption"></div>
+  </section>
+</div>
 
 <main>
   <section class="panel">
@@ -305,6 +370,8 @@ _HTML_TEMPLATE = """<!doctype html>
     </div>
   </section>
 </main>
+
+<div id="chart-tooltip"></div>
 
 <script id="report-data" type="application/json">__REPORT_DATA__</script>
 <script>
@@ -433,6 +500,113 @@ _HTML_TEMPLATE = """<!doctype html>
     ctx.fillText(fmt(values[0]), padL - 8, h - padTB);
   }
 
+  function drawHistogram(canvasId, hist, opts) {
+    opts = opts || {};
+    var canvas = document.getElementById(canvasId);
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width = canvas.clientWidth * 2;
+    var h = canvas.height = canvas.clientHeight * 2;
+    ctx.clearRect(0, 0, w, h);
+    var textColor = getComputedStyle(document.body).getPropertyValue('--text-dim').trim();
+    var accent = getComputedStyle(document.body).getPropertyValue('--accent').trim();
+    var highlight = getComputedStyle(document.body).getPropertyValue('--highlight').trim();
+
+    if (!hist || !hist.edges || hist.edges.length < 2) {
+      ctx.fillStyle = textColor;
+      ctx.font = '20px sans-serif';
+      ctx.fillText('No data', 16, h / 2);
+      return;
+    }
+
+    var edges = hist.edges, counts = hist.counts, isLog = hist.log;
+    var padL = 46, padR = 12, padT = 14, padB = 26;
+    var plotW = w - padL - padR, plotH = h - padT - padB;
+    var maxCount = Math.max.apply(null, counts) || 1;
+    var loEdge = edges[0], hiEdge = edges[edges.length - 1];
+    var logLo = isLog ? Math.log10(loEdge) : 0, logHi = isLog ? Math.log10(hiEdge) : 0;
+
+    function toX(v) {
+      var t = isLog ? (Math.log10(v) - logLo) / (logHi - logLo) : (v - loEdge) / (hiEdge - loEdge);
+      return padL + t * plotW;
+    }
+
+    var bars = [];
+    ctx.fillStyle = accent;
+    for (var i = 0; i < counts.length; i++) {
+      var x0 = toX(edges[i]), x1 = toX(edges[i + 1]);
+      var bh = (counts[i] / maxCount) * plotH;
+      var y = padT + plotH - bh;
+      ctx.fillRect(x0, y, Math.max(x1 - x0 - 1, 1), Math.max(bh, counts[i] > 0 ? 2 : 0));
+      bars.push({ x0: x0, x1: x1, count: counts[i], lo: edges[i], hi: edges[i + 1] });
+    }
+
+    ctx.strokeStyle = textColor;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padL, padT + plotH);
+    ctx.lineTo(w - padR, padT + plotH);
+    ctx.stroke();
+
+    ctx.fillStyle = textColor;
+    ctx.font = '18px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(fmt(loEdge), padL, h - 6);
+    ctx.textAlign = 'right';
+    ctx.fillText(fmt(hiEdge), w - padR, h - 6);
+
+    function vline(v, color, dashed) {
+      if (v < loEdge || v > hiEdge) return;
+      var x = toX(v);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = dashed ? 2 : 3;
+      if (dashed) ctx.setLineDash([6, 5]); else ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.moveTo(x, padT);
+      ctx.lineTo(x, padT + plotH);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    if (opts.mean !== undefined && opts.mean !== null) vline(opts.mean, highlight, false);
+    if (opts.std) {
+      vline(opts.mean - opts.std, highlight, true);
+      vline(opts.mean + opts.std, highlight, true);
+    }
+
+    var tooltip = document.getElementById('chart-tooltip');
+    canvas.onmousemove = function (e) {
+      var rect = canvas.getBoundingClientRect();
+      var scaleX = canvas.width / rect.width;
+      var mx = (e.clientX - rect.left) * scaleX;
+      var hitBar = null;
+      for (var j = 0; j < bars.length; j++) {
+        if (mx >= bars[j].x0 && mx <= bars[j].x1) { hitBar = bars[j]; break; }
+      }
+      if (hitBar) {
+        tooltip.style.display = 'block';
+        tooltip.style.left = (e.clientX + 12) + 'px';
+        tooltip.style.top = (e.clientY + 12) + 'px';
+        tooltip.textContent = fmt(hitBar.lo) + '–' + fmt(hitBar.hi) + ': ' + hitBar.count + ' agent' + (hitBar.count === 1 ? '' : 's');
+      } else {
+        tooltip.style.display = 'none';
+      }
+    };
+    canvas.onmouseleave = function () { tooltip.style.display = 'none'; };
+  }
+
+  function renderDistributions() {
+    drawHistogram('talent-chart', data.talent_histogram, { mean: summary.mean_talent, std: summary.std_talent });
+    document.getElementById('talent-dist-title').textContent =
+      'Talent distribution — Normal(μ=' + summary.mean_talent.toFixed(3) + ', σ=' + summary.std_talent.toFixed(3) + ')';
+    document.getElementById('talent-dist-caption').textContent =
+      'Solid line = mean (' + summary.mean_talent.toFixed(3) + '); dashed lines = ±1 std dev (' + summary.std_talent.toFixed(3) + '). Hover a bar for its count.';
+
+    drawHistogram('capital-chart', data.capital_histogram, { mean: summary.mean_capital });
+    document.getElementById('capital-dist-caption').textContent =
+      'Log-scale x-axis. Mean ' + fmt(summary.mean_capital) + ' (line) · std dev ' + fmt(summary.std_capital) +
+      ' · median ' + fmt(summary.median_capital) + '. Mean sits far right of most agents because a few outliers dominate it — median is the more typical outcome. Hover a bar for its count.';
+  }
+
   function selectAgent(id) {
     selectedId = id;
     var agent = agents[id];
@@ -478,8 +652,18 @@ _HTML_TEMPLATE = """<!doctype html>
   document.getElementById('jump-talented').addEventListener('click', function () { selectAgent(summary.max_talent_agent_id); });
 
   renderSummary();
+  renderDistributions();
   renderTable();
   selectAgent(summary.top_capital_agent_id);
+
+  var resizeTimer = null;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      renderDistributions();
+      if (selectedId !== null) drawChart(history ? history[selectedId] : null);
+    }, 150);
+  });
 })();
 </script>
 </body>

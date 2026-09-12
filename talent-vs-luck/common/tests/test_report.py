@@ -2,7 +2,7 @@ import json
 
 import numpy as np
 
-from common.report import save_interactive_report, save_numeric_report
+from common.report import _histogram, save_interactive_report, save_numeric_report
 from common.stats import gini, pareto_tail_exponent, summarize_population
 
 
@@ -40,6 +40,37 @@ def test_summarize_population_identifies_richest_and_most_talented():
     assert summary["max_talent_capital"] == 5.0
 
 
+def test_summarize_population_includes_talent_and_capital_moments():
+    talent = np.array([0.4, 0.5, 0.6, 0.7])
+    capital = np.array([10.0, 20.0, 30.0, 40.0])
+    summary = summarize_population(talent, capital)
+    assert summary["mean_talent"] == talent.mean()
+    assert summary["std_talent"] == talent.std()
+    assert summary["std_capital"] == capital.std()
+
+
+def test_histogram_linear_bins_cover_the_full_range_and_counts_sum_to_n():
+    values = np.array([0.1, 0.2, 0.2, 0.5, 0.9])
+    hist = _histogram(values, bins=4, log=False)
+    assert hist["log"] is False
+    assert len(hist["edges"]) == 5
+    assert hist["edges"][0] <= values.min()
+    assert hist["edges"][-1] >= values.max()
+    assert sum(hist["counts"]) == values.size
+
+
+def test_histogram_log_bins_ignore_non_positive_values():
+    values = np.array([0.0, -5.0, 1.0, 10.0, 100.0])
+    hist = _histogram(values, bins=10, log=True)
+    assert hist["log"] is True
+    assert sum(hist["counts"]) == 3  # only the strictly-positive values
+
+
+def test_histogram_handles_constant_input_without_crashing():
+    hist = _histogram(np.full(5, 3.0), bins=5, log=False)
+    assert sum(hist["counts"]) == 5
+
+
 def test_save_numeric_report_writes_valid_json(tmp_path):
     talent, capital, life_events, _ = _toy_population()
     path = tmp_path / "report.json"
@@ -74,3 +105,7 @@ def test_save_interactive_report_embeds_agent_data(tmp_path):
     # every agent id should show up in the embedded data
     for i in range(talent.size):
         assert f'"id":{i},' in html
+    assert '"talent_histogram"' in html
+    assert '"capital_histogram"' in html
+    assert 'id="talent-chart"' in html
+    assert 'id="capital-chart"' in html
