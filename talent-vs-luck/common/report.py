@@ -167,6 +167,11 @@ def save_interactive_report(
         "history": history_by_agent,
         "events": events_by_agent,
         "talent_histogram": _histogram(talent, bins=30, log=False),
+        # Deliberately raw: linear bins across the true min/max, no log
+        # transform and no percentile clipping. The point is to show what
+        # the data actually looks like before assuming any particular
+        # distribution shape -- see the report's view toggle.
+        "capital_histogram_linear": _histogram(capital, bins=30, log=False),
     }
 
     json_blob = json.dumps(data, separators=(",", ":")).replace("</script>", "<\\/script>")
@@ -314,6 +319,20 @@ _HTML_TEMPLATE = """<!doctype html>
     .dist-grid { grid-template-columns: 1fr; }
   }
   .dist-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .dist-title-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .dist-title-row .dist-title { margin-bottom: 0; }
+  .view-toggle { display: flex; gap: 4px; }
+  button.view-btn {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 7px;
+    padding: 4px 9px;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  button.view-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.view-btn:hover:not(.active) { border-color: var(--accent); color: var(--accent); }
   canvas.dist-chart { width: 100%; height: 140px; display: block; cursor: crosshair; }
   .dist-caption { font-size: 12px; color: var(--text-dim); margin-top: 8px; }
   #chart-tooltip {
@@ -343,7 +362,13 @@ _HTML_TEMPLATE = """<!doctype html>
     <div class="dist-caption" id="talent-dist-caption"></div>
   </section>
   <section class="panel">
-    <div class="dist-title" id="capital-dist-title">Final capital distribution</div>
+    <div class="dist-title-row">
+      <div class="dist-title" id="capital-dist-title">Final capital distribution</div>
+      <div class="view-toggle" id="capital-view-toggle">
+        <button class="view-btn active" data-view="linear">Linear</button>
+        <button class="view-btn" data-view="loglog">Log-log (test for Pareto)</button>
+      </div>
+    </div>
     <canvas id="capital-chart" class="dist-chart"></canvas>
     <div class="dist-caption" id="capital-dist-caption"></div>
   </section>
@@ -731,6 +756,54 @@ _HTML_TEMPLATE = """<!doctype html>
     canvas.onmouseleave = function () { tooltip.style.display = 'none'; };
   }
 
+  // Default view is a plain, unprocessed histogram -- no log transform,
+  // no percentile clipping, no assumed distribution family. It shows
+  // exactly what the data looks like. The log-log rank-size view is
+  // opt-in: it specifically tests "does the tail look like a straight
+  // line on log-log axes", which is only meaningful once you've chosen
+  // to test that hypothesis, not as the first thing you're shown.
+  var capitalView = 'linear';
+
+  function renderCapitalChart() {
+    var capitals = agents.map(function (a) { return a.capital; });
+    var titleEl = document.getElementById('capital-dist-title');
+    var captionEl = document.getElementById('capital-dist-caption');
+
+    if (capitalView === 'linear') {
+      drawHistogram('capital-chart', data.capital_histogram_linear, { mean: summary.mean_capital });
+      titleEl.textContent = 'Final capital distribution';
+      captionEl.textContent =
+        'Raw data, linear x-axis, no assumptions: equal-width bins from the true minimum to the true maximum. ' +
+        'If almost everything piles into the first bar with a long empty stretch after it, that itself is the finding -- ' +
+        'a few outliers span such a huge range that most agents look identical next to them. ' +
+        'Mean ' + fmt(summary.mean_capital) + ' vs. median ' + fmt(summary.median_capital) +
+        ' — how far those differ is another sign of skew. Hover a bar for its count, or switch to Log-log to test a specific hypothesis (a power-law/Pareto tail).';
+    } else {
+      drawParetoTail('capital-chart', capitals, summary.pareto_exponent, 0.2);
+      titleEl.textContent =
+        'Final capital — log-log rank-size' +
+        (summary.pareto_exponent !== null && summary.pareto_exponent !== undefined
+          ? ', fitted tail exponent ≈ ' + summary.pareto_exponent.toFixed(2)
+          : '');
+      captionEl.textContent =
+        'P(capital ≥ x), both axes log-scale — this is a hypothesis test, not a default: a power-law (Pareto) tail would show up ' +
+        'as a straight line here, but plotting log-log makes many unrelated distributions look roughly linear too, so a straight-ish ' +
+        'line here is suggestive, not proof. Dashed line = fitted power law on the wealthiest 20%. Hover the curve for exact rank/value.';
+    }
+  }
+
+  function setCapitalView(view) {
+    capitalView = view;
+    Array.prototype.forEach.call(document.querySelectorAll('#capital-view-toggle .view-btn'), function (btn) {
+      btn.classList.toggle('active', btn.getAttribute('data-view') === view);
+    });
+    renderCapitalChart();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('#capital-view-toggle .view-btn'), function (btn) {
+    btn.addEventListener('click', function () { setCapitalView(btn.getAttribute('data-view')); });
+  });
+
   function renderDistributions() {
     drawHistogram('talent-chart', data.talent_histogram, { mean: summary.mean_talent, std: summary.std_talent });
     document.getElementById('talent-dist-title').textContent =
@@ -738,17 +811,7 @@ _HTML_TEMPLATE = """<!doctype html>
     document.getElementById('talent-dist-caption').textContent =
       'Solid line = mean (' + summary.mean_talent.toFixed(3) + '); dashed lines = ±1 std dev (' + summary.std_talent.toFixed(3) + '). Hover a bar for its count.';
 
-    var capitals = agents.map(function (a) { return a.capital; });
-    drawParetoTail('capital-chart', capitals, summary.pareto_exponent, 0.2);
-    document.getElementById('capital-dist-title').textContent =
-      'Final capital — Pareto tail (log-log rank-size)' +
-      (summary.pareto_exponent !== null && summary.pareto_exponent !== undefined
-        ? ', exponent ≈ ' + summary.pareto_exponent.toFixed(2)
-        : '');
-    document.getElementById('capital-dist-caption').textContent =
-      'P(capital ≥ x), both axes log-scale: a straight line means a Pareto (power-law) tail, the paper’s headline claim about wealth. ' +
-      'Dashed line = fitted power law on the wealthiest 20%. Median capital ' + fmt(summary.median_capital) +
-      ' vs. mean ' + fmt(summary.mean_capital) + ' shows how far a few outliers pull the average above the typical outcome. Hover the curve for exact rank/value.';
+    renderCapitalChart();
   }
 
   function selectAgent(id) {

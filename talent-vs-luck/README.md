@@ -115,21 +115,24 @@ packages) turns that into two artifacts:
   `spatial_sim`): a single, dependency-free file you open directly in a
   browser. At the top, two hoverable population charts: talent as a
   histogram (with its mean and ±1 std dev marked — it's Gaussian by
-  construction), and final capital as a **log-log rank-size (CCDF)
-  plot** — P(capital ≥ x) — with a fitted power-law line over the
-  wealthiest 20%, labeled with its fitted exponent. A raw histogram of
-  the whole population can't show Pareto behavior (Pareto only ever
-  describes the tail above some minimum; a large share of agents end up
-  *below* their starting capital, which a power law doesn't model at
-  all), so the rank-size plot is the standard way to actually reveal it:
-  a straight line in the tail confirms the wealth distribution follows
-  the paper's headline Pareto claim. Below that, a searchable, sortable
-  table of every agent; click any row (or the "Wealthiest" / "Most
-  talented" shortcut buttons) to see that agent's capital trajectory
-  chart and a narrated, step-by-step timeline of their career — e.g.
-  *"Step 11 (year 5.5): Hit by misfortune — capital 80 → 40"*. This is
-  the direct way to answer "what did agent #42 actually experience in
-  their life?"
+  construction), and final capital, which **defaults to a plain linear
+  histogram** — raw counts, equal-width bins, no log transform, no
+  percentile clipping, no assumed distribution family — so you see what
+  the data actually looks like before anything is asserted about its
+  shape (typically: nearly everything piles into the first bar, because
+  a few outliers span such a huge range that everyone else looks
+  identical next to them — that compression *is* the finding). A
+  **Log-log** toggle switches to a rank-size plot — P(capital ≥ x), both
+  axes log-scale, with a power-law line fitted to the wealthiest 20% —
+  to explicitly test the paper's Pareto-tail claim; its caption is
+  upfront that a roughly-straight line there is suggestive, not proof,
+  since log-log axes flatter plenty of non-power-law data too. Below
+  that, a searchable, sortable table of every agent; click any row (or
+  the "Wealthiest" / "Most talented" shortcut buttons) to see that
+  agent's capital trajectory chart and a narrated, step-by-step timeline
+  of their career — e.g. *"Step 11 (year 5.5): Hit by misfortune —
+  capital 80 → 40"*. This is the direct way to answer "what did agent
+  #42 actually experience in their life?"
 
 ```bash
 # vectorized simulation: save both reports alongside the console summary
