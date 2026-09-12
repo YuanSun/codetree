@@ -113,12 +113,16 @@ packages) turns that into two artifacts:
   capital, wealth rank, lucky-seized/missed/unlucky counts).
 - **Interactive HTML report** (`--html-report path.html` / auto-saved by
   `spatial_sim`): a single, dependency-free file you open directly in a
-  browser. It has a searchable, sortable table of every agent; click any
-  row (or the "Wealthiest" / "Most talented" shortcut buttons) to see
-  that agent's capital trajectory chart and a narrated, step-by-step
-  timeline of their career — e.g. *"Step 11 (year 5.5): Hit by
-  misfortune — capital 80 → 40"*. This is the direct way to answer "what
-  did agent #42 actually experience in their life?"
+  browser. At the top, two hoverable histograms show the population as a
+  whole — talent (with its mean and ±1 std dev marked) and final capital
+  (log-scale, since it spans orders of magnitude, with its mean marked
+  against the much-lower median). Below that, a searchable, sortable
+  table of every agent; click any row (or the "Wealthiest" / "Most
+  talented" shortcut buttons) to see that agent's capital trajectory
+  chart and a narrated, step-by-step timeline of their career — e.g.
+  *"Step 11 (year 5.5): Hit by misfortune — capital 80 → 40"*. This is
+  the direct way to answer "what did agent #42 actually experience in
+  their life?"
 
 ```bash
 # vectorized simulation: save both reports alongside the console summary

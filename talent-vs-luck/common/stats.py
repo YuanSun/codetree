@@ -44,7 +44,10 @@ def summarize_population(talent: np.ndarray, capital: np.ndarray) -> dict:
     return {
         "n_agents": int(capital.size),
         "mean_capital": float(capital.mean()),
+        "std_capital": float(capital.std()),
         "median_capital": float(np.median(capital)),
+        "mean_talent": float(talent.mean()),
+        "std_talent": float(talent.std()),
         "gini_capital": gini(capital),
         "gini_talent": gini(talent),
         "pareto_exponent": pareto_tail_exponent(capital),
