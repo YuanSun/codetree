@@ -113,10 +113,17 @@ packages) turns that into two artifacts:
   capital, wealth rank, lucky-seized/missed/unlucky counts).
 - **Interactive HTML report** (`--html-report path.html` / auto-saved by
   `spatial_sim`): a single, dependency-free file you open directly in a
-  browser. At the top, two hoverable histograms show the population as a
-  whole — talent (with its mean and ±1 std dev marked) and final capital
-  (log-scale, since it spans orders of magnitude, with its mean marked
-  against the much-lower median). Below that, a searchable, sortable
+  browser. At the top, two hoverable population charts: talent as a
+  histogram (with its mean and ±1 std dev marked — it's Gaussian by
+  construction), and final capital as a **log-log rank-size (CCDF)
+  plot** — P(capital ≥ x) — with a fitted power-law line over the
+  wealthiest 20%, labeled with its fitted exponent. A raw histogram of
+  the whole population can't show Pareto behavior (Pareto only ever
+  describes the tail above some minimum; a large share of agents end up
+  *below* their starting capital, which a power law doesn't model at
+  all), so the rank-size plot is the standard way to actually reveal it:
+  a straight line in the tail confirms the wealth distribution follows
+  the paper's headline Pareto claim. Below that, a searchable, sortable
   table of every agent; click any row (or the "Wealthiest" / "Most
   talented" shortcut buttons) to see that agent's capital trajectory
   chart and a narrated, step-by-step timeline of their career — e.g.
