@@ -66,6 +66,29 @@ def test_histogram_log_bins_ignore_non_positive_values():
     assert sum(hist["counts"]) == 3  # only the strictly-positive values
 
 
+def test_histogram_clip_percentile_still_counts_every_value():
+    # A population clustered around 10, plus one extreme outlier -- the
+    # kind of shape that comes out of the multiplicative capital model.
+    values = np.concatenate([np.full(199, 10.0), [7e-11]])
+    hist = _histogram(values, bins=30, log=True, clip_percentile=1.0)
+    assert sum(hist["counts"]) == values.size
+    assert hist["edges"][0] <= values.min()
+    assert hist["edges"][-1] >= values.max()
+
+
+def test_histogram_clip_percentile_gives_the_bulk_of_the_data_more_resolution():
+    # Without clipping, the single outlier stretches nearly every bin
+    # edge down toward it, leaving almost no resolution around the
+    # cluster at 10. With clipping, most of the inner bins should sit
+    # close to where the data actually is.
+    values = np.concatenate([np.full(199, 10.0), [7e-11]])
+    unclipped = _histogram(values, bins=30, log=True, clip_percentile=0.0)
+    clipped = _histogram(values, bins=30, log=True, clip_percentile=1.0)
+    # the first "real" edge after the outlier-catching bin should be much
+    # closer to 10 when clipped than when not
+    assert clipped["edges"][1] > unclipped["edges"][1]
+
+
 def test_histogram_handles_constant_input_without_crashing():
     hist = _histogram(np.full(5, 3.0), bins=5, log=False)
     assert sum(hist["counts"]) == 5

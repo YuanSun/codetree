@@ -28,26 +28,46 @@ def _round(value: float, sig: int = 6) -> float:
     return float(f"{value:.{sig}g}")
 
 
-def _histogram(values: np.ndarray, bins: int = 30, log: bool = False) -> dict:
+def _histogram(values: np.ndarray, bins: int = 30, log: bool = False, clip_percentile: float = 0.0) -> dict:
     """Bin edges + counts for a population histogram, JSON-ready.
 
     `log`-spaced bins are used for capital, which spans many orders of
     magnitude; linear bins for talent, which doesn't.
+
+    `clip_percentile` guards against a single extreme outlier stretching
+    the whole axis and squeezing everyone else into a sliver: the *inner*
+    bin edges are placed between the `clip_percentile` and
+    `100 - clip_percentile` percentiles (so most bins have real
+    resolution where the data actually is), while the outermost edges
+    are still widened out to the true min/max, so every value is still
+    counted somewhere -- outliers just land in a wider catch-all bin at
+    either end instead of dictating the whole scale.
     """
     values = np.asarray(values, dtype=float)
     if log:
         values = values[values > 0]
-        if values.size == 0:
-            return {"edges": [], "counts": [], "log": True}
-        lo, hi = np.log10(values.min()), np.log10(values.max())
-        if lo == hi:
-            lo, hi = lo - 0.5, hi + 0.5
+    if values.size == 0:
+        return {"edges": [], "counts": [], "log": log}
+
+    true_lo, true_hi = float(values.min()), float(values.max())
+    space = values if not log else np.log10(values)
+    if clip_percentile > 0 and values.size > 1:
+        # percentile is monotonic in its argument, so lo <= hi always --
+        # the only degenerate case is lo == hi (the core of the
+        # distribution is a spike), handled uniformly below by widening.
+        lo, hi = np.percentile(space, [clip_percentile, 100 - clip_percentile])
+    else:
+        lo, hi = space.min(), space.max()
+    if lo == hi:
+        lo, hi = lo - 0.5, hi + 0.5
+
+    if log:
         edges = np.logspace(lo, hi, bins + 1)
     else:
-        lo, hi = float(values.min()), float(values.max())
-        if lo == hi:
-            lo, hi = lo - 0.5, hi + 0.5
         edges = np.linspace(lo, hi, bins + 1)
+    edges[0] = min(edges[0], true_lo)
+    edges[-1] = max(edges[-1], true_hi)
+
     counts, edges = np.histogram(values, bins=edges)
     return {"edges": [_round(float(e)) for e in edges], "counts": [int(c) for c in counts], "log": log}
 
@@ -147,7 +167,7 @@ def save_interactive_report(
         "history": history_by_agent,
         "events": events_by_agent,
         "talent_histogram": _histogram(talent, bins=30, log=False),
-        "capital_histogram": _histogram(capital, bins=30, log=True),
+        "capital_histogram": _histogram(capital, bins=30, log=True, clip_percentile=1.0),
     }
 
     json_blob = json.dumps(data, separators=(",", ":")).replace("</script>", "<\\/script>")
@@ -390,7 +410,13 @@ _HTML_TEMPLATE = """<!doctype html>
 
   function fmt(n) {
     if (n === null || n === undefined) return '—';
-    if (Math.abs(n) >= 1000) return n.toLocaleString(undefined, { maximumFractionDigits: 1 });
+    var abs = Math.abs(n);
+    if (abs === 0) return '0';
+    if (abs >= 1000) return n.toLocaleString(undefined, { maximumFractionDigits: 1 });
+    // Rounding to 3 decimals would silently print "0" for tiny-but-nonzero
+    // capital (an agent many unlucky halvings deep) -- use scientific
+    // notation there instead of lying about the value.
+    if (abs < 0.001) return n.toExponential(1);
     return (Math.round(n * 1000) / 1000).toString();
   }
 
@@ -477,8 +503,12 @@ _HTML_TEMPLATE = """<!doctype html>
       ctx.fillText('No trajectory data recorded for this run', 16, h / 2);
       return;
     }
-    var eps = 1e-6;
-    var logs = values.map(function (v) { return Math.log10(Math.max(v, eps)); });
+    // Capital can shrink to genuinely tiny (but never zero) values after
+    // enough unlucky halvings -- floor only guards against literal 0/NaN,
+    // it must not clip real data (a 1e-6 floor used to silently flatten
+    // anything smaller than that, which happens well within 80 steps).
+    var floor = 1e-300;
+    var logs = values.map(function (v) { return Math.log10(v > 0 ? v : floor); });
     var minL = Math.min.apply(null, logs), maxL = Math.max.apply(null, logs);
     if (minL === maxL) { minL -= 1; maxL += 1; }
     var padL = 70, padR = 16, padTB = 16;
@@ -488,7 +518,7 @@ _HTML_TEMPLATE = """<!doctype html>
     ctx.beginPath();
     values.forEach(function (v, i) {
       var x = padL + (i / (values.length - 1)) * (w - padL - padR);
-      var yl = (Math.log10(Math.max(v, eps)) - minL) / (maxL - minL);
+      var yl = (logs[i] - minL) / (maxL - minL);
       var y = h - padTB - yl * (h - padTB * 2);
       if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     });
@@ -496,8 +526,11 @@ _HTML_TEMPLATE = """<!doctype html>
     ctx.fillStyle = textColor;
     ctx.font = '20px sans-serif';
     ctx.textAlign = 'right';
-    ctx.fillText(fmt(values[values.length - 1]), padL - 8, padTB + 10);
-    ctx.fillText(fmt(values[0]), padL - 8, h - padTB);
+    // Axis labels are the actual plotted min/max (not the first/last data
+    // point -- those can be anywhere on the line, e.g. an agent who dips
+    // below their starting capital and never fully recovers).
+    ctx.fillText(fmt(Math.pow(10, maxL)), padL - 8, padTB + 10);
+    ctx.fillText(fmt(Math.pow(10, minL)), padL - 8, h - padTB);
   }
 
   function drawHistogram(canvasId, hist, opts) {
@@ -603,7 +636,8 @@ _HTML_TEMPLATE = """<!doctype html>
 
     drawHistogram('capital-chart', data.capital_histogram, { mean: summary.mean_capital });
     document.getElementById('capital-dist-caption').textContent =
-      'Log-scale x-axis. Mean ' + fmt(summary.mean_capital) + ' (line) · std dev ' + fmt(summary.std_capital) +
+      'Log-scale x-axis (outermost bars fold in the most extreme 1% on each side, so a single outlier cannot flatten the rest). ' +
+      'Mean ' + fmt(summary.mean_capital) + ' (line) · std dev ' + fmt(summary.std_capital) +
       ' · median ' + fmt(summary.median_capital) + '. Mean sits far right of most agents because a few outliers dominate it — median is the more typical outcome. Hover a bar for its count.';
   }
 
