@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import argparse
 import datetime
+import random
 import webbrowser
 from pathlib import Path
 from typing import Optional
@@ -60,7 +61,13 @@ def to_screen(pos: np.ndarray, grid_size: int, w: int, h: int):
 def parse_args(argv=None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--steps", type=int, default=80, help="half-year steps (80 = 40 years)")
-    parser.add_argument("--seed", type=int, default=None)
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="omit for a fresh random run each time (the seed actually used is always printed and "
+        "saved to reports, so you can pass it back later to reproduce any run you liked)",
+    )
     parser.add_argument("--report-dir", type=str, default="reports", help="where to save end-of-run reports")
     parser.add_argument("--no-report", action="store_true", help="skip saving reports when the run ends")
     parser.add_argument("--open-browser", action="store_true", help="open the HTML report when it's saved")
@@ -68,6 +75,14 @@ def parse_args(argv=None) -> argparse.Namespace:
 
 
 def run(n_steps: int = 80, seed: Optional[int] = None, report_dir: Optional[str] = "reports", open_browser: bool = False) -> None:
+    # A fixed seed is deterministic *by design* (that's the point of a seed --
+    # same seed always replays the same run). Omitting it gives a fresh random
+    # run each time; we still generate and report the seed actually used so an
+    # interesting random run can be reproduced later with --seed <printed value>.
+    if seed is None:
+        seed = random.SystemRandom().randrange(2**31)
+        print(f"no --seed given; using a fresh random seed: {seed} (pass --seed {seed} to reproduce this exact run)")
+
     pygame.init()
     screen = pygame.display.set_mode((WINDOW_W, WINDOW_H))
     pygame.display.set_caption("Talent vs Luck -- spatial simulation")

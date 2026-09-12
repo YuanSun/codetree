@@ -145,6 +145,18 @@ python -m spatial_sim.main --seed 42 --report-dir reports --open-browser
 python -m pytest simulation/tests spatial_sim/tests common/tests
 ```
 
+## A note on `--seed`
+
+`--seed 42` in the examples above is there so the *examples* are
+reproducible when you follow along — it is not something you need to
+pass. **Omit `--seed` and every run is genuinely random** (both CLIs
+print the seed they end up using, e.g. `no --seed given; using a fresh
+random seed: 1766640294`, and save it into the report's metadata), so
+you always get fresh randomness by default while still being able to
+paste that printed value back in as `--seed 1766640294` to replay any
+specific run you liked. Passing the *same* explicit seed twice giving
+the *same* result isn't a bug — that's what a seed is for.
+
 ## Notes on parameters
 
 The paper doesn't publish an exact closed-form for how often a given
