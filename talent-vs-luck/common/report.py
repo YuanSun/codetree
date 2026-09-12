@@ -28,26 +28,46 @@ def _round(value: float, sig: int = 6) -> float:
     return float(f"{value:.{sig}g}")
 
 
-def _histogram(values: np.ndarray, bins: int = 30, log: bool = False) -> dict:
+def _histogram(values: np.ndarray, bins: int = 30, log: bool = False, clip_percentile: float = 0.0) -> dict:
     """Bin edges + counts for a population histogram, JSON-ready.
 
     `log`-spaced bins are used for capital, which spans many orders of
     magnitude; linear bins for talent, which doesn't.
+
+    `clip_percentile` guards against a single extreme outlier stretching
+    the whole axis and squeezing everyone else into a sliver: the *inner*
+    bin edges are placed between the `clip_percentile` and
+    `100 - clip_percentile` percentiles (so most bins have real
+    resolution where the data actually is), while the outermost edges
+    are still widened out to the true min/max, so every value is still
+    counted somewhere -- outliers just land in a wider catch-all bin at
+    either end instead of dictating the whole scale.
     """
     values = np.asarray(values, dtype=float)
     if log:
         values = values[values > 0]
-        if values.size == 0:
-            return {"edges": [], "counts": [], "log": True}
-        lo, hi = np.log10(values.min()), np.log10(values.max())
-        if lo == hi:
-            lo, hi = lo - 0.5, hi + 0.5
+    if values.size == 0:
+        return {"edges": [], "counts": [], "log": log}
+
+    true_lo, true_hi = float(values.min()), float(values.max())
+    space = values if not log else np.log10(values)
+    if clip_percentile > 0 and values.size > 1:
+        # percentile is monotonic in its argument, so lo <= hi always --
+        # the only degenerate case is lo == hi (the core of the
+        # distribution is a spike), handled uniformly below by widening.
+        lo, hi = np.percentile(space, [clip_percentile, 100 - clip_percentile])
+    else:
+        lo, hi = space.min(), space.max()
+    if lo == hi:
+        lo, hi = lo - 0.5, hi + 0.5
+
+    if log:
         edges = np.logspace(lo, hi, bins + 1)
     else:
-        lo, hi = float(values.min()), float(values.max())
-        if lo == hi:
-            lo, hi = lo - 0.5, hi + 0.5
         edges = np.linspace(lo, hi, bins + 1)
+    edges[0] = min(edges[0], true_lo)
+    edges[-1] = max(edges[-1], true_hi)
+
     counts, edges = np.histogram(values, bins=edges)
     return {"edges": [_round(float(e)) for e in edges], "counts": [int(c) for c in counts], "log": log}
 
@@ -147,7 +167,6 @@ def save_interactive_report(
         "history": history_by_agent,
         "events": events_by_agent,
         "talent_histogram": _histogram(talent, bins=30, log=False),
-        "capital_histogram": _histogram(capital, bins=30, log=True),
     }
 
     json_blob = json.dumps(data, separators=(",", ":")).replace("</script>", "<\\/script>")
@@ -390,7 +409,13 @@ _HTML_TEMPLATE = """<!doctype html>
 
   function fmt(n) {
     if (n === null || n === undefined) return '—';
-    if (Math.abs(n) >= 1000) return n.toLocaleString(undefined, { maximumFractionDigits: 1 });
+    var abs = Math.abs(n);
+    if (abs === 0) return '0';
+    if (abs >= 1000) return n.toLocaleString(undefined, { maximumFractionDigits: 1 });
+    // Rounding to 3 decimals would silently print "0" for tiny-but-nonzero
+    // capital (an agent many unlucky halvings deep) -- use scientific
+    // notation there instead of lying about the value.
+    if (abs < 0.001) return n.toExponential(1);
     return (Math.round(n * 1000) / 1000).toString();
   }
 
@@ -477,8 +502,12 @@ _HTML_TEMPLATE = """<!doctype html>
       ctx.fillText('No trajectory data recorded for this run', 16, h / 2);
       return;
     }
-    var eps = 1e-6;
-    var logs = values.map(function (v) { return Math.log10(Math.max(v, eps)); });
+    // Capital can shrink to genuinely tiny (but never zero) values after
+    // enough unlucky halvings -- floor only guards against literal 0/NaN,
+    // it must not clip real data (a 1e-6 floor used to silently flatten
+    // anything smaller than that, which happens well within 80 steps).
+    var floor = 1e-300;
+    var logs = values.map(function (v) { return Math.log10(v > 0 ? v : floor); });
     var minL = Math.min.apply(null, logs), maxL = Math.max.apply(null, logs);
     if (minL === maxL) { minL -= 1; maxL += 1; }
     var padL = 70, padR = 16, padTB = 16;
@@ -488,7 +517,7 @@ _HTML_TEMPLATE = """<!doctype html>
     ctx.beginPath();
     values.forEach(function (v, i) {
       var x = padL + (i / (values.length - 1)) * (w - padL - padR);
-      var yl = (Math.log10(Math.max(v, eps)) - minL) / (maxL - minL);
+      var yl = (logs[i] - minL) / (maxL - minL);
       var y = h - padTB - yl * (h - padTB * 2);
       if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     });
@@ -496,8 +525,11 @@ _HTML_TEMPLATE = """<!doctype html>
     ctx.fillStyle = textColor;
     ctx.font = '20px sans-serif';
     ctx.textAlign = 'right';
-    ctx.fillText(fmt(values[values.length - 1]), padL - 8, padTB + 10);
-    ctx.fillText(fmt(values[0]), padL - 8, h - padTB);
+    // Axis labels are the actual plotted min/max (not the first/last data
+    // point -- those can be anywhere on the line, e.g. an agent who dips
+    // below their starting capital and never fully recovers).
+    ctx.fillText(fmt(Math.pow(10, maxL)), padL - 8, padTB + 10);
+    ctx.fillText(fmt(Math.pow(10, minL)), padL - 8, h - padTB);
   }
 
   function drawHistogram(canvasId, hist, opts) {
@@ -594,6 +626,111 @@ _HTML_TEMPLATE = """<!doctype html>
     canvas.onmouseleave = function () { tooltip.style.display = 'none'; };
   }
 
+  // A Pareto/power-law distribution only ever describes a *tail* (zero
+  // density below some minimum, monotonically decreasing above it) --
+  // a plain histogram of the *whole* population (including the ~40% of
+  // agents sitting below the starting capital) can never look like one.
+  // The standard way to actually show power-law tail behavior is a
+  // log-log rank-size plot: P(capital >= x) vs x. A power-law tail shows
+  // up as a straight line here, which a raw histogram cannot reveal.
+  function drawParetoTail(canvasId, capitals, paretoExponent, tailFraction) {
+    var canvas = document.getElementById(canvasId);
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width = canvas.clientWidth * 2;
+    var h = canvas.height = canvas.clientHeight * 2;
+    ctx.clearRect(0, 0, w, h);
+    var textColor = getComputedStyle(document.body).getPropertyValue('--text-dim').trim();
+    var accent = getComputedStyle(document.body).getPropertyValue('--accent').trim();
+    var highlight = getComputedStyle(document.body).getPropertyValue('--highlight').trim();
+
+    var sorted = capitals.filter(function (v) { return v > 0; }).sort(function (a, b) { return b - a; });
+    var n = sorted.length;
+    if (n < 2) {
+      ctx.fillStyle = textColor;
+      ctx.font = '20px sans-serif';
+      ctx.fillText('No data', 16, h / 2);
+      return;
+    }
+
+    var logX = sorted.map(function (v) { return Math.log10(v); });
+    var logY = sorted.map(function (v, i) { return Math.log10((i + 1) / n); }); // survival prob, always <= 0
+    var minLogX = logX[n - 1], maxLogX = logX[0];
+    if (minLogX === maxLogX) { minLogX -= 0.5; maxLogX += 0.5; }
+    var minLogY = logY[0]; // most negative (rarest / richest point)
+
+    var padL = 52, padR = 12, padT = 14, padB = 26;
+    var plotW = w - padL - padR, plotH = h - padT - padB;
+
+    function toX(lx) { return padL + (lx - minLogX) / (maxLogX - minLogX) * plotW; }
+    function toY(ly) { return padT + (ly / minLogY) * plotH; } // ly in [minLogY, 0] -> [padT+plotH, padT]
+
+    var points = sorted.map(function (v, i) { return { x: toX(logX[i]), y: toY(logY[i]), value: v, rank: i + 1 }; });
+
+    ctx.strokeStyle = accent;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    points.forEach(function (p, i) { if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
+    ctx.stroke();
+
+    // Dashed reference line: the fitted power law over the top
+    // `tailFraction` of agents (same convention as the backend's
+    // pareto_exponent), anchored at that cutoff point.
+    if (paretoExponent !== null && paretoExponent !== undefined) {
+      var k = Math.max(Math.floor(n * tailFraction), 5);
+      if (k < n) {
+        var x0 = sorted[k - 1], y0 = k / n;
+        var xMax = sorted[0];
+        var logX0 = Math.log10(x0), logY0 = Math.log10(y0);
+        var logXMax = Math.log10(xMax);
+        var fitStart = { x: toX(logX0), y: toY(logY0) };
+        var fitEnd = { x: toX(logXMax), y: toY(logY0 - paretoExponent * (logXMax - logX0)) };
+        ctx.strokeStyle = highlight;
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 5]);
+        ctx.beginPath();
+        ctx.moveTo(fitStart.x, fitStart.y);
+        ctx.lineTo(fitEnd.x, fitEnd.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    }
+
+    ctx.strokeStyle = textColor;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padL, padT + plotH);
+    ctx.lineTo(w - padR, padT + plotH);
+    ctx.stroke();
+
+    ctx.fillStyle = textColor;
+    ctx.font = '18px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(fmt(sorted[n - 1]), padL, h - 6);
+    ctx.textAlign = 'right';
+    ctx.fillText(fmt(sorted[0]), w - padR, h - 6);
+
+    var tooltip = document.getElementById('chart-tooltip');
+    canvas.onmousemove = function (e) {
+      var rect = canvas.getBoundingClientRect();
+      var scaleX = canvas.width / rect.width;
+      var mx = (e.clientX - rect.left) * scaleX;
+      var nearest = null, bestDist = Infinity;
+      for (var j = 0; j < points.length; j++) {
+        var d = Math.abs(points[j].x - mx);
+        if (d < bestDist) { bestDist = d; nearest = points[j]; }
+      }
+      if (nearest) {
+        tooltip.style.display = 'block';
+        tooltip.style.left = (e.clientX + 12) + 'px';
+        tooltip.style.top = (e.clientY + 12) + 'px';
+        tooltip.textContent = fmt(nearest.rank) + ' of ' + n + ' agents (' + (100 * nearest.rank / n).toFixed(1) + '%) have capital ≥ ' + fmt(nearest.value);
+      } else {
+        tooltip.style.display = 'none';
+      }
+    };
+    canvas.onmouseleave = function () { tooltip.style.display = 'none'; };
+  }
+
   function renderDistributions() {
     drawHistogram('talent-chart', data.talent_histogram, { mean: summary.mean_talent, std: summary.std_talent });
     document.getElementById('talent-dist-title').textContent =
@@ -601,10 +738,17 @@ _HTML_TEMPLATE = """<!doctype html>
     document.getElementById('talent-dist-caption').textContent =
       'Solid line = mean (' + summary.mean_talent.toFixed(3) + '); dashed lines = ±1 std dev (' + summary.std_talent.toFixed(3) + '). Hover a bar for its count.';
 
-    drawHistogram('capital-chart', data.capital_histogram, { mean: summary.mean_capital });
+    var capitals = agents.map(function (a) { return a.capital; });
+    drawParetoTail('capital-chart', capitals, summary.pareto_exponent, 0.2);
+    document.getElementById('capital-dist-title').textContent =
+      'Final capital — Pareto tail (log-log rank-size)' +
+      (summary.pareto_exponent !== null && summary.pareto_exponent !== undefined
+        ? ', exponent ≈ ' + summary.pareto_exponent.toFixed(2)
+        : '');
     document.getElementById('capital-dist-caption').textContent =
-      'Log-scale x-axis. Mean ' + fmt(summary.mean_capital) + ' (line) · std dev ' + fmt(summary.std_capital) +
-      ' · median ' + fmt(summary.median_capital) + '. Mean sits far right of most agents because a few outliers dominate it — median is the more typical outcome. Hover a bar for its count.';
+      'P(capital ≥ x), both axes log-scale: a straight line means a Pareto (power-law) tail, the paper’s headline claim about wealth. ' +
+      'Dashed line = fitted power law on the wealthiest 20%. Median capital ' + fmt(summary.median_capital) +
+      ' vs. mean ' + fmt(summary.mean_capital) + ' shows how far a few outliers pull the average above the typical outcome. Hover the curve for exact rank/value.';
   }
 
   function selectAgent(id) {
