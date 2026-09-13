@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+.storyforge/
+*.egg-info/
+.pytest_cache/

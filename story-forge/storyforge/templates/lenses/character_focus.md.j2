@@ -1,0 +1,18 @@
+{% include '_context.md.j2' %}
+{% if character_yaml %}
+## Character in focus
+{{ character_yaml }}
+{% endif %}
+## Task: Character deep-dive
+
+Focused on the character above, work through this chapter from inside their perspective:
+
+- What do they want in this chapter, moment to moment, versus what they want overall (their want vs. need from the story bible)?
+- What do they know / not know that the reader does or doesn't?
+- What is their emotional arc across the chapter — where do they start and end, and what's the turning point?
+- Where does their voice (diction, rhythm, what they notice) risk sounding generic here — give specific lines or beats that would sound distinctly like them.
+- Does anything in this chapter move their overall arc forward (per the story bible), stall it, or contradict it?
+{% if extra %}
+Author's specific focus for this pass: {{ extra }}
+{% endif %}
+Respond with concrete, usable content (specific beats, lines, interiority) rather than generic character-writing advice.

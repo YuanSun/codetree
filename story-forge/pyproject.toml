@@ -1,0 +1,23 @@
+[project]
+name = "story-forge"
+version = "0.1.0"
+description = "AI-assisted novel writing tool: story bible -> chapter briefs -> scene-level drafting"
+requires-python = ">=3.10"
+dependencies = [
+    "typer>=0.12",
+    "rich>=13.7",
+    "pyyaml>=6.0",
+    "jinja2>=3.1",
+    "httpx>=0.27",
+    "anthropic>=0.34",
+]
+
+[project.scripts]
+storyforge = "storyforge.cli:app"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["storyforge*"]

@@ -1,0 +1,17 @@
+## Story bible
+{{ bible_yaml }}
+
+## Chapter brief (chapter {{ brief.get('number', '?') }}: {{ brief.get('title', 'untitled') }})
+{{ brief_yaml }}
+{% if prev_summary %}
+## Previous chapter (summary / tail)
+{{ prev_summary }}
+{% endif %}
+{% if draft_text %}
+## Current draft of this chapter
+{{ draft_text }}
+{% endif %}
+{% if notes_so_far %}
+## Notes accumulated so far from earlier passes
+{{ notes_so_far }}
+{% endif %}

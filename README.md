@@ -44,6 +44,22 @@ literal 2D grid mechanic with a live dashboard where you can click any
 agent to inspect it. Both save a numeric JSON report and a self-contained,
 interactive HTML report letting you browse any agent's full life story.
 
+### Story Forge
+
+An AI-assisted novel writing tool structured like a software project: a story bible
+(the Epic) breaks down into chapter briefs (Jira-style tickets with requirements,
+acceptance criteria, and considerations), worked through detail by detail using
+lenses — focused prompts for 5W1H, character voice, transitions, contrast,
+foreshadowing, pacing, dialogue, setting, and continuity — before generating prose.
+
+- **Location**: `story-forge/`
+- **Status**: CLI complete and tested (init/bible/character/chapter/status/config flows), against both the Anthropic API and a local Ollama model
+- **Tech Stack**: Python, Typer, Jinja2, Anthropic SDK, Ollama (pluggable LLM backend)
+
+See [story-forge/README.md](story-forge/README.md) for more details. Projects live as
+plain YAML/Markdown under `story-forge/projects/<slug>/`, so they're human-readable
+and git-diffable.
+
 ## Structure
 
 Each subdirectory contains a self-contained project with its own documentation and dependencies.
