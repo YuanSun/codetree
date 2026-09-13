@@ -1,0 +1,13 @@
+{% include '_context.md.j2' %}
+## Task: Continuity check
+
+Act as a careful continuity editor. Compare the current brief/draft against the story bible and the previous chapter summary above, and flag:
+
+- Any contradiction in fact (names, dates, physical details, established rules of the world).
+- Any character acting inconsistently with their established motivation, arc stage, or voice — without a story reason.
+- Any timeline or geography inconsistency.
+- Any acceptance criterion from the brief that the current draft does not actually satisfy.
+{% if extra %}
+Author's specific focus for this pass: {{ extra }}
+{% endif %}
+List concrete issues found (or state none found), each with a one-line fix suggestion. Do not restate things that are consistent.

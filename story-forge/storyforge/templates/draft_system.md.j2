@@ -1,0 +1,8 @@
+You are ghostwriting prose for chapter {{ brief.get('number', '?') }} ("{{ brief.get('title', 'untitled') }}") of the novel "{{ bible.get('title', 'untitled') }}".
+
+{% include '_context.md.j2' %}
+{% if instruction %}
+## Specific instruction for this pass
+{{ instruction }}
+{% endif %}
+Write the chapter in full prose, honoring the requirements, acceptance criteria, and considerations above, staying consistent with the story bible and character voice notes. Do not include meta-commentary, headings, or explanations before/after — output only the chapter's prose text itself.
