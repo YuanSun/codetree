@@ -1,0 +1,9031 @@
+{
+  "meta": {
+    "implementation": "vectorized simulation",
+    "n_agents": 1000,
+    "n_steps": 80,
+    "seed": 46,
+    "generated_at": "2026-09-11T23:33:07"
+  },
+  "summary": {
+    "n_agents": 1000,
+    "mean_capital": 385.2369160434976,
+    "std_capital": 10384.35154852899,
+    "median_capital": 0.0390625,
+    "mean_talent": 0.6002490305508776,
+    "std_talent": 0.09783941144957592,
+    "gini_capital": 0.9970078041291354,
+    "gini_talent": 0.09174588017300699,
+    "pareto_exponent": 0.44776478591115587,
+    "top_capital": 327680.0,
+    "top_capital_agent_id": 15,
+    "top_capital_talent": 0.7718312345883783,
+    "top_capital_talent_percentile": 95.89999999999999,
+    "max_talent": 0.9180134842474561,
+    "max_talent_agent_id": 662,
+    "max_talent_capital": 40.0,
+    "max_talent_capital_percentile": 94.6,
+    "corr_talent_capital": 0.059259119190279035
+  },
+  "agents": [
+    {
+      "id": 15,
+      "talent": 0.771831,
+      "capital": 327680.0,
+      "rank": 1,
+      "lucky_seized": 27,
+      "lucky_missed": 5,
+      "unlucky": 12
+    },
+    {
+      "id": 150,
+      "talent": 0.736811,
+      "capital": 20480.0,
+      "rank": 2,
+      "lucky_seized": 20,
+      "lucky_missed": 5,
+      "unlucky": 9
+    },
+    {
+      "id": 779,
+      "talent": 0.625175,
+      "capital": 10240.0,
+      "rank": 3,
+      "lucky_seized": 21,
+      "lucky_missed": 5,
+      "unlucky": 11
+    },
+    {
+      "id": 791,
+      "talent": 0.565231,
+      "capital": 5120.0,
+      "rank": 4,
+      "lucky_seized": 20,
+      "lucky_missed": 7,
+      "unlucky": 11
+    },
+    {
+      "id": 680,
+      "talent": 0.688443,
+      "capital": 5120.0,
+      "rank": 5,
+      "lucky_seized": 22,
+      "lucky_missed": 9,
+      "unlucky": 13
+    },
+    {
+      "id": 948,
+      "talent": 0.649314,
+      "capital": 5120.0,
+      "rank": 6,
+      "lucky_seized": 22,
+      "lucky_missed": 7,
+      "unlucky": 13
+    },
+    {
+      "id": 43,
+      "talent": 0.667419,
+      "capital": 1280.0,
+      "rank": 7,
+      "lucky_seized": 23,
+      "lucky_missed": 6,
+      "unlucky": 16
+    },
+    {
+      "id": 621,
+      "talent": 0.526753,
+      "capital": 1280.0,
+      "rank": 8,
+      "lucky_seized": 16,
+      "lucky_missed": 8,
+      "unlucky": 9
+    },
+    {
+      "id": 805,
+      "talent": 0.72732,
+      "capital": 640.0,
+      "rank": 9,
+      "lucky_seized": 21,
+      "lucky_missed": 7,
+      "unlucky": 15
+    },
+    {
+      "id": 956,
+      "talent": 0.573258,
+      "capital": 640.0,
+      "rank": 10,
+      "lucky_seized": 23,
+      "lucky_missed": 8,
+      "unlucky": 17
+    },
+    {
+      "id": 872,
+      "talent": 0.631986,
+      "capital": 640.0,
+      "rank": 11,
+      "lucky_seized": 22,
+      "lucky_missed": 10,
+      "unlucky": 16
+    },
+    {
+      "id": 44,
+      "talent": 0.722833,
+      "capital": 640.0,
+      "rank": 12,
+      "lucky_seized": 18,
+      "lucky_missed": 7,
+      "unlucky": 12
+    },
+    {
+      "id": 50,
+      "talent": 0.596421,
+      "capital": 320.0,
+      "rank": 13,
+      "lucky_seized": 17,
+      "lucky_missed": 14,
+      "unlucky": 12
+    },
+    {
+      "id": 636,
+      "talent": 0.730216,
+      "capital": 320.0,
+      "rank": 14,
+      "lucky_seized": 18,
+      "lucky_missed": 4,
+      "unlucky": 13
+    },
+    {
+      "id": 79,
+      "talent": 0.651219,
+      "capital": 320.0,
+      "rank": 15,
+      "lucky_seized": 19,
+      "lucky_missed": 6,
+      "unlucky": 14
+    },
+    {
+      "id": 969,
+      "talent": 0.636388,
+      "capital": 320.0,
+      "rank": 16,
+      "lucky_seized": 19,
+      "lucky_missed": 9,
+      "unlucky": 14
+    },
+    {
+      "id": 90,
+      "talent": 0.56733,
+      "capital": 320.0,
+      "rank": 17,
+      "lucky_seized": 18,
+      "lucky_missed": 8,
+      "unlucky": 13
+    },
+    {
+      "id": 290,
+      "talent": 0.662668,
+      "capital": 320.0,
+      "rank": 18,
+      "lucky_seized": 18,
+      "lucky_missed": 6,
+      "unlucky": 13
+    },
+    {
+      "id": 936,
+      "talent": 0.495757,
+      "capital": 320.0,
+      "rank": 19,
+      "lucky_seized": 17,
+      "lucky_missed": 15,
+      "unlucky": 12
+    },
+    {
+      "id": 205,
+      "talent": 0.659964,
+      "capital": 320.0,
+      "rank": 20,
+      "lucky_seized": 23,
+      "lucky_missed": 2,
+      "unlucky": 18
+    },
+    {
+      "id": 510,
+      "talent": 0.707817,
+      "capital": 160.0,
+      "rank": 21,
+      "lucky_seized": 24,
+      "lucky_missed": 3,
+      "unlucky": 20
+    },
+    {
+      "id": 164,
+      "talent": 0.760577,
+      "capital": 160.0,
+      "rank": 22,
+      "lucky_seized": 20,
+      "lucky_missed": 6,
+      "unlucky": 16
+    },
+    {
+      "id": 34,
+      "talent": 0.566817,
+      "capital": 160.0,
+      "rank": 23,
+      "lucky_seized": 19,
+      "lucky_missed": 8,
+      "unlucky": 15
+    },
+    {
+      "id": 163,
+      "talent": 0.838596,
+      "capital": 160.0,
+      "rank": 24,
+      "lucky_seized": 23,
+      "lucky_missed": 2,
+      "unlucky": 19
+    },
+    {
+      "id": 835,
+      "talent": 0.587246,
+      "capital": 160.0,
+      "rank": 25,
+      "lucky_seized": 18,
+      "lucky_missed": 9,
+      "unlucky": 14
+    },
+    {
+      "id": 755,
+      "talent": 0.705974,
+      "capital": 160.0,
+      "rank": 26,
+      "lucky_seized": 21,
+      "lucky_missed": 8,
+      "unlucky": 17
+    },
+    {
+      "id": 330,
+      "talent": 0.511778,
+      "capital": 160.0,
+      "rank": 27,
+      "lucky_seized": 18,
+      "lucky_missed": 14,
+      "unlucky": 14
+    },
+    {
+      "id": 726,
+      "talent": 0.463669,
+      "capital": 160.0,
+      "rank": 28,
+      "lucky_seized": 17,
+      "lucky_missed": 10,
+      "unlucky": 13
+    },
+    {
+      "id": 286,
+      "talent": 0.572501,
+      "capital": 160.0,
+      "rank": 29,
+      "lucky_seized": 17,
+      "lucky_missed": 5,
+      "unlucky": 13
+    },
+    {
+      "id": 322,
+      "talent": 0.624712,
+      "capital": 80.0,
+      "rank": 30,
+      "lucky_seized": 21,
+      "lucky_missed": 3,
+      "unlucky": 18
+    },
+    {
+      "id": 455,
+      "talent": 0.532506,
+      "capital": 80.0,
+      "rank": 31,
+      "lucky_seized": 17,
+      "lucky_missed": 9,
+      "unlucky": 14
+    },
+    {
+      "id": 949,
+      "talent": 0.680707,
+      "capital": 80.0,
+      "rank": 32,
+      "lucky_seized": 17,
+      "lucky_missed": 8,
+      "unlucky": 14
+    },
+    {
+      "id": 9,
+      "talent": 0.65253,
+      "capital": 80.0,
+      "rank": 33,
+      "lucky_seized": 18,
+      "lucky_missed": 2,
+      "unlucky": 15
+    },
+    {
+      "id": 984,
+      "talent": 0.577786,
+      "capital": 80.0,
+      "rank": 34,
+      "lucky_seized": 17,
+      "lucky_missed": 11,
+      "unlucky": 14
+    },
+    {
+      "id": 997,
+      "talent": 0.686678,
+      "capital": 80.0,
+      "rank": 35,
+      "lucky_seized": 18,
+      "lucky_missed": 9,
+      "unlucky": 15
+    },
+    {
+      "id": 641,
+      "talent": 0.679451,
+      "capital": 80.0,
+      "rank": 36,
+      "lucky_seized": 18,
+      "lucky_missed": 6,
+      "unlucky": 15
+    },
+    {
+      "id": 624,
+      "talent": 0.782281,
+      "capital": 40.0,
+      "rank": 37,
+      "lucky_seized": 15,
+      "lucky_missed": 3,
+      "unlucky": 13
+    },
+    {
+      "id": 654,
+      "talent": 0.645062,
+      "capital": 40.0,
+      "rank": 38,
+      "lucky_seized": 17,
+      "lucky_missed": 9,
+      "unlucky": 15
+    },
+    {
+      "id": 752,
+      "talent": 0.716143,
+      "capital": 40.0,
+      "rank": 39,
+      "lucky_seized": 12,
+      "lucky_missed": 8,
+      "unlucky": 10
+    },
+    {
+      "id": 662,
+      "talent": 0.918013,
+      "capital": 40.0,
+      "rank": 40,
+      "lucky_seized": 18,
+      "lucky_missed": 1,
+      "unlucky": 16
+    },
+    {
+      "id": 214,
+      "talent": 0.689406,
+      "capital": 40.0,
+      "rank": 41,
+      "lucky_seized": 20,
+      "lucky_missed": 5,
+      "unlucky": 18
+    },
+    {
+      "id": 784,
+      "talent": 0.59229,
+      "capital": 40.0,
+      "rank": 42,
+      "lucky_seized": 20,
+      "lucky_missed": 4,
+      "unlucky": 18
+    },
+    {
+      "id": 491,
+      "talent": 0.569241,
+      "capital": 40.0,
+      "rank": 43,
+      "lucky_seized": 15,
+      "lucky_missed": 5,
+      "unlucky": 13
+    },
+    {
+      "id": 695,
+      "talent": 0.647312,
+      "capital": 40.0,
+      "rank": 44,
+      "lucky_seized": 18,
+      "lucky_missed": 5,
+      "unlucky": 16
+    },
+    {
+      "id": 102,
+      "talent": 0.643931,
+      "capital": 40.0,
+      "rank": 45,
+      "lucky_seized": 14,
+      "lucky_missed": 6,
+      "unlucky": 12
+    },
+    {
+      "id": 498,
+      "talent": 0.693863,
+      "capital": 40.0,
+      "rank": 46,
+      "lucky_seized": 17,
+      "lucky_missed": 8,
+      "unlucky": 15
+    },
+    {
+      "id": 28,
+      "talent": 0.793188,
+      "capital": 40.0,
+      "rank": 47,
+      "lucky_seized": 17,
+      "lucky_missed": 5,
+      "unlucky": 15
+    },
+    {
+      "id": 982,
+      "talent": 0.69761,
+      "capital": 40.0,
+      "rank": 48,
+      "lucky_seized": 21,
+      "lucky_missed": 7,
+      "unlucky": 19
+    },
+    {
+      "id": 226,
+      "talent": 0.789877,
+      "capital": 40.0,
+      "rank": 49,
+      "lucky_seized": 18,
+      "lucky_missed": 9,
+      "unlucky": 16
+    },
+    {
+      "id": 231,
+      "talent": 0.722553,
+      "capital": 40.0,
+      "rank": 50,
+      "lucky_seized": 22,
+      "lucky_missed": 5,
+      "unlucky": 20
+    },
+    {
+      "id": 233,
+      "talent": 0.812118,
+      "capital": 40.0,
+      "rank": 51,
+      "lucky_seized": 15,
+      "lucky_missed": 4,
+      "unlucky": 13
+    },
+    {
+      "id": 249,
+      "talent": 0.605578,
+      "capital": 40.0,
+      "rank": 52,
+      "lucky_seized": 15,
+      "lucky_missed": 6,
+      "unlucky": 13
+    },
+    {
+      "id": 947,
+      "talent": 0.489321,
+      "capital": 40.0,
+      "rank": 53,
+      "lucky_seized": 12,
+      "lucky_missed": 12,
+      "unlucky": 10
+    },
+    {
+      "id": 934,
+      "talent": 0.670864,
+      "capital": 40.0,
+      "rank": 54,
+      "lucky_seized": 15,
+      "lucky_missed": 4,
+      "unlucky": 13
+    },
+    {
+      "id": 572,
+      "talent": 0.835936,
+      "capital": 20.0,
+      "rank": 55,
+      "lucky_seized": 18,
+      "lucky_missed": 3,
+      "unlucky": 17
+    },
+    {
+      "id": 348,
+      "talent": 0.623922,
+      "capital": 20.0,
+      "rank": 56,
+      "lucky_seized": 18,
+      "lucky_missed": 7,
+      "unlucky": 17
+    },
+    {
+      "id": 71,
+      "talent": 0.632463,
+      "capital": 20.0,
+      "rank": 57,
+      "lucky_seized": 19,
+      "lucky_missed": 11,
+      "unlucky": 18
+    },
+    {
+      "id": 451,
+      "talent": 0.572608,
+      "capital": 20.0,
+      "rank": 58,
+      "lucky_seized": 18,
+      "lucky_missed": 6,
+      "unlucky": 17
+    },
+    {
+      "id": 512,
+      "talent": 0.752793,
+      "capital": 20.0,
+      "rank": 59,
+      "lucky_seized": 19,
+      "lucky_missed": 2,
+      "unlucky": 18
+    },
+    {
+      "id": 309,
+      "talent": 0.517802,
+      "capital": 20.0,
+      "rank": 60,
+      "lucky_seized": 12,
+      "lucky_missed": 9,
+      "unlucky": 11
+    },
+    {
+      "id": 392,
+      "talent": 0.821099,
+      "capital": 20.0,
+      "rank": 61,
+      "lucky_seized": 19,
+      "lucky_missed": 4,
+      "unlucky": 18
+    },
+    {
+      "id": 132,
+      "talent": 0.708904,
+      "capital": 20.0,
+      "rank": 62,
+      "lucky_seized": 21,
+      "lucky_missed": 7,
+      "unlucky": 20
+    },
+    {
+      "id": 871,
+      "talent": 0.57215,
+      "capital": 20.0,
+      "rank": 63,
+      "lucky_seized": 11,
+      "lucky_missed": 13,
+      "unlucky": 10
+    },
+    {
+      "id": 188,
+      "talent": 0.693376,
+      "capital": 20.0,
+      "rank": 64,
+      "lucky_seized": 19,
+      "lucky_missed": 5,
+      "unlucky": 18
+    },
+    {
+      "id": 996,
+      "talent": 0.577119,
+      "capital": 20.0,
+      "rank": 65,
+      "lucky_seized": 15,
+      "lucky_missed": 11,
+      "unlucky": 14
+    },
+    {
+      "id": 270,
+      "talent": 0.457857,
+      "capital": 20.0,
+      "rank": 66,
+      "lucky_seized": 14,
+      "lucky_missed": 11,
+      "unlucky": 13
+    },
+    {
+      "id": 31,
+      "talent": 0.696821,
+      "capital": 20.0,
+      "rank": 67,
+      "lucky_seized": 22,
+      "lucky_missed": 6,
+      "unlucky": 21
+    },
+    {
+      "id": 955,
+      "talent": 0.706146,
+      "capital": 20.0,
+      "rank": 68,
+      "lucky_seized": 18,
+      "lucky_missed": 4,
+      "unlucky": 17
+    },
+    {
+      "id": 923,
+      "talent": 0.468029,
+      "capital": 20.0,
+      "rank": 69,
+      "lucky_seized": 11,
+      "lucky_missed": 13,
+      "unlucky": 10
+    },
+    {
+      "id": 40,
+      "talent": 0.681385,
+      "capital": 20.0,
+      "rank": 70,
+      "lucky_seized": 17,
+      "lucky_missed": 5,
+      "unlucky": 16
+    },
+    {
+      "id": 853,
+      "talent": 0.693036,
+      "capital": 20.0,
+      "rank": 71,
+      "lucky_seized": 17,
+      "lucky_missed": 8,
+      "unlucky": 16
+    },
+    {
+      "id": 213,
+      "talent": 0.778686,
+      "capital": 20.0,
+      "rank": 72,
+      "lucky_seized": 17,
+      "lucky_missed": 3,
+      "unlucky": 16
+    },
+    {
+      "id": 38,
+      "talent": 0.685905,
+      "capital": 20.0,
+      "rank": 73,
+      "lucky_seized": 18,
+      "lucky_missed": 2,
+      "unlucky": 17
+    },
+    {
+      "id": 876,
+      "talent": 0.474233,
+      "capital": 20.0,
+      "rank": 74,
+      "lucky_seized": 17,
+      "lucky_missed": 5,
+      "unlucky": 16
+    },
+    {
+      "id": 889,
+      "talent": 0.630291,
+      "capital": 20.0,
+      "rank": 75,
+      "lucky_seized": 15,
+      "lucky_missed": 9,
+      "unlucky": 14
+    },
+    {
+      "id": 822,
+      "talent": 0.576277,
+      "capital": 20.0,
+      "rank": 76,
+      "lucky_seized": 16,
+      "lucky_missed": 12,
+      "unlucky": 15
+    },
+    {
+      "id": 440,
+      "talent": 0.689656,
+      "capital": 10.0,
+      "rank": 77,
+      "lucky_seized": 18,
+      "lucky_missed": 3,
+      "unlucky": 18
+    },
+    {
+      "id": 232,
+      "talent": 0.612567,
+      "capital": 10.0,
+      "rank": 78,
+      "lucky_seized": 12,
+      "lucky_missed": 6,
+      "unlucky": 12
+    },
+    {
+      "id": 698,
+      "talent": 0.68921,
+      "capital": 10.0,
+      "rank": 79,
+      "lucky_seized": 14,
+      "lucky_missed": 11,
+      "unlucky": 14
+    },
+    {
+      "id": 382,
+      "talent": 0.717088,
+      "capital": 10.0,
+      "rank": 80,
+      "lucky_seized": 16,
+      "lucky_missed": 5,
+      "unlucky": 16
+    },
+    {
+      "id": 917,
+      "talent": 0.617929,
+      "capital": 10.0,
+      "rank": 81,
+      "lucky_seized": 13,
+      "lucky_missed": 10,
+      "unlucky": 13
+    },
+    {
+      "id": 297,
+      "talent": 0.877164,
+      "capital": 10.0,
+      "rank": 82,
+      "lucky_seized": 19,
+      "lucky_missed": 2,
+      "unlucky": 19
+    },
+    {
+      "id": 966,
+      "talent": 0.69856,
+      "capital": 10.0,
+      "rank": 83,
+      "lucky_seized": 14,
+      "lucky_missed": 6,
+      "unlucky": 14
+    },
+    {
+      "id": 993,
+      "talent": 0.755295,
+      "capital": 10.0,
+      "rank": 84,
+      "lucky_seized": 17,
+      "lucky_missed": 3,
+      "unlucky": 17
+    },
+    {
+      "id": 22,
+      "talent": 0.60113,
+      "capital": 10.0,
+      "rank": 85,
+      "lucky_seized": 14,
+      "lucky_missed": 12,
+      "unlucky": 14
+    },
+    {
+      "id": 904,
+      "talent": 0.721028,
+      "capital": 10.0,
+      "rank": 86,
+      "lucky_seized": 21,
+      "lucky_missed": 6,
+      "unlucky": 21
+    },
+    {
+      "id": 29,
+      "talent": 0.717487,
+      "capital": 10.0,
+      "rank": 87,
+      "lucky_seized": 18,
+      "lucky_missed": 5,
+      "unlucky": 18
+    },
+    {
+      "id": 482,
+      "talent": 0.595418,
+      "capital": 10.0,
+      "rank": 88,
+      "lucky_seized": 16,
+      "lucky_missed": 10,
+      "unlucky": 16
+    },
+    {
+      "id": 169,
+      "talent": 0.652984,
+      "capital": 10.0,
+      "rank": 89,
+      "lucky_seized": 18,
+      "lucky_missed": 6,
+      "unlucky": 18
+    },
+    {
+      "id": 659,
+      "talent": 0.576903,
+      "capital": 10.0,
+      "rank": 90,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 13
+    },
+    {
+      "id": 760,
+      "talent": 0.71847,
+      "capital": 10.0,
+      "rank": 91,
+      "lucky_seized": 19,
+      "lucky_missed": 4,
+      "unlucky": 19
+    },
+    {
+      "id": 776,
+      "talent": 0.854478,
+      "capital": 10.0,
+      "rank": 92,
+      "lucky_seized": 15,
+      "lucky_missed": 1,
+      "unlucky": 15
+    },
+    {
+      "id": 787,
+      "talent": 0.747525,
+      "capital": 10.0,
+      "rank": 93,
+      "lucky_seized": 18,
+      "lucky_missed": 5,
+      "unlucky": 18
+    },
+    {
+      "id": 788,
+      "talent": 0.775879,
+      "capital": 10.0,
+      "rank": 94,
+      "lucky_seized": 20,
+      "lucky_missed": 6,
+      "unlucky": 20
+    },
+    {
+      "id": 873,
+      "talent": 0.715804,
+      "capital": 10.0,
+      "rank": 95,
+      "lucky_seized": 17,
+      "lucky_missed": 4,
+      "unlucky": 17
+    },
+    {
+      "id": 216,
+      "talent": 0.716031,
+      "capital": 10.0,
+      "rank": 96,
+      "lucky_seized": 13,
+      "lucky_missed": 3,
+      "unlucky": 13
+    },
+    {
+      "id": 114,
+      "talent": 0.708566,
+      "capital": 10.0,
+      "rank": 97,
+      "lucky_seized": 14,
+      "lucky_missed": 5,
+      "unlucky": 14
+    },
+    {
+      "id": 546,
+      "talent": 0.644272,
+      "capital": 10.0,
+      "rank": 98,
+      "lucky_seized": 14,
+      "lucky_missed": 10,
+      "unlucky": 14
+    },
+    {
+      "id": 531,
+      "talent": 0.707355,
+      "capital": 10.0,
+      "rank": 99,
+      "lucky_seized": 16,
+      "lucky_missed": 4,
+      "unlucky": 16
+    },
+    {
+      "id": 826,
+      "talent": 0.556574,
+      "capital": 10.0,
+      "rank": 100,
+      "lucky_seized": 16,
+      "lucky_missed": 7,
+      "unlucky": 16
+    },
+    {
+      "id": 868,
+      "talent": 0.689103,
+      "capital": 10.0,
+      "rank": 101,
+      "lucky_seized": 14,
+      "lucky_missed": 5,
+      "unlucky": 14
+    },
+    {
+      "id": 613,
+      "talent": 0.672021,
+      "capital": 10.0,
+      "rank": 102,
+      "lucky_seized": 16,
+      "lucky_missed": 5,
+      "unlucky": 16
+    },
+    {
+      "id": 268,
+      "talent": 0.635464,
+      "capital": 10.0,
+      "rank": 103,
+      "lucky_seized": 21,
+      "lucky_missed": 6,
+      "unlucky": 21
+    },
+    {
+      "id": 139,
+      "talent": 0.694267,
+      "capital": 5.0,
+      "rank": 104,
+      "lucky_seized": 15,
+      "lucky_missed": 2,
+      "unlucky": 16
+    },
+    {
+      "id": 241,
+      "talent": 0.74912,
+      "capital": 5.0,
+      "rank": 105,
+      "lucky_seized": 17,
+      "lucky_missed": 8,
+      "unlucky": 18
+    },
+    {
+      "id": 147,
+      "talent": 0.626614,
+      "capital": 5.0,
+      "rank": 106,
+      "lucky_seized": 14,
+      "lucky_missed": 10,
+      "unlucky": 15
+    },
+    {
+      "id": 255,
+      "talent": 0.589109,
+      "capital": 5.0,
+      "rank": 107,
+      "lucky_seized": 14,
+      "lucky_missed": 15,
+      "unlucky": 15
+    },
+    {
+      "id": 0,
+      "talent": 0.549708,
+      "capital": 5.0,
+      "rank": 108,
+      "lucky_seized": 13,
+      "lucky_missed": 10,
+      "unlucky": 14
+    },
+    {
+      "id": 300,
+      "talent": 0.630793,
+      "capital": 5.0,
+      "rank": 109,
+      "lucky_seized": 15,
+      "lucky_missed": 5,
+      "unlucky": 16
+    },
+    {
+      "id": 922,
+      "talent": 0.632768,
+      "capital": 5.0,
+      "rank": 110,
+      "lucky_seized": 14,
+      "lucky_missed": 13,
+      "unlucky": 15
+    },
+    {
+      "id": 874,
+      "talent": 0.479128,
+      "capital": 5.0,
+      "rank": 111,
+      "lucky_seized": 14,
+      "lucky_missed": 11,
+      "unlucky": 15
+    },
+    {
+      "id": 866,
+      "talent": 0.580613,
+      "capital": 5.0,
+      "rank": 112,
+      "lucky_seized": 11,
+      "lucky_missed": 9,
+      "unlucky": 12
+    },
+    {
+      "id": 809,
+      "talent": 0.697232,
+      "capital": 5.0,
+      "rank": 113,
+      "lucky_seized": 14,
+      "lucky_missed": 8,
+      "unlucky": 15
+    },
+    {
+      "id": 785,
+      "talent": 0.644726,
+      "capital": 5.0,
+      "rank": 114,
+      "lucky_seized": 13,
+      "lucky_missed": 11,
+      "unlucky": 14
+    },
+    {
+      "id": 734,
+      "talent": 0.695886,
+      "capital": 5.0,
+      "rank": 115,
+      "lucky_seized": 18,
+      "lucky_missed": 4,
+      "unlucky": 19
+    },
+    {
+      "id": 730,
+      "talent": 0.656649,
+      "capital": 5.0,
+      "rank": 116,
+      "lucky_seized": 16,
+      "lucky_missed": 6,
+      "unlucky": 17
+    },
+    {
+      "id": 699,
+      "talent": 0.628368,
+      "capital": 5.0,
+      "rank": 117,
+      "lucky_seized": 12,
+      "lucky_missed": 9,
+      "unlucky": 13
+    },
+    {
+      "id": 683,
+      "talent": 0.669096,
+      "capital": 5.0,
+      "rank": 118,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 14
+    },
+    {
+      "id": 133,
+      "talent": 0.667636,
+      "capital": 5.0,
+      "rank": 119,
+      "lucky_seized": 15,
+      "lucky_missed": 5,
+      "unlucky": 16
+    },
+    {
+      "id": 617,
+      "talent": 0.743743,
+      "capital": 5.0,
+      "rank": 120,
+      "lucky_seized": 19,
+      "lucky_missed": 6,
+      "unlucky": 20
+    },
+    {
+      "id": 554,
+      "talent": 0.690622,
+      "capital": 5.0,
+      "rank": 121,
+      "lucky_seized": 16,
+      "lucky_missed": 6,
+      "unlucky": 17
+    },
+    {
+      "id": 450,
+      "talent": 0.573884,
+      "capital": 5.0,
+      "rank": 122,
+      "lucky_seized": 14,
+      "lucky_missed": 7,
+      "unlucky": 15
+    },
+    {
+      "id": 420,
+      "talent": 0.521092,
+      "capital": 5.0,
+      "rank": 123,
+      "lucky_seized": 16,
+      "lucky_missed": 11,
+      "unlucky": 17
+    },
+    {
+      "id": 416,
+      "talent": 0.584255,
+      "capital": 5.0,
+      "rank": 124,
+      "lucky_seized": 16,
+      "lucky_missed": 10,
+      "unlucky": 17
+    },
+    {
+      "id": 405,
+      "talent": 0.522172,
+      "capital": 5.0,
+      "rank": 125,
+      "lucky_seized": 12,
+      "lucky_missed": 8,
+      "unlucky": 13
+    },
+    {
+      "id": 388,
+      "talent": 0.700727,
+      "capital": 5.0,
+      "rank": 126,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 14
+    },
+    {
+      "id": 279,
+      "talent": 0.612048,
+      "capital": 5.0,
+      "rank": 127,
+      "lucky_seized": 11,
+      "lucky_missed": 9,
+      "unlucky": 12
+    },
+    {
+      "id": 668,
+      "talent": 0.448418,
+      "capital": 5.0,
+      "rank": 128,
+      "lucky_seized": 16,
+      "lucky_missed": 13,
+      "unlucky": 17
+    },
+    {
+      "id": 499,
+      "talent": 0.430995,
+      "capital": 5.0,
+      "rank": 129,
+      "lucky_seized": 11,
+      "lucky_missed": 10,
+      "unlucky": 12
+    },
+    {
+      "id": 103,
+      "talent": 0.729115,
+      "capital": 5.0,
+      "rank": 130,
+      "lucky_seized": 16,
+      "lucky_missed": 4,
+      "unlucky": 17
+    },
+    {
+      "id": 121,
+      "talent": 0.657743,
+      "capital": 5.0,
+      "rank": 131,
+      "lucky_seized": 17,
+      "lucky_missed": 4,
+      "unlucky": 18
+    },
+    {
+      "id": 18,
+      "talent": 0.582556,
+      "capital": 5.0,
+      "rank": 132,
+      "lucky_seized": 18,
+      "lucky_missed": 9,
+      "unlucky": 19
+    },
+    {
+      "id": 920,
+      "talent": 0.727534,
+      "capital": 2.5,
+      "rank": 133,
+      "lucky_seized": 14,
+      "lucky_missed": 8,
+      "unlucky": 16
+    },
+    {
+      "id": 419,
+      "talent": 0.564597,
+      "capital": 2.5,
+      "rank": 134,
+      "lucky_seized": 18,
+      "lucky_missed": 7,
+      "unlucky": 20
+    },
+    {
+      "id": 430,
+      "talent": 0.408573,
+      "capital": 2.5,
+      "rank": 135,
+      "lucky_seized": 17,
+      "lucky_missed": 9,
+      "unlucky": 19
+    },
+    {
+      "id": 903,
+      "talent": 0.621141,
+      "capital": 2.5,
+      "rank": 136,
+      "lucky_seized": 11,
+      "lucky_missed": 7,
+      "unlucky": 13
+    },
+    {
+      "id": 736,
+      "talent": 0.673841,
+      "capital": 2.5,
+      "rank": 137,
+      "lucky_seized": 10,
+      "lucky_missed": 9,
+      "unlucky": 12
+    },
+    {
+      "id": 901,
+      "talent": 0.614835,
+      "capital": 2.5,
+      "rank": 138,
+      "lucky_seized": 14,
+      "lucky_missed": 9,
+      "unlucky": 16
+    },
+    {
+      "id": 880,
+      "talent": 0.588515,
+      "capital": 2.5,
+      "rank": 139,
+      "lucky_seized": 14,
+      "lucky_missed": 9,
+      "unlucky": 16
+    },
+    {
+      "id": 467,
+      "talent": 0.545143,
+      "capital": 2.5,
+      "rank": 140,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 15
+    },
+    {
+      "id": 847,
+      "talent": 0.656862,
+      "capital": 2.5,
+      "rank": 141,
+      "lucky_seized": 16,
+      "lucky_missed": 6,
+      "unlucky": 18
+    },
+    {
+      "id": 842,
+      "talent": 0.747319,
+      "capital": 2.5,
+      "rank": 142,
+      "lucky_seized": 13,
+      "lucky_missed": 8,
+      "unlucky": 15
+    },
+    {
+      "id": 614,
+      "talent": 0.697413,
+      "capital": 2.5,
+      "rank": 143,
+      "lucky_seized": 15,
+      "lucky_missed": 4,
+      "unlucky": 17
+    },
+    {
+      "id": 825,
+      "talent": 0.702385,
+      "capital": 2.5,
+      "rank": 144,
+      "lucky_seized": 13,
+      "lucky_missed": 5,
+      "unlucky": 15
+    },
+    {
+      "id": 819,
+      "talent": 0.766628,
+      "capital": 2.5,
+      "rank": 145,
+      "lucky_seized": 19,
+      "lucky_missed": 4,
+      "unlucky": 21
+    },
+    {
+      "id": 692,
+      "talent": 0.677095,
+      "capital": 2.5,
+      "rank": 146,
+      "lucky_seized": 15,
+      "lucky_missed": 5,
+      "unlucky": 17
+    },
+    {
+      "id": 46,
+      "talent": 0.730171,
+      "capital": 2.5,
+      "rank": 147,
+      "lucky_seized": 16,
+      "lucky_missed": 9,
+      "unlucky": 18
+    },
+    {
+      "id": 51,
+      "talent": 0.551637,
+      "capital": 2.5,
+      "rank": 148,
+      "lucky_seized": 14,
+      "lucky_missed": 8,
+      "unlucky": 16
+    },
+    {
+      "id": 60,
+      "talent": 0.702249,
+      "capital": 2.5,
+      "rank": 149,
+      "lucky_seized": 16,
+      "lucky_missed": 6,
+      "unlucky": 18
+    },
+    {
+      "id": 202,
+      "talent": 0.683792,
+      "capital": 2.5,
+      "rank": 150,
+      "lucky_seized": 13,
+      "lucky_missed": 5,
+      "unlucky": 15
+    },
+    {
+      "id": 754,
+      "talent": 0.672444,
+      "capital": 2.5,
+      "rank": 151,
+      "lucky_seized": 12,
+      "lucky_missed": 7,
+      "unlucky": 14
+    },
+    {
+      "id": 244,
+      "talent": 0.642426,
+      "capital": 2.5,
+      "rank": 152,
+      "lucky_seized": 14,
+      "lucky_missed": 11,
+      "unlucky": 16
+    },
+    {
+      "id": 206,
+      "talent": 0.777513,
+      "capital": 2.5,
+      "rank": 153,
+      "lucky_seized": 18,
+      "lucky_missed": 6,
+      "unlucky": 20
+    },
+    {
+      "id": 744,
+      "talent": 0.677927,
+      "capital": 2.5,
+      "rank": 154,
+      "lucky_seized": 20,
+      "lucky_missed": 3,
+      "unlucky": 22
+    },
+    {
+      "id": 81,
+      "talent": 0.625945,
+      "capital": 2.5,
+      "rank": 155,
+      "lucky_seized": 14,
+      "lucky_missed": 7,
+      "unlucky": 16
+    },
+    {
+      "id": 492,
+      "talent": 0.626365,
+      "capital": 2.5,
+      "rank": 156,
+      "lucky_seized": 14,
+      "lucky_missed": 8,
+      "unlucky": 16
+    },
+    {
+      "id": 735,
+      "talent": 0.572254,
+      "capital": 2.5,
+      "rank": 157,
+      "lucky_seized": 12,
+      "lucky_missed": 10,
+      "unlucky": 14
+    },
+    {
+      "id": 415,
+      "talent": 0.548221,
+      "capital": 2.5,
+      "rank": 158,
+      "lucky_seized": 11,
+      "lucky_missed": 8,
+      "unlucky": 13
+    },
+    {
+      "id": 946,
+      "talent": 0.557205,
+      "capital": 2.5,
+      "rank": 159,
+      "lucky_seized": 13,
+      "lucky_missed": 14,
+      "unlucky": 15
+    },
+    {
+      "id": 298,
+      "talent": 0.725536,
+      "capital": 2.5,
+      "rank": 160,
+      "lucky_seized": 18,
+      "lucky_missed": 5,
+      "unlucky": 20
+    },
+    {
+      "id": 363,
+      "talent": 0.51324,
+      "capital": 2.5,
+      "rank": 161,
+      "lucky_seized": 14,
+      "lucky_missed": 13,
+      "unlucky": 16
+    },
+    {
+      "id": 69,
+      "talent": 0.697143,
+      "capital": 2.5,
+      "rank": 162,
+      "lucky_seized": 16,
+      "lucky_missed": 5,
+      "unlucky": 18
+    },
+    {
+      "id": 362,
+      "talent": 0.582086,
+      "capital": 2.5,
+      "rank": 163,
+      "lucky_seized": 17,
+      "lucky_missed": 6,
+      "unlucky": 19
+    },
+    {
+      "id": 972,
+      "talent": 0.563524,
+      "capital": 2.5,
+      "rank": 164,
+      "lucky_seized": 14,
+      "lucky_missed": 10,
+      "unlucky": 16
+    },
+    {
+      "id": 353,
+      "talent": 0.710947,
+      "capital": 2.5,
+      "rank": 165,
+      "lucky_seized": 15,
+      "lucky_missed": 7,
+      "unlucky": 17
+    },
+    {
+      "id": 953,
+      "talent": 0.566191,
+      "capital": 2.5,
+      "rank": 166,
+      "lucky_seized": 16,
+      "lucky_missed": 8,
+      "unlucky": 18
+    },
+    {
+      "id": 134,
+      "talent": 0.629022,
+      "capital": 2.5,
+      "rank": 167,
+      "lucky_seized": 15,
+      "lucky_missed": 7,
+      "unlucky": 17
+    },
+    {
+      "id": 939,
+      "talent": 0.59826,
+      "capital": 2.5,
+      "rank": 168,
+      "lucky_seized": 16,
+      "lucky_missed": 5,
+      "unlucky": 18
+    },
+    {
+      "id": 368,
+      "talent": 0.538092,
+      "capital": 2.5,
+      "rank": 169,
+      "lucky_seized": 15,
+      "lucky_missed": 10,
+      "unlucky": 17
+    },
+    {
+      "id": 343,
+      "talent": 0.619433,
+      "capital": 2.5,
+      "rank": 170,
+      "lucky_seized": 14,
+      "lucky_missed": 13,
+      "unlucky": 16
+    },
+    {
+      "id": 224,
+      "talent": 0.737227,
+      "capital": 2.5,
+      "rank": 171,
+      "lucky_seized": 19,
+      "lucky_missed": 4,
+      "unlucky": 21
+    },
+    {
+      "id": 340,
+      "talent": 0.643378,
+      "capital": 2.5,
+      "rank": 172,
+      "lucky_seized": 17,
+      "lucky_missed": 6,
+      "unlucky": 19
+    },
+    {
+      "id": 364,
+      "talent": 0.493643,
+      "capital": 1.25,
+      "rank": 173,
+      "lucky_seized": 9,
+      "lucky_missed": 13,
+      "unlucky": 12
+    },
+    {
+      "id": 36,
+      "talent": 0.769454,
+      "capital": 1.25,
+      "rank": 174,
+      "lucky_seized": 14,
+      "lucky_missed": 7,
+      "unlucky": 17
+    },
+    {
+      "id": 190,
+      "talent": 0.553316,
+      "capital": 1.25,
+      "rank": 175,
+      "lucky_seized": 12,
+      "lucky_missed": 11,
+      "unlucky": 15
+    },
+    {
+      "id": 577,
+      "talent": 0.601443,
+      "capital": 1.25,
+      "rank": 176,
+      "lucky_seized": 11,
+      "lucky_missed": 8,
+      "unlucky": 14
+    },
+    {
+      "id": 741,
+      "talent": 0.608411,
+      "capital": 1.25,
+      "rank": 177,
+      "lucky_seized": 16,
+      "lucky_missed": 9,
+      "unlucky": 19
+    },
+    {
+      "id": 817,
+      "talent": 0.670928,
+      "capital": 1.25,
+      "rank": 178,
+      "lucky_seized": 13,
+      "lucky_missed": 6,
+      "unlucky": 16
+    },
+    {
+      "id": 543,
+      "talent": 0.651181,
+      "capital": 1.25,
+      "rank": 179,
+      "lucky_seized": 11,
+      "lucky_missed": 9,
+      "unlucky": 14
+    },
+    {
+      "id": 998,
+      "talent": 0.625085,
+      "capital": 1.25,
+      "rank": 180,
+      "lucky_seized": 13,
+      "lucky_missed": 12,
+      "unlucky": 16
+    },
+    {
+      "id": 557,
+      "talent": 0.579307,
+      "capital": 1.25,
+      "rank": 181,
+      "lucky_seized": 14,
+      "lucky_missed": 5,
+      "unlucky": 17
+    },
+    {
+      "id": 795,
+      "talent": 0.549006,
+      "capital": 1.25,
+      "rank": 182,
+      "lucky_seized": 17,
+      "lucky_missed": 3,
+      "unlucky": 20
+    },
+    {
+      "id": 985,
+      "talent": 0.463445,
+      "capital": 1.25,
+      "rank": 183,
+      "lucky_seized": 12,
+      "lucky_missed": 6,
+      "unlucky": 15
+    },
+    {
+      "id": 230,
+      "talent": 0.518666,
+      "capital": 1.25,
+      "rank": 184,
+      "lucky_seized": 14,
+      "lucky_missed": 12,
+      "unlucky": 17
+    },
+    {
+      "id": 537,
+      "talent": 0.793196,
+      "capital": 1.25,
+      "rank": 185,
+      "lucky_seized": 15,
+      "lucky_missed": 4,
+      "unlucky": 18
+    },
+    {
+      "id": 547,
+      "talent": 0.717743,
+      "capital": 1.25,
+      "rank": 186,
+      "lucky_seized": 15,
+      "lucky_missed": 1,
+      "unlucky": 18
+    },
+    {
+      "id": 70,
+      "talent": 0.574395,
+      "capital": 1.25,
+      "rank": 187,
+      "lucky_seized": 13,
+      "lucky_missed": 11,
+      "unlucky": 16
+    },
+    {
+      "id": 622,
+      "talent": 0.642374,
+      "capital": 1.25,
+      "rank": 188,
+      "lucky_seized": 16,
+      "lucky_missed": 10,
+      "unlucky": 19
+    },
+    {
+      "id": 927,
+      "talent": 0.532534,
+      "capital": 1.25,
+      "rank": 189,
+      "lucky_seized": 11,
+      "lucky_missed": 9,
+      "unlucky": 14
+    },
+    {
+      "id": 159,
+      "talent": 0.662914,
+      "capital": 1.25,
+      "rank": 190,
+      "lucky_seized": 19,
+      "lucky_missed": 3,
+      "unlucky": 22
+    },
+    {
+      "id": 160,
+      "talent": 0.760051,
+      "capital": 1.25,
+      "rank": 191,
+      "lucky_seized": 14,
+      "lucky_missed": 3,
+      "unlucky": 17
+    },
+    {
+      "id": 161,
+      "talent": 0.694136,
+      "capital": 1.25,
+      "rank": 192,
+      "lucky_seized": 13,
+      "lucky_missed": 4,
+      "unlucky": 16
+    },
+    {
+      "id": 931,
+      "talent": 0.713683,
+      "capital": 1.25,
+      "rank": 193,
+      "lucky_seized": 14,
+      "lucky_missed": 8,
+      "unlucky": 17
+    },
+    {
+      "id": 122,
+      "talent": 0.779543,
+      "capital": 1.25,
+      "rank": 194,
+      "lucky_seized": 13,
+      "lucky_missed": 3,
+      "unlucky": 16
+    },
+    {
+      "id": 932,
+      "talent": 0.67309,
+      "capital": 1.25,
+      "rank": 195,
+      "lucky_seized": 18,
+      "lucky_missed": 6,
+      "unlucky": 21
+    },
+    {
+      "id": 165,
+      "talent": 0.770235,
+      "capital": 1.25,
+      "rank": 196,
+      "lucky_seized": 14,
+      "lucky_missed": 3,
+      "unlucky": 17
+    },
+    {
+      "id": 639,
+      "talent": 0.86334,
+      "capital": 1.25,
+      "rank": 197,
+      "lucky_seized": 20,
+      "lucky_missed": 3,
+      "unlucky": 23
+    },
+    {
+      "id": 907,
+      "talent": 0.788023,
+      "capital": 1.25,
+      "rank": 198,
+      "lucky_seized": 16,
+      "lucky_missed": 2,
+      "unlucky": 19
+    },
+    {
+      "id": 486,
+      "talent": 0.697311,
+      "capital": 1.25,
+      "rank": 199,
+      "lucky_seized": 16,
+      "lucky_missed": 10,
+      "unlucky": 19
+    },
+    {
+      "id": 630,
+      "talent": 0.720835,
+      "capital": 1.25,
+      "rank": 200,
+      "lucky_seized": 14,
+      "lucky_missed": 4,
+      "unlucky": 17
+    },
+    {
+      "id": 890,
+      "talent": 0.756884,
+      "capital": 1.25,
+      "rank": 201,
+      "lucky_seized": 13,
+      "lucky_missed": 2,
+      "unlucky": 16
+    },
+    {
+      "id": 438,
+      "talent": 0.631728,
+      "capital": 1.25,
+      "rank": 202,
+      "lucky_seized": 18,
+      "lucky_missed": 6,
+      "unlucky": 21
+    },
+    {
+      "id": 276,
+      "talent": 0.47809,
+      "capital": 1.25,
+      "rank": 203,
+      "lucky_seized": 13,
+      "lucky_missed": 7,
+      "unlucky": 16
+    },
+    {
+      "id": 883,
+      "talent": 0.628732,
+      "capital": 1.25,
+      "rank": 204,
+      "lucky_seized": 16,
+      "lucky_missed": 10,
+      "unlucky": 19
+    },
+    {
+      "id": 457,
+      "talent": 0.658594,
+      "capital": 1.25,
+      "rank": 205,
+      "lucky_seized": 17,
+      "lucky_missed": 5,
+      "unlucky": 20
+    },
+    {
+      "id": 23,
+      "talent": 0.654518,
+      "capital": 1.25,
+      "rank": 206,
+      "lucky_seized": 18,
+      "lucky_missed": 5,
+      "unlucky": 21
+    },
+    {
+      "id": 109,
+      "talent": 0.514174,
+      "capital": 1.25,
+      "rank": 207,
+      "lucky_seized": 12,
+      "lucky_missed": 13,
+      "unlucky": 15
+    },
+    {
+      "id": 324,
+      "talent": 0.546628,
+      "capital": 1.25,
+      "rank": 208,
+      "lucky_seized": 16,
+      "lucky_missed": 10,
+      "unlucky": 19
+    },
+    {
+      "id": 218,
+      "talent": 0.631642,
+      "capital": 1.25,
+      "rank": 209,
+      "lucky_seized": 15,
+      "lucky_missed": 7,
+      "unlucky": 18
+    },
+    {
+      "id": 606,
+      "talent": 0.567731,
+      "capital": 1.25,
+      "rank": 210,
+      "lucky_seized": 11,
+      "lucky_missed": 17,
+      "unlucky": 14
+    },
+    {
+      "id": 591,
+      "talent": 0.778811,
+      "capital": 1.25,
+      "rank": 211,
+      "lucky_seized": 17,
+      "lucky_missed": 6,
+      "unlucky": 20
+    },
+    {
+      "id": 600,
+      "talent": 0.643364,
+      "capital": 0.625,
+      "rank": 212,
+      "lucky_seized": 13,
+      "lucky_missed": 8,
+      "unlucky": 17
+    },
+    {
+      "id": 588,
+      "talent": 0.436264,
+      "capital": 0.625,
+      "rank": 213,
+      "lucky_seized": 14,
+      "lucky_missed": 9,
+      "unlucky": 18
+    },
+    {
+      "id": 999,
+      "talent": 0.764596,
+      "capital": 0.625,
+      "rank": 214,
+      "lucky_seized": 19,
+      "lucky_missed": 1,
+      "unlucky": 23
+    },
+    {
+      "id": 566,
+      "talent": 0.620442,
+      "capital": 0.625,
+      "rank": 215,
+      "lucky_seized": 15,
+      "lucky_missed": 8,
+      "unlucky": 19
+    },
+    {
+      "id": 334,
+      "talent": 0.481517,
+      "capital": 0.625,
+      "rank": 216,
+      "lucky_seized": 12,
+      "lucky_missed": 13,
+      "unlucky": 16
+    },
+    {
+      "id": 95,
+      "talent": 0.635756,
+      "capital": 0.625,
+      "rank": 217,
+      "lucky_seized": 14,
+      "lucky_missed": 10,
+      "unlucky": 18
+    },
+    {
+      "id": 387,
+      "talent": 0.675152,
+      "capital": 0.625,
+      "rank": 218,
+      "lucky_seized": 11,
+      "lucky_missed": 5,
+      "unlucky": 15
+    },
+    {
+      "id": 93,
+      "talent": 0.760977,
+      "capital": 0.625,
+      "rank": 219,
+      "lucky_seized": 17,
+      "lucky_missed": 3,
+      "unlucky": 21
+    },
+    {
+      "id": 291,
+      "talent": 0.460754,
+      "capital": 0.625,
+      "rank": 220,
+      "lucky_seized": 10,
+      "lucky_missed": 16,
+      "unlucky": 14
+    },
+    {
+      "id": 394,
+      "talent": 0.582597,
+      "capital": 0.625,
+      "rank": 221,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 17
+    },
+    {
+      "id": 400,
+      "talent": 0.582103,
+      "capital": 0.625,
+      "rank": 222,
+      "lucky_seized": 10,
+      "lucky_missed": 9,
+      "unlucky": 14
+    },
+    {
+      "id": 411,
+      "talent": 0.684224,
+      "capital": 0.625,
+      "rank": 223,
+      "lucky_seized": 14,
+      "lucky_missed": 5,
+      "unlucky": 18
+    },
+    {
+      "id": 426,
+      "talent": 0.707704,
+      "capital": 0.625,
+      "rank": 224,
+      "lucky_seized": 16,
+      "lucky_missed": 11,
+      "unlucky": 20
+    },
+    {
+      "id": 431,
+      "talent": 0.688724,
+      "capital": 0.625,
+      "rank": 225,
+      "lucky_seized": 15,
+      "lucky_missed": 7,
+      "unlucky": 19
+    },
+    {
+      "id": 460,
+      "talent": 0.672368,
+      "capital": 0.625,
+      "rank": 226,
+      "lucky_seized": 15,
+      "lucky_missed": 9,
+      "unlucky": 19
+    },
+    {
+      "id": 462,
+      "talent": 0.642458,
+      "capital": 0.625,
+      "rank": 227,
+      "lucky_seized": 14,
+      "lucky_missed": 11,
+      "unlucky": 18
+    },
+    {
+      "id": 234,
+      "talent": 0.520407,
+      "capital": 0.625,
+      "rank": 228,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 17
+    },
+    {
+      "id": 475,
+      "talent": 0.660599,
+      "capital": 0.625,
+      "rank": 229,
+      "lucky_seized": 15,
+      "lucky_missed": 6,
+      "unlucky": 19
+    },
+    {
+      "id": 506,
+      "talent": 0.739431,
+      "capital": 0.625,
+      "rank": 230,
+      "lucky_seized": 15,
+      "lucky_missed": 8,
+      "unlucky": 19
+    },
+    {
+      "id": 534,
+      "talent": 0.645393,
+      "capital": 0.625,
+      "rank": 231,
+      "lucky_seized": 15,
+      "lucky_missed": 12,
+      "unlucky": 19
+    },
+    {
+      "id": 549,
+      "talent": 0.64896,
+      "capital": 0.625,
+      "rank": 232,
+      "lucky_seized": 15,
+      "lucky_missed": 8,
+      "unlucky": 19
+    },
+    {
+      "id": 571,
+      "talent": 0.64292,
+      "capital": 0.625,
+      "rank": 233,
+      "lucky_seized": 13,
+      "lucky_missed": 12,
+      "unlucky": 17
+    },
+    {
+      "id": 464,
+      "talent": 0.610723,
+      "capital": 0.625,
+      "rank": 234,
+      "lucky_seized": 14,
+      "lucky_missed": 10,
+      "unlucky": 18
+    },
+    {
+      "id": 676,
+      "talent": 0.619913,
+      "capital": 0.625,
+      "rank": 235,
+      "lucky_seized": 15,
+      "lucky_missed": 5,
+      "unlucky": 19
+    },
+    {
+      "id": 181,
+      "talent": 0.483171,
+      "capital": 0.625,
+      "rank": 236,
+      "lucky_seized": 13,
+      "lucky_missed": 14,
+      "unlucky": 17
+    },
+    {
+      "id": 153,
+      "talent": 0.498827,
+      "capital": 0.625,
+      "rank": 237,
+      "lucky_seized": 12,
+      "lucky_missed": 10,
+      "unlucky": 16
+    },
+    {
+      "id": 796,
+      "talent": 0.728564,
+      "capital": 0.625,
+      "rank": 238,
+      "lucky_seized": 15,
+      "lucky_missed": 8,
+      "unlucky": 19
+    },
+    {
+      "id": 123,
+      "talent": 0.648511,
+      "capital": 0.625,
+      "rank": 239,
+      "lucky_seized": 16,
+      "lucky_missed": 3,
+      "unlucky": 20
+    },
+    {
+      "id": 935,
+      "talent": 0.759378,
+      "capital": 0.625,
+      "rank": 240,
+      "lucky_seized": 13,
+      "lucky_missed": 4,
+      "unlucky": 17
+    },
+    {
+      "id": 938,
+      "talent": 0.727126,
+      "capital": 0.625,
+      "rank": 241,
+      "lucky_seized": 16,
+      "lucky_missed": 7,
+      "unlucky": 20
+    },
+    {
+      "id": 941,
+      "talent": 0.696133,
+      "capital": 0.625,
+      "rank": 242,
+      "lucky_seized": 14,
+      "lucky_missed": 8,
+      "unlucky": 18
+    },
+    {
+      "id": 773,
+      "talent": 0.665677,
+      "capital": 0.625,
+      "rank": 243,
+      "lucky_seized": 15,
+      "lucky_missed": 12,
+      "unlucky": 19
+    },
+    {
+      "id": 836,
+      "talent": 0.636235,
+      "capital": 0.625,
+      "rank": 244,
+      "lucky_seized": 12,
+      "lucky_missed": 7,
+      "unlucky": 16
+    },
+    {
+      "id": 155,
+      "talent": 0.678404,
+      "capital": 0.625,
+      "rank": 245,
+      "lucky_seized": 12,
+      "lucky_missed": 6,
+      "unlucky": 16
+    },
+    {
+      "id": 848,
+      "talent": 0.634657,
+      "capital": 0.625,
+      "rank": 246,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 17
+    },
+    {
+      "id": 763,
+      "talent": 0.529864,
+      "capital": 0.625,
+      "rank": 247,
+      "lucky_seized": 14,
+      "lucky_missed": 12,
+      "unlucky": 18
+    },
+    {
+      "id": 761,
+      "talent": 0.771308,
+      "capital": 0.625,
+      "rank": 248,
+      "lucky_seized": 18,
+      "lucky_missed": 2,
+      "unlucky": 22
+    },
+    {
+      "id": 919,
+      "talent": 0.605093,
+      "capital": 0.625,
+      "rank": 249,
+      "lucky_seized": 12,
+      "lucky_missed": 13,
+      "unlucky": 16
+    },
+    {
+      "id": 39,
+      "talent": 0.607704,
+      "capital": 0.625,
+      "rank": 250,
+      "lucky_seized": 12,
+      "lucky_missed": 10,
+      "unlucky": 16
+    },
+    {
+      "id": 957,
+      "talent": 0.651462,
+      "capital": 0.625,
+      "rank": 251,
+      "lucky_seized": 14,
+      "lucky_missed": 7,
+      "unlucky": 18
+    },
+    {
+      "id": 125,
+      "talent": 0.622573,
+      "capital": 0.625,
+      "rank": 252,
+      "lucky_seized": 14,
+      "lucky_missed": 15,
+      "unlucky": 18
+    },
+    {
+      "id": 852,
+      "talent": 0.714028,
+      "capital": 0.625,
+      "rank": 253,
+      "lucky_seized": 14,
+      "lucky_missed": 4,
+      "unlucky": 18
+    },
+    {
+      "id": 166,
+      "talent": 0.512738,
+      "capital": 0.625,
+      "rank": 254,
+      "lucky_seized": 9,
+      "lucky_missed": 11,
+      "unlucky": 13
+    },
+    {
+      "id": 976,
+      "talent": 0.580203,
+      "capital": 0.625,
+      "rank": 255,
+      "lucky_seized": 12,
+      "lucky_missed": 7,
+      "unlucky": 16
+    },
+    {
+      "id": 913,
+      "talent": 0.679641,
+      "capital": 0.625,
+      "rank": 256,
+      "lucky_seized": 15,
+      "lucky_missed": 6,
+      "unlucky": 19
+    },
+    {
+      "id": 875,
+      "talent": 0.5944,
+      "capital": 0.625,
+      "rank": 257,
+      "lucky_seized": 10,
+      "lucky_missed": 13,
+      "unlucky": 14
+    },
+    {
+      "id": 882,
+      "talent": 0.564216,
+      "capital": 0.625,
+      "rank": 258,
+      "lucky_seized": 12,
+      "lucky_missed": 9,
+      "unlucky": 16
+    },
+    {
+      "id": 675,
+      "talent": 0.517095,
+      "capital": 0.625,
+      "rank": 259,
+      "lucky_seized": 12,
+      "lucky_missed": 12,
+      "unlucky": 16
+    },
+    {
+      "id": 647,
+      "talent": 0.683474,
+      "capital": 0.625,
+      "rank": 260,
+      "lucky_seized": 17,
+      "lucky_missed": 8,
+      "unlucky": 21
+    },
+    {
+      "id": 991,
+      "talent": 0.529051,
+      "capital": 0.625,
+      "rank": 261,
+      "lucky_seized": 10,
+      "lucky_missed": 14,
+      "unlucky": 14
+    },
+    {
+      "id": 884,
+      "talent": 0.636923,
+      "capital": 0.625,
+      "rank": 262,
+      "lucky_seized": 15,
+      "lucky_missed": 9,
+      "unlucky": 19
+    },
+    {
+      "id": 2,
+      "talent": 0.572888,
+      "capital": 0.625,
+      "rank": 263,
+      "lucky_seized": 14,
+      "lucky_missed": 4,
+      "unlucky": 18
+    },
+    {
+      "id": 628,
+      "talent": 0.834377,
+      "capital": 0.625,
+      "rank": 264,
+      "lucky_seized": 13,
+      "lucky_missed": 7,
+      "unlucky": 17
+    },
+    {
+      "id": 154,
+      "talent": 0.563825,
+      "capital": 0.625,
+      "rank": 265,
+      "lucky_seized": 12,
+      "lucky_missed": 10,
+      "unlucky": 16
+    },
+    {
+      "id": 88,
+      "talent": 0.658172,
+      "capital": 0.3125,
+      "rank": 266,
+      "lucky_seized": 16,
+      "lucky_missed": 4,
+      "unlucky": 21
+    },
+    {
+      "id": 13,
+      "talent": 0.494717,
+      "capital": 0.3125,
+      "rank": 267,
+      "lucky_seized": 14,
+      "lucky_missed": 10,
+      "unlucky": 19
+    },
+    {
+      "id": 375,
+      "talent": 0.630344,
+      "capital": 0.3125,
+      "rank": 268,
+      "lucky_seized": 14,
+      "lucky_missed": 8,
+      "unlucky": 19
+    },
+    {
+      "id": 369,
+      "talent": 0.584299,
+      "capital": 0.3125,
+      "rank": 269,
+      "lucky_seized": 15,
+      "lucky_missed": 6,
+      "unlucky": 20
+    },
+    {
+      "id": 8,
+      "talent": 0.608808,
+      "capital": 0.3125,
+      "rank": 270,
+      "lucky_seized": 15,
+      "lucky_missed": 5,
+      "unlucky": 20
+    },
+    {
+      "id": 962,
+      "talent": 0.678444,
+      "capital": 0.3125,
+      "rank": 271,
+      "lucky_seized": 14,
+      "lucky_missed": 8,
+      "unlucky": 19
+    },
+    {
+      "id": 6,
+      "talent": 0.597673,
+      "capital": 0.3125,
+      "rank": 272,
+      "lucky_seized": 14,
+      "lucky_missed": 10,
+      "unlucky": 19
+    },
+    {
+      "id": 354,
+      "talent": 0.661704,
+      "capital": 0.3125,
+      "rank": 273,
+      "lucky_seized": 15,
+      "lucky_missed": 6,
+      "unlucky": 20
+    },
+    {
+      "id": 981,
+      "talent": 0.548035,
+      "capital": 0.3125,
+      "rank": 274,
+      "lucky_seized": 13,
+      "lucky_missed": 11,
+      "unlucky": 18
+    },
+    {
+      "id": 983,
+      "talent": 0.645517,
+      "capital": 0.3125,
+      "rank": 275,
+      "lucky_seized": 13,
+      "lucky_missed": 5,
+      "unlucky": 18
+    },
+    {
+      "id": 341,
+      "talent": 0.627027,
+      "capital": 0.3125,
+      "rank": 276,
+      "lucky_seized": 12,
+      "lucky_missed": 12,
+      "unlucky": 17
+    },
+    {
+      "id": 336,
+      "talent": 0.463153,
+      "capital": 0.3125,
+      "rank": 277,
+      "lucky_seized": 8,
+      "lucky_missed": 15,
+      "unlucky": 13
+    },
+    {
+      "id": 902,
+      "talent": 0.51332,
+      "capital": 0.3125,
+      "rank": 278,
+      "lucky_seized": 10,
+      "lucky_missed": 7,
+      "unlucky": 15
+    },
+    {
+      "id": 888,
+      "talent": 0.580144,
+      "capital": 0.3125,
+      "rank": 279,
+      "lucky_seized": 10,
+      "lucky_missed": 9,
+      "unlucky": 15
+    },
+    {
+      "id": 607,
+      "talent": 0.753934,
+      "capital": 0.3125,
+      "rank": 280,
+      "lucky_seized": 17,
+      "lucky_missed": 4,
+      "unlucky": 22
+    },
+    {
+      "id": 445,
+      "talent": 0.721288,
+      "capital": 0.3125,
+      "rank": 281,
+      "lucky_seized": 12,
+      "lucky_missed": 6,
+      "unlucky": 17
+    },
+    {
+      "id": 68,
+      "talent": 0.662061,
+      "capital": 0.3125,
+      "rank": 282,
+      "lucky_seized": 12,
+      "lucky_missed": 6,
+      "unlucky": 17
+    },
+    {
+      "id": 599,
+      "talent": 0.584408,
+      "capital": 0.3125,
+      "rank": 283,
+      "lucky_seized": 13,
+      "lucky_missed": 10,
+      "unlucky": 18
+    },
+    {
+      "id": 642,
+      "talent": 0.445385,
+      "capital": 0.3125,
+      "rank": 284,
+      "lucky_seized": 11,
+      "lucky_missed": 14,
+      "unlucky": 16
+    },
+    {
+      "id": 580,
+      "talent": 0.563617,
+      "capital": 0.3125,
+      "rank": 285,
+      "lucky_seized": 13,
+      "lucky_missed": 10,
+      "unlucky": 18
+    },
+    {
+      "id": 579,
+      "talent": 0.65509,
+      "capital": 0.3125,
+      "rank": 286,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 18
+    },
+    {
+      "id": 709,
+      "talent": 0.614377,
+      "capital": 0.3125,
+      "rank": 287,
+      "lucky_seized": 9,
+      "lucky_missed": 11,
+      "unlucky": 14
+    },
+    {
+      "id": 57,
+      "talent": 0.508141,
+      "capital": 0.3125,
+      "rank": 288,
+      "lucky_seized": 12,
+      "lucky_missed": 12,
+      "unlucky": 17
+    },
+    {
+      "id": 574,
+      "talent": 0.635372,
+      "capital": 0.3125,
+      "rank": 289,
+      "lucky_seized": 10,
+      "lucky_missed": 9,
+      "unlucky": 15
+    },
+    {
+      "id": 732,
+      "talent": 0.614853,
+      "capital": 0.3125,
+      "rank": 290,
+      "lucky_seized": 19,
+      "lucky_missed": 8,
+      "unlucky": 24
+    },
+    {
+      "id": 738,
+      "talent": 0.590373,
+      "capital": 0.3125,
+      "rank": 291,
+      "lucky_seized": 9,
+      "lucky_missed": 11,
+      "unlucky": 14
+    },
+    {
+      "id": 745,
+      "talent": 0.546722,
+      "capital": 0.3125,
+      "rank": 292,
+      "lucky_seized": 16,
+      "lucky_missed": 6,
+      "unlucky": 21
+    },
+    {
+      "id": 555,
+      "talent": 0.580495,
+      "capital": 0.3125,
+      "rank": 293,
+      "lucky_seized": 12,
+      "lucky_missed": 12,
+      "unlucky": 17
+    },
+    {
+      "id": 748,
+      "talent": 0.651518,
+      "capital": 0.3125,
+      "rank": 294,
+      "lucky_seized": 15,
+      "lucky_missed": 9,
+      "unlucky": 20
+    },
+    {
+      "id": 444,
+      "talent": 0.535377,
+      "capital": 0.3125,
+      "rank": 295,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 18
+    },
+    {
+      "id": 539,
+      "talent": 0.63106,
+      "capital": 0.3125,
+      "rank": 296,
+      "lucky_seized": 14,
+      "lucky_missed": 6,
+      "unlucky": 19
+    },
+    {
+      "id": 772,
+      "talent": 0.680735,
+      "capital": 0.3125,
+      "rank": 297,
+      "lucky_seized": 16,
+      "lucky_missed": 7,
+      "unlucky": 21
+    },
+    {
+      "id": 527,
+      "talent": 0.600965,
+      "capital": 0.3125,
+      "rank": 298,
+      "lucky_seized": 13,
+      "lucky_missed": 8,
+      "unlucky": 18
+    },
+    {
+      "id": 525,
+      "talent": 0.542906,
+      "capital": 0.3125,
+      "rank": 299,
+      "lucky_seized": 13,
+      "lucky_missed": 8,
+      "unlucky": 18
+    },
+    {
+      "id": 518,
+      "talent": 0.662083,
+      "capital": 0.3125,
+      "rank": 300,
+      "lucky_seized": 14,
+      "lucky_missed": 6,
+      "unlucky": 19
+    },
+    {
+      "id": 517,
+      "talent": 0.715272,
+      "capital": 0.3125,
+      "rank": 301,
+      "lucky_seized": 18,
+      "lucky_missed": 4,
+      "unlucky": 23
+    },
+    {
+      "id": 500,
+      "talent": 0.602093,
+      "capital": 0.3125,
+      "rank": 302,
+      "lucky_seized": 15,
+      "lucky_missed": 4,
+      "unlucky": 20
+    },
+    {
+      "id": 832,
+      "talent": 0.692227,
+      "capital": 0.3125,
+      "rank": 303,
+      "lucky_seized": 17,
+      "lucky_missed": 5,
+      "unlucky": 22
+    },
+    {
+      "id": 837,
+      "talent": 0.594324,
+      "capital": 0.3125,
+      "rank": 304,
+      "lucky_seized": 17,
+      "lucky_missed": 11,
+      "unlucky": 22
+    },
+    {
+      "id": 473,
+      "talent": 0.727282,
+      "capital": 0.3125,
+      "rank": 305,
+      "lucky_seized": 18,
+      "lucky_missed": 4,
+      "unlucky": 23
+    },
+    {
+      "id": 468,
+      "talent": 0.667062,
+      "capital": 0.3125,
+      "rank": 306,
+      "lucky_seized": 14,
+      "lucky_missed": 5,
+      "unlucky": 19
+    },
+    {
+      "id": 615,
+      "talent": 0.401698,
+      "capital": 0.3125,
+      "rank": 307,
+      "lucky_seized": 9,
+      "lucky_missed": 13,
+      "unlucky": 14
+    },
+    {
+      "id": 26,
+      "talent": 0.558724,
+      "capital": 0.3125,
+      "rank": 308,
+      "lucky_seized": 15,
+      "lucky_missed": 6,
+      "unlucky": 20
+    },
+    {
+      "id": 84,
+      "talent": 0.63087,
+      "capital": 0.3125,
+      "rank": 309,
+      "lucky_seized": 16,
+      "lucky_missed": 5,
+      "unlucky": 21
+    },
+    {
+      "id": 538,
+      "talent": 0.636346,
+      "capital": 0.3125,
+      "rank": 310,
+      "lucky_seized": 14,
+      "lucky_missed": 6,
+      "unlucky": 19
+    },
+    {
+      "id": 317,
+      "talent": 0.571674,
+      "capital": 0.3125,
+      "rank": 311,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 18
+    },
+    {
+      "id": 129,
+      "talent": 0.591923,
+      "capital": 0.3125,
+      "rank": 312,
+      "lucky_seized": 11,
+      "lucky_missed": 8,
+      "unlucky": 16
+    },
+    {
+      "id": 148,
+      "talent": 0.608576,
+      "capital": 0.3125,
+      "rank": 313,
+      "lucky_seized": 12,
+      "lucky_missed": 8,
+      "unlucky": 17
+    },
+    {
+      "id": 136,
+      "talent": 0.768638,
+      "capital": 0.3125,
+      "rank": 314,
+      "lucky_seized": 12,
+      "lucky_missed": 1,
+      "unlucky": 17
+    },
+    {
+      "id": 299,
+      "talent": 0.623467,
+      "capital": 0.3125,
+      "rank": 315,
+      "lucky_seized": 15,
+      "lucky_missed": 9,
+      "unlucky": 20
+    },
+    {
+      "id": 209,
+      "talent": 0.74849,
+      "capital": 0.3125,
+      "rank": 316,
+      "lucky_seized": 17,
+      "lucky_missed": 8,
+      "unlucky": 22
+    },
+    {
+      "id": 252,
+      "talent": 0.577128,
+      "capital": 0.3125,
+      "rank": 317,
+      "lucky_seized": 17,
+      "lucky_missed": 7,
+      "unlucky": 22
+    },
+    {
+      "id": 272,
+      "talent": 0.536233,
+      "capital": 0.3125,
+      "rank": 318,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 18
+    },
+    {
+      "id": 105,
+      "talent": 0.493116,
+      "capital": 0.3125,
+      "rank": 319,
+      "lucky_seized": 9,
+      "lucky_missed": 14,
+      "unlucky": 14
+    },
+    {
+      "id": 311,
+      "talent": 0.647134,
+      "capital": 0.3125,
+      "rank": 320,
+      "lucky_seized": 15,
+      "lucky_missed": 7,
+      "unlucky": 20
+    },
+    {
+      "id": 222,
+      "talent": 0.605547,
+      "capital": 0.3125,
+      "rank": 321,
+      "lucky_seized": 11,
+      "lucky_missed": 11,
+      "unlucky": 16
+    },
+    {
+      "id": 305,
+      "talent": 0.608035,
+      "capital": 0.3125,
+      "rank": 322,
+      "lucky_seized": 15,
+      "lucky_missed": 10,
+      "unlucky": 20
+    },
+    {
+      "id": 127,
+      "talent": 0.551091,
+      "capital": 0.3125,
+      "rank": 323,
+      "lucky_seized": 11,
+      "lucky_missed": 9,
+      "unlucky": 16
+    },
+    {
+      "id": 106,
+      "talent": 0.716274,
+      "capital": 0.3125,
+      "rank": 324,
+      "lucky_seized": 15,
+      "lucky_missed": 6,
+      "unlucky": 20
+    },
+    {
+      "id": 524,
+      "talent": 0.647454,
+      "capital": 0.15625,
+      "rank": 325,
+      "lucky_seized": 14,
+      "lucky_missed": 7,
+      "unlucky": 20
+    },
+    {
+      "id": 533,
+      "talent": 0.696964,
+      "capital": 0.15625,
+      "rank": 326,
+      "lucky_seized": 11,
+      "lucky_missed": 6,
+      "unlucky": 17
+    },
+    {
+      "id": 810,
+      "talent": 0.530547,
+      "capital": 0.15625,
+      "rank": 327,
+      "lucky_seized": 12,
+      "lucky_missed": 11,
+      "unlucky": 18
+    },
+    {
+      "id": 807,
+      "talent": 0.602138,
+      "capital": 0.15625,
+      "rank": 328,
+      "lucky_seized": 11,
+      "lucky_missed": 10,
+      "unlucky": 17
+    },
+    {
+      "id": 496,
+      "talent": 0.618649,
+      "capital": 0.15625,
+      "rank": 329,
+      "lucky_seized": 18,
+      "lucky_missed": 3,
+      "unlucky": 24
+    },
+    {
+      "id": 377,
+      "talent": 0.641905,
+      "capital": 0.15625,
+      "rank": 330,
+      "lucky_seized": 18,
+      "lucky_missed": 7,
+      "unlucky": 24
+    },
+    {
+      "id": 195,
+      "talent": 0.546279,
+      "capital": 0.15625,
+      "rank": 331,
+      "lucky_seized": 13,
+      "lucky_missed": 10,
+      "unlucky": 19
+    },
+    {
+      "id": 553,
+      "talent": 0.629167,
+      "capital": 0.15625,
+      "rank": 332,
+      "lucky_seized": 14,
+      "lucky_missed": 10,
+      "unlucky": 20
+    },
+    {
+      "id": 575,
+      "talent": 0.682663,
+      "capital": 0.15625,
+      "rank": 333,
+      "lucky_seized": 15,
+      "lucky_missed": 5,
+      "unlucky": 21
+    },
+    {
+      "id": 367,
+      "talent": 0.557775,
+      "capital": 0.15625,
+      "rank": 334,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 19
+    },
+    {
+      "id": 366,
+      "talent": 0.617069,
+      "capital": 0.15625,
+      "rank": 335,
+      "lucky_seized": 15,
+      "lucky_missed": 8,
+      "unlucky": 21
+    },
+    {
+      "id": 767,
+      "talent": 0.561396,
+      "capital": 0.15625,
+      "rank": 336,
+      "lucky_seized": 17,
+      "lucky_missed": 10,
+      "unlucky": 23
+    },
+    {
+      "id": 100,
+      "talent": 0.668129,
+      "capital": 0.15625,
+      "rank": 337,
+      "lucky_seized": 15,
+      "lucky_missed": 11,
+      "unlucky": 21
+    },
+    {
+      "id": 545,
+      "talent": 0.514491,
+      "capital": 0.15625,
+      "rank": 338,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 19
+    },
+    {
+      "id": 821,
+      "talent": 0.528323,
+      "capital": 0.15625,
+      "rank": 339,
+      "lucky_seized": 10,
+      "lucky_missed": 6,
+      "unlucky": 16
+    },
+    {
+      "id": 682,
+      "talent": 0.851274,
+      "capital": 0.15625,
+      "rank": 340,
+      "lucky_seized": 11,
+      "lucky_missed": 4,
+      "unlucky": 17
+    },
+    {
+      "id": 830,
+      "talent": 0.612301,
+      "capital": 0.15625,
+      "rank": 341,
+      "lucky_seized": 12,
+      "lucky_missed": 7,
+      "unlucky": 18
+    },
+    {
+      "id": 898,
+      "talent": 0.643703,
+      "capital": 0.15625,
+      "rank": 342,
+      "lucky_seized": 9,
+      "lucky_missed": 6,
+      "unlucky": 15
+    },
+    {
+      "id": 441,
+      "talent": 0.739094,
+      "capital": 0.15625,
+      "rank": 343,
+      "lucky_seized": 17,
+      "lucky_missed": 4,
+      "unlucky": 23
+    },
+    {
+      "id": 881,
+      "talent": 0.492732,
+      "capital": 0.15625,
+      "rank": 344,
+      "lucky_seized": 12,
+      "lucky_missed": 11,
+      "unlucky": 18
+    },
+    {
+      "id": 177,
+      "talent": 0.538292,
+      "capital": 0.15625,
+      "rank": 345,
+      "lucky_seized": 12,
+      "lucky_missed": 10,
+      "unlucky": 18
+    },
+    {
+      "id": 104,
+      "talent": 0.642782,
+      "capital": 0.15625,
+      "rank": 346,
+      "lucky_seized": 13,
+      "lucky_missed": 4,
+      "unlucky": 19
+    },
+    {
+      "id": 278,
+      "talent": 0.531848,
+      "capital": 0.15625,
+      "rank": 347,
+      "lucky_seized": 7,
+      "lucky_missed": 16,
+      "unlucky": 13
+    },
+    {
+      "id": 456,
+      "talent": 0.629891,
+      "capital": 0.15625,
+      "rank": 348,
+      "lucky_seized": 18,
+      "lucky_missed": 7,
+      "unlucky": 24
+    },
+    {
+      "id": 458,
+      "talent": 0.714642,
+      "capital": 0.15625,
+      "rank": 349,
+      "lucky_seized": 16,
+      "lucky_missed": 1,
+      "unlucky": 22
+    },
+    {
+      "id": 32,
+      "talent": 0.556341,
+      "capital": 0.15625,
+      "rank": 350,
+      "lucky_seized": 12,
+      "lucky_missed": 7,
+      "unlucky": 18
+    },
+    {
+      "id": 471,
+      "talent": 0.531996,
+      "capital": 0.15625,
+      "rank": 351,
+      "lucky_seized": 12,
+      "lucky_missed": 14,
+      "unlucky": 18
+    },
+    {
+      "id": 412,
+      "talent": 0.655492,
+      "capital": 0.15625,
+      "rank": 352,
+      "lucky_seized": 12,
+      "lucky_missed": 10,
+      "unlucky": 18
+    },
+    {
+      "id": 168,
+      "talent": 0.527542,
+      "capital": 0.15625,
+      "rank": 353,
+      "lucky_seized": 11,
+      "lucky_missed": 14,
+      "unlucky": 17
+    },
+    {
+      "id": 862,
+      "talent": 0.676773,
+      "capital": 0.15625,
+      "rank": 354,
+      "lucky_seized": 14,
+      "lucky_missed": 3,
+      "unlucky": 20
+    },
+    {
+      "id": 484,
+      "talent": 0.538914,
+      "capital": 0.15625,
+      "rank": 355,
+      "lucky_seized": 12,
+      "lucky_missed": 11,
+      "unlucky": 18
+    },
+    {
+      "id": 289,
+      "talent": 0.578753,
+      "capital": 0.15625,
+      "rank": 356,
+      "lucky_seized": 14,
+      "lucky_missed": 7,
+      "unlucky": 20
+    },
+    {
+      "id": 397,
+      "talent": 0.45187,
+      "capital": 0.15625,
+      "rank": 357,
+      "lucky_seized": 9,
+      "lucky_missed": 10,
+      "unlucky": 15
+    },
+    {
+      "id": 501,
+      "talent": 0.627883,
+      "capital": 0.15625,
+      "rank": 358,
+      "lucky_seized": 12,
+      "lucky_missed": 8,
+      "unlucky": 18
+    },
+    {
+      "id": 823,
+      "talent": 0.525901,
+      "capital": 0.15625,
+      "rank": 359,
+      "lucky_seized": 15,
+      "lucky_missed": 6,
+      "unlucky": 21
+    },
+    {
+      "id": 954,
+      "talent": 0.542642,
+      "capital": 0.15625,
+      "rank": 360,
+      "lucky_seized": 15,
+      "lucky_missed": 13,
+      "unlucky": 21
+    },
+    {
+      "id": 573,
+      "talent": 0.682787,
+      "capital": 0.15625,
+      "rank": 361,
+      "lucky_seized": 11,
+      "lucky_missed": 4,
+      "unlucky": 17
+    },
+    {
+      "id": 337,
+      "talent": 0.607413,
+      "capital": 0.15625,
+      "rank": 362,
+      "lucky_seized": 18,
+      "lucky_missed": 4,
+      "unlucky": 24
+    },
+    {
+      "id": 632,
+      "talent": 0.75442,
+      "capital": 0.15625,
+      "rank": 363,
+      "lucky_seized": 17,
+      "lucky_missed": 4,
+      "unlucky": 23
+    },
+    {
+      "id": 637,
+      "talent": 0.715818,
+      "capital": 0.15625,
+      "rank": 364,
+      "lucky_seized": 16,
+      "lucky_missed": 3,
+      "unlucky": 22
+    },
+    {
+      "id": 729,
+      "talent": 0.652809,
+      "capital": 0.15625,
+      "rank": 365,
+      "lucky_seized": 13,
+      "lucky_missed": 7,
+      "unlucky": 19
+    },
+    {
+      "id": 716,
+      "talent": 0.522968,
+      "capital": 0.15625,
+      "rank": 366,
+      "lucky_seized": 16,
+      "lucky_missed": 13,
+      "unlucky": 22
+    },
+    {
+      "id": 117,
+      "talent": 0.51956,
+      "capital": 0.15625,
+      "rank": 367,
+      "lucky_seized": 9,
+      "lucky_missed": 10,
+      "unlucky": 15
+    },
+    {
+      "id": 137,
+      "talent": 0.777178,
+      "capital": 0.15625,
+      "rank": 368,
+      "lucky_seized": 12,
+      "lucky_missed": 6,
+      "unlucky": 18
+    },
+    {
+      "id": 215,
+      "talent": 0.609803,
+      "capital": 0.15625,
+      "rank": 369,
+      "lucky_seized": 12,
+      "lucky_missed": 10,
+      "unlucky": 18
+    },
+    {
+      "id": 733,
+      "talent": 0.503144,
+      "capital": 0.15625,
+      "rank": 370,
+      "lucky_seized": 10,
+      "lucky_missed": 11,
+      "unlucky": 16
+    },
+    {
+      "id": 746,
+      "talent": 0.605879,
+      "capital": 0.15625,
+      "rank": 371,
+      "lucky_seized": 12,
+      "lucky_missed": 10,
+      "unlucky": 18
+    },
+    {
+      "id": 702,
+      "talent": 0.766276,
+      "capital": 0.15625,
+      "rank": 372,
+      "lucky_seized": 11,
+      "lucky_missed": 5,
+      "unlucky": 17
+    },
+    {
+      "id": 700,
+      "talent": 0.6136,
+      "capital": 0.15625,
+      "rank": 373,
+      "lucky_seized": 14,
+      "lucky_missed": 12,
+      "unlucky": 20
+    },
+    {
+      "id": 238,
+      "talent": 0.783018,
+      "capital": 0.15625,
+      "rank": 374,
+      "lucky_seized": 12,
+      "lucky_missed": 3,
+      "unlucky": 18
+    },
+    {
+      "id": 598,
+      "talent": 0.611309,
+      "capital": 0.15625,
+      "rank": 375,
+      "lucky_seized": 12,
+      "lucky_missed": 11,
+      "unlucky": 18
+    },
+    {
+      "id": 73,
+      "talent": 0.630542,
+      "capital": 0.15625,
+      "rank": 376,
+      "lucky_seized": 10,
+      "lucky_missed": 11,
+      "unlucky": 16
+    },
+    {
+      "id": 65,
+      "talent": 0.396438,
+      "capital": 0.15625,
+      "rank": 377,
+      "lucky_seized": 9,
+      "lucky_missed": 11,
+      "unlucky": 15
+    },
+    {
+      "id": 669,
+      "talent": 0.556644,
+      "capital": 0.15625,
+      "rank": 378,
+      "lucky_seized": 14,
+      "lucky_missed": 9,
+      "unlucky": 20
+    },
+    {
+      "id": 219,
+      "talent": 0.45525,
+      "capital": 0.15625,
+      "rank": 379,
+      "lucky_seized": 10,
+      "lucky_missed": 13,
+      "unlucky": 16
+    },
+    {
+      "id": 130,
+      "talent": 0.651261,
+      "capital": 0.15625,
+      "rank": 380,
+      "lucky_seized": 14,
+      "lucky_missed": 5,
+      "unlucky": 20
+    },
+    {
+      "id": 61,
+      "talent": 0.814741,
+      "capital": 0.15625,
+      "rank": 381,
+      "lucky_seized": 16,
+      "lucky_missed": 6,
+      "unlucky": 22
+    },
+    {
+      "id": 592,
+      "talent": 0.670733,
+      "capital": 0.15625,
+      "rank": 382,
+      "lucky_seized": 12,
+      "lucky_missed": 8,
+      "unlucky": 18
+    },
+    {
+      "id": 590,
+      "talent": 0.597196,
+      "capital": 0.15625,
+      "rank": 383,
+      "lucky_seized": 11,
+      "lucky_missed": 9,
+      "unlucky": 17
+    },
+    {
+      "id": 320,
+      "talent": 0.812295,
+      "capital": 0.15625,
+      "rank": 384,
+      "lucky_seized": 14,
+      "lucky_missed": 2,
+      "unlucky": 20
+    },
+    {
+      "id": 960,
+      "talent": 0.599747,
+      "capital": 0.15625,
+      "rank": 385,
+      "lucky_seized": 9,
+      "lucky_missed": 6,
+      "unlucky": 15
+    },
+    {
+      "id": 751,
+      "talent": 0.572412,
+      "capital": 0.15625,
+      "rank": 386,
+      "lucky_seized": 13,
+      "lucky_missed": 7,
+      "unlucky": 19
+    },
+    {
+      "id": 184,
+      "talent": 0.62384,
+      "capital": 0.078125,
+      "rank": 387,
+      "lucky_seized": 11,
+      "lucky_missed": 8,
+      "unlucky": 18
+    },
+    {
+      "id": 855,
+      "talent": 0.478752,
+      "capital": 0.078125,
+      "rank": 388,
+      "lucky_seized": 11,
+      "lucky_missed": 10,
+      "unlucky": 18
+    },
+    {
+      "id": 885,
+      "talent": 0.582232,
+      "capital": 0.078125,
+      "rank": 389,
+      "lucky_seized": 14,
+      "lucky_missed": 10,
+      "unlucky": 21
+    },
+    {
+      "id": 720,
+      "talent": 0.658092,
+      "capital": 0.078125,
+      "rank": 390,
+      "lucky_seized": 11,
+      "lucky_missed": 6,
+      "unlucky": 18
+    },
+    {
+      "id": 864,
+      "talent": 0.643394,
+      "capital": 0.078125,
+      "rank": 391,
+      "lucky_seized": 12,
+      "lucky_missed": 8,
+      "unlucky": 19
+    },
+    {
+      "id": 643,
+      "talent": 0.637235,
+      "capital": 0.078125,
+      "rank": 392,
+      "lucky_seized": 12,
+      "lucky_missed": 5,
+      "unlucky": 19
+    },
+    {
+      "id": 476,
+      "talent": 0.643301,
+      "capital": 0.078125,
+      "rank": 393,
+      "lucky_seized": 16,
+      "lucky_missed": 6,
+      "unlucky": 23
+    },
+    {
+      "id": 221,
+      "talent": 0.595265,
+      "capital": 0.078125,
+      "rank": 394,
+      "lucky_seized": 13,
+      "lucky_missed": 4,
+      "unlucky": 20
+    },
+    {
+      "id": 865,
+      "talent": 0.487627,
+      "capital": 0.078125,
+      "rank": 395,
+      "lucky_seized": 12,
+      "lucky_missed": 7,
+      "unlucky": 19
+    },
+    {
+      "id": 678,
+      "talent": 0.902263,
+      "capital": 0.078125,
+      "rank": 396,
+      "lucky_seized": 15,
+      "lucky_missed": 1,
+      "unlucky": 22
+    },
+    {
+      "id": 652,
+      "talent": 0.507914,
+      "capital": 0.078125,
+      "rank": 397,
+      "lucky_seized": 11,
+      "lucky_missed": 7,
+      "unlucky": 18
+    },
+    {
+      "id": 846,
+      "talent": 0.588658,
+      "capital": 0.078125,
+      "rank": 398,
+      "lucky_seized": 14,
+      "lucky_missed": 4,
+      "unlucky": 21
+    },
+    {
+      "id": 672,
+      "talent": 0.526817,
+      "capital": 0.078125,
+      "rank": 399,
+      "lucky_seized": 12,
+      "lucky_missed": 8,
+      "unlucky": 19
+    },
+    {
+      "id": 477,
+      "talent": 0.635358,
+      "capital": 0.078125,
+      "rank": 400,
+      "lucky_seized": 12,
+      "lucky_missed": 10,
+      "unlucky": 19
+    },
+    {
+      "id": 490,
+      "talent": 0.693386,
+      "capital": 0.078125,
+      "rank": 401,
+      "lucky_seized": 15,
+      "lucky_missed": 2,
+      "unlucky": 22
+    },
+    {
+      "id": 243,
+      "talent": 0.586475,
+      "capital": 0.078125,
+      "rank": 402,
+      "lucky_seized": 16,
+      "lucky_missed": 8,
+      "unlucky": 23
+    },
+    {
+      "id": 266,
+      "talent": 0.624367,
+      "capital": 0.078125,
+      "rank": 403,
+      "lucky_seized": 13,
+      "lucky_missed": 7,
+      "unlucky": 20
+    },
+    {
+      "id": 586,
+      "talent": 0.691952,
+      "capital": 0.078125,
+      "rank": 404,
+      "lucky_seized": 15,
+      "lucky_missed": 9,
+      "unlucky": 22
+    },
+    {
+      "id": 54,
+      "talent": 0.575031,
+      "capital": 0.078125,
+      "rank": 405,
+      "lucky_seized": 12,
+      "lucky_missed": 7,
+      "unlucky": 19
+    },
+    {
+      "id": 594,
+      "talent": 0.479133,
+      "capital": 0.078125,
+      "rank": 406,
+      "lucky_seized": 13,
+      "lucky_missed": 6,
+      "unlucky": 20
+    },
+    {
+      "id": 246,
+      "talent": 0.631674,
+      "capital": 0.078125,
+      "rank": 407,
+      "lucky_seized": 13,
+      "lucky_missed": 3,
+      "unlucky": 20
+    },
+    {
+      "id": 435,
+      "talent": 0.725968,
+      "capital": 0.078125,
+      "rank": 408,
+      "lucky_seized": 14,
+      "lucky_missed": 4,
+      "unlucky": 21
+    },
+    {
+      "id": 248,
+      "talent": 0.603162,
+      "capital": 0.078125,
+      "rank": 409,
+      "lucky_seized": 15,
+      "lucky_missed": 6,
+      "unlucky": 22
+    },
+    {
+      "id": 75,
+      "talent": 0.631342,
+      "capital": 0.078125,
+      "rank": 410,
+      "lucky_seized": 10,
+      "lucky_missed": 7,
+      "unlucky": 17
+    },
+    {
+      "id": 750,
+      "talent": 0.629922,
+      "capital": 0.078125,
+      "rank": 411,
+      "lucky_seized": 14,
+      "lucky_missed": 11,
+      "unlucky": 21
+    },
+    {
+      "id": 794,
+      "talent": 0.564102,
+      "capital": 0.078125,
+      "rank": 412,
+      "lucky_seized": 8,
+      "lucky_missed": 10,
+      "unlucky": 15
+    },
+    {
+      "id": 605,
+      "talent": 0.486428,
+      "capital": 0.078125,
+      "rank": 413,
+      "lucky_seized": 10,
+      "lucky_missed": 15,
+      "unlucky": 17
+    },
+    {
+      "id": 236,
+      "talent": 0.739174,
+      "capital": 0.078125,
+      "rank": 414,
+      "lucky_seized": 13,
+      "lucky_missed": 3,
+      "unlucky": 20
+    },
+    {
+      "id": 225,
+      "talent": 0.466468,
+      "capital": 0.078125,
+      "rank": 415,
+      "lucky_seized": 7,
+      "lucky_missed": 14,
+      "unlucky": 14
+    },
+    {
+      "id": 194,
+      "talent": 0.631419,
+      "capital": 0.078125,
+      "rank": 416,
+      "lucky_seized": 9,
+      "lucky_missed": 7,
+      "unlucky": 16
+    },
+    {
+      "id": 193,
+      "talent": 0.685267,
+      "capital": 0.078125,
+      "rank": 417,
+      "lucky_seized": 10,
+      "lucky_missed": 5,
+      "unlucky": 17
+    },
+    {
+      "id": 818,
+      "talent": 0.670329,
+      "capital": 0.078125,
+      "rank": 418,
+      "lucky_seized": 9,
+      "lucky_missed": 6,
+      "unlucky": 16
+    },
+    {
+      "id": 227,
+      "talent": 0.554883,
+      "capital": 0.078125,
+      "rank": 419,
+      "lucky_seized": 13,
+      "lucky_missed": 11,
+      "unlucky": 20
+    },
+    {
+      "id": 261,
+      "talent": 0.690502,
+      "capital": 0.078125,
+      "rank": 420,
+      "lucky_seized": 14,
+      "lucky_missed": 9,
+      "unlucky": 21
+    },
+    {
+      "id": 516,
+      "talent": 0.719373,
+      "capital": 0.078125,
+      "rank": 421,
+      "lucky_seized": 15,
+      "lucky_missed": 4,
+      "unlucky": 22
+    },
+    {
+      "id": 515,
+      "talent": 0.715025,
+      "capital": 0.078125,
+      "rank": 422,
+      "lucky_seized": 12,
+      "lucky_missed": 8,
+      "unlucky": 19
+    },
+    {
+      "id": 727,
+      "talent": 0.409644,
+      "capital": 0.078125,
+      "rank": 423,
+      "lucky_seized": 7,
+      "lucky_missed": 11,
+      "unlucky": 14
+    },
+    {
+      "id": 203,
+      "talent": 0.467361,
+      "capital": 0.078125,
+      "rank": 424,
+      "lucky_seized": 13,
+      "lucky_missed": 8,
+      "unlucky": 20
+    },
+    {
+      "id": 263,
+      "talent": 0.757811,
+      "capital": 0.078125,
+      "rank": 425,
+      "lucky_seized": 11,
+      "lucky_missed": 6,
+      "unlucky": 18
+    },
+    {
+      "id": 724,
+      "talent": 0.554332,
+      "capital": 0.078125,
+      "rank": 426,
+      "lucky_seized": 9,
+      "lucky_missed": 7,
+      "unlucky": 16
+    },
+    {
+      "id": 841,
+      "talent": 0.801046,
+      "capital": 0.078125,
+      "rank": 427,
+      "lucky_seized": 15,
+      "lucky_missed": 5,
+      "unlucky": 22
+    },
+    {
+      "id": 812,
+      "talent": 0.546748,
+      "capital": 0.078125,
+      "rank": 428,
+      "lucky_seized": 10,
+      "lucky_missed": 11,
+      "unlucky": 17
+    },
+    {
+      "id": 894,
+      "talent": 0.691089,
+      "capital": 0.078125,
+      "rank": 429,
+      "lucky_seized": 15,
+      "lucky_missed": 7,
+      "unlucky": 22
+    },
+    {
+      "id": 681,
+      "talent": 0.590128,
+      "capital": 0.078125,
+      "rank": 430,
+      "lucky_seized": 18,
+      "lucky_missed": 7,
+      "unlucky": 25
+    },
+    {
+      "id": 937,
+      "talent": 0.617777,
+      "capital": 0.078125,
+      "rank": 431,
+      "lucky_seized": 16,
+      "lucky_missed": 9,
+      "unlucky": 23
+    },
+    {
+      "id": 5,
+      "talent": 0.457053,
+      "capital": 0.078125,
+      "rank": 432,
+      "lucky_seized": 14,
+      "lucky_missed": 13,
+      "unlucky": 21
+    },
+    {
+      "id": 296,
+      "talent": 0.819878,
+      "capital": 0.078125,
+      "rank": 433,
+      "lucky_seized": 14,
+      "lucky_missed": 3,
+      "unlucky": 21
+    },
+    {
+      "id": 361,
+      "talent": 0.693157,
+      "capital": 0.078125,
+      "rank": 434,
+      "lucky_seized": 15,
+      "lucky_missed": 8,
+      "unlucky": 22
+    },
+    {
+      "id": 418,
+      "talent": 0.683433,
+      "capital": 0.078125,
+      "rank": 435,
+      "lucky_seized": 16,
+      "lucky_missed": 5,
+      "unlucky": 23
+    },
+    {
+      "id": 332,
+      "talent": 0.623633,
+      "capital": 0.078125,
+      "rank": 436,
+      "lucky_seized": 16,
+      "lucky_missed": 9,
+      "unlucky": 23
+    },
+    {
+      "id": 333,
+      "talent": 0.670811,
+      "capital": 0.078125,
+      "rank": 437,
+      "lucky_seized": 16,
+      "lucky_missed": 10,
+      "unlucky": 23
+    },
+    {
+      "id": 381,
+      "talent": 0.583734,
+      "capital": 0.078125,
+      "rank": 438,
+      "lucky_seized": 12,
+      "lucky_missed": 13,
+      "unlucky": 19
+    },
+    {
+      "id": 287,
+      "talent": 0.637568,
+      "capital": 0.078125,
+      "rank": 439,
+      "lucky_seized": 12,
+      "lucky_missed": 8,
+      "unlucky": 19
+    },
+    {
+      "id": 151,
+      "talent": 0.514234,
+      "capital": 0.078125,
+      "rank": 440,
+      "lucky_seized": 13,
+      "lucky_missed": 7,
+      "unlucky": 20
+    },
+    {
+      "id": 413,
+      "talent": 0.500255,
+      "capital": 0.078125,
+      "rank": 441,
+      "lucky_seized": 13,
+      "lucky_missed": 10,
+      "unlucky": 20
+    },
+    {
+      "id": 359,
+      "talent": 0.783202,
+      "capital": 0.078125,
+      "rank": 442,
+      "lucky_seized": 18,
+      "lucky_missed": 2,
+      "unlucky": 25
+    },
+    {
+      "id": 959,
+      "talent": 0.539556,
+      "capital": 0.078125,
+      "rank": 443,
+      "lucky_seized": 14,
+      "lucky_missed": 9,
+      "unlucky": 21
+    },
+    {
+      "id": 407,
+      "talent": 0.648236,
+      "capital": 0.078125,
+      "rank": 444,
+      "lucky_seized": 11,
+      "lucky_missed": 8,
+      "unlucky": 18
+    },
+    {
+      "id": 138,
+      "talent": 0.727561,
+      "capital": 0.078125,
+      "rank": 445,
+      "lucky_seized": 16,
+      "lucky_missed": 7,
+      "unlucky": 23
+    },
+    {
+      "id": 404,
+      "talent": 0.638196,
+      "capital": 0.078125,
+      "rank": 446,
+      "lucky_seized": 14,
+      "lucky_missed": 4,
+      "unlucky": 21
+    },
+    {
+      "id": 390,
+      "talent": 0.715618,
+      "capital": 0.078125,
+      "rank": 447,
+      "lucky_seized": 14,
+      "lucky_missed": 9,
+      "unlucky": 21
+    },
+    {
+      "id": 345,
+      "talent": 0.558763,
+      "capital": 0.078125,
+      "rank": 448,
+      "lucky_seized": 12,
+      "lucky_missed": 12,
+      "unlucky": 19
+    },
+    {
+      "id": 918,
+      "talent": 0.691542,
+      "capital": 0.078125,
+      "rank": 449,
+      "lucky_seized": 12,
+      "lucky_missed": 8,
+      "unlucky": 19
+    },
+    {
+      "id": 350,
+      "talent": 0.5625,
+      "capital": 0.078125,
+      "rank": 450,
+      "lucky_seized": 13,
+      "lucky_missed": 11,
+      "unlucky": 20
+    },
+    {
+      "id": 146,
+      "talent": 0.364229,
+      "capital": 0.078125,
+      "rank": 451,
+      "lucky_seized": 7,
+      "lucky_missed": 21,
+      "unlucky": 14
+    },
+    {
+      "id": 986,
+      "talent": 0.685454,
+      "capital": 0.078125,
+      "rank": 452,
+      "lucky_seized": 14,
+      "lucky_missed": 4,
+      "unlucky": 21
+    },
+    {
+      "id": 308,
+      "talent": 0.596971,
+      "capital": 0.078125,
+      "rank": 453,
+      "lucky_seized": 15,
+      "lucky_missed": 8,
+      "unlucky": 22
+    },
+    {
+      "id": 97,
+      "talent": 0.513356,
+      "capital": 0.078125,
+      "rank": 454,
+      "lucky_seized": 13,
+      "lucky_missed": 7,
+      "unlucky": 20
+    },
+    {
+      "id": 987,
+      "talent": 0.5369,
+      "capital": 0.078125,
+      "rank": 455,
+      "lucky_seized": 12,
+      "lucky_missed": 14,
+      "unlucky": 19
+    },
+    {
+      "id": 897,
+      "talent": 0.698577,
+      "capital": 0.078125,
+      "rank": 456,
+      "lucky_seized": 11,
+      "lucky_missed": 9,
+      "unlucky": 18
+    },
+    {
+      "id": 170,
+      "talent": 0.678786,
+      "capital": 0.078125,
+      "rank": 457,
+      "lucky_seized": 13,
+      "lucky_missed": 5,
+      "unlucky": 20
+    },
+    {
+      "id": 422,
+      "talent": 0.758723,
+      "capital": 0.078125,
+      "rank": 458,
+      "lucky_seized": 13,
+      "lucky_missed": 8,
+      "unlucky": 20
+    },
+    {
+      "id": 314,
+      "talent": 0.506549,
+      "capital": 0.078125,
+      "rank": 459,
+      "lucky_seized": 13,
+      "lucky_missed": 6,
+      "unlucky": 20
+    },
+    {
+      "id": 145,
+      "talent": 0.625125,
+      "capital": 0.078125,
+      "rank": 460,
+      "lucky_seized": 11,
+      "lucky_missed": 7,
+      "unlucky": 18
+    },
+    {
+      "id": 943,
+      "talent": 0.74139,
+      "capital": 0.0390625,
+      "rank": 461,
+      "lucky_seized": 14,
+      "lucky_missed": 6,
+      "unlucky": 22
+    },
+    {
+      "id": 963,
+      "talent": 0.509057,
+      "capital": 0.0390625,
+      "rank": 462,
+      "lucky_seized": 9,
+      "lucky_missed": 5,
+      "unlucky": 17
+    },
+    {
+      "id": 292,
+      "talent": 0.554253,
+      "capital": 0.0390625,
+      "rank": 463,
+      "lucky_seized": 8,
+      "lucky_missed": 10,
+      "unlucky": 16
+    },
+    {
+      "id": 11,
+      "talent": 0.564203,
+      "capital": 0.0390625,
+      "rank": 464,
+      "lucky_seized": 12,
+      "lucky_missed": 5,
+      "unlucky": 20
+    },
+    {
+      "id": 239,
+      "talent": 0.765818,
+      "capital": 0.0390625,
+      "rank": 465,
+      "lucky_seized": 10,
+      "lucky_missed": 9,
+      "unlucky": 18
+    },
+    {
+      "id": 781,
+      "talent": 0.556057,
+      "capital": 0.0390625,
+      "rank": 466,
+      "lucky_seized": 12,
+      "lucky_missed": 6,
+      "unlucky": 20
+    },
+    {
+      "id": 593,
+      "talent": 0.451783,
+      "capital": 0.0390625,
+      "rank": 467,
+      "lucky_seized": 10,
+      "lucky_missed": 16,
+      "unlucky": 18
+    },
+    {
+      "id": 389,
+      "talent": 0.480614,
+      "capital": 0.0390625,
+      "rank": 468,
+      "lucky_seized": 12,
+      "lucky_missed": 10,
+      "unlucky": 20
+    },
+    {
+      "id": 770,
+      "talent": 0.555473,
+      "capital": 0.0390625,
+      "rank": 469,
+      "lucky_seized": 11,
+      "lucky_missed": 5,
+      "unlucky": 19
+    },
+    {
+      "id": 596,
+      "talent": 0.559347,
+      "capital": 0.0390625,
+      "rank": 470,
+      "lucky_seized": 13,
+      "lucky_missed": 10,
+      "unlucky": 21
+    },
+    {
+      "id": 352,
+      "talent": 0.655247,
+      "capital": 0.0390625,
+      "rank": 471,
+      "lucky_seized": 11,
+      "lucky_missed": 7,
+      "unlucky": 19
+    },
+    {
+      "id": 63,
+      "talent": 0.596689,
+      "capital": 0.0390625,
+      "rank": 472,
+      "lucky_seized": 9,
+      "lucky_missed": 15,
+      "unlucky": 17
+    },
+    {
+      "id": 601,
+      "talent": 0.564783,
+      "capital": 0.0390625,
+      "rank": 473,
+      "lucky_seized": 12,
+      "lucky_missed": 9,
+      "unlucky": 20
+    },
+    {
+      "id": 602,
+      "talent": 0.697246,
+      "capital": 0.0390625,
+      "rank": 474,
+      "lucky_seized": 18,
+      "lucky_missed": 4,
+      "unlucky": 26
+    },
+    {
+      "id": 603,
+      "talent": 0.679406,
+      "capital": 0.0390625,
+      "rank": 475,
+      "lucky_seized": 11,
+      "lucky_missed": 10,
+      "unlucky": 19
+    },
+    {
+      "id": 827,
+      "talent": 0.567969,
+      "capital": 0.0390625,
+      "rank": 476,
+      "lucky_seized": 11,
+      "lucky_missed": 5,
+      "unlucky": 19
+    },
+    {
+      "id": 828,
+      "talent": 0.479668,
+      "capital": 0.0390625,
+      "rank": 477,
+      "lucky_seized": 12,
+      "lucky_missed": 9,
+      "unlucky": 20
+    },
+    {
+      "id": 559,
+      "talent": 0.450426,
+      "capital": 0.0390625,
+      "rank": 478,
+      "lucky_seized": 9,
+      "lucky_missed": 10,
+      "unlucky": 17
+    },
+    {
+      "id": 192,
+      "talent": 0.602611,
+      "capital": 0.0390625,
+      "rank": 479,
+      "lucky_seized": 17,
+      "lucky_missed": 6,
+      "unlucky": 25
+    },
+    {
+      "id": 758,
+      "talent": 0.577093,
+      "capital": 0.0390625,
+      "rank": 480,
+      "lucky_seized": 14,
+      "lucky_missed": 8,
+      "unlucky": 22
+    },
+    {
+      "id": 558,
+      "talent": 0.606046,
+      "capital": 0.0390625,
+      "rank": 481,
+      "lucky_seized": 10,
+      "lucky_missed": 5,
+      "unlucky": 18
+    },
+    {
+      "id": 42,
+      "talent": 0.589246,
+      "capital": 0.0390625,
+      "rank": 482,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 21
+    },
+    {
+      "id": 552,
+      "talent": 0.528047,
+      "capital": 0.0390625,
+      "rank": 483,
+      "lucky_seized": 14,
+      "lucky_missed": 9,
+      "unlucky": 22
+    },
+    {
+      "id": 995,
+      "talent": 0.476356,
+      "capital": 0.0390625,
+      "rank": 484,
+      "lucky_seized": 9,
+      "lucky_missed": 6,
+      "unlucky": 17
+    },
+    {
+      "id": 373,
+      "talent": 0.514827,
+      "capital": 0.0390625,
+      "rank": 485,
+      "lucky_seized": 10,
+      "lucky_missed": 12,
+      "unlucky": 18
+    },
+    {
+      "id": 41,
+      "talent": 0.685042,
+      "capital": 0.0390625,
+      "rank": 486,
+      "lucky_seized": 11,
+      "lucky_missed": 7,
+      "unlucky": 19
+    },
+    {
+      "id": 581,
+      "talent": 0.529748,
+      "capital": 0.0390625,
+      "rank": 487,
+      "lucky_seized": 8,
+      "lucky_missed": 11,
+      "unlucky": 16
+    },
+    {
+      "id": 141,
+      "talent": 0.61054,
+      "capital": 0.0390625,
+      "rank": 488,
+      "lucky_seized": 8,
+      "lucky_missed": 13,
+      "unlucky": 16
+    },
+    {
+      "id": 688,
+      "talent": 0.660605,
+      "capital": 0.0390625,
+      "rank": 489,
+      "lucky_seized": 16,
+      "lucky_missed": 3,
+      "unlucky": 24
+    },
+    {
+      "id": 293,
+      "talent": 0.549268,
+      "capital": 0.0390625,
+      "rank": 490,
+      "lucky_seized": 11,
+      "lucky_missed": 15,
+      "unlucky": 19
+    },
+    {
+      "id": 604,
+      "talent": 0.595139,
+      "capital": 0.0390625,
+      "rank": 491,
+      "lucky_seized": 11,
+      "lucky_missed": 4,
+      "unlucky": 19
+    },
+    {
+      "id": 149,
+      "talent": 0.530542,
+      "capital": 0.0390625,
+      "rank": 492,
+      "lucky_seized": 9,
+      "lucky_missed": 9,
+      "unlucky": 17
+    },
+    {
+      "id": 16,
+      "talent": 0.59941,
+      "capital": 0.0390625,
+      "rank": 493,
+      "lucky_seized": 15,
+      "lucky_missed": 2,
+      "unlucky": 23
+    },
+    {
+      "id": 813,
+      "talent": 0.424067,
+      "capital": 0.0390625,
+      "rank": 494,
+      "lucky_seized": 11,
+      "lucky_missed": 9,
+      "unlucky": 19
+    },
+    {
+      "id": 815,
+      "talent": 0.576158,
+      "capital": 0.0390625,
+      "rank": 495,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 21
+    },
+    {
+      "id": 816,
+      "talent": 0.848467,
+      "capital": 0.0390625,
+      "rank": 496,
+      "lucky_seized": 14,
+      "lucky_missed": 2,
+      "unlucky": 22
+    },
+    {
+      "id": 48,
+      "talent": 0.753991,
+      "capital": 0.0390625,
+      "rank": 497,
+      "lucky_seized": 10,
+      "lucky_missed": 5,
+      "unlucky": 18
+    },
+    {
+      "id": 108,
+      "talent": 0.604653,
+      "capital": 0.0390625,
+      "rank": 498,
+      "lucky_seized": 11,
+      "lucky_missed": 9,
+      "unlucky": 19
+    },
+    {
+      "id": 671,
+      "talent": 0.615371,
+      "capital": 0.0390625,
+      "rank": 499,
+      "lucky_seized": 9,
+      "lucky_missed": 6,
+      "unlucky": 17
+    },
+    {
+      "id": 584,
+      "talent": 0.706614,
+      "capital": 0.0390625,
+      "rank": 500,
+      "lucky_seized": 13,
+      "lucky_missed": 5,
+      "unlucky": 21
+    },
+    {
+      "id": 747,
+      "talent": 0.507826,
+      "capital": 0.0390625,
+      "rank": 501,
+      "lucky_seized": 12,
+      "lucky_missed": 10,
+      "unlucky": 20
+    },
+    {
+      "id": 775,
+      "talent": 0.733071,
+      "capital": 0.0390625,
+      "rank": 502,
+      "lucky_seized": 12,
+      "lucky_missed": 5,
+      "unlucky": 20
+    },
+    {
+      "id": 162,
+      "talent": 0.466873,
+      "capital": 0.0390625,
+      "rank": 503,
+      "lucky_seized": 9,
+      "lucky_missed": 7,
+      "unlucky": 17
+    },
+    {
+      "id": 469,
+      "talent": 0.506627,
+      "capital": 0.0390625,
+      "rank": 504,
+      "lucky_seized": 13,
+      "lucky_missed": 11,
+      "unlucky": 21
+    },
+    {
+      "id": 975,
+      "talent": 0.790315,
+      "capital": 0.0390625,
+      "rank": 505,
+      "lucky_seized": 17,
+      "lucky_missed": 4,
+      "unlucky": 25
+    },
+    {
+      "id": 673,
+      "talent": 0.647926,
+      "capital": 0.0390625,
+      "rank": 506,
+      "lucky_seized": 11,
+      "lucky_missed": 6,
+      "unlucky": 19
+    },
+    {
+      "id": 631,
+      "talent": 0.4826,
+      "capital": 0.0390625,
+      "rank": 507,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 21
+    },
+    {
+      "id": 417,
+      "talent": 0.511737,
+      "capital": 0.0390625,
+      "rank": 508,
+      "lucky_seized": 10,
+      "lucky_missed": 8,
+      "unlucky": 18
+    },
+    {
+      "id": 24,
+      "talent": 0.683815,
+      "capital": 0.0390625,
+      "rank": 509,
+      "lucky_seized": 13,
+      "lucky_missed": 7,
+      "unlucky": 21
+    },
+    {
+      "id": 96,
+      "talent": 0.583812,
+      "capital": 0.0390625,
+      "rank": 510,
+      "lucky_seized": 16,
+      "lucky_missed": 6,
+      "unlucky": 24
+    },
+    {
+      "id": 285,
+      "talent": 0.684568,
+      "capital": 0.0390625,
+      "rank": 511,
+      "lucky_seized": 10,
+      "lucky_missed": 7,
+      "unlucky": 18
+    },
+    {
+      "id": 277,
+      "talent": 0.556575,
+      "capital": 0.0390625,
+      "rank": 512,
+      "lucky_seized": 13,
+      "lucky_missed": 14,
+      "unlucky": 21
+    },
+    {
+      "id": 453,
+      "talent": 0.582462,
+      "capital": 0.0390625,
+      "rank": 513,
+      "lucky_seized": 12,
+      "lucky_missed": 4,
+      "unlucky": 20
+    },
+    {
+      "id": 339,
+      "talent": 0.675169,
+      "capital": 0.0390625,
+      "rank": 514,
+      "lucky_seized": 10,
+      "lucky_missed": 13,
+      "unlucky": 18
+    },
+    {
+      "id": 644,
+      "talent": 0.592736,
+      "capital": 0.0390625,
+      "rank": 515,
+      "lucky_seized": 11,
+      "lucky_missed": 5,
+      "unlucky": 19
+    },
+    {
+      "id": 711,
+      "talent": 0.618219,
+      "capital": 0.0390625,
+      "rank": 516,
+      "lucky_seized": 14,
+      "lucky_missed": 7,
+      "unlucky": 22
+    },
+    {
+      "id": 646,
+      "talent": 0.648474,
+      "capital": 0.0390625,
+      "rank": 517,
+      "lucky_seized": 10,
+      "lucky_missed": 9,
+      "unlucky": 18
+    },
+    {
+      "id": 653,
+      "talent": 0.457286,
+      "capital": 0.0390625,
+      "rank": 518,
+      "lucky_seized": 11,
+      "lucky_missed": 13,
+      "unlucky": 19
+    },
+    {
+      "id": 900,
+      "talent": 0.507689,
+      "capital": 0.0390625,
+      "rank": 519,
+      "lucky_seized": 13,
+      "lucky_missed": 5,
+      "unlucky": 21
+    },
+    {
+      "id": 437,
+      "talent": 0.592014,
+      "capital": 0.0390625,
+      "rank": 520,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 21
+    },
+    {
+      "id": 886,
+      "talent": 0.760388,
+      "capital": 0.0390625,
+      "rank": 521,
+      "lucky_seized": 12,
+      "lucky_missed": 4,
+      "unlucky": 20
+    },
+    {
+      "id": 427,
+      "talent": 0.576995,
+      "capital": 0.0390625,
+      "rank": 522,
+      "lucky_seized": 12,
+      "lucky_missed": 12,
+      "unlucky": 20
+    },
+    {
+      "id": 315,
+      "talent": 0.588912,
+      "capital": 0.0390625,
+      "rank": 523,
+      "lucky_seized": 15,
+      "lucky_missed": 5,
+      "unlucky": 23
+    },
+    {
+      "id": 432,
+      "talent": 0.669917,
+      "capital": 0.0390625,
+      "rank": 524,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 21
+    },
+    {
+      "id": 3,
+      "talent": 0.673018,
+      "capital": 0.0390625,
+      "rank": 525,
+      "lucky_seized": 11,
+      "lucky_missed": 3,
+      "unlucky": 19
+    },
+    {
+      "id": 86,
+      "talent": 0.676888,
+      "capital": 0.0390625,
+      "rank": 526,
+      "lucky_seized": 14,
+      "lucky_missed": 8,
+      "unlucky": 22
+    },
+    {
+      "id": 472,
+      "talent": 0.678162,
+      "capital": 0.0390625,
+      "rank": 527,
+      "lucky_seized": 13,
+      "lucky_missed": 6,
+      "unlucky": 21
+    },
+    {
+      "id": 30,
+      "talent": 0.489898,
+      "capital": 0.0390625,
+      "rank": 528,
+      "lucky_seized": 9,
+      "lucky_missed": 8,
+      "unlucky": 17
+    },
+    {
+      "id": 19,
+      "talent": 0.679393,
+      "capital": 0.0390625,
+      "rank": 529,
+      "lucky_seized": 15,
+      "lucky_missed": 9,
+      "unlucky": 23
+    },
+    {
+      "id": 399,
+      "talent": 0.387321,
+      "capital": 0.0390625,
+      "rank": 530,
+      "lucky_seized": 6,
+      "lucky_missed": 14,
+      "unlucky": 14
+    },
+    {
+      "id": 968,
+      "talent": 0.457874,
+      "capital": 0.0390625,
+      "rank": 531,
+      "lucky_seized": 10,
+      "lucky_missed": 11,
+      "unlucky": 18
+    },
+    {
+      "id": 288,
+      "talent": 0.532284,
+      "capital": 0.0390625,
+      "rank": 532,
+      "lucky_seized": 13,
+      "lucky_missed": 7,
+      "unlucky": 21
+    },
+    {
+      "id": 740,
+      "talent": 0.408068,
+      "capital": 0.0390625,
+      "rank": 533,
+      "lucky_seized": 10,
+      "lucky_missed": 8,
+      "unlucky": 18
+    },
+    {
+      "id": 611,
+      "talent": 0.531194,
+      "capital": 0.0390625,
+      "rank": 534,
+      "lucky_seized": 11,
+      "lucky_missed": 10,
+      "unlucky": 19
+    },
+    {
+      "id": 208,
+      "talent": 0.540266,
+      "capital": 0.0390625,
+      "rank": 535,
+      "lucky_seized": 10,
+      "lucky_missed": 11,
+      "unlucky": 18
+    },
+    {
+      "id": 396,
+      "talent": 0.625577,
+      "capital": 0.0390625,
+      "rank": 536,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 21
+    },
+    {
+      "id": 839,
+      "talent": 0.576447,
+      "capital": 0.0390625,
+      "rank": 537,
+      "lucky_seized": 13,
+      "lucky_missed": 5,
+      "unlucky": 21
+    },
+    {
+      "id": 664,
+      "talent": 0.596434,
+      "capital": 0.0390625,
+      "rank": 538,
+      "lucky_seized": 14,
+      "lucky_missed": 12,
+      "unlucky": 22
+    },
+    {
+      "id": 199,
+      "talent": 0.64967,
+      "capital": 0.0390625,
+      "rank": 539,
+      "lucky_seized": 13,
+      "lucky_missed": 7,
+      "unlucky": 21
+    },
+    {
+      "id": 228,
+      "talent": 0.61217,
+      "capital": 0.0390625,
+      "rank": 540,
+      "lucky_seized": 11,
+      "lucky_missed": 6,
+      "unlucky": 19
+    },
+    {
+      "id": 342,
+      "talent": 0.493396,
+      "capital": 0.0390625,
+      "rank": 541,
+      "lucky_seized": 12,
+      "lucky_missed": 8,
+      "unlucky": 20
+    },
+    {
+      "id": 834,
+      "talent": 0.598745,
+      "capital": 0.0390625,
+      "rank": 542,
+      "lucky_seized": 9,
+      "lucky_missed": 10,
+      "unlucky": 17
+    },
+    {
+      "id": 478,
+      "talent": 0.575417,
+      "capital": 0.0390625,
+      "rank": 543,
+      "lucky_seized": 13,
+      "lucky_missed": 5,
+      "unlucky": 21
+    },
+    {
+      "id": 908,
+      "talent": 0.443802,
+      "capital": 0.0390625,
+      "rank": 544,
+      "lucky_seized": 8,
+      "lucky_missed": 11,
+      "unlucky": 16
+    },
+    {
+      "id": 906,
+      "talent": 0.678195,
+      "capital": 0.0390625,
+      "rank": 545,
+      "lucky_seized": 20,
+      "lucky_missed": 4,
+      "unlucky": 28
+    },
+    {
+      "id": 858,
+      "talent": 0.693065,
+      "capital": 0.0390625,
+      "rank": 546,
+      "lucky_seized": 16,
+      "lucky_missed": 6,
+      "unlucky": 24
+    },
+    {
+      "id": 493,
+      "talent": 0.481882,
+      "capital": 0.0390625,
+      "rank": 547,
+      "lucky_seized": 10,
+      "lucky_missed": 15,
+      "unlucky": 18
+    },
+    {
+      "id": 115,
+      "talent": 0.70108,
+      "capital": 0.0195312,
+      "rank": 548,
+      "lucky_seized": 11,
+      "lucky_missed": 3,
+      "unlucky": 20
+    },
+    {
+      "id": 321,
+      "talent": 0.463368,
+      "capital": 0.0195312,
+      "rank": 549,
+      "lucky_seized": 11,
+      "lucky_missed": 4,
+      "unlucky": 20
+    },
+    {
+      "id": 992,
+      "talent": 0.574536,
+      "capital": 0.0195312,
+      "rank": 550,
+      "lucky_seized": 12,
+      "lucky_missed": 8,
+      "unlucky": 21
+    },
+    {
+      "id": 706,
+      "talent": 0.524383,
+      "capital": 0.0195312,
+      "rank": 551,
+      "lucky_seized": 10,
+      "lucky_missed": 12,
+      "unlucky": 19
+    },
+    {
+      "id": 118,
+      "talent": 0.61381,
+      "capital": 0.0195312,
+      "rank": 552,
+      "lucky_seized": 13,
+      "lucky_missed": 10,
+      "unlucky": 22
+    },
+    {
+      "id": 349,
+      "talent": 0.521988,
+      "capital": 0.0195312,
+      "rank": 553,
+      "lucky_seized": 11,
+      "lucky_missed": 11,
+      "unlucky": 20
+    },
+    {
+      "id": 306,
+      "talent": 0.479238,
+      "capital": 0.0195312,
+      "rank": 554,
+      "lucky_seized": 11,
+      "lucky_missed": 12,
+      "unlucky": 20
+    },
+    {
+      "id": 595,
+      "talent": 0.583827,
+      "capital": 0.0195312,
+      "rank": 555,
+      "lucky_seized": 8,
+      "lucky_missed": 7,
+      "unlucky": 17
+    },
+    {
+      "id": 951,
+      "talent": 0.511637,
+      "capital": 0.0195312,
+      "rank": 556,
+      "lucky_seized": 14,
+      "lucky_missed": 7,
+      "unlucky": 23
+    },
+    {
+      "id": 245,
+      "talent": 0.712747,
+      "capital": 0.0195312,
+      "rank": 557,
+      "lucky_seized": 14,
+      "lucky_missed": 5,
+      "unlucky": 23
+    },
+    {
+      "id": 764,
+      "talent": 0.368181,
+      "capital": 0.0195312,
+      "rank": 558,
+      "lucky_seized": 10,
+      "lucky_missed": 8,
+      "unlucky": 19
+    },
+    {
+      "id": 715,
+      "talent": 0.600814,
+      "capital": 0.0195312,
+      "rank": 559,
+      "lucky_seized": 15,
+      "lucky_missed": 9,
+      "unlucky": 24
+    },
+    {
+      "id": 201,
+      "talent": 0.630863,
+      "capital": 0.0195312,
+      "rank": 560,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 22
+    },
+    {
+      "id": 980,
+      "talent": 0.647417,
+      "capital": 0.0195312,
+      "rank": 561,
+      "lucky_seized": 11,
+      "lucky_missed": 4,
+      "unlucky": 20
+    },
+    {
+      "id": 212,
+      "talent": 0.598875,
+      "capital": 0.0195312,
+      "rank": 562,
+      "lucky_seized": 12,
+      "lucky_missed": 7,
+      "unlucky": 21
+    },
+    {
+      "id": 583,
+      "talent": 0.671012,
+      "capital": 0.0195312,
+      "rank": 563,
+      "lucky_seized": 14,
+      "lucky_missed": 6,
+      "unlucky": 23
+    },
+    {
+      "id": 690,
+      "talent": 0.629062,
+      "capital": 0.0195312,
+      "rank": 564,
+      "lucky_seized": 10,
+      "lucky_missed": 9,
+      "unlucky": 19
+    },
+    {
+      "id": 667,
+      "talent": 0.544525,
+      "capital": 0.0195312,
+      "rank": 565,
+      "lucky_seized": 8,
+      "lucky_missed": 6,
+      "unlucky": 17
+    },
+    {
+      "id": 965,
+      "talent": 0.669472,
+      "capital": 0.0195312,
+      "rank": 566,
+      "lucky_seized": 18,
+      "lucky_missed": 5,
+      "unlucky": 27
+    },
+    {
+      "id": 347,
+      "talent": 0.587998,
+      "capital": 0.0195312,
+      "rank": 567,
+      "lucky_seized": 13,
+      "lucky_missed": 6,
+      "unlucky": 22
+    },
+    {
+      "id": 661,
+      "talent": 0.641846,
+      "capital": 0.0195312,
+      "rank": 568,
+      "lucky_seized": 12,
+      "lucky_missed": 5,
+      "unlucky": 21
+    },
+    {
+      "id": 856,
+      "talent": 0.674534,
+      "capital": 0.0195312,
+      "rank": 569,
+      "lucky_seized": 10,
+      "lucky_missed": 7,
+      "unlucky": 19
+    },
+    {
+      "id": 523,
+      "talent": 0.587821,
+      "capital": 0.0195312,
+      "rank": 570,
+      "lucky_seized": 14,
+      "lucky_missed": 8,
+      "unlucky": 23
+    },
+    {
+      "id": 521,
+      "talent": 0.533449,
+      "capital": 0.0195312,
+      "rank": 571,
+      "lucky_seized": 10,
+      "lucky_missed": 7,
+      "unlucky": 19
+    },
+    {
+      "id": 878,
+      "talent": 0.587442,
+      "capital": 0.0195312,
+      "rank": 572,
+      "lucky_seized": 13,
+      "lucky_missed": 10,
+      "unlucky": 22
+    },
+    {
+      "id": 877,
+      "talent": 0.509677,
+      "capital": 0.0195312,
+      "rank": 573,
+      "lucky_seized": 9,
+      "lucky_missed": 9,
+      "unlucky": 18
+    },
+    {
+      "id": 452,
+      "talent": 0.773267,
+      "capital": 0.0195312,
+      "rank": 574,
+      "lucky_seized": 14,
+      "lucky_missed": 4,
+      "unlucky": 23
+    },
+    {
+      "id": 185,
+      "talent": 0.387833,
+      "capital": 0.0195312,
+      "rank": 575,
+      "lucky_seized": 6,
+      "lucky_missed": 14,
+      "unlucky": 15
+    },
+    {
+      "id": 447,
+      "talent": 0.504201,
+      "capital": 0.0195312,
+      "rank": 576,
+      "lucky_seized": 9,
+      "lucky_missed": 15,
+      "unlucky": 18
+    },
+    {
+      "id": 275,
+      "talent": 0.507287,
+      "capital": 0.0195312,
+      "rank": 577,
+      "lucky_seized": 10,
+      "lucky_missed": 10,
+      "unlucky": 19
+    },
+    {
+      "id": 824,
+      "talent": 0.57175,
+      "capital": 0.0195312,
+      "rank": 578,
+      "lucky_seized": 13,
+      "lucky_missed": 5,
+      "unlucky": 22
+    },
+    {
+      "id": 511,
+      "talent": 0.388058,
+      "capital": 0.0195312,
+      "rank": 579,
+      "lucky_seized": 9,
+      "lucky_missed": 18,
+      "unlucky": 18
+    },
+    {
+      "id": 466,
+      "talent": 0.66445,
+      "capital": 0.0195312,
+      "rank": 580,
+      "lucky_seized": 10,
+      "lucky_missed": 10,
+      "unlucky": 19
+    },
+    {
+      "id": 189,
+      "talent": 0.717826,
+      "capital": 0.0195312,
+      "rank": 581,
+      "lucky_seized": 15,
+      "lucky_missed": 2,
+      "unlucky": 24
+    },
+    {
+      "id": 398,
+      "talent": 0.578523,
+      "capital": 0.0195312,
+      "rank": 582,
+      "lucky_seized": 11,
+      "lucky_missed": 14,
+      "unlucky": 20
+    },
+    {
+      "id": 495,
+      "talent": 0.567074,
+      "capital": 0.0195312,
+      "rank": 583,
+      "lucky_seized": 8,
+      "lucky_missed": 12,
+      "unlucky": 17
+    },
+    {
+      "id": 92,
+      "talent": 0.681308,
+      "capital": 0.0195312,
+      "rank": 584,
+      "lucky_seized": 6,
+      "lucky_missed": 6,
+      "unlucky": 15
+    },
+    {
+      "id": 20,
+      "talent": 0.619299,
+      "capital": 0.0195312,
+      "rank": 585,
+      "lucky_seized": 12,
+      "lucky_missed": 6,
+      "unlucky": 21
+    },
+    {
+      "id": 386,
+      "talent": 0.573673,
+      "capital": 0.0195312,
+      "rank": 586,
+      "lucky_seized": 12,
+      "lucky_missed": 7,
+      "unlucky": 21
+    },
+    {
+      "id": 269,
+      "talent": 0.539003,
+      "capital": 0.0195312,
+      "rank": 587,
+      "lucky_seized": 11,
+      "lucky_missed": 8,
+      "unlucky": 20
+    },
+    {
+      "id": 428,
+      "talent": 0.384033,
+      "capital": 0.0195312,
+      "rank": 588,
+      "lucky_seized": 7,
+      "lucky_missed": 14,
+      "unlucky": 16
+    },
+    {
+      "id": 425,
+      "talent": 0.666566,
+      "capital": 0.0195312,
+      "rank": 589,
+      "lucky_seized": 15,
+      "lucky_missed": 5,
+      "unlucky": 24
+    },
+    {
+      "id": 128,
+      "talent": 0.631688,
+      "capital": 0.0195312,
+      "rank": 590,
+      "lucky_seized": 10,
+      "lucky_missed": 8,
+      "unlucky": 19
+    },
+    {
+      "id": 439,
+      "talent": 0.713712,
+      "capital": 0.0195312,
+      "rank": 591,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 22
+    },
+    {
+      "id": 783,
+      "talent": 0.524912,
+      "capital": 0.0195312,
+      "rank": 592,
+      "lucky_seized": 14,
+      "lucky_missed": 11,
+      "unlucky": 23
+    },
+    {
+      "id": 912,
+      "talent": 0.696001,
+      "capital": 0.0195312,
+      "rank": 593,
+      "lucky_seized": 15,
+      "lucky_missed": 6,
+      "unlucky": 24
+    },
+    {
+      "id": 167,
+      "talent": 0.557404,
+      "capital": 0.0195312,
+      "rank": 594,
+      "lucky_seized": 12,
+      "lucky_missed": 4,
+      "unlucky": 21
+    },
+    {
+      "id": 800,
+      "talent": 0.618574,
+      "capital": 0.0195312,
+      "rank": 595,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 22
+    },
+    {
+      "id": 660,
+      "talent": 0.708174,
+      "capital": 0.0195312,
+      "rank": 596,
+      "lucky_seized": 10,
+      "lucky_missed": 10,
+      "unlucky": 19
+    },
+    {
+      "id": 424,
+      "talent": 0.676114,
+      "capital": 0.0195312,
+      "rank": 597,
+      "lucky_seized": 13,
+      "lucky_missed": 3,
+      "unlucky": 22
+    },
+    {
+      "id": 479,
+      "talent": 0.58613,
+      "capital": 0.0195312,
+      "rank": 598,
+      "lucky_seized": 12,
+      "lucky_missed": 7,
+      "unlucky": 21
+    },
+    {
+      "id": 446,
+      "talent": 0.61987,
+      "capital": 0.0195312,
+      "rank": 599,
+      "lucky_seized": 15,
+      "lucky_missed": 4,
+      "unlucky": 24
+    },
+    {
+      "id": 14,
+      "talent": 0.623593,
+      "capital": 0.0195312,
+      "rank": 600,
+      "lucky_seized": 12,
+      "lucky_missed": 6,
+      "unlucky": 21
+    },
+    {
+      "id": 253,
+      "talent": 0.616703,
+      "capital": 0.0195312,
+      "rank": 601,
+      "lucky_seized": 9,
+      "lucky_missed": 5,
+      "unlucky": 18
+    },
+    {
+      "id": 869,
+      "talent": 0.538045,
+      "capital": 0.0195312,
+      "rank": 602,
+      "lucky_seized": 14,
+      "lucky_missed": 9,
+      "unlucky": 23
+    },
+    {
+      "id": 120,
+      "talent": 0.518328,
+      "capital": 0.00976562,
+      "rank": 603,
+      "lucky_seized": 8,
+      "lucky_missed": 10,
+      "unlucky": 18
+    },
+    {
+      "id": 625,
+      "talent": 0.624763,
+      "capital": 0.00976562,
+      "rank": 604,
+      "lucky_seized": 11,
+      "lucky_missed": 5,
+      "unlucky": 21
+    },
+    {
+      "id": 56,
+      "talent": 0.486175,
+      "capital": 0.00976562,
+      "rank": 605,
+      "lucky_seized": 7,
+      "lucky_missed": 10,
+      "unlucky": 17
+    },
+    {
+      "id": 633,
+      "talent": 0.528066,
+      "capital": 0.00976562,
+      "rank": 606,
+      "lucky_seized": 11,
+      "lucky_missed": 7,
+      "unlucky": 21
+    },
+    {
+      "id": 977,
+      "talent": 0.602816,
+      "capital": 0.00976562,
+      "rank": 607,
+      "lucky_seized": 7,
+      "lucky_missed": 12,
+      "unlucky": 17
+    },
+    {
+      "id": 994,
+      "talent": 0.461685,
+      "capital": 0.00976562,
+      "rank": 608,
+      "lucky_seized": 7,
+      "lucky_missed": 14,
+      "unlucky": 17
+    },
+    {
+      "id": 27,
+      "talent": 0.650605,
+      "capital": 0.00976562,
+      "rank": 609,
+      "lucky_seized": 10,
+      "lucky_missed": 3,
+      "unlucky": 20
+    },
+    {
+      "id": 25,
+      "talent": 0.399957,
+      "capital": 0.00976562,
+      "rank": 610,
+      "lucky_seized": 13,
+      "lucky_missed": 11,
+      "unlucky": 23
+    },
+    {
+      "id": 638,
+      "talent": 0.690151,
+      "capital": 0.00976562,
+      "rank": 611,
+      "lucky_seized": 14,
+      "lucky_missed": 3,
+      "unlucky": 24
+    },
+    {
+      "id": 274,
+      "talent": 0.620613,
+      "capital": 0.00976562,
+      "rank": 612,
+      "lucky_seized": 11,
+      "lucky_missed": 6,
+      "unlucky": 21
+    },
+    {
+      "id": 178,
+      "talent": 0.704282,
+      "capital": 0.00976562,
+      "rank": 613,
+      "lucky_seized": 12,
+      "lucky_missed": 3,
+      "unlucky": 22
+    },
+    {
+      "id": 910,
+      "talent": 0.559204,
+      "capital": 0.00976562,
+      "rank": 614,
+      "lucky_seized": 12,
+      "lucky_missed": 9,
+      "unlucky": 22
+    },
+    {
+      "id": 879,
+      "talent": 0.663341,
+      "capital": 0.00976562,
+      "rank": 615,
+      "lucky_seized": 11,
+      "lucky_missed": 8,
+      "unlucky": 21
+    },
+    {
+      "id": 648,
+      "talent": 0.65572,
+      "capital": 0.00976562,
+      "rank": 616,
+      "lucky_seized": 9,
+      "lucky_missed": 6,
+      "unlucky": 19
+    },
+    {
+      "id": 649,
+      "talent": 0.497902,
+      "capital": 0.00976562,
+      "rank": 617,
+      "lucky_seized": 9,
+      "lucky_missed": 9,
+      "unlucky": 19
+    },
+    {
+      "id": 988,
+      "talent": 0.524821,
+      "capital": 0.00976562,
+      "rank": 618,
+      "lucky_seized": 14,
+      "lucky_missed": 9,
+      "unlucky": 24
+    },
+    {
+      "id": 707,
+      "talent": 0.689977,
+      "capital": 0.00976562,
+      "rank": 619,
+      "lucky_seized": 13,
+      "lucky_missed": 8,
+      "unlucky": 23
+    },
+    {
+      "id": 284,
+      "talent": 0.640986,
+      "capital": 0.00976562,
+      "rank": 620,
+      "lucky_seized": 11,
+      "lucky_missed": 5,
+      "unlucky": 21
+    },
+    {
+      "id": 316,
+      "talent": 0.545045,
+      "capital": 0.00976562,
+      "rank": 621,
+      "lucky_seized": 10,
+      "lucky_missed": 5,
+      "unlucky": 20
+    },
+    {
+      "id": 701,
+      "talent": 0.712415,
+      "capital": 0.00976562,
+      "rank": 622,
+      "lucky_seized": 11,
+      "lucky_missed": 5,
+      "unlucky": 21
+    },
+    {
+      "id": 722,
+      "talent": 0.450311,
+      "capital": 0.00976562,
+      "rank": 623,
+      "lucky_seized": 13,
+      "lucky_missed": 8,
+      "unlucky": 23
+    },
+    {
+      "id": 454,
+      "talent": 0.544494,
+      "capital": 0.00976562,
+      "rank": 624,
+      "lucky_seized": 6,
+      "lucky_missed": 7,
+      "unlucky": 16
+    },
+    {
+      "id": 742,
+      "talent": 0.564128,
+      "capital": 0.00976562,
+      "rank": 625,
+      "lucky_seized": 8,
+      "lucky_missed": 10,
+      "unlucky": 18
+    },
+    {
+      "id": 55,
+      "talent": 0.572589,
+      "capital": 0.00976562,
+      "rank": 626,
+      "lucky_seized": 13,
+      "lucky_missed": 7,
+      "unlucky": 23
+    },
+    {
+      "id": 301,
+      "talent": 0.579231,
+      "capital": 0.00976562,
+      "rank": 627,
+      "lucky_seized": 12,
+      "lucky_missed": 7,
+      "unlucky": 22
+    },
+    {
+      "id": 519,
+      "talent": 0.534569,
+      "capital": 0.00976562,
+      "rank": 628,
+      "lucky_seized": 11,
+      "lucky_missed": 11,
+      "unlucky": 21
+    },
+    {
+      "id": 259,
+      "talent": 0.513712,
+      "capital": 0.00976562,
+      "rank": 629,
+      "lucky_seized": 13,
+      "lucky_missed": 14,
+      "unlucky": 23
+    },
+    {
+      "id": 258,
+      "talent": 0.585791,
+      "capital": 0.00976562,
+      "rank": 630,
+      "lucky_seized": 10,
+      "lucky_missed": 11,
+      "unlucky": 20
+    },
+    {
+      "id": 529,
+      "talent": 0.662301,
+      "capital": 0.00976562,
+      "rank": 631,
+      "lucky_seized": 12,
+      "lucky_missed": 4,
+      "unlucky": 22
+    },
+    {
+      "id": 811,
+      "talent": 0.673511,
+      "capital": 0.00976562,
+      "rank": 632,
+      "lucky_seized": 12,
+      "lucky_missed": 4,
+      "unlucky": 22
+    },
+    {
+      "id": 380,
+      "talent": 0.584581,
+      "capital": 0.00976562,
+      "rank": 633,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 23
+    },
+    {
+      "id": 806,
+      "talent": 0.790397,
+      "capital": 0.00976562,
+      "rank": 634,
+      "lucky_seized": 11,
+      "lucky_missed": 3,
+      "unlucky": 21
+    },
+    {
+      "id": 804,
+      "talent": 0.772072,
+      "capital": 0.00976562,
+      "rank": 635,
+      "lucky_seized": 16,
+      "lucky_missed": 4,
+      "unlucky": 26
+    },
+    {
+      "id": 801,
+      "talent": 0.592421,
+      "capital": 0.00976562,
+      "rank": 636,
+      "lucky_seized": 10,
+      "lucky_missed": 1,
+      "unlucky": 20
+    },
+    {
+      "id": 940,
+      "talent": 0.618627,
+      "capital": 0.00976562,
+      "rank": 637,
+      "lucky_seized": 11,
+      "lucky_missed": 9,
+      "unlucky": 21
+    },
+    {
+      "id": 780,
+      "talent": 0.400762,
+      "capital": 0.00976562,
+      "rank": 638,
+      "lucky_seized": 7,
+      "lucky_missed": 10,
+      "unlucky": 17
+    },
+    {
+      "id": 49,
+      "talent": 0.393481,
+      "capital": 0.00976562,
+      "rank": 639,
+      "lucky_seized": 11,
+      "lucky_missed": 11,
+      "unlucky": 21
+    },
+    {
+      "id": 778,
+      "talent": 0.679986,
+      "capital": 0.00976562,
+      "rank": 640,
+      "lucky_seized": 14,
+      "lucky_missed": 7,
+      "unlucky": 24
+    },
+    {
+      "id": 569,
+      "talent": 0.866677,
+      "capital": 0.00976562,
+      "rank": 641,
+      "lucky_seized": 14,
+      "lucky_missed": 3,
+      "unlucky": 24
+    },
+    {
+      "id": 260,
+      "talent": 0.747548,
+      "capital": 0.00976562,
+      "rank": 642,
+      "lucky_seized": 15,
+      "lucky_missed": 4,
+      "unlucky": 25
+    },
+    {
+      "id": 229,
+      "talent": 0.565091,
+      "capital": 0.00976562,
+      "rank": 643,
+      "lucky_seized": 9,
+      "lucky_missed": 7,
+      "unlucky": 19
+    },
+    {
+      "id": 302,
+      "talent": 0.501032,
+      "capital": 0.00976562,
+      "rank": 644,
+      "lucky_seized": 13,
+      "lucky_missed": 7,
+      "unlucky": 23
+    },
+    {
+      "id": 514,
+      "talent": 0.731056,
+      "capital": 0.00976562,
+      "rank": 645,
+      "lucky_seized": 14,
+      "lucky_missed": 3,
+      "unlucky": 24
+    },
+    {
+      "id": 80,
+      "talent": 0.630211,
+      "capital": 0.00976562,
+      "rank": 646,
+      "lucky_seized": 12,
+      "lucky_missed": 13,
+      "unlucky": 22
+    },
+    {
+      "id": 508,
+      "talent": 0.699818,
+      "capital": 0.00976562,
+      "rank": 647,
+      "lucky_seized": 13,
+      "lucky_missed": 6,
+      "unlucky": 23
+    },
+    {
+      "id": 507,
+      "talent": 0.597992,
+      "capital": 0.00976562,
+      "rank": 648,
+      "lucky_seized": 11,
+      "lucky_missed": 9,
+      "unlucky": 21
+    },
+    {
+      "id": 393,
+      "talent": 0.601922,
+      "capital": 0.00976562,
+      "rank": 649,
+      "lucky_seized": 10,
+      "lucky_missed": 8,
+      "unlucky": 20
+    },
+    {
+      "id": 831,
+      "talent": 0.69362,
+      "capital": 0.00976562,
+      "rank": 650,
+      "lucky_seized": 14,
+      "lucky_missed": 6,
+      "unlucky": 24
+    },
+    {
+      "id": 665,
+      "talent": 0.611844,
+      "capital": 0.00976562,
+      "rank": 651,
+      "lucky_seized": 14,
+      "lucky_missed": 4,
+      "unlucky": 24
+    },
+    {
+      "id": 502,
+      "talent": 0.63072,
+      "capital": 0.00976562,
+      "rank": 652,
+      "lucky_seized": 12,
+      "lucky_missed": 5,
+      "unlucky": 22
+    },
+    {
+      "id": 925,
+      "talent": 0.591322,
+      "capital": 0.00976562,
+      "rank": 653,
+      "lucky_seized": 10,
+      "lucky_missed": 4,
+      "unlucky": 20
+    },
+    {
+      "id": 609,
+      "talent": 0.611756,
+      "capital": 0.00976562,
+      "rank": 654,
+      "lucky_seized": 12,
+      "lucky_missed": 10,
+      "unlucky": 22
+    },
+    {
+      "id": 743,
+      "talent": 0.580542,
+      "capital": 0.00976562,
+      "rank": 655,
+      "lucky_seized": 10,
+      "lucky_missed": 9,
+      "unlucky": 20
+    },
+    {
+      "id": 371,
+      "talent": 0.441669,
+      "capital": 0.00976562,
+      "rank": 656,
+      "lucky_seized": 8,
+      "lucky_missed": 12,
+      "unlucky": 18
+    },
+    {
+      "id": 843,
+      "talent": 0.634464,
+      "capital": 0.00976562,
+      "rank": 657,
+      "lucky_seized": 10,
+      "lucky_missed": 5,
+      "unlucky": 20
+    },
+    {
+      "id": 737,
+      "talent": 0.506415,
+      "capital": 0.00976562,
+      "rank": 658,
+      "lucky_seized": 11,
+      "lucky_missed": 12,
+      "unlucky": 21
+    },
+    {
+      "id": 220,
+      "talent": 0.597086,
+      "capital": 0.00976562,
+      "rank": 659,
+      "lucky_seized": 6,
+      "lucky_missed": 4,
+      "unlucky": 16
+    },
+    {
+      "id": 619,
+      "talent": 0.5878,
+      "capital": 0.00976562,
+      "rank": 660,
+      "lucky_seized": 6,
+      "lucky_missed": 10,
+      "unlucky": 16
+    },
+    {
+      "id": 685,
+      "talent": 0.645086,
+      "capital": 0.00488281,
+      "rank": 661,
+      "lucky_seized": 15,
+      "lucky_missed": 5,
+      "unlucky": 26
+    },
+    {
+      "id": 895,
+      "talent": 0.606899,
+      "capital": 0.00488281,
+      "rank": 662,
+      "lucky_seized": 12,
+      "lucky_missed": 8,
+      "unlucky": 23
+    },
+    {
+      "id": 790,
+      "talent": 0.567315,
+      "capital": 0.00488281,
+      "rank": 663,
+      "lucky_seized": 12,
+      "lucky_missed": 3,
+      "unlucky": 23
+    },
+    {
+      "id": 990,
+      "talent": 0.649654,
+      "capital": 0.00488281,
+      "rank": 664,
+      "lucky_seized": 9,
+      "lucky_missed": 9,
+      "unlucky": 20
+    },
+    {
+      "id": 892,
+      "talent": 0.57958,
+      "capital": 0.00488281,
+      "rank": 665,
+      "lucky_seized": 14,
+      "lucky_missed": 10,
+      "unlucky": 25
+    },
+    {
+      "id": 887,
+      "talent": 0.44143,
+      "capital": 0.00488281,
+      "rank": 666,
+      "lucky_seized": 9,
+      "lucky_missed": 12,
+      "unlucky": 20
+    },
+    {
+      "id": 174,
+      "talent": 0.624023,
+      "capital": 0.00488281,
+      "rank": 667,
+      "lucky_seized": 13,
+      "lucky_missed": 3,
+      "unlucky": 24
+    },
+    {
+      "id": 849,
+      "talent": 0.570208,
+      "capital": 0.00488281,
+      "rank": 668,
+      "lucky_seized": 5,
+      "lucky_missed": 8,
+      "unlucky": 16
+    },
+    {
+      "id": 186,
+      "talent": 0.570113,
+      "capital": 0.00488281,
+      "rank": 669,
+      "lucky_seized": 11,
+      "lucky_missed": 6,
+      "unlucky": 22
+    },
+    {
+      "id": 158,
+      "talent": 0.515507,
+      "capital": 0.00488281,
+      "rank": 670,
+      "lucky_seized": 9,
+      "lucky_missed": 13,
+      "unlucky": 20
+    },
+    {
+      "id": 799,
+      "talent": 0.688638,
+      "capital": 0.00488281,
+      "rank": 671,
+      "lucky_seized": 12,
+      "lucky_missed": 1,
+      "unlucky": 23
+    },
+    {
+      "id": 196,
+      "talent": 0.639485,
+      "capital": 0.00488281,
+      "rank": 672,
+      "lucky_seized": 9,
+      "lucky_missed": 9,
+      "unlucky": 20
+    },
+    {
+      "id": 944,
+      "talent": 0.806188,
+      "capital": 0.00488281,
+      "rank": 673,
+      "lucky_seized": 15,
+      "lucky_missed": 4,
+      "unlucky": 26
+    },
+    {
+      "id": 774,
+      "talent": 0.563597,
+      "capital": 0.00488281,
+      "rank": 674,
+      "lucky_seized": 10,
+      "lucky_missed": 5,
+      "unlucky": 21
+    },
+    {
+      "id": 771,
+      "talent": 0.552035,
+      "capital": 0.00488281,
+      "rank": 675,
+      "lucky_seized": 10,
+      "lucky_missed": 6,
+      "unlucky": 21
+    },
+    {
+      "id": 52,
+      "talent": 0.533896,
+      "capital": 0.00488281,
+      "rank": 676,
+      "lucky_seized": 11,
+      "lucky_missed": 9,
+      "unlucky": 22
+    },
+    {
+      "id": 140,
+      "talent": 0.475669,
+      "capital": 0.00488281,
+      "rank": 677,
+      "lucky_seized": 11,
+      "lucky_missed": 7,
+      "unlucky": 22
+    },
+    {
+      "id": 7,
+      "talent": 0.555221,
+      "capital": 0.00488281,
+      "rank": 678,
+      "lucky_seized": 13,
+      "lucky_missed": 11,
+      "unlucky": 24
+    },
+    {
+      "id": 211,
+      "talent": 0.645402,
+      "capital": 0.00488281,
+      "rank": 679,
+      "lucky_seized": 13,
+      "lucky_missed": 5,
+      "unlucky": 24
+    },
+    {
+      "id": 58,
+      "talent": 0.677112,
+      "capital": 0.00488281,
+      "rank": 680,
+      "lucky_seized": 8,
+      "lucky_missed": 10,
+      "unlucky": 19
+    },
+    {
+      "id": 312,
+      "talent": 0.586653,
+      "capital": 0.00488281,
+      "rank": 681,
+      "lucky_seized": 10,
+      "lucky_missed": 10,
+      "unlucky": 21
+    },
+    {
+      "id": 655,
+      "talent": 0.795305,
+      "capital": 0.00488281,
+      "rank": 682,
+      "lucky_seized": 14,
+      "lucky_missed": 4,
+      "unlucky": 25
+    },
+    {
+      "id": 520,
+      "talent": 0.607736,
+      "capital": 0.00488281,
+      "rank": 683,
+      "lucky_seized": 8,
+      "lucky_missed": 6,
+      "unlucky": 19
+    },
+    {
+      "id": 408,
+      "talent": 0.658639,
+      "capital": 0.00488281,
+      "rank": 684,
+      "lucky_seized": 12,
+      "lucky_missed": 6,
+      "unlucky": 23
+    },
+    {
+      "id": 267,
+      "talent": 0.619706,
+      "capital": 0.00488281,
+      "rank": 685,
+      "lucky_seized": 9,
+      "lucky_missed": 5,
+      "unlucky": 20
+    },
+    {
+      "id": 280,
+      "talent": 0.43756,
+      "capital": 0.00488281,
+      "rank": 686,
+      "lucky_seized": 11,
+      "lucky_missed": 9,
+      "unlucky": 22
+    },
+    {
+      "id": 568,
+      "talent": 0.509055,
+      "capital": 0.00488281,
+      "rank": 687,
+      "lucky_seized": 9,
+      "lucky_missed": 11,
+      "unlucky": 20
+    },
+    {
+      "id": 247,
+      "talent": 0.641256,
+      "capital": 0.00488281,
+      "rank": 688,
+      "lucky_seized": 9,
+      "lucky_missed": 8,
+      "unlucky": 20
+    },
+    {
+      "id": 576,
+      "talent": 0.44451,
+      "capital": 0.00488281,
+      "rank": 689,
+      "lucky_seized": 11,
+      "lucky_missed": 7,
+      "unlucky": 22
+    },
+    {
+      "id": 67,
+      "talent": 0.52545,
+      "capital": 0.00488281,
+      "rank": 690,
+      "lucky_seized": 10,
+      "lucky_missed": 9,
+      "unlucky": 21
+    },
+    {
+      "id": 640,
+      "talent": 0.704848,
+      "capital": 0.00488281,
+      "rank": 691,
+      "lucky_seized": 15,
+      "lucky_missed": 4,
+      "unlucky": 26
+    },
+    {
+      "id": 565,
+      "talent": 0.522761,
+      "capital": 0.00488281,
+      "rank": 692,
+      "lucky_seized": 9,
+      "lucky_missed": 10,
+      "unlucky": 20
+    },
+    {
+      "id": 443,
+      "talent": 0.736604,
+      "capital": 0.00488281,
+      "rank": 693,
+      "lucky_seized": 11,
+      "lucky_missed": 8,
+      "unlucky": 22
+    },
+    {
+      "id": 335,
+      "talent": 0.576645,
+      "capital": 0.00488281,
+      "rank": 694,
+      "lucky_seized": 8,
+      "lucky_missed": 4,
+      "unlucky": 19
+    },
+    {
+      "id": 403,
+      "talent": 0.676806,
+      "capital": 0.00488281,
+      "rank": 695,
+      "lucky_seized": 10,
+      "lucky_missed": 7,
+      "unlucky": 21
+    },
+    {
+      "id": 307,
+      "talent": 0.459766,
+      "capital": 0.00488281,
+      "rank": 696,
+      "lucky_seized": 6,
+      "lucky_missed": 9,
+      "unlucky": 17
+    },
+    {
+      "id": 459,
+      "talent": 0.645888,
+      "capital": 0.00488281,
+      "rank": 697,
+      "lucky_seized": 8,
+      "lucky_missed": 7,
+      "unlucky": 19
+    },
+    {
+      "id": 483,
+      "talent": 0.489624,
+      "capital": 0.00488281,
+      "rank": 698,
+      "lucky_seized": 11,
+      "lucky_missed": 6,
+      "unlucky": 22
+    },
+    {
+      "id": 83,
+      "talent": 0.739693,
+      "capital": 0.00488281,
+      "rank": 699,
+      "lucky_seized": 11,
+      "lucky_missed": 5,
+      "unlucky": 22
+    },
+    {
+      "id": 273,
+      "talent": 0.566663,
+      "capital": 0.00488281,
+      "rank": 700,
+      "lucky_seized": 9,
+      "lucky_missed": 6,
+      "unlucky": 20
+    },
+    {
+      "id": 72,
+      "talent": 0.50954,
+      "capital": 0.00488281,
+      "rank": 701,
+      "lucky_seized": 10,
+      "lucky_missed": 13,
+      "unlucky": 21
+    },
+    {
+      "id": 485,
+      "talent": 0.519126,
+      "capital": 0.00488281,
+      "rank": 702,
+      "lucky_seized": 12,
+      "lucky_missed": 13,
+      "unlucky": 23
+    },
+    {
+      "id": 494,
+      "talent": 0.501857,
+      "capital": 0.00488281,
+      "rank": 703,
+      "lucky_seized": 7,
+      "lucky_missed": 12,
+      "unlucky": 18
+    },
+    {
+      "id": 406,
+      "talent": 0.657706,
+      "capital": 0.00488281,
+      "rank": 704,
+      "lucky_seized": 10,
+      "lucky_missed": 6,
+      "unlucky": 21
+    },
+    {
+      "id": 497,
+      "talent": 0.531995,
+      "capital": 0.00488281,
+      "rank": 705,
+      "lucky_seized": 9,
+      "lucky_missed": 12,
+      "unlucky": 20
+    },
+    {
+      "id": 421,
+      "talent": 0.572862,
+      "capital": 0.00488281,
+      "rank": 706,
+      "lucky_seized": 11,
+      "lucky_missed": 7,
+      "unlucky": 22
+    },
+    {
+      "id": 310,
+      "talent": 0.518265,
+      "capital": 0.00488281,
+      "rank": 707,
+      "lucky_seized": 9,
+      "lucky_missed": 15,
+      "unlucky": 20
+    },
+    {
+      "id": 530,
+      "talent": 0.658709,
+      "capital": 0.00488281,
+      "rank": 708,
+      "lucky_seized": 12,
+      "lucky_missed": 6,
+      "unlucky": 23
+    },
+    {
+      "id": 374,
+      "talent": 0.48875,
+      "capital": 0.00488281,
+      "rank": 709,
+      "lucky_seized": 7,
+      "lucky_missed": 13,
+      "unlucky": 18
+    },
+    {
+      "id": 319,
+      "talent": 0.516139,
+      "capital": 0.00488281,
+      "rank": 710,
+      "lucky_seized": 9,
+      "lucky_missed": 15,
+      "unlucky": 20
+    },
+    {
+      "id": 616,
+      "talent": 0.527681,
+      "capital": 0.00488281,
+      "rank": 711,
+      "lucky_seized": 8,
+      "lucky_missed": 12,
+      "unlucky": 19
+    },
+    {
+      "id": 328,
+      "talent": 0.515422,
+      "capital": 0.00488281,
+      "rank": 712,
+      "lucky_seized": 7,
+      "lucky_missed": 10,
+      "unlucky": 18
+    },
+    {
+      "id": 251,
+      "talent": 0.590856,
+      "capital": 0.00488281,
+      "rank": 713,
+      "lucky_seized": 9,
+      "lucky_missed": 12,
+      "unlucky": 20
+    },
+    {
+      "id": 37,
+      "talent": 0.50199,
+      "capital": 0.00244141,
+      "rank": 714,
+      "lucky_seized": 7,
+      "lucky_missed": 9,
+      "unlucky": 19
+    },
+    {
+      "id": 271,
+      "talent": 0.526685,
+      "capital": 0.00244141,
+      "rank": 715,
+      "lucky_seized": 8,
+      "lucky_missed": 10,
+      "unlucky": 20
+    },
+    {
+      "id": 610,
+      "talent": 0.563715,
+      "capital": 0.00244141,
+      "rank": 716,
+      "lucky_seized": 12,
+      "lucky_missed": 12,
+      "unlucky": 24
+    },
+    {
+      "id": 207,
+      "talent": 0.556968,
+      "capital": 0.00244141,
+      "rank": 717,
+      "lucky_seized": 13,
+      "lucky_missed": 8,
+      "unlucky": 25
+    },
+    {
+      "id": 470,
+      "talent": 0.747818,
+      "capital": 0.00244141,
+      "rank": 718,
+      "lucky_seized": 10,
+      "lucky_missed": 4,
+      "unlucky": 22
+    },
+    {
+      "id": 474,
+      "talent": 0.623905,
+      "capital": 0.00244141,
+      "rank": 719,
+      "lucky_seized": 10,
+      "lucky_missed": 6,
+      "unlucky": 22
+    },
+    {
+      "id": 197,
+      "talent": 0.638968,
+      "capital": 0.00244141,
+      "rank": 720,
+      "lucky_seized": 13,
+      "lucky_missed": 4,
+      "unlucky": 25
+    },
+    {
+      "id": 863,
+      "talent": 0.426878,
+      "capital": 0.00244141,
+      "rank": 721,
+      "lucky_seized": 9,
+      "lucky_missed": 9,
+      "unlucky": 21
+    },
+    {
+      "id": 820,
+      "talent": 0.746265,
+      "capital": 0.00244141,
+      "rank": 722,
+      "lucky_seized": 12,
+      "lucky_missed": 3,
+      "unlucky": 24
+    },
+    {
+      "id": 481,
+      "talent": 0.524669,
+      "capital": 0.00244141,
+      "rank": 723,
+      "lucky_seized": 11,
+      "lucky_missed": 7,
+      "unlucky": 23
+    },
+    {
+      "id": 859,
+      "talent": 0.615702,
+      "capital": 0.00244141,
+      "rank": 724,
+      "lucky_seized": 9,
+      "lucky_missed": 9,
+      "unlucky": 21
+    },
+    {
+      "id": 152,
+      "talent": 0.618293,
+      "capital": 0.00244141,
+      "rank": 725,
+      "lucky_seized": 9,
+      "lucky_missed": 8,
+      "unlucky": 21
+    },
+    {
+      "id": 548,
+      "talent": 0.44207,
+      "capital": 0.00244141,
+      "rank": 726,
+      "lucky_seized": 8,
+      "lucky_missed": 7,
+      "unlucky": 20
+    },
+    {
+      "id": 792,
+      "talent": 0.432824,
+      "capital": 0.00244141,
+      "rank": 727,
+      "lucky_seized": 8,
+      "lucky_missed": 15,
+      "unlucky": 20
+    },
+    {
+      "id": 814,
+      "talent": 0.770752,
+      "capital": 0.00244141,
+      "rank": 728,
+      "lucky_seized": 11,
+      "lucky_missed": 6,
+      "unlucky": 23
+    },
+    {
+      "id": 509,
+      "talent": 0.503042,
+      "capital": 0.00244141,
+      "rank": 729,
+      "lucky_seized": 7,
+      "lucky_missed": 10,
+      "unlucky": 19
+    },
+    {
+      "id": 265,
+      "talent": 0.639648,
+      "capital": 0.00244141,
+      "rank": 730,
+      "lucky_seized": 7,
+      "lucky_missed": 6,
+      "unlucky": 19
+    },
+    {
+      "id": 242,
+      "talent": 0.66818,
+      "capital": 0.00244141,
+      "rank": 731,
+      "lucky_seized": 12,
+      "lucky_missed": 4,
+      "unlucky": 24
+    },
+    {
+      "id": 378,
+      "talent": 0.693886,
+      "capital": 0.00244141,
+      "rank": 732,
+      "lucky_seized": 12,
+      "lucky_missed": 4,
+      "unlucky": 24
+    },
+    {
+      "id": 766,
+      "talent": 0.485455,
+      "capital": 0.00244141,
+      "rank": 733,
+      "lucky_seized": 11,
+      "lucky_missed": 8,
+      "unlucky": 23
+    },
+    {
+      "id": 391,
+      "talent": 0.551896,
+      "capital": 0.00244141,
+      "rank": 734,
+      "lucky_seized": 12,
+      "lucky_missed": 8,
+      "unlucky": 24
+    },
+    {
+      "id": 542,
+      "talent": 0.590274,
+      "capital": 0.00244141,
+      "rank": 735,
+      "lucky_seized": 8,
+      "lucky_missed": 7,
+      "unlucky": 20
+    },
+    {
+      "id": 76,
+      "talent": 0.698961,
+      "capital": 0.00244141,
+      "rank": 736,
+      "lucky_seized": 14,
+      "lucky_missed": 8,
+      "unlucky": 26
+    },
+    {
+      "id": 33,
+      "talent": 0.587554,
+      "capital": 0.00244141,
+      "rank": 737,
+      "lucky_seized": 11,
+      "lucky_missed": 4,
+      "unlucky": 23
+    },
+    {
+      "id": 797,
+      "talent": 0.82429,
+      "capital": 0.00244141,
+      "rank": 738,
+      "lucky_seized": 9,
+      "lucky_missed": 7,
+      "unlucky": 21
+    },
+    {
+      "id": 110,
+      "talent": 0.59625,
+      "capital": 0.00244141,
+      "rank": 739,
+      "lucky_seized": 12,
+      "lucky_missed": 9,
+      "unlucky": 24
+    },
+    {
+      "id": 257,
+      "talent": 0.546313,
+      "capital": 0.00244141,
+      "rank": 740,
+      "lucky_seized": 7,
+      "lucky_missed": 8,
+      "unlucky": 19
+    },
+    {
+      "id": 589,
+      "talent": 0.59154,
+      "capital": 0.00244141,
+      "rank": 741,
+      "lucky_seized": 8,
+      "lucky_missed": 11,
+      "unlucky": 20
+    },
+    {
+      "id": 974,
+      "talent": 0.540808,
+      "capital": 0.00244141,
+      "rank": 742,
+      "lucky_seized": 8,
+      "lucky_missed": 8,
+      "unlucky": 20
+    },
+    {
+      "id": 714,
+      "talent": 0.400021,
+      "capital": 0.00244141,
+      "rank": 743,
+      "lucky_seized": 6,
+      "lucky_missed": 13,
+      "unlucky": 18
+    },
+    {
+      "id": 217,
+      "talent": 0.552696,
+      "capital": 0.00244141,
+      "rank": 744,
+      "lucky_seized": 10,
+      "lucky_missed": 15,
+      "unlucky": 22
+    },
+    {
+      "id": 338,
+      "talent": 0.533285,
+      "capital": 0.00244141,
+      "rank": 745,
+      "lucky_seized": 8,
+      "lucky_missed": 6,
+      "unlucky": 20
+    },
+    {
+      "id": 59,
+      "talent": 0.583636,
+      "capital": 0.00244141,
+      "rank": 746,
+      "lucky_seized": 6,
+      "lucky_missed": 13,
+      "unlucky": 18
+    },
+    {
+      "id": 433,
+      "talent": 0.564407,
+      "capital": 0.00244141,
+      "rank": 747,
+      "lucky_seized": 9,
+      "lucky_missed": 7,
+      "unlucky": 21
+    },
+    {
+      "id": 712,
+      "talent": 0.452707,
+      "capital": 0.00244141,
+      "rank": 748,
+      "lucky_seized": 8,
+      "lucky_missed": 8,
+      "unlucky": 20
+    },
+    {
+      "id": 179,
+      "talent": 0.304195,
+      "capital": 0.00244141,
+      "rank": 749,
+      "lucky_seized": 8,
+      "lucky_missed": 8,
+      "unlucky": 20
+    },
+    {
+      "id": 410,
+      "talent": 0.68842,
+      "capital": 0.00244141,
+      "rank": 750,
+      "lucky_seized": 14,
+      "lucky_missed": 8,
+      "unlucky": 26
+    },
+    {
+      "id": 719,
+      "talent": 0.622132,
+      "capital": 0.00244141,
+      "rank": 751,
+      "lucky_seized": 9,
+      "lucky_missed": 6,
+      "unlucky": 21
+    },
+    {
+      "id": 21,
+      "talent": 0.474807,
+      "capital": 0.00244141,
+      "rank": 752,
+      "lucky_seized": 8,
+      "lucky_missed": 9,
+      "unlucky": 20
+    },
+    {
+      "id": 126,
+      "talent": 0.616074,
+      "capital": 0.00244141,
+      "rank": 753,
+      "lucky_seized": 7,
+      "lucky_missed": 9,
+      "unlucky": 19
+    },
+    {
+      "id": 463,
+      "talent": 0.56146,
+      "capital": 0.00244141,
+      "rank": 754,
+      "lucky_seized": 7,
+      "lucky_missed": 11,
+      "unlucky": 19
+    },
+    {
+      "id": 282,
+      "talent": 0.577548,
+      "capital": 0.00244141,
+      "rank": 755,
+      "lucky_seized": 13,
+      "lucky_missed": 11,
+      "unlucky": 25
+    },
+    {
+      "id": 677,
+      "talent": 0.585317,
+      "capital": 0.00244141,
+      "rank": 756,
+      "lucky_seized": 8,
+      "lucky_missed": 10,
+      "unlucky": 20
+    },
+    {
+      "id": 970,
+      "talent": 0.537035,
+      "capital": 0.00244141,
+      "rank": 757,
+      "lucky_seized": 8,
+      "lucky_missed": 6,
+      "unlucky": 20
+    },
+    {
+      "id": 656,
+      "talent": 0.492816,
+      "capital": 0.0012207,
+      "rank": 758,
+      "lucky_seized": 6,
+      "lucky_missed": 16,
+      "unlucky": 19
+    },
+    {
+      "id": 924,
+      "talent": 0.562786,
+      "capital": 0.0012207,
+      "rank": 759,
+      "lucky_seized": 14,
+      "lucky_missed": 14,
+      "unlucky": 27
+    },
+    {
+      "id": 942,
+      "talent": 0.592745,
+      "capital": 0.0012207,
+      "rank": 760,
+      "lucky_seized": 12,
+      "lucky_missed": 6,
+      "unlucky": 25
+    },
+    {
+      "id": 705,
+      "talent": 0.543623,
+      "capital": 0.0012207,
+      "rank": 761,
+      "lucky_seized": 4,
+      "lucky_missed": 13,
+      "unlucky": 17
+    },
+    {
+      "id": 786,
+      "talent": 0.639407,
+      "capital": 0.0012207,
+      "rank": 762,
+      "lucky_seized": 10,
+      "lucky_missed": 14,
+      "unlucky": 23
+    },
+    {
+      "id": 157,
+      "talent": 0.769749,
+      "capital": 0.0012207,
+      "rank": 763,
+      "lucky_seized": 11,
+      "lucky_missed": 7,
+      "unlucky": 24
+    },
+    {
+      "id": 989,
+      "talent": 0.582795,
+      "capital": 0.0012207,
+      "rank": 764,
+      "lucky_seized": 13,
+      "lucky_missed": 7,
+      "unlucky": 26
+    },
+    {
+      "id": 346,
+      "talent": 0.428891,
+      "capital": 0.0012207,
+      "rank": 765,
+      "lucky_seized": 5,
+      "lucky_missed": 10,
+      "unlucky": 18
+    },
+    {
+      "id": 124,
+      "talent": 0.603365,
+      "capital": 0.0012207,
+      "rank": 766,
+      "lucky_seized": 9,
+      "lucky_missed": 9,
+      "unlucky": 22
+    },
+    {
+      "id": 376,
+      "talent": 0.691899,
+      "capital": 0.0012207,
+      "rank": 767,
+      "lucky_seized": 13,
+      "lucky_missed": 5,
+      "unlucky": 26
+    },
+    {
+      "id": 694,
+      "talent": 0.618015,
+      "capital": 0.0012207,
+      "rank": 768,
+      "lucky_seized": 8,
+      "lucky_missed": 9,
+      "unlucky": 21
+    },
+    {
+      "id": 372,
+      "talent": 0.519425,
+      "capital": 0.0012207,
+      "rank": 769,
+      "lucky_seized": 9,
+      "lucky_missed": 13,
+      "unlucky": 22
+    },
+    {
+      "id": 541,
+      "talent": 0.599397,
+      "capital": 0.0012207,
+      "rank": 770,
+      "lucky_seized": 8,
+      "lucky_missed": 6,
+      "unlucky": 21
+    },
+    {
+      "id": 318,
+      "talent": 0.540868,
+      "capital": 0.0012207,
+      "rank": 771,
+      "lucky_seized": 10,
+      "lucky_missed": 11,
+      "unlucky": 23
+    },
+    {
+      "id": 119,
+      "talent": 0.492496,
+      "capital": 0.0012207,
+      "rank": 772,
+      "lucky_seized": 10,
+      "lucky_missed": 5,
+      "unlucky": 23
+    },
+    {
+      "id": 156,
+      "talent": 0.429565,
+      "capital": 0.0012207,
+      "rank": 773,
+      "lucky_seized": 8,
+      "lucky_missed": 11,
+      "unlucky": 21
+    },
+    {
+      "id": 829,
+      "talent": 0.635177,
+      "capital": 0.0012207,
+      "rank": 774,
+      "lucky_seized": 11,
+      "lucky_missed": 6,
+      "unlucky": 24
+    },
+    {
+      "id": 536,
+      "talent": 0.603338,
+      "capital": 0.0012207,
+      "rank": 775,
+      "lucky_seized": 9,
+      "lucky_missed": 7,
+      "unlucky": 22
+    },
+    {
+      "id": 928,
+      "talent": 0.631375,
+      "capital": 0.0012207,
+      "rank": 776,
+      "lucky_seized": 11,
+      "lucky_missed": 7,
+      "unlucky": 24
+    },
+    {
+      "id": 666,
+      "talent": 0.560247,
+      "capital": 0.0012207,
+      "rank": 777,
+      "lucky_seized": 4,
+      "lucky_missed": 14,
+      "unlucky": 17
+    },
+    {
+      "id": 689,
+      "talent": 0.702431,
+      "capital": 0.0012207,
+      "rank": 778,
+      "lucky_seized": 10,
+      "lucky_missed": 2,
+      "unlucky": 23
+    },
+    {
+      "id": 670,
+      "talent": 0.554594,
+      "capital": 0.0012207,
+      "rank": 779,
+      "lucky_seized": 9,
+      "lucky_missed": 8,
+      "unlucky": 22
+    },
+    {
+      "id": 385,
+      "talent": 0.735227,
+      "capital": 0.0012207,
+      "rank": 780,
+      "lucky_seized": 11,
+      "lucky_missed": 6,
+      "unlucky": 24
+    },
+    {
+      "id": 663,
+      "talent": 0.688811,
+      "capital": 0.0012207,
+      "rank": 781,
+      "lucky_seized": 10,
+      "lucky_missed": 6,
+      "unlucky": 23
+    },
+    {
+      "id": 782,
+      "talent": 0.545361,
+      "capital": 0.0012207,
+      "rank": 782,
+      "lucky_seized": 5,
+      "lucky_missed": 6,
+      "unlucky": 18
+    },
+    {
+      "id": 423,
+      "talent": 0.446972,
+      "capital": 0.0012207,
+      "rank": 783,
+      "lucky_seized": 8,
+      "lucky_missed": 13,
+      "unlucky": 21
+    },
+    {
+      "id": 725,
+      "talent": 0.73573,
+      "capital": 0.0012207,
+      "rank": 784,
+      "lucky_seized": 12,
+      "lucky_missed": 6,
+      "unlucky": 25
+    },
+    {
+      "id": 860,
+      "talent": 0.815799,
+      "capital": 0.0012207,
+      "rank": 785,
+      "lucky_seized": 12,
+      "lucky_missed": 6,
+      "unlucky": 25
+    },
+    {
+      "id": 757,
+      "talent": 0.519698,
+      "capital": 0.0012207,
+      "rank": 786,
+      "lucky_seized": 11,
+      "lucky_missed": 7,
+      "unlucky": 24
+    },
+    {
+      "id": 10,
+      "talent": 0.631618,
+      "capital": 0.0012207,
+      "rank": 787,
+      "lucky_seized": 11,
+      "lucky_missed": 9,
+      "unlucky": 24
+    },
+    {
+      "id": 857,
+      "talent": 0.43653,
+      "capital": 0.0012207,
+      "rank": 788,
+      "lucky_seized": 7,
+      "lucky_missed": 11,
+      "unlucky": 20
+    },
+    {
+      "id": 465,
+      "talent": 0.270547,
+      "capital": 0.0012207,
+      "rank": 789,
+      "lucky_seized": 7,
+      "lucky_missed": 16,
+      "unlucky": 20
+    },
+    {
+      "id": 762,
+      "talent": 0.567692,
+      "capital": 0.0012207,
+      "rank": 790,
+      "lucky_seized": 8,
+      "lucky_missed": 8,
+      "unlucky": 21
+    },
+    {
+      "id": 461,
+      "talent": 0.431404,
+      "capital": 0.0012207,
+      "rank": 791,
+      "lucky_seized": 6,
+      "lucky_missed": 12,
+      "unlucky": 19
+    },
+    {
+      "id": 578,
+      "talent": 0.650281,
+      "capital": 0.0012207,
+      "rank": 792,
+      "lucky_seized": 11,
+      "lucky_missed": 7,
+      "unlucky": 24
+    },
+    {
+      "id": 911,
+      "talent": 0.557439,
+      "capital": 0.0012207,
+      "rank": 793,
+      "lucky_seized": 12,
+      "lucky_missed": 7,
+      "unlucky": 25
+    },
+    {
+      "id": 626,
+      "talent": 0.602381,
+      "capital": 0.0012207,
+      "rank": 794,
+      "lucky_seized": 14,
+      "lucky_missed": 4,
+      "unlucky": 27
+    },
+    {
+      "id": 756,
+      "talent": 0.550344,
+      "capital": 0.0012207,
+      "rank": 795,
+      "lucky_seized": 8,
+      "lucky_missed": 10,
+      "unlucky": 21
+    },
+    {
+      "id": 769,
+      "talent": 0.443337,
+      "capital": 0.0012207,
+      "rank": 796,
+      "lucky_seized": 5,
+      "lucky_missed": 10,
+      "unlucky": 18
+    },
+    {
+      "id": 112,
+      "talent": 0.508891,
+      "capital": 0.0012207,
+      "rank": 797,
+      "lucky_seized": 9,
+      "lucky_missed": 12,
+      "unlucky": 22
+    },
+    {
+      "id": 978,
+      "talent": 0.558835,
+      "capital": 0.0012207,
+      "rank": 798,
+      "lucky_seized": 8,
+      "lucky_missed": 8,
+      "unlucky": 21
+    },
+    {
+      "id": 620,
+      "talent": 0.462641,
+      "capital": 0.0012207,
+      "rank": 799,
+      "lucky_seized": 10,
+      "lucky_missed": 8,
+      "unlucky": 23
+    },
+    {
+      "id": 436,
+      "talent": 0.439289,
+      "capital": 0.0012207,
+      "rank": 800,
+      "lucky_seized": 9,
+      "lucky_missed": 14,
+      "unlucky": 22
+    },
+    {
+      "id": 173,
+      "talent": 0.707648,
+      "capital": 0.0012207,
+      "rank": 801,
+      "lucky_seized": 12,
+      "lucky_missed": 5,
+      "unlucky": 25
+    },
+    {
+      "id": 210,
+      "talent": 0.486211,
+      "capital": 0.0012207,
+      "rank": 802,
+      "lucky_seized": 9,
+      "lucky_missed": 12,
+      "unlucky": 22
+    },
+    {
+      "id": 488,
+      "talent": 0.550237,
+      "capital": 0.0012207,
+      "rank": 803,
+      "lucky_seized": 11,
+      "lucky_missed": 12,
+      "unlucky": 24
+    },
+    {
+      "id": 914,
+      "talent": 0.629659,
+      "capital": 0.0012207,
+      "rank": 804,
+      "lucky_seized": 13,
+      "lucky_missed": 5,
+      "unlucky": 26
+    },
+    {
+      "id": 958,
+      "talent": 0.699902,
+      "capital": 0.0012207,
+      "rank": 805,
+      "lucky_seized": 14,
+      "lucky_missed": 10,
+      "unlucky": 27
+    },
+    {
+      "id": 915,
+      "talent": 0.467707,
+      "capital": 0.000610352,
+      "rank": 806,
+      "lucky_seized": 11,
+      "lucky_missed": 9,
+      "unlucky": 25
+    },
+    {
+      "id": 930,
+      "talent": 0.600322,
+      "capital": 0.000610352,
+      "rank": 807,
+      "lucky_seized": 10,
+      "lucky_missed": 10,
+      "unlucky": 24
+    },
+    {
+      "id": 281,
+      "talent": 0.576939,
+      "capital": 0.000610352,
+      "rank": 808,
+      "lucky_seized": 10,
+      "lucky_missed": 7,
+      "unlucky": 24
+    },
+    {
+      "id": 870,
+      "talent": 0.672243,
+      "capital": 0.000610352,
+      "rank": 809,
+      "lucky_seized": 11,
+      "lucky_missed": 6,
+      "unlucky": 25
+    },
+    {
+      "id": 489,
+      "talent": 0.637041,
+      "capital": 0.000610352,
+      "rank": 810,
+      "lucky_seized": 11,
+      "lucky_missed": 6,
+      "unlucky": 25
+    },
+    {
+      "id": 449,
+      "talent": 0.51254,
+      "capital": 0.000610352,
+      "rank": 811,
+      "lucky_seized": 8,
+      "lucky_missed": 12,
+      "unlucky": 22
+    },
+    {
+      "id": 905,
+      "talent": 0.538728,
+      "capital": 0.000610352,
+      "rank": 812,
+      "lucky_seized": 4,
+      "lucky_missed": 7,
+      "unlucky": 18
+    },
+    {
+      "id": 854,
+      "talent": 0.553172,
+      "capital": 0.000610352,
+      "rank": 813,
+      "lucky_seized": 11,
+      "lucky_missed": 10,
+      "unlucky": 25
+    },
+    {
+      "id": 442,
+      "talent": 0.623087,
+      "capital": 0.000610352,
+      "rank": 814,
+      "lucky_seized": 8,
+      "lucky_missed": 8,
+      "unlucky": 22
+    },
+    {
+      "id": 182,
+      "talent": 0.583027,
+      "capital": 0.000610352,
+      "rank": 815,
+      "lucky_seized": 9,
+      "lucky_missed": 6,
+      "unlucky": 23
+    },
+    {
+      "id": 851,
+      "talent": 0.616157,
+      "capital": 0.000610352,
+      "rank": 816,
+      "lucky_seized": 10,
+      "lucky_missed": 6,
+      "unlucky": 24
+    },
+    {
+      "id": 838,
+      "talent": 0.525139,
+      "capital": 0.000610352,
+      "rank": 817,
+      "lucky_seized": 9,
+      "lucky_missed": 12,
+      "unlucky": 23
+    },
+    {
+      "id": 916,
+      "talent": 0.594242,
+      "capital": 0.000610352,
+      "rank": 818,
+      "lucky_seized": 10,
+      "lucky_missed": 11,
+      "unlucky": 24
+    },
+    {
+      "id": 401,
+      "talent": 0.546045,
+      "capital": 0.000610352,
+      "rank": 819,
+      "lucky_seized": 10,
+      "lucky_missed": 10,
+      "unlucky": 24
+    },
+    {
+      "id": 395,
+      "talent": 0.410052,
+      "capital": 0.000610352,
+      "rank": 820,
+      "lucky_seized": 8,
+      "lucky_missed": 15,
+      "unlucky": 22
+    },
+    {
+      "id": 833,
+      "talent": 0.486657,
+      "capital": 0.000610352,
+      "rank": 821,
+      "lucky_seized": 10,
+      "lucky_missed": 13,
+      "unlucky": 24
+    },
+    {
+      "id": 844,
+      "talent": 0.416591,
+      "capital": 0.000610352,
+      "rank": 822,
+      "lucky_seized": 4,
+      "lucky_missed": 18,
+      "unlucky": 18
+    },
+    {
+      "id": 564,
+      "talent": 0.390674,
+      "capital": 0.000610352,
+      "rank": 823,
+      "lucky_seized": 6,
+      "lucky_missed": 10,
+      "unlucky": 20
+    },
+    {
+      "id": 383,
+      "talent": 0.504225,
+      "capital": 0.000610352,
+      "rank": 824,
+      "lucky_seized": 6,
+      "lucky_missed": 12,
+      "unlucky": 20
+    },
+    {
+      "id": 143,
+      "talent": 0.534387,
+      "capital": 0.000610352,
+      "rank": 825,
+      "lucky_seized": 11,
+      "lucky_missed": 9,
+      "unlucky": 25
+    },
+    {
+      "id": 933,
+      "talent": 0.71214,
+      "capital": 0.000610352,
+      "rank": 826,
+      "lucky_seized": 12,
+      "lucky_missed": 4,
+      "unlucky": 26
+    },
+    {
+      "id": 964,
+      "talent": 0.63315,
+      "capital": 0.000610352,
+      "rank": 827,
+      "lucky_seized": 12,
+      "lucky_missed": 2,
+      "unlucky": 26
+    },
+    {
+      "id": 235,
+      "talent": 0.527299,
+      "capital": 0.000610352,
+      "rank": 828,
+      "lucky_seized": 7,
+      "lucky_missed": 14,
+      "unlucky": 21
+    },
+    {
+      "id": 967,
+      "talent": 0.635518,
+      "capital": 0.000610352,
+      "rank": 829,
+      "lucky_seized": 12,
+      "lucky_missed": 11,
+      "unlucky": 26
+    },
+    {
+      "id": 612,
+      "talent": 0.694735,
+      "capital": 0.000610352,
+      "rank": 830,
+      "lucky_seized": 14,
+      "lucky_missed": 6,
+      "unlucky": 28
+    },
+    {
+      "id": 739,
+      "talent": 0.616457,
+      "capital": 0.000610352,
+      "rank": 831,
+      "lucky_seized": 6,
+      "lucky_missed": 8,
+      "unlucky": 20
+    },
+    {
+      "id": 200,
+      "talent": 0.516037,
+      "capital": 0.000610352,
+      "rank": 832,
+      "lucky_seized": 7,
+      "lucky_missed": 12,
+      "unlucky": 21
+    },
+    {
+      "id": 618,
+      "talent": 0.594131,
+      "capital": 0.000610352,
+      "rank": 833,
+      "lucky_seized": 9,
+      "lucky_missed": 5,
+      "unlucky": 23
+    },
+    {
+      "id": 635,
+      "talent": 0.377701,
+      "capital": 0.000610352,
+      "rank": 834,
+      "lucky_seized": 7,
+      "lucky_missed": 13,
+      "unlucky": 21
+    },
+    {
+      "id": 718,
+      "talent": 0.596783,
+      "capital": 0.000610352,
+      "rank": 835,
+      "lucky_seized": 6,
+      "lucky_missed": 8,
+      "unlucky": 20
+    },
+    {
+      "id": 717,
+      "talent": 0.638111,
+      "capital": 0.000610352,
+      "rank": 836,
+      "lucky_seized": 11,
+      "lucky_missed": 4,
+      "unlucky": 25
+    },
+    {
+      "id": 713,
+      "talent": 0.586025,
+      "capital": 0.000610352,
+      "rank": 837,
+      "lucky_seized": 15,
+      "lucky_missed": 7,
+      "unlucky": 29
+    },
+    {
+      "id": 135,
+      "talent": 0.554991,
+      "capital": 0.000610352,
+      "rank": 838,
+      "lucky_seized": 9,
+      "lucky_missed": 10,
+      "unlucky": 23
+    },
+    {
+      "id": 329,
+      "talent": 0.585095,
+      "capital": 0.000610352,
+      "rank": 839,
+      "lucky_seized": 12,
+      "lucky_missed": 7,
+      "unlucky": 26
+    },
+    {
+      "id": 325,
+      "talent": 0.628976,
+      "capital": 0.000610352,
+      "rank": 840,
+      "lucky_seized": 8,
+      "lucky_missed": 7,
+      "unlucky": 22
+    },
+    {
+      "id": 634,
+      "talent": 0.482243,
+      "capital": 0.000610352,
+      "rank": 841,
+      "lucky_seized": 10,
+      "lucky_missed": 7,
+      "unlucky": 24
+    },
+    {
+      "id": 47,
+      "talent": 0.633771,
+      "capital": 0.000610352,
+      "rank": 842,
+      "lucky_seized": 9,
+      "lucky_missed": 9,
+      "unlucky": 23
+    },
+    {
+      "id": 961,
+      "talent": 0.633494,
+      "capital": 0.000610352,
+      "rank": 843,
+      "lucky_seized": 12,
+      "lucky_missed": 9,
+      "unlucky": 26
+    },
+    {
+      "id": 254,
+      "talent": 0.476751,
+      "capital": 0.000610352,
+      "rank": 844,
+      "lucky_seized": 7,
+      "lucky_missed": 7,
+      "unlucky": 21
+    },
+    {
+      "id": 294,
+      "talent": 0.362146,
+      "capital": 0.000610352,
+      "rank": 845,
+      "lucky_seized": 10,
+      "lucky_missed": 15,
+      "unlucky": 24
+    },
+    {
+      "id": 528,
+      "talent": 0.389896,
+      "capital": 0.000610352,
+      "rank": 846,
+      "lucky_seized": 9,
+      "lucky_missed": 11,
+      "unlucky": 23
+    },
+    {
+      "id": 77,
+      "talent": 0.378594,
+      "capital": 0.000610352,
+      "rank": 847,
+      "lucky_seized": 7,
+      "lucky_missed": 13,
+      "unlucky": 21
+    },
+    {
+      "id": 256,
+      "talent": 0.494158,
+      "capital": 0.000610352,
+      "rank": 848,
+      "lucky_seized": 11,
+      "lucky_missed": 8,
+      "unlucky": 25
+    },
+    {
+      "id": 45,
+      "talent": 0.488328,
+      "capital": 0.000610352,
+      "rank": 849,
+      "lucky_seized": 11,
+      "lucky_missed": 12,
+      "unlucky": 25
+    },
+    {
+      "id": 180,
+      "talent": 0.566248,
+      "capital": 0.000305176,
+      "rank": 850,
+      "lucky_seized": 7,
+      "lucky_missed": 15,
+      "unlucky": 22
+    },
+    {
+      "id": 731,
+      "talent": 0.576574,
+      "capital": 0.000305176,
+      "rank": 851,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 28
+    },
+    {
+      "id": 113,
+      "talent": 0.526211,
+      "capital": 0.000305176,
+      "rank": 852,
+      "lucky_seized": 9,
+      "lucky_missed": 7,
+      "unlucky": 24
+    },
+    {
+      "id": 503,
+      "talent": 0.500595,
+      "capital": 0.000305176,
+      "rank": 853,
+      "lucky_seized": 8,
+      "lucky_missed": 8,
+      "unlucky": 23
+    },
+    {
+      "id": 94,
+      "talent": 0.46119,
+      "capital": 0.000305176,
+      "rank": 854,
+      "lucky_seized": 9,
+      "lucky_missed": 10,
+      "unlucky": 24
+    },
+    {
+      "id": 223,
+      "talent": 0.481958,
+      "capital": 0.000305176,
+      "rank": 855,
+      "lucky_seized": 9,
+      "lucky_missed": 11,
+      "unlucky": 24
+    },
+    {
+      "id": 505,
+      "talent": 0.572147,
+      "capital": 0.000305176,
+      "rank": 856,
+      "lucky_seized": 7,
+      "lucky_missed": 6,
+      "unlucky": 22
+    },
+    {
+      "id": 945,
+      "talent": 0.479624,
+      "capital": 0.000305176,
+      "rank": 857,
+      "lucky_seized": 9,
+      "lucky_missed": 15,
+      "unlucky": 24
+    },
+    {
+      "id": 175,
+      "talent": 0.562881,
+      "capital": 0.000305176,
+      "rank": 858,
+      "lucky_seized": 11,
+      "lucky_missed": 7,
+      "unlucky": 26
+    },
+    {
+      "id": 979,
+      "talent": 0.619818,
+      "capital": 0.000305176,
+      "rank": 859,
+      "lucky_seized": 10,
+      "lucky_missed": 8,
+      "unlucky": 25
+    },
+    {
+      "id": 708,
+      "talent": 0.708902,
+      "capital": 0.000305176,
+      "rank": 860,
+      "lucky_seized": 11,
+      "lucky_missed": 6,
+      "unlucky": 26
+    },
+    {
+      "id": 532,
+      "talent": 0.535348,
+      "capital": 0.000305176,
+      "rank": 861,
+      "lucky_seized": 5,
+      "lucky_missed": 8,
+      "unlucky": 20
+    },
+    {
+      "id": 703,
+      "talent": 0.703016,
+      "capital": 0.000305176,
+      "rank": 862,
+      "lucky_seized": 10,
+      "lucky_missed": 7,
+      "unlucky": 25
+    },
+    {
+      "id": 326,
+      "talent": 0.677384,
+      "capital": 0.000305176,
+      "rank": 863,
+      "lucky_seized": 8,
+      "lucky_missed": 7,
+      "unlucky": 23
+    },
+    {
+      "id": 687,
+      "talent": 0.557772,
+      "capital": 0.000305176,
+      "rank": 864,
+      "lucky_seized": 9,
+      "lucky_missed": 4,
+      "unlucky": 24
+    },
+    {
+      "id": 674,
+      "talent": 0.54653,
+      "capital": 0.000305176,
+      "rank": 865,
+      "lucky_seized": 9,
+      "lucky_missed": 4,
+      "unlucky": 24
+    },
+    {
+      "id": 1,
+      "talent": 0.721789,
+      "capital": 0.000305176,
+      "rank": 866,
+      "lucky_seized": 9,
+      "lucky_missed": 6,
+      "unlucky": 24
+    },
+    {
+      "id": 535,
+      "talent": 0.663451,
+      "capital": 0.000305176,
+      "rank": 867,
+      "lucky_seized": 9,
+      "lucky_missed": 7,
+      "unlucky": 24
+    },
+    {
+      "id": 710,
+      "talent": 0.566332,
+      "capital": 0.000305176,
+      "rank": 868,
+      "lucky_seized": 10,
+      "lucky_missed": 6,
+      "unlucky": 25
+    },
+    {
+      "id": 250,
+      "talent": 0.510114,
+      "capital": 0.000305176,
+      "rank": 869,
+      "lucky_seized": 9,
+      "lucky_missed": 18,
+      "unlucky": 24
+    },
+    {
+      "id": 803,
+      "talent": 0.529673,
+      "capital": 0.000305176,
+      "rank": 870,
+      "lucky_seized": 7,
+      "lucky_missed": 9,
+      "unlucky": 22
+    },
+    {
+      "id": 950,
+      "talent": 0.374852,
+      "capital": 0.000305176,
+      "rank": 871,
+      "lucky_seized": 6,
+      "lucky_missed": 16,
+      "unlucky": 21
+    },
+    {
+      "id": 563,
+      "talent": 0.744358,
+      "capital": 0.000305176,
+      "rank": 872,
+      "lucky_seized": 9,
+      "lucky_missed": 7,
+      "unlucky": 24
+    },
+    {
+      "id": 777,
+      "talent": 0.69011,
+      "capital": 0.000305176,
+      "rank": 873,
+      "lucky_seized": 9,
+      "lucky_missed": 4,
+      "unlucky": 24
+    },
+    {
+      "id": 567,
+      "talent": 0.548163,
+      "capital": 0.000305176,
+      "rank": 874,
+      "lucky_seized": 9,
+      "lucky_missed": 11,
+      "unlucky": 24
+    },
+    {
+      "id": 570,
+      "talent": 0.602315,
+      "capital": 0.000305176,
+      "rank": 875,
+      "lucky_seized": 11,
+      "lucky_missed": 5,
+      "unlucky": 26
+    },
+    {
+      "id": 62,
+      "talent": 0.600553,
+      "capital": 0.000305176,
+      "rank": 876,
+      "lucky_seized": 11,
+      "lucky_missed": 7,
+      "unlucky": 26
+    },
+    {
+      "id": 74,
+      "talent": 0.428649,
+      "capital": 0.000305176,
+      "rank": 877,
+      "lucky_seized": 8,
+      "lucky_missed": 10,
+      "unlucky": 23
+    },
+    {
+      "id": 429,
+      "talent": 0.577525,
+      "capital": 0.000305176,
+      "rank": 878,
+      "lucky_seized": 10,
+      "lucky_missed": 7,
+      "unlucky": 25
+    },
+    {
+      "id": 585,
+      "talent": 0.595241,
+      "capital": 0.000305176,
+      "rank": 879,
+      "lucky_seized": 9,
+      "lucky_missed": 6,
+      "unlucky": 24
+    },
+    {
+      "id": 768,
+      "talent": 0.59001,
+      "capital": 0.000305176,
+      "rank": 880,
+      "lucky_seized": 9,
+      "lucky_missed": 7,
+      "unlucky": 24
+    },
+    {
+      "id": 357,
+      "talent": 0.330529,
+      "capital": 0.000305176,
+      "rank": 881,
+      "lucky_seized": 2,
+      "lucky_missed": 14,
+      "unlucky": 17
+    },
+    {
+      "id": 551,
+      "talent": 0.5329,
+      "capital": 0.000305176,
+      "rank": 882,
+      "lucky_seized": 8,
+      "lucky_missed": 11,
+      "unlucky": 23
+    },
+    {
+      "id": 798,
+      "talent": 0.602052,
+      "capital": 0.000305176,
+      "rank": 883,
+      "lucky_seized": 9,
+      "lucky_missed": 9,
+      "unlucky": 24
+    },
+    {
+      "id": 861,
+      "talent": 0.488549,
+      "capital": 0.000305176,
+      "rank": 884,
+      "lucky_seized": 8,
+      "lucky_missed": 8,
+      "unlucky": 23
+    },
+    {
+      "id": 749,
+      "talent": 0.528497,
+      "capital": 0.000305176,
+      "rank": 885,
+      "lucky_seized": 9,
+      "lucky_missed": 12,
+      "unlucky": 24
+    },
+    {
+      "id": 759,
+      "talent": 0.57422,
+      "capital": 0.000305176,
+      "rank": 886,
+      "lucky_seized": 10,
+      "lucky_missed": 10,
+      "unlucky": 25
+    },
+    {
+      "id": 237,
+      "talent": 0.447165,
+      "capital": 0.000305176,
+      "rank": 887,
+      "lucky_seized": 9,
+      "lucky_missed": 5,
+      "unlucky": 24
+    },
+    {
+      "id": 12,
+      "talent": 0.507126,
+      "capital": 0.000152588,
+      "rank": 888,
+      "lucky_seized": 10,
+      "lucky_missed": 6,
+      "unlucky": 26
+    },
+    {
+      "id": 101,
+      "talent": 0.576458,
+      "capital": 0.000152588,
+      "rank": 889,
+      "lucky_seized": 7,
+      "lucky_missed": 9,
+      "unlucky": 23
+    },
+    {
+      "id": 131,
+      "talent": 0.609015,
+      "capital": 0.000152588,
+      "rank": 890,
+      "lucky_seized": 11,
+      "lucky_missed": 5,
+      "unlucky": 27
+    },
+    {
+      "id": 344,
+      "talent": 0.534949,
+      "capital": 0.000152588,
+      "rank": 891,
+      "lucky_seized": 8,
+      "lucky_missed": 6,
+      "unlucky": 24
+    },
+    {
+      "id": 365,
+      "talent": 0.623395,
+      "capital": 0.000152588,
+      "rank": 892,
+      "lucky_seized": 6,
+      "lucky_missed": 8,
+      "unlucky": 22
+    },
+    {
+      "id": 973,
+      "talent": 0.56196,
+      "capital": 0.000152588,
+      "rank": 893,
+      "lucky_seized": 9,
+      "lucky_missed": 3,
+      "unlucky": 25
+    },
+    {
+      "id": 356,
+      "talent": 0.558522,
+      "capital": 0.000152588,
+      "rank": 894,
+      "lucky_seized": 9,
+      "lucky_missed": 7,
+      "unlucky": 25
+    },
+    {
+      "id": 909,
+      "talent": 0.50535,
+      "capital": 0.000152588,
+      "rank": 895,
+      "lucky_seized": 7,
+      "lucky_missed": 16,
+      "unlucky": 23
+    },
+    {
+      "id": 926,
+      "talent": 0.561893,
+      "capital": 0.000152588,
+      "rank": 896,
+      "lucky_seized": 7,
+      "lucky_missed": 8,
+      "unlucky": 23
+    },
+    {
+      "id": 99,
+      "talent": 0.419151,
+      "capital": 0.000152588,
+      "rank": 897,
+      "lucky_seized": 7,
+      "lucky_missed": 11,
+      "unlucky": 23
+    },
+    {
+      "id": 409,
+      "talent": 0.512636,
+      "capital": 0.000152588,
+      "rank": 898,
+      "lucky_seized": 11,
+      "lucky_missed": 6,
+      "unlucky": 27
+    },
+    {
+      "id": 379,
+      "talent": 0.367986,
+      "capital": 0.000152588,
+      "rank": 899,
+      "lucky_seized": 6,
+      "lucky_missed": 14,
+      "unlucky": 22
+    },
+    {
+      "id": 840,
+      "talent": 0.63225,
+      "capital": 0.000152588,
+      "rank": 900,
+      "lucky_seized": 6,
+      "lucky_missed": 11,
+      "unlucky": 22
+    },
+    {
+      "id": 480,
+      "talent": 0.618804,
+      "capital": 0.000152588,
+      "rank": 901,
+      "lucky_seized": 8,
+      "lucky_missed": 8,
+      "unlucky": 24
+    },
+    {
+      "id": 550,
+      "talent": 0.534118,
+      "capital": 0.000152588,
+      "rank": 902,
+      "lucky_seized": 11,
+      "lucky_missed": 9,
+      "unlucky": 27
+    },
+    {
+      "id": 850,
+      "talent": 0.614865,
+      "capital": 0.000152588,
+      "rank": 903,
+      "lucky_seized": 7,
+      "lucky_missed": 6,
+      "unlucky": 23
+    },
+    {
+      "id": 66,
+      "talent": 0.572418,
+      "capital": 0.000152588,
+      "rank": 904,
+      "lucky_seized": 9,
+      "lucky_missed": 6,
+      "unlucky": 25
+    },
+    {
+      "id": 765,
+      "talent": 0.507108,
+      "capital": 0.000152588,
+      "rank": 905,
+      "lucky_seized": 5,
+      "lucky_missed": 4,
+      "unlucky": 21
+    },
+    {
+      "id": 696,
+      "talent": 0.562139,
+      "capital": 0.000152588,
+      "rank": 906,
+      "lucky_seized": 11,
+      "lucky_missed": 6,
+      "unlucky": 27
+    },
+    {
+      "id": 187,
+      "talent": 0.602109,
+      "capital": 0.000152588,
+      "rank": 907,
+      "lucky_seized": 7,
+      "lucky_missed": 10,
+      "unlucky": 23
+    },
+    {
+      "id": 448,
+      "talent": 0.634533,
+      "capital": 0.000152588,
+      "rank": 908,
+      "lucky_seized": 8,
+      "lucky_missed": 7,
+      "unlucky": 24
+    },
+    {
+      "id": 176,
+      "talent": 0.319359,
+      "capital": 0.000152588,
+      "rank": 909,
+      "lucky_seized": 3,
+      "lucky_missed": 19,
+      "unlucky": 19
+    },
+    {
+      "id": 87,
+      "talent": 0.660951,
+      "capital": 0.000152588,
+      "rank": 910,
+      "lucky_seized": 7,
+      "lucky_missed": 4,
+      "unlucky": 23
+    },
+    {
+      "id": 544,
+      "talent": 0.618266,
+      "capital": 0.000152588,
+      "rank": 911,
+      "lucky_seized": 13,
+      "lucky_missed": 6,
+      "unlucky": 29
+    },
+    {
+      "id": 172,
+      "talent": 0.739109,
+      "capital": 0.000152588,
+      "rank": 912,
+      "lucky_seized": 13,
+      "lucky_missed": 2,
+      "unlucky": 29
+    },
+    {
+      "id": 891,
+      "talent": 0.785034,
+      "capital": 0.000152588,
+      "rank": 913,
+      "lucky_seized": 8,
+      "lucky_missed": 3,
+      "unlucky": 24
+    },
+    {
+      "id": 264,
+      "talent": 0.505486,
+      "capital": 0.000152588,
+      "rank": 914,
+      "lucky_seized": 7,
+      "lucky_missed": 6,
+      "unlucky": 23
+    },
+    {
+      "id": 526,
+      "talent": 0.524408,
+      "capital": 0.000152588,
+      "rank": 915,
+      "lucky_seized": 8,
+      "lucky_missed": 12,
+      "unlucky": 24
+    },
+    {
+      "id": 684,
+      "talent": 0.515426,
+      "capital": 0.000152588,
+      "rank": 916,
+      "lucky_seized": 9,
+      "lucky_missed": 4,
+      "unlucky": 25
+    },
+    {
+      "id": 721,
+      "talent": 0.558991,
+      "capital": 0.000152588,
+      "rank": 917,
+      "lucky_seized": 7,
+      "lucky_missed": 9,
+      "unlucky": 23
+    },
+    {
+      "id": 107,
+      "talent": 0.589953,
+      "capital": 7.62939e-05,
+      "rank": 918,
+      "lucky_seized": 8,
+      "lucky_missed": 8,
+      "unlucky": 25
+    },
+    {
+      "id": 384,
+      "talent": 0.502534,
+      "capital": 7.62939e-05,
+      "rank": 919,
+      "lucky_seized": 7,
+      "lucky_missed": 13,
+      "unlucky": 24
+    },
+    {
+      "id": 650,
+      "talent": 0.595563,
+      "capital": 7.62939e-05,
+      "rank": 920,
+      "lucky_seized": 8,
+      "lucky_missed": 14,
+      "unlucky": 25
+    },
+    {
+      "id": 704,
+      "talent": 0.525863,
+      "capital": 7.62939e-05,
+      "rank": 921,
+      "lucky_seized": 8,
+      "lucky_missed": 8,
+      "unlucky": 25
+    },
+    {
+      "id": 728,
+      "talent": 0.522565,
+      "capital": 7.62939e-05,
+      "rank": 922,
+      "lucky_seized": 7,
+      "lucky_missed": 6,
+      "unlucky": 24
+    },
+    {
+      "id": 198,
+      "talent": 0.592394,
+      "capital": 7.62939e-05,
+      "rank": 923,
+      "lucky_seized": 7,
+      "lucky_missed": 9,
+      "unlucky": 24
+    },
+    {
+      "id": 952,
+      "talent": 0.579677,
+      "capital": 7.62939e-05,
+      "rank": 924,
+      "lucky_seized": 6,
+      "lucky_missed": 8,
+      "unlucky": 23
+    },
+    {
+      "id": 582,
+      "talent": 0.479739,
+      "capital": 7.62939e-05,
+      "rank": 925,
+      "lucky_seized": 4,
+      "lucky_missed": 15,
+      "unlucky": 21
+    },
+    {
+      "id": 971,
+      "talent": 0.582404,
+      "capital": 7.62939e-05,
+      "rank": 926,
+      "lucky_seized": 9,
+      "lucky_missed": 6,
+      "unlucky": 26
+    },
+    {
+      "id": 142,
+      "talent": 0.900513,
+      "capital": 7.62939e-05,
+      "rank": 927,
+      "lucky_seized": 11,
+      "lucky_missed": 2,
+      "unlucky": 28
+    },
+    {
+      "id": 627,
+      "talent": 0.455762,
+      "capital": 7.62939e-05,
+      "rank": 928,
+      "lucky_seized": 7,
+      "lucky_missed": 8,
+      "unlucky": 24
+    },
+    {
+      "id": 358,
+      "talent": 0.570252,
+      "capital": 7.62939e-05,
+      "rank": 929,
+      "lucky_seized": 7,
+      "lucky_missed": 7,
+      "unlucky": 24
+    },
+    {
+      "id": 608,
+      "talent": 0.538727,
+      "capital": 7.62939e-05,
+      "rank": 930,
+      "lucky_seized": 7,
+      "lucky_missed": 12,
+      "unlucky": 24
+    },
+    {
+      "id": 560,
+      "talent": 0.67426,
+      "capital": 7.62939e-05,
+      "rank": 931,
+      "lucky_seized": 15,
+      "lucky_missed": 3,
+      "unlucky": 32
+    },
+    {
+      "id": 355,
+      "talent": 0.496817,
+      "capital": 7.62939e-05,
+      "rank": 932,
+      "lucky_seized": 5,
+      "lucky_missed": 11,
+      "unlucky": 22
+    },
+    {
+      "id": 351,
+      "talent": 0.383553,
+      "capital": 7.62939e-05,
+      "rank": 933,
+      "lucky_seized": 7,
+      "lucky_missed": 13,
+      "unlucky": 24
+    },
+    {
+      "id": 487,
+      "talent": 0.611863,
+      "capital": 7.62939e-05,
+      "rank": 934,
+      "lucky_seized": 7,
+      "lucky_missed": 7,
+      "unlucky": 24
+    },
+    {
+      "id": 929,
+      "talent": 0.542803,
+      "capital": 7.62939e-05,
+      "rank": 935,
+      "lucky_seized": 6,
+      "lucky_missed": 8,
+      "unlucky": 23
+    },
+    {
+      "id": 327,
+      "talent": 0.614626,
+      "capital": 7.62939e-05,
+      "rank": 936,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 30
+    },
+    {
+      "id": 504,
+      "talent": 0.472002,
+      "capital": 7.62939e-05,
+      "rank": 937,
+      "lucky_seized": 6,
+      "lucky_missed": 16,
+      "unlucky": 23
+    },
+    {
+      "id": 414,
+      "talent": 0.487969,
+      "capital": 7.62939e-05,
+      "rank": 938,
+      "lucky_seized": 7,
+      "lucky_missed": 12,
+      "unlucky": 24
+    },
+    {
+      "id": 434,
+      "talent": 0.577278,
+      "capital": 7.62939e-05,
+      "rank": 939,
+      "lucky_seized": 8,
+      "lucky_missed": 8,
+      "unlucky": 25
+    },
+    {
+      "id": 17,
+      "talent": 0.480772,
+      "capital": 7.62939e-05,
+      "rank": 940,
+      "lucky_seized": 7,
+      "lucky_missed": 13,
+      "unlucky": 24
+    },
+    {
+      "id": 697,
+      "talent": 0.570723,
+      "capital": 7.62939e-05,
+      "rank": 941,
+      "lucky_seized": 11,
+      "lucky_missed": 9,
+      "unlucky": 28
+    },
+    {
+      "id": 98,
+      "talent": 0.542344,
+      "capital": 7.62939e-05,
+      "rank": 942,
+      "lucky_seized": 10,
+      "lucky_missed": 2,
+      "unlucky": 27
+    },
+    {
+      "id": 111,
+      "talent": 0.543389,
+      "capital": 3.8147e-05,
+      "rank": 943,
+      "lucky_seized": 9,
+      "lucky_missed": 6,
+      "unlucky": 27
+    },
+    {
+      "id": 623,
+      "talent": 0.614207,
+      "capital": 3.8147e-05,
+      "rank": 944,
+      "lucky_seized": 7,
+      "lucky_missed": 4,
+      "unlucky": 25
+    },
+    {
+      "id": 323,
+      "talent": 0.58112,
+      "capital": 3.8147e-05,
+      "rank": 945,
+      "lucky_seized": 8,
+      "lucky_missed": 5,
+      "unlucky": 26
+    },
+    {
+      "id": 867,
+      "talent": 0.523744,
+      "capital": 3.8147e-05,
+      "rank": 946,
+      "lucky_seized": 3,
+      "lucky_missed": 14,
+      "unlucky": 21
+    },
+    {
+      "id": 402,
+      "talent": 0.699516,
+      "capital": 3.8147e-05,
+      "rank": 947,
+      "lucky_seized": 11,
+      "lucky_missed": 8,
+      "unlucky": 29
+    },
+    {
+      "id": 562,
+      "talent": 0.532881,
+      "capital": 3.8147e-05,
+      "rank": 948,
+      "lucky_seized": 6,
+      "lucky_missed": 8,
+      "unlucky": 24
+    },
+    {
+      "id": 679,
+      "talent": 0.508813,
+      "capital": 3.8147e-05,
+      "rank": 949,
+      "lucky_seized": 7,
+      "lucky_missed": 11,
+      "unlucky": 25
+    },
+    {
+      "id": 723,
+      "talent": 0.583409,
+      "capital": 3.8147e-05,
+      "rank": 950,
+      "lucky_seized": 9,
+      "lucky_missed": 6,
+      "unlucky": 27
+    },
+    {
+      "id": 845,
+      "talent": 0.605155,
+      "capital": 3.8147e-05,
+      "rank": 951,
+      "lucky_seized": 9,
+      "lucky_missed": 7,
+      "unlucky": 27
+    },
+    {
+      "id": 645,
+      "talent": 0.535082,
+      "capital": 3.8147e-05,
+      "rank": 952,
+      "lucky_seized": 7,
+      "lucky_missed": 11,
+      "unlucky": 25
+    },
+    {
+      "id": 82,
+      "talent": 0.483846,
+      "capital": 3.8147e-05,
+      "rank": 953,
+      "lucky_seized": 6,
+      "lucky_missed": 9,
+      "unlucky": 24
+    },
+    {
+      "id": 802,
+      "talent": 0.578076,
+      "capital": 3.8147e-05,
+      "rank": 954,
+      "lucky_seized": 7,
+      "lucky_missed": 11,
+      "unlucky": 25
+    },
+    {
+      "id": 540,
+      "talent": 0.580715,
+      "capital": 3.8147e-05,
+      "rank": 955,
+      "lucky_seized": 8,
+      "lucky_missed": 9,
+      "unlucky": 26
+    },
+    {
+      "id": 651,
+      "talent": 0.429338,
+      "capital": 3.8147e-05,
+      "rank": 956,
+      "lucky_seized": 3,
+      "lucky_missed": 15,
+      "unlucky": 21
+    },
+    {
+      "id": 78,
+      "talent": 0.499128,
+      "capital": 3.8147e-05,
+      "rank": 957,
+      "lucky_seized": 8,
+      "lucky_missed": 7,
+      "unlucky": 26
+    },
+    {
+      "id": 629,
+      "talent": 0.503373,
+      "capital": 1.90735e-05,
+      "rank": 958,
+      "lucky_seized": 4,
+      "lucky_missed": 9,
+      "unlucky": 23
+    },
+    {
+      "id": 116,
+      "talent": 0.512028,
+      "capital": 1.90735e-05,
+      "rank": 959,
+      "lucky_seized": 7,
+      "lucky_missed": 7,
+      "unlucky": 26
+    },
+    {
+      "id": 658,
+      "talent": 0.504267,
+      "capital": 1.90735e-05,
+      "rank": 960,
+      "lucky_seized": 7,
+      "lucky_missed": 5,
+      "unlucky": 26
+    },
+    {
+      "id": 693,
+      "talent": 0.470258,
+      "capital": 1.90735e-05,
+      "rank": 961,
+      "lucky_seized": 8,
+      "lucky_missed": 17,
+      "unlucky": 27
+    },
+    {
+      "id": 691,
+      "talent": 0.5599,
+      "capital": 1.90735e-05,
+      "rank": 962,
+      "lucky_seized": 6,
+      "lucky_missed": 10,
+      "unlucky": 25
+    },
+    {
+      "id": 313,
+      "talent": 0.434741,
+      "capital": 1.90735e-05,
+      "rank": 963,
+      "lucky_seized": 7,
+      "lucky_missed": 14,
+      "unlucky": 26
+    },
+    {
+      "id": 303,
+      "talent": 0.429203,
+      "capital": 1.90735e-05,
+      "rank": 964,
+      "lucky_seized": 7,
+      "lucky_missed": 9,
+      "unlucky": 26
+    },
+    {
+      "id": 657,
+      "talent": 0.520751,
+      "capital": 1.90735e-05,
+      "rank": 965,
+      "lucky_seized": 5,
+      "lucky_missed": 11,
+      "unlucky": 24
+    },
+    {
+      "id": 295,
+      "talent": 0.687219,
+      "capital": 1.90735e-05,
+      "rank": 966,
+      "lucky_seized": 7,
+      "lucky_missed": 7,
+      "unlucky": 26
+    },
+    {
+      "id": 753,
+      "talent": 0.564169,
+      "capital": 1.90735e-05,
+      "rank": 967,
+      "lucky_seized": 6,
+      "lucky_missed": 6,
+      "unlucky": 25
+    },
+    {
+      "id": 171,
+      "talent": 0.560017,
+      "capital": 1.90735e-05,
+      "rank": 968,
+      "lucky_seized": 5,
+      "lucky_missed": 10,
+      "unlucky": 24
+    },
+    {
+      "id": 53,
+      "talent": 0.407075,
+      "capital": 1.90735e-05,
+      "rank": 969,
+      "lucky_seized": 3,
+      "lucky_missed": 10,
+      "unlucky": 22
+    },
+    {
+      "id": 183,
+      "talent": 0.619775,
+      "capital": 1.90735e-05,
+      "rank": 970,
+      "lucky_seized": 9,
+      "lucky_missed": 5,
+      "unlucky": 28
+    },
+    {
+      "id": 144,
+      "talent": 0.507036,
+      "capital": 1.90735e-05,
+      "rank": 971,
+      "lucky_seized": 7,
+      "lucky_missed": 4,
+      "unlucky": 26
+    },
+    {
+      "id": 262,
+      "talent": 0.723758,
+      "capital": 1.90735e-05,
+      "rank": 972,
+      "lucky_seized": 7,
+      "lucky_missed": 7,
+      "unlucky": 26
+    },
+    {
+      "id": 893,
+      "talent": 0.575813,
+      "capital": 9.53674e-06,
+      "rank": 973,
+      "lucky_seized": 9,
+      "lucky_missed": 9,
+      "unlucky": 29
+    },
+    {
+      "id": 91,
+      "talent": 0.413622,
+      "capital": 9.53674e-06,
+      "rank": 974,
+      "lucky_seized": 7,
+      "lucky_missed": 7,
+      "unlucky": 27
+    },
+    {
+      "id": 85,
+      "talent": 0.614497,
+      "capital": 9.53674e-06,
+      "rank": 975,
+      "lucky_seized": 6,
+      "lucky_missed": 8,
+      "unlucky": 26
+    },
+    {
+      "id": 789,
+      "talent": 0.400723,
+      "capital": 9.53674e-06,
+      "rank": 976,
+      "lucky_seized": 6,
+      "lucky_missed": 10,
+      "unlucky": 26
+    },
+    {
+      "id": 793,
+      "talent": 0.431879,
+      "capital": 9.53674e-06,
+      "rank": 977,
+      "lucky_seized": 3,
+      "lucky_missed": 15,
+      "unlucky": 23
+    },
+    {
+      "id": 597,
+      "talent": 0.426309,
+      "capital": 9.53674e-06,
+      "rank": 978,
+      "lucky_seized": 4,
+      "lucky_missed": 8,
+      "unlucky": 24
+    },
+    {
+      "id": 240,
+      "talent": 0.463807,
+      "capital": 4.76837e-06,
+      "rank": 979,
+      "lucky_seized": 6,
+      "lucky_missed": 10,
+      "unlucky": 27
+    },
+    {
+      "id": 64,
+      "talent": 0.440246,
+      "capital": 4.76837e-06,
+      "rank": 980,
+      "lucky_seized": 4,
+      "lucky_missed": 11,
+      "unlucky": 25
+    },
+    {
+      "id": 35,
+      "talent": 0.630888,
+      "capital": 4.76837e-06,
+      "rank": 981,
+      "lucky_seized": 7,
+      "lucky_missed": 9,
+      "unlucky": 28
+    },
+    {
+      "id": 191,
+      "talent": 0.754519,
+      "capital": 4.76837e-06,
+      "rank": 982,
+      "lucky_seized": 11,
+      "lucky_missed": 2,
+      "unlucky": 32
+    },
+    {
+      "id": 522,
+      "talent": 0.493867,
+      "capital": 4.76837e-06,
+      "rank": 983,
+      "lucky_seized": 8,
+      "lucky_missed": 7,
+      "unlucky": 29
+    },
+    {
+      "id": 283,
+      "talent": 0.551636,
+      "capital": 4.76837e-06,
+      "rank": 984,
+      "lucky_seized": 5,
+      "lucky_missed": 5,
+      "unlucky": 26
+    },
+    {
+      "id": 331,
+      "talent": 0.539347,
+      "capital": 4.76837e-06,
+      "rank": 985,
+      "lucky_seized": 13,
+      "lucky_missed": 9,
+      "unlucky": 34
+    },
+    {
+      "id": 556,
+      "talent": 0.542993,
+      "capital": 4.76837e-06,
+      "rank": 986,
+      "lucky_seized": 6,
+      "lucky_missed": 4,
+      "unlucky": 27
+    },
+    {
+      "id": 370,
+      "talent": 0.516248,
+      "capital": 4.76837e-06,
+      "rank": 987,
+      "lucky_seized": 7,
+      "lucky_missed": 11,
+      "unlucky": 28
+    },
+    {
+      "id": 360,
+      "talent": 0.507626,
+      "capital": 4.76837e-06,
+      "rank": 988,
+      "lucky_seized": 7,
+      "lucky_missed": 6,
+      "unlucky": 28
+    },
+    {
+      "id": 899,
+      "talent": 0.519505,
+      "capital": 4.76837e-06,
+      "rank": 989,
+      "lucky_seized": 7,
+      "lucky_missed": 12,
+      "unlucky": 28
+    },
+    {
+      "id": 808,
+      "talent": 0.639645,
+      "capital": 4.76837e-06,
+      "rank": 990,
+      "lucky_seized": 8,
+      "lucky_missed": 8,
+      "unlucky": 29
+    },
+    {
+      "id": 587,
+      "talent": 0.5067,
+      "capital": 4.76837e-06,
+      "rank": 991,
+      "lucky_seized": 7,
+      "lucky_missed": 8,
+      "unlucky": 28
+    },
+    {
+      "id": 204,
+      "talent": 0.583821,
+      "capital": 2.38419e-06,
+      "rank": 992,
+      "lucky_seized": 6,
+      "lucky_missed": 7,
+      "unlucky": 28
+    },
+    {
+      "id": 89,
+      "talent": 0.586313,
+      "capital": 2.38419e-06,
+      "rank": 993,
+      "lucky_seized": 9,
+      "lucky_missed": 5,
+      "unlucky": 31
+    },
+    {
+      "id": 513,
+      "talent": 0.598944,
+      "capital": 2.38419e-06,
+      "rank": 994,
+      "lucky_seized": 6,
+      "lucky_missed": 7,
+      "unlucky": 28
+    },
+    {
+      "id": 561,
+      "talent": 0.498423,
+      "capital": 1.19209e-06,
+      "rank": 995,
+      "lucky_seized": 7,
+      "lucky_missed": 5,
+      "unlucky": 30
+    },
+    {
+      "id": 921,
+      "talent": 0.524545,
+      "capital": 1.19209e-06,
+      "rank": 996,
+      "lucky_seized": 5,
+      "lucky_missed": 8,
+      "unlucky": 28
+    },
+    {
+      "id": 304,
+      "talent": 0.665831,
+      "capital": 1.19209e-06,
+      "rank": 997,
+      "lucky_seized": 9,
+      "lucky_missed": 5,
+      "unlucky": 32
+    },
+    {
+      "id": 686,
+      "talent": 0.399793,
+      "capital": 5.96046e-07,
+      "rank": 998,
+      "lucky_seized": 5,
+      "lucky_missed": 12,
+      "unlucky": 29
+    },
+    {
+      "id": 4,
+      "talent": 0.483069,
+      "capital": 2.98023e-07,
+      "rank": 999,
+      "lucky_seized": 5,
+      "lucky_missed": 9,
+      "unlucky": 30
+    },
+    {
+      "id": 896,
+      "talent": 0.557535,
+      "capital": 3.72529e-08,
+      "rank": 1000,
+      "lucky_seized": 5,
+      "lucky_missed": 6,
+      "unlucky": 33
+    }
+  ]
+}

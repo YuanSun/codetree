@@ -1,0 +1,1672 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatlog 管理控制台</title>
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#1c1c1e" media="(prefers-color-scheme: dark)">
+    <link rel="stylesheet" href="/static/styles.css">
+    <script type="module" src="/static/js/app.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="console-brand">
+                <div class="console-brand-mark" aria-hidden="true">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1>Chatlog 控制台</h1>
+                    <div class="console-brand-subtitle">检索、分析与管理微信聊天数据</div>
+                </div>
+            </div>
+            <div class="console-actions">
+                <button id="control-summary-button" class="control-summary-button" type="button" aria-label="打开系统设置">
+                    <span class="control-summary-avatar" aria-hidden="true">微</span>
+                    <span class="control-summary-copy">
+                        <strong id="control-header-account">尚未选择账号</strong>
+                        <small id="control-header-detail">读取本机状态…</small>
+                    </span>
+                    <span id="control-header-database" class="control-database-state is-loading">DB 检查中</span>
+                </button>
+                <span id="service-status" class="service-status">正在检查</span>
+                <span class="console-shortcut">⌘/Ctrl K 全局搜索</span>
+            </div>
+        </header>
+
+        <nav class="tabs" aria-label="控制台功能导航">
+            <span class="nav-section-label">概览</span>
+            <button class="tab-btn active" data-icon="▦" data-tab="dashboard">仪表盘</button>
+            <button class="tab-btn" data-icon="⌁" data-tab="analytics">聊天数据分析</button>
+            <button class="tab-btn" data-icon="▤" data-tab="database">数据库</button>
+            <button class="tab-btn" data-icon="⌕" data-tab="global-search">全局搜索</button>
+            <button class="tab-btn" data-icon="▧" data-tab="ocr-search">图片文字搜索</button>
+            <span class="nav-section-label">自动化</span>
+            <button class="tab-btn" data-icon="↗" data-tab="hook">推送页面</button>
+            <button class="tab-btn" data-icon="◫" data-tab="ocr-center">OCR 识别</button>
+            <span class="nav-section-label">数据查询</span>
+            <button class="tab-btn" data-icon="✦" data-tab="message-center">消息中心</button>
+            <button class="tab-btn" data-icon="◷" data-tab="session">最近会话</button>
+            <button class="tab-btn" data-icon="♟" data-tab="chatroom">群聊管理</button>
+            <button class="tab-btn" data-icon="◎" data-tab="contact">联系人</button>
+            <button class="tab-btn" data-icon="◉" data-tab="sns">朋友圈与收藏</button>
+            <button class="tab-btn" data-icon="≡" data-tab="chatlog">消息检索</button>
+            <span class="nav-section-label">系统</span>
+            <button class="tab-btn" data-icon="⚙" data-tab="settings">系统设置</button>
+            <span class="nav-section-label">开发工具</span>
+            <button class="tab-btn" data-icon="⌘" data-tab="api-inspector">API 状态</button>
+        </nav>
+
+        <!-- Runtime dashboard -->
+        <div id="dashboard" class="tab-content active">
+            <div class="page-heading runtime-page-heading">
+                <div>
+                    <span class="page-kicker">LIVE OPERATIONS</span>
+                    <h2>项目运行仪表盘</h2>
+                    <p>实时查看服务、数据库、项目关联进程文件读写、请求吞吐、延迟、内存、CPU 与 Go 运行时指标，集中呈现排查线索。</p>
+                </div>
+                <div class="runtime-heading-actions">
+                    <span id="runtime-live-state" class="runtime-live-state"><i aria-hidden="true"></i>每 2 秒更新</span>
+                    <button id="runtime-refresh-button" class="btn btn-secondary" type="button" data-on-click="loadRuntimeDashboard" data-action-args="[{&quot;manual&quot;:true}]">立即刷新</button>
+                    <button id="runtime-terminate-button" class="btn btn-danger runtime-terminate-button" type="button" data-on-click="terminateChatlogAndRestartWeChat">结束 Chatlog 并重启微信</button>
+                </div>
+            </div>
+
+            <section id="runtime-hero" class="runtime-hero" aria-live="polite">
+                <div class="runtime-hero-status">
+                    <span id="runtime-overall-dot" class="runtime-overall-dot is-loading" aria-hidden="true"></span>
+                    <div>
+                        <span class="runtime-eyebrow">当前状态</span>
+                        <strong id="runtime-overall-state">正在读取运行状态</strong>
+                        <small id="runtime-overall-detail">等待首个实时样本</small>
+                    </div>
+                </div>
+                <div class="runtime-hero-meta">
+                    <span>监听地址 <strong id="runtime-listen-address">-</strong></span>
+                    <span>最后更新 <strong id="runtime-updated-at">-</strong></span>
+                </div>
+            </section>
+
+            <div class="runtime-metric-grid">
+                <article class="runtime-metric-card accent-blue">
+                    <span class="runtime-metric-label">运行时长</span>
+                    <strong id="runtime-uptime">-</strong>
+                    <small id="runtime-started-at">启动时间 -</small>
+                </article>
+                <article class="runtime-metric-card accent-violet">
+                    <span class="runtime-metric-label">进程 CPU</span>
+                    <strong id="runtime-cpu">-</strong>
+                    <small id="runtime-cpu-context">- 个逻辑核心</small>
+                </article>
+                <article class="runtime-metric-card accent-emerald">
+                    <span class="runtime-metric-label">进程内存 RSS</span>
+                    <strong id="runtime-rss">-</strong>
+                    <small id="runtime-heap-context">堆内存 -</small>
+                </article>
+                <article class="runtime-metric-card accent-cyan">
+                    <span class="runtime-metric-label">Go 协程</span>
+                    <strong id="runtime-goroutines">-</strong>
+                    <small id="runtime-thread-context">系统线程 -</small>
+                </article>
+                <article class="runtime-metric-card accent-indigo">
+                    <span class="runtime-metric-label">API 请求</span>
+                    <strong id="runtime-request-total">-</strong>
+                    <small id="runtime-request-active">当前并发 -</small>
+                </article>
+                <article class="runtime-metric-card accent-amber">
+                    <span class="runtime-metric-label">平均响应</span>
+                    <strong id="runtime-latency-average">-</strong>
+                    <small id="runtime-latency-max">最大 -</small>
+                </article>
+                <article class="runtime-metric-card accent-rose">
+                    <span class="runtime-metric-label">HTTP 异常</span>
+                    <strong id="runtime-http-errors">-</strong>
+                    <small id="runtime-http-error-context">4xx / 5xx</small>
+                </article>
+                <article class="runtime-metric-card accent-slate">
+                    <span class="runtime-metric-label">数据库</span>
+                    <strong id="runtime-database-state">-</strong>
+                    <small id="runtime-database-message">等待状态</small>
+                </article>
+            </div>
+
+            <section class="runtime-panel runtime-database-io-panel">
+                <div class="runtime-panel-heading">
+                    <div>
+                        <span class="runtime-eyebrow">DATABASE I/O</span>
+                        <h3>数据库读写</h3>
+                    </div>
+                    <span class="runtime-panel-note">按数据库接口实际传输字节统计；当前服务为只读查询模式</span>
+                </div>
+                <div class="runtime-io-metric-grid">
+                    <div class="runtime-io-metric"><span>总读入量</span><strong id="runtime-db-read-total">-</strong><small id="runtime-db-read-ops">- 次读取</small></div>
+                    <div class="runtime-io-metric"><span>总写入量</span><strong id="runtime-db-write-total">-</strong><small id="runtime-db-write-ops">- 次写入</small></div>
+                    <div class="runtime-io-metric is-read"><span>实时读取速度</span><strong id="runtime-db-read-speed">-</strong><small>最近采样窗口</small></div>
+                    <div class="runtime-io-metric is-write"><span>实时写入速度</span><strong id="runtime-db-write-speed">-</strong><small>最近采样窗口</small></div>
+                    <div class="runtime-io-metric"><span>消息增量流</span><strong id="runtime-change-mode">-</strong><small id="runtime-change-subscribers">- 个消费者</small></div>
+                    <div class="runtime-io-metric"><span>统一发布量</span><strong id="runtime-change-messages">-</strong><small id="runtime-change-batches">- 个批次</small></div>
+                    <div class="runtime-io-metric"><span>消费者积压</span><strong id="runtime-change-pending">-</strong><small id="runtime-change-buffered">- 条回放缓存</small></div>
+                    <div class="runtime-io-metric"><span>最新同步延迟</span><strong id="runtime-change-lag">-</strong><small id="runtime-change-error">运行正常</small></div>
+                </div>
+                <div class="runtime-io-trend-grid">
+                    <div class="runtime-trend-card">
+                        <div><span>数据库读取速度</span><strong id="runtime-db-read-trend-value">-</strong></div>
+                        <div id="runtime-db-read-trend" class="runtime-sparkline runtime-io-sparkline" aria-label="数据库读取速度趋势"></div>
+                    </div>
+                    <div class="runtime-trend-card">
+                        <div><span>数据库写入速度</span><strong id="runtime-db-write-trend-value">-</strong></div>
+                        <div id="runtime-db-write-trend" class="runtime-sparkline runtime-io-sparkline" aria-label="数据库写入速度趋势"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="runtime-panel runtime-file-io-panel">
+                <div class="runtime-panel-heading">
+                    <div>
+                        <span class="runtime-eyebrow">PROJECT FILE I/O</span>
+                        <h3>项目及衍生进程文件读写</h3>
+                    </div>
+                    <span id="runtime-file-io-state" class="runtime-panel-note">等待操作系统进程采样</span>
+                </div>
+                <div class="runtime-io-metric-grid">
+                    <div class="runtime-io-metric"><span>累计文件读取量</span><strong id="runtime-file-read-total">-</strong><small id="runtime-file-read-active">当前活跃进程合计 -</small></div>
+                    <div class="runtime-io-metric"><span>累计文件写入量</span><strong id="runtime-file-write-total">-</strong><small id="runtime-file-write-active">当前活跃进程合计 -</small></div>
+                    <div class="runtime-io-metric is-read"><span>实时文件读取速度</span><strong id="runtime-file-read-speed">-</strong><small>最近 2 秒采样窗口</small></div>
+                    <div class="runtime-io-metric is-write"><span>实时文件写入速度</span><strong id="runtime-file-write-speed">-</strong><small>最近 2 秒采样窗口</small></div>
+                </div>
+                <div class="runtime-io-trend-grid">
+                    <div class="runtime-trend-card">
+                        <div><span>全部关联进程读取速度</span><strong id="runtime-file-read-trend-value">-</strong></div>
+                        <div id="runtime-file-read-trend" class="runtime-sparkline runtime-io-sparkline" aria-label="全部关联进程文件读取速度趋势"></div>
+                    </div>
+                    <div class="runtime-trend-card">
+                        <div><span>全部关联进程写入速度</span><strong id="runtime-file-write-trend-value">-</strong></div>
+                        <div id="runtime-file-write-trend" class="runtime-sparkline runtime-io-sparkline" aria-label="全部关联进程文件写入速度趋势"></div>
+                    </div>
+                </div>
+                <div class="runtime-file-process-heading">
+                    <strong>实时进程明细</strong>
+                    <span>包含 Chatlog、OCR、数据密钥辅助进程及其子进程；累计量保留已观察到的退出进程。</span>
+                </div>
+                <div id="runtime-file-io-processes" class="runtime-file-processes">
+                    <div class="runtime-list-empty">正在识别项目关联进程...</div>
+                </div>
+                <div class="runtime-file-trace">
+                    <div class="runtime-file-trace-heading">
+                        <div>
+                            <strong>逐文件读写明细</strong>
+                            <span id="runtime-file-trace-state">按需开启，事件仅保存在内存中</span>
+                        </div>
+                        <div class="runtime-file-trace-actions">
+                            <button id="runtime-file-trace-start" class="btn btn-primary" type="button" data-on-click="startRuntimeFileTrace">开启详细追踪</button>
+                            <button id="runtime-file-trace-stop" class="btn btn-secondary" type="button" data-on-click="stopRuntimeFileTrace" disabled>停止追踪</button>
+                            <button id="runtime-file-trace-clear" class="btn btn-secondary" type="button" data-on-click="clearRuntimeFileTrace">清空记录</button>
+                        </div>
+                    </div>
+                    <div class="runtime-file-trace-notice">
+                        <span>使用 macOS <code>fs_usage</code> 捕获真实文件系统调用，开启时系统会请求一次管理员授权。</span>
+                        <span id="runtime-file-trace-targets">追踪目标将在开启时锁定</span>
+                    </div>
+                    <div class="runtime-file-trace-auto-stop">
+                        <label class="runtime-file-trace-auto-stop-toggle">
+                            <input id="runtime-file-trace-auto-stop-enabled" type="checkbox">
+                            <span>写入达到阈值后自动暂停</span>
+                        </label>
+                        <label class="runtime-file-trace-auto-stop-value">
+                            <span>本轮累计写入</span>
+                            <input id="runtime-file-trace-auto-stop-mb" type="number" min="0.1" max="102400" step="0.1" value="50" inputmode="decimal">
+                            <span>MB</span>
+                        </label>
+                        <span id="runtime-file-trace-auto-stop-state" class="runtime-panel-note">自动暂停已关闭</span>
+                    </div>
+                    <div class="runtime-file-trace-summary">
+                        <div><span>已捕获</span><strong id="runtime-file-trace-total">0 条</strong></div>
+                        <div><span>读取</span><strong id="runtime-file-trace-read">0 次 · 0 B</strong></div>
+                        <div><span>写入</span><strong id="runtime-file-trace-write">0 次 · 0 B</strong></div>
+                    <div><span>文件元数据 / 已过滤噪声</span><strong id="runtime-file-trace-metadata">0 次 / 0 次</strong></div>
+                    </div>
+                    <div class="runtime-file-trace-rankings">
+                        <section><div class="runtime-file-ranking-heading"><strong>读取排名 Top 100</strong><span>本轮追踪开启至结束</span></div><div id="runtime-file-read-ranking" class="runtime-file-ranking-list"><div class="runtime-list-empty">等待追踪数据</div></div></section>
+                        <section><div class="runtime-file-ranking-heading"><strong>写入排名 Top 100</strong><span>本轮追踪开启至结束</span></div><div id="runtime-file-write-ranking" class="runtime-file-ranking-list"><div class="runtime-list-empty">等待追踪数据</div></div></section>
+                    </div>
+                    <div class="runtime-file-trace-toolbar">
+                        <label>类型
+                            <select id="runtime-file-trace-kind" data-on-change="loadRuntimeFileTraceDetails" data-action-args="[{&quot;force&quot;:true}]">
+                                <option value="all">全部事件</option>
+                                <option value="write">仅写入</option>
+                                <option value="read">仅读取</option>
+                                <option value="metadata">元数据操作</option>
+                            </select>
+                        </label>
+                        <label class="runtime-file-trace-query">路径 / 进程 / 操作
+                            <input id="runtime-file-trace-query" type="search" placeholder="例如 Message、.db-wal、WrData" data-on-input="scheduleRuntimeFileTraceFilter">
+                        </label>
+                        <span id="runtime-file-trace-retention" class="runtime-panel-note">最多保留最近 1,000 条</span>
+                    </div>
+                    <div id="runtime-file-trace-records" class="runtime-file-trace-records">
+                        <div class="runtime-list-empty">开启详细追踪后，这里会显示每次读取、写入和文件元数据操作。</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="runtime-panel">
+                <div class="runtime-panel-heading">
+                    <div><span class="runtime-eyebrow">QUERY PERFORMANCE</span><h3>数据库查询延迟与慢查询</h3></div>
+                    <span id="runtime-query-sample-count" class="runtime-panel-note">等待查询样本</span>
+                </div>
+                <div class="runtime-io-metric-grid">
+                    <div class="runtime-io-metric"><span>P50 延迟</span><strong id="runtime-query-p50">-</strong><small>最近 512 次数据库请求</small></div>
+                    <div class="runtime-io-metric"><span>P95 延迟</span><strong id="runtime-query-p95">-</strong><small>主要性能基线</small></div>
+                    <div class="runtime-io-metric"><span>P99 延迟</span><strong id="runtime-query-p99">-</strong><small>尾部延迟</small></div>
+                    <div class="runtime-io-metric"><span>查询错误</span><strong id="runtime-query-errors">-</strong><small id="runtime-query-row-count">累计返回 - 行</small></div>
+                </div>
+                <div id="runtime-slow-queries" class="runtime-resource-result">
+                    <div class="runtime-list-empty">暂无慢查询记录</div>
+                </div>
+            </section>
+
+            <section class="runtime-panel runtime-database-audit-panel">
+                <div class="runtime-panel-heading runtime-filter-heading">
+                    <div>
+                        <span class="runtime-eyebrow">DATABASE COVERAGE</span>
+                        <h3>数据库解析覆盖率与分片水位</h3>
+                    </div>
+                    <div class="runtime-filter-controls">
+                        <span id="runtime-audit-updated" class="runtime-panel-note">全库审计仅按需执行</span>
+                        <button id="runtime-audit-refresh" class="btn btn-secondary btn-sm" type="button" data-on-click="loadRuntimeDatabaseAudit" data-action-args="[{&quot;manual&quot;:true}]">执行全库审计</button>
+                    </div>
+                </div>
+                <div id="runtime-database-audit" class="runtime-audit-content" aria-live="polite">
+                    <div class="runtime-list-empty">已停止自动全库扫描；点击“执行全库审计”时按需读取检查，不生成完整数据库副本。</div>
+                </div>
+                <div class="runtime-resource-lookup">
+                    <div>
+                        <strong>消息资源关联查询</strong>
+                        <span>按资源库消息 ID、本地消息 ID、服务器消息 ID 或 chat_id 定位 MessageResourceDetail。</span>
+                    </div>
+                    <div class="runtime-resource-lookup-form">
+                        <select id="message-resource-filter" aria-label="资源关联字段">
+                            <option value="message_id">资源库消息 ID</option>
+                            <option value="message_local_id">本地消息 ID</option>
+                            <option value="message_svr_id">服务器消息 ID</option>
+                            <option value="chat_id">chat_id</option>
+                        </select>
+                        <input id="message-resource-value" type="text" inputmode="numeric" autocomplete="off" placeholder="留空查看最新关联">
+                        <button class="btn btn-primary btn-sm" type="button" data-on-click="loadMessageResources">查询资源</button>
+                    </div>
+                </div>
+                <div id="message-resource-result" class="runtime-resource-result"></div>
+            </section>
+
+            <div class="runtime-workspace">
+                <section class="runtime-panel runtime-trends-panel">
+                    <div class="runtime-panel-heading">
+                        <div><span class="runtime-eyebrow">90 秒窗口</span><h3>性能趋势</h3></div>
+                        <span id="runtime-sample-count" class="runtime-panel-note">0 个样本</span>
+                    </div>
+                    <div class="runtime-trend-grid">
+                        <div class="runtime-trend-card">
+                            <div><span>CPU</span><strong id="runtime-trend-cpu-value">-</strong></div>
+                            <div id="runtime-trend-cpu" class="runtime-sparkline" aria-label="CPU 使用趋势"></div>
+                        </div>
+                        <div class="runtime-trend-card">
+                            <div><span>RSS 内存</span><strong id="runtime-trend-rss-value">-</strong></div>
+                            <div id="runtime-trend-rss" class="runtime-sparkline" aria-label="RSS 内存趋势"></div>
+                        </div>
+                        <div class="runtime-trend-card">
+                            <div><span>平均响应</span><strong id="runtime-trend-latency-value">-</strong></div>
+                            <div id="runtime-trend-latency" class="runtime-sparkline" aria-label="平均响应耗时趋势"></div>
+                        </div>
+                        <div class="runtime-trend-card">
+                            <div><span>Go 协程</span><strong id="runtime-trend-goroutines-value">-</strong></div>
+                            <div id="runtime-trend-goroutines" class="runtime-sparkline" aria-label="Go 协程趋势"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="runtime-panel runtime-diagnostics-panel">
+                    <div class="runtime-panel-heading">
+                        <div><span class="runtime-eyebrow">TROUBLESHOOTING</span><h3>排查提示</h3></div>
+                        <span id="runtime-diagnostic-count" class="runtime-panel-note">等待数据</span>
+                    </div>
+                    <div id="runtime-diagnostics" class="runtime-diagnostics-list">
+                        <div class="runtime-diagnostic is-neutral"><i></i><div><strong>正在分析</strong><span>实时样本到达后生成排查建议。</span></div></div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="runtime-workspace runtime-detail-workspace">
+                <section class="runtime-panel">
+                    <div class="runtime-panel-heading"><div><span class="runtime-eyebrow">REQUESTS</span><h3>HTTP 请求性能</h3></div></div>
+                    <dl id="runtime-http-details" class="runtime-detail-list">
+                        <div><dt>成功响应</dt><dd>-</dd></div><div><dt>重定向</dt><dd>-</dd></div>
+                        <div><dt>客户端错误</dt><dd>-</dd></div><div><dt>服务端错误</dt><dd>-</dd></div>
+                        <div class="runtime-detail-wide"><dt>最近请求</dt><dd>-</dd></div>
+                    </dl>
+                </section>
+                <section class="runtime-panel">
+                    <div class="runtime-panel-heading"><div><span class="runtime-eyebrow">MEMORY & GC</span><h3>内存与垃圾回收</h3></div></div>
+                    <dl id="runtime-memory-details" class="runtime-detail-list">
+                        <div><dt>堆已用</dt><dd>-</dd></div><div><dt>堆保留</dt><dd>-</dd></div>
+                        <div><dt>堆对象</dt><dd>-</dd></div><div><dt>GC 次数</dt><dd>-</dd></div>
+                        <div><dt>最近暂停</dt><dd>-</dd></div><div><dt>累计暂停</dt><dd>-</dd></div>
+                    </dl>
+                </section>
+                <section class="runtime-panel">
+                    <div class="runtime-panel-heading"><div><span class="runtime-eyebrow">MEDIA WORKERS</span><h3>媒体任务并发</h3></div></div>
+                    <div id="runtime-resource-usage" class="runtime-resource-list"><div class="runtime-resource-row"><span>等待资源数据</span></div></div>
+                </section>
+            </div>
+
+            <div class="runtime-observability-grid">
+                <section class="runtime-panel runtime-logs-panel">
+                    <div class="runtime-panel-heading runtime-filter-heading">
+                        <div><span class="runtime-eyebrow">CLASSIFIED LOGS</span><h3>分类运行日志</h3></div>
+                        <div class="runtime-filter-controls">
+                            <select id="runtime-log-category" aria-label="日志分类" data-on-change="loadRuntimeLogs">
+                                <option value="all">全部分类</option>
+                                <option value="system">系统</option>
+                                <option value="http">HTTP</option>
+                                <option value="database">数据库</option>
+                                <option value="cache">缓存</option>
+                                <option value="media">媒体</option>
+                                <option value="push">推送</option>
+                            </select>
+                            <select id="runtime-log-level" aria-label="日志级别" data-on-change="loadRuntimeLogs">
+                                <option value="all">全部级别</option>
+                                <option value="debug">Debug</option>
+                                <option value="info">Info</option>
+                                <option value="warn">Warn</option>
+                                <option value="error">Error</option>
+                            </select>
+                            <button class="btn btn-secondary btn-sm" type="button" data-on-click="loadRuntimeLogs" data-action-args="[{&quot;manual&quot;:true}]">刷新</button>
+                        </div>
+                    </div>
+                    <div id="runtime-log-category-summary" class="runtime-category-summary"></div>
+                    <div id="runtime-log-list" class="runtime-log-list">
+                        <div class="runtime-list-empty">正在读取分类日志...</div>
+                    </div>
+                </section>
+
+                <section class="runtime-panel runtime-http-errors-panel">
+                    <div class="runtime-panel-heading">
+                        <div><span class="runtime-eyebrow">HTTP ERRORS</span><h3>错误 HTTP 记录</h3></div>
+                        <span id="runtime-http-error-record-count" class="runtime-panel-note">0 条</span>
+                    </div>
+                    <div id="runtime-http-error-records" class="runtime-http-error-list">
+                        <div class="runtime-list-empty">暂未记录 HTTP 错误</div>
+                    </div>
+                </section>
+            </div>
+
+            <section class="runtime-panel runtime-cache-panel">
+                <div class="runtime-panel-heading runtime-filter-heading">
+                    <div>
+                        <span class="runtime-eyebrow">CACHE CONTROL</span>
+                        <h3>分类缓存详情与清理</h3>
+                    </div>
+                    <div class="runtime-filter-controls">
+                        <span id="runtime-cache-summary" class="runtime-panel-note">等待缓存详情</span>
+                        <button class="btn btn-secondary btn-sm" type="button" data-on-click="loadRuntimeCacheDetails" data-action-args="[true]">重新扫描</button>
+                        <button class="btn btn-danger btn-sm" type="button" data-on-click="clearRuntimeCache" data-action-args="[&quot;all&quot;,&quot;全部缓存&quot;]">清理全部</button>
+                    </div>
+                </div>
+                <div id="runtime-cache-categories" class="runtime-cache-grid">
+                    <div class="runtime-list-empty">正在扫描缓存...</div>
+                </div>
+                <div id="runtime-cache-files" class="runtime-cache-files hidden" aria-live="polite"></div>
+            </section>
+        </div>
+
+        <!-- Chat data analysis -->
+        <div id="analytics" class="tab-content">
+            <div class="page-heading">
+                <div>
+                    <span class="page-kicker">CHAT ANALYTICS</span>
+                    <h2>聊天数据分析</h2>
+                    <p>按私聊和群聊查看消息结构、活跃时段、发言排行及跨群对比，并跳转到原始消息验证。</p>
+                </div>
+                <button class="btn btn-secondary" type="button" data-on-click="refreshChatAnalytics">刷新分析</button>
+            </div>
+            <section class="analytics-panel analytics-panel-spaced">
+                <div class="analytics-title-row">
+                    <div>
+                        <h3>关键词消息分析</h3>
+                        <p>由 FTS 候选集统计消息量、聊天对象、时间趋势和类型分布；可跳转到原始消息及媒体预览。</p>
+                    </div>
+                    <span id="keyword-analytics-state" class="badge">等待分析</span>
+                </div>
+                <div class="analytics-toolbar">
+                    <input id="keyword-analytics-keyword" type="search" placeholder="输入关键词" data-on-keydown="loadKeywordAnalytics" data-action-key="Enter">
+                    <input id="keyword-analytics-chats" type="text" placeholder="会话 ID，可留空">
+                    <select id="keyword-analytics-time">
+                        <option value="last-7d">最近 7 天</option>
+                        <option value="last-30d" selected>最近 30 天</option>
+                        <option value="last-3m">最近 3 个月</option>
+                        <option value="last-1y">最近 1 年</option>
+                        <option value="all">全部时间</option>
+                    </select>
+                    <select id="keyword-analytics-type">
+                        <option value="0">全部类型</option>
+                        <option value="1">文本</option>
+                        <option value="3">图片</option>
+                        <option value="34">语音</option>
+                        <option value="43">视频</option>
+                        <option value="49">文件 / 分享</option>
+                    </select>
+                    <button class="btn btn-primary btn-sm" type="button" data-on-click="loadKeywordAnalytics">开始分析</button>
+                    <button class="btn btn-secondary btn-sm" type="button" data-on-click="loadKeywordAnalytics" data-action-args="[true]">强制刷新</button>
+                </div>
+                <div id="keyword-analytics-body" class="analytics-body">
+                    <div class="analytics-empty">输入关键词后开始分析</div>
+                </div>
+            </section>
+            <div class="analytics-grid">
+                <section class="analytics-panel">
+                    <div class="analytics-title-row">
+                        <div>
+                            <h3>私聊分析</h3>
+                            <p>展示消息类型、发送/接收比例与活跃时段。</p>
+                        </div>
+                        <div class="analytics-title-actions">
+                            <button class="analytics-link-btn" data-on-click="openDashboardChat" data-action-args="[&quot;private&quot;]">打开私聊</button>
+                        </div>
+                    </div>
+	                    <div class="analytics-toolbar">
+	                        <select id="dashboard-private-select" data-on-change="loadDashboardStats" data-action-args="[&quot;private&quot;]"></select>
+	                        <select id="dashboard-private-range" data-on-change="loadDashboardStats" data-action-args="[&quot;private&quot;]">
+	                            <option value="all">全部时间</option>
+	                            <option value="30d" selected>最近 30 天</option>
+	                            <option value="90d">最近 90 天</option>
+	                        </select>
+	                        <select id="dashboard-private-jump-type">
+	                            <option value="">跳转类型: 全部</option>
+	                            <option value="1">跳转类型: 文本</option>
+	                            <option value="3">跳转类型: 图片</option>
+	                            <option value="34">跳转类型: 语音</option>
+	                            <option value="43">跳转类型: 视频</option>
+	                            <option value="49">跳转类型: 文件/分享</option>
+	                        </select>
+	                        <button class="btn btn-secondary btn-sm" data-on-click="loadDashboardStats" data-action-args="[&quot;private&quot;,true]">刷新</button>
+	                    </div>
+                    <div id="dashboard-private-body" class="analytics-body">
+                        <div class="analytics-empty">加载中...</div>
+                    </div>
+                </section>
+                <section class="analytics-panel">
+                    <div class="analytics-title-row">
+                        <div>
+                            <h3>群聊分析</h3>
+                            <p>展示发言排行、消息类型与群聊活跃时段。</p>
+                        </div>
+                        <div class="analytics-title-actions">
+                            <button class="analytics-link-btn" data-on-click="openDashboardChat" data-action-args="[&quot;group&quot;]">打开群聊</button>
+                        </div>
+                    </div>
+	                    <div class="analytics-toolbar">
+	                        <select id="dashboard-group-select" data-on-change="loadDashboardStats" data-action-args="[&quot;group&quot;]"></select>
+	                        <select id="dashboard-group-range" data-on-change="loadDashboardStats" data-action-args="[&quot;group&quot;]">
+	                            <option value="all">全部时间</option>
+	                            <option value="30d" selected>最近 30 天</option>
+	                            <option value="90d">最近 90 天</option>
+	                        </select>
+	                        <select id="dashboard-group-jump-type">
+	                            <option value="">跳转类型: 全部</option>
+	                            <option value="1">跳转类型: 文本</option>
+	                            <option value="3">跳转类型: 图片</option>
+	                            <option value="34">跳转类型: 语音</option>
+	                            <option value="43">跳转类型: 视频</option>
+	                            <option value="49">跳转类型: 文件/分享</option>
+	                        </select>
+	                        <button class="btn btn-secondary btn-sm" data-on-click="loadDashboardStats" data-action-args="[&quot;group&quot;,true]">刷新</button>
+	                    </div>
+                    <div id="dashboard-group-body" class="analytics-body">
+                        <div class="analytics-empty">加载中...</div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 群聊数据概览 -->
+            <div class="section-header">
+                <h2>群聊数据概览</h2>
+                <div class="analytics-section-controls">
+                    <div class="time-range-tabs" id="dashboard-stats-range">
+                        <button class="time-range-tab active" data-range="1d">今天</button>
+                        <button class="time-range-tab" data-range="7d">近7天</button>
+                        <button class="time-range-tab" data-range="30d">近1月</button>
+                        <button class="time-range-tab" data-range="90d">近季度</button>
+                        <button class="time-range-tab" data-range="1y">近1年</button>
+                        <button class="time-range-tab" data-range="all">全部</button>
+                    </div>
+                    <button id="dashboard-overview-load-all" class="btn btn-secondary btn-sm hidden" type="button" data-on-click="loadDashboardOverview" data-action-args="[true]">统计全部群聊</button>
+                    <span id="dashboard-overview-time" class="analytics-section-note"></span>
+                </div>
+            </div>
+            <div class="overview-grid" id="dashboard-overview-grid">
+                <div class="overview-card">
+                    <div class="overview-icon blue">💬</div>
+                    <div class="overview-info">
+                        <span class="overview-value" id="dashboard-ov-msgs">-</span>
+                        <span class="overview-label">消息总量</span>
+                    </div>
+                </div>
+                <div class="overview-card">
+                    <div class="overview-icon green">👥</div>
+                    <div class="overview-info">
+                        <span class="overview-value" id="dashboard-ov-groups">-</span>
+                        <span class="overview-label">活跃群聊</span>
+                    </div>
+                </div>
+                <div class="overview-card">
+                    <div class="overview-icon amber">📇</div>
+                    <div class="overview-info">
+                        <span class="overview-value" id="dashboard-ov-senders">-</span>
+                        <span class="overview-label">活跃成员(按群)</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 群聊对比 -->
+            <div class="section-header">
+                <h2>群聊对比</h2>
+                <span class="analytics-section-note">最多展示活跃度前 30 个群；点击卡片跳转消息检索</span>
+            </div>
+            <div class="comparison-grid" id="dashboard-comparison-grid">
+                <div class="analytics-empty analytics-grid-wide">加载中...</div>
+            </div>
+
+            <!-- 发言人排行榜 -->
+            <div class="section-header">
+                <h2>发言人排行榜</h2>
+                <span class="analytics-section-note">跨群汇总 Top 15</span>
+            </div>
+            <div class="analytics-panel analytics-panel-spaced">
+                <div id="dashboard-leaderboard-body">
+                    <div class="analytics-empty">加载中...</div>
+                </div>
+            </div>
+
+            <!-- 群聊对比图表 -->
+            <div class="section-header">
+                <h2>群聊对比图表</h2>
+                <span class="analytics-section-note">展示活跃度前 30 个群的消息类型结构与 24 小时活跃度</span>
+            </div>
+            <div class="analytics-grid analytics-grid-spaced">
+                <section class="analytics-panel">
+                    <h3>消息类型结构</h3>
+                    <div id="dashboard-cross-type-chart" class="chart-container wide native-chart-container"></div>
+                </section>
+                <section class="analytics-panel">
+                    <h3>24 小时活跃度</h3>
+                    <div id="dashboard-cross-hour-chart" class="chart-container wide native-chart-container"></div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Database workspace -->
+        <div id="database" class="tab-content">
+            <div class="page-heading database-section-header">
+                <div>
+                    <span class="page-kicker">DATA SOURCES</span>
+                    <h2 id="database-section-title">数据库</h2>
+                    <p>按业务分组查看数据库状态，支持表搜索、数据筛选、分页、完整导出和只读 SQL。</p>
+                </div>
+                <div class="database-list-actions">
+                    <label class="search-box" for="db-list-filter">
+                        <span aria-hidden="true">⌕</span>
+                        <input id="db-list-filter" type="search" placeholder="筛选数据库文件" data-on-input="filterDatabaseCards">
+                    </label>
+                    <button class="btn btn-secondary btn-sm" type="button" data-on-click="loadDBList" data-action-args="[true]">刷新列表</button>
+                </div>
+            </div>
+            <section class="database-business-section" aria-labelledby="database-business-title">
+                <div class="section-header compact">
+                    <div>
+                        <h3 id="database-business-title">业务模块</h3>
+                        <p>按实际数据库文件核对会话、通讯录、媒体、朋友圈、收藏和公众号能力。</p>
+                    </div>
+                </div>
+                <div id="db-business-modules" class="database-business-grid" aria-live="polite">
+                    <div class="loading">正在核对业务模块...</div>
+                </div>
+                <div id="db-business-result" class="database-business-detail hidden" aria-live="polite"></div>
+            </section>
+            <section class="database-business-section" aria-labelledby="database-auxiliary-title">
+                <div class="section-header compact">
+                    <div>
+                        <h3 id="database-auxiliary-title">辅助数据库语义数据</h3>
+                        <p>直接读取头像、表情、最近搜索、好友请求、支付关联、撤回和迁移记录。</p>
+                    </div>
+                </div>
+                <div id="db-auxiliary-datasets" class="database-business-grid" aria-live="polite">
+                    <div class="loading">正在发现辅助数据集...</div>
+                </div>
+                <div id="db-auxiliary-result" class="result-area hidden"></div>
+            </section>
+            <section class="database-section database-section-standalone" aria-labelledby="database-section-title">
+                <div id="db-list-summary" class="database-summary" aria-live="polite"></div>
+                <div id="db-list-container">
+                    <div class="loading">正在发现可查询数据库...</div>
+                </div>
+            </section>
+        </div>
+
+        <div id="global-search" class="tab-content">
+            <div class="page-heading"><div><span class="page-kicker">GLOBAL SEARCH</span><h2>全局数据库搜索</h2><p>跨数据库、表和列搜索关键词，并直接跳到命中的原始数据。</p></div></div>
+            <div class="form-grid">
+                <div class="form-group form-group-wide">
+                    <label>关键词</label>
+                    <input type="text" id="global-search-keyword" placeholder="输入要搜索的关键词" data-on-keydown="runGlobalSearch" data-action-key="Enter">
+                </div>
+                <div class="form-group">
+                    <label>返回上限</label>
+                    <input type="number" id="global-search-limit" value="100" min="1" max="500">
+                </div>
+                <div class="form-group">
+                    <label>搜索模式</label>
+                    <select id="global-search-mode">
+                        <option value="quick">快速搜索</option>
+                        <option value="deep">深度搜索</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>匹配模式</label>
+                    <select id="global-search-match">
+                        <option value="phrase">完整短语</option>
+                        <option value="all">包含全部关键词</option>
+                        <option value="any">包含任一关键词</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>排序</label>
+                    <select id="global-search-sort">
+                        <option value="relevance">相关度优先</option>
+                        <option value="source">数据源顺序</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>数据库分组</label>
+                    <input type="text" id="global-search-group" placeholder="全部；可填 message,contact">
+                </div>
+                <div class="form-group">
+                    <label>数据库文件</label>
+                    <input type="text" id="global-search-file" placeholder="全部；可填 message_fts.db">
+                </div>
+                <div class="form-group">
+                    <label>分页偏移</label>
+                    <input type="number" id="global-search-offset" value="0" min="0" max="5000">
+                </div>
+            </div>
+            <div class="actions">
+                <button class="btn btn-primary" data-on-click="runGlobalSearch">搜索</button>
+                <button class="btn btn-secondary" data-on-click="loadSearchConsistency">检查索引一致性</button>
+            </div>
+            <div id="global-search-consistency" class="database-summary" aria-live="polite"></div>
+            <div id="global-search-result" class="result-area hidden"></div>
+        </div>
+
+        <div id="ocr-search" class="tab-content">
+            <div class="page-heading ocr-page-heading">
+                <div><span class="page-kicker">OCR SEARCH</span><h2>图片文字搜索</h2><p>在已识别图片的文字与场景描述中搜索，结果直接展示原图、会话和时间。</p></div>
+                <div class="ocr-heading-actions"><span id="ocr-search-page-state" class="badge">等待搜索</span><button class="btn btn-secondary" type="button" data-on-click="ocrSearchRefreshStatus">刷新索引状态</button></div>
+            </div>
+            <div class="ocr-search-summary">
+                <article><span>可搜索图片</span><strong id="ocr-search-searchable">-</strong><small id="ocr-search-index-mode">正在读取索引</small></article>
+                <article><span>识别成功</span><strong id="ocr-search-succeeded">-</strong><small id="ocr-search-provider">-</small></article>
+                <article><span>待处理 / 失败</span><strong id="ocr-search-queue">-</strong><small id="ocr-search-updated">-</small></article>
+            </div>
+            <section class="feature-panel ocr-search-panel">
+                <div class="feature-panel-heading"><div><span class="feature-index">01</span><h3>按图片文字检索</h3></div><p>关键词支持中文子串匹配；可按会话和时间范围缩小结果。</p></div>
+                <div class="form-grid compact-grid">
+                    <div class="form-group ocr-wide-field"><label>图片文字 *</label><input id="ocr-search-keyword" type="search" placeholder="例如：发票号码、会议主题" data-on-keydown="ocrCenterSearch" data-action-key="Enter" data-action-prevent-default="true"></div>
+                    <div class="form-group"><label>会话 ID</label><input id="ocr-search-chats" type="text" placeholder="多个会话使用逗号分隔"></div>
+                    <div class="form-group"><label>时间范围</label><input id="ocr-search-time" type="text" placeholder="last-30d 或日期区间"></div>
+                    <div class="form-group"><label>Limit</label><input id="ocr-search-limit" type="number" value="50" min="1" max="500"></div>
+                    <div class="form-group"><label>Offset</label><input id="ocr-search-offset" type="number" value="0" min="0" max="5000"></div>
+                </div>
+                <div class="actions"><button class="btn btn-primary" type="button" data-on-click="ocrCenterSearch">搜索图片文字</button><button class="btn btn-secondary" type="button" data-on-click="ocrCenterResetSearch">重置</button></div>
+                <div id="ocr-search-result" class="structured-result"><div class="analytics-empty">尚未搜索图片文字</div></div>
+            </section>
+        </div>
+
+
+
+
+
+        <div id="hook" class="tab-content">
+            <div class="page-heading hook-page-heading">
+                <div><span class="page-kicker">AUTOMATION</span><h2>推送中心</h2><p>配置转发规则、投递渠道，并通过轻量轮询查看最近结果。</p></div>
+                <div class="hook-heading-actions">
+                    <button class="btn btn-secondary" type="button" data-on-click="refreshHookPanel" data-action-args="[true]">刷新状态</button>
+                    <button class="btn btn-primary" type="button" data-on-click="saveHookConfig">保存推送规则</button>
+                </div>
+            </div>
+
+            <div id="hook-status" class="hook-status-grid" aria-live="polite">
+                <div class="hook-status-card is-loading"><span>服务状态</span><strong>正在读取…</strong></div>
+            </div>
+
+            <div class="hook-workspace">
+                <section class="hook-config-card">
+                    <div class="hook-card-heading"><div><span class="hook-step">01</span><h3>匹配规则</h3></div><p>控制哪些新消息进入推送队列。</p></div>
+                    <label class="hook-toggle-row">
+                        <span><strong>实时全部转发</strong><small>开启后忽略筛选，仅推送本次开启后的新增消息</small></span>
+                        <input type="checkbox" id="hook-forward-all" data-on-change="syncHookFormState">
+                    </label>
+                    <div class="form-group">
+                        <label>关键词 <span class="hook-delimiter-badge">仅使用 ｜ 或 | 分隔</span></label>
+                        <input type="text" id="hook-keywords" placeholder="到账｜告警｜异常" data-on-input="renderHookRulePreview">
+                        <small class="hook-rule-help">逗号、空格和分号会保留在关键词中，不会拆分。</small>
+                        <div id="hook-keywords-preview" class="hook-rule-preview" aria-live="polite"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>关键词消息模式</label>
+                        <select id="hook-keyword-mode" data-on-change="renderHookRulePreview">
+                            <option value="text">文字消息</option>
+                            <option value="image_ocr">图片 OCR</option>
+                            <option value="mixed">混合模式（文字 + 图片 OCR）</option>
+                        </select>
+                        <small class="hook-rule-help" id="hook-keyword-mode-help">仅在新增文字消息中匹配关键词。</small>
+                    </div>
+                    <div class="form-group">
+                        <label>指定联系人 <span class="hook-delimiter-badge">逗号 / 分号 / 换行 / |</span></label>
+                        <div class="hook-suggest-field"><input type="text" id="hook-forward-contacts" autocomplete="off" placeholder="输入昵称、备注或 wxid" data-on-input="hookRuleInputChanged" data-action-args="[&quot;contact&quot;]" data-on-focus="hookRuleInputChanged" data-action-args="[&quot;contact&quot;]"><div id="hook-contact-suggestions" class="hook-suggestion-list hidden"></div></div>
+                        <div id="hook-contacts-preview" class="hook-rule-preview" aria-live="polite"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>指定群聊 <span class="hook-delimiter-badge">逗号 / 分号 / 换行 / |</span></label>
+                        <div class="hook-suggest-field"><input type="text" id="hook-forward-chatrooms" autocomplete="off" placeholder="输入群名称或 @chatroom ID" data-on-input="hookRuleInputChanged" data-action-args="[&quot;chatroom&quot;]" data-on-focus="hookRuleInputChanged" data-action-args="[&quot;chatroom&quot;]"><div id="hook-chatroom-suggestions" class="hook-suggestion-list hidden"></div></div>
+                        <div id="hook-chatrooms-preview" class="hook-rule-preview" aria-live="polite"></div>
+                    </div>
+                    <div class="hook-context-grid">
+                        <div class="form-group"><label>前文条数</label><input type="number" id="hook-before-count" value="5" min="0" max="100"></div>
+                        <div class="form-group"><label>后文条数</label><input type="number" id="hook-after-count" value="5" min="0" max="100"></div>
+                    </div>
+                </section>
+
+                <section class="hook-config-card">
+                    <div class="hook-card-heading"><div><span class="hook-step">02</span><h3>投递渠道</h3></div><p>可同时启用多个渠道。</p></div>
+                    <div class="hook-channel-options" role="group" aria-label="通知方式">
+                        <label class="hook-channel-option"><input type="checkbox" id="hook-target-post" data-on-change="syncHookFormState"><span><strong>HTTP POST</strong><small>发送到自定义 Webhook</small></span></label>
+                        <label class="hook-channel-option"><input type="checkbox" id="hook-target-weixin" data-on-change="syncHookFormState"><span><strong>Hermes 微信</strong><small>投递到微信 Home Channel</small></span></label>
+                        <label class="hook-channel-option"><input type="checkbox" id="hook-target-qq" data-on-change="syncHookFormState"><span><strong>Hermes QQ</strong><small>投递到 QQ Bot Channel</small></span></label>
+                    </div>
+                    <div class="form-group hook-post-field">
+                        <label>POST 地址</label>
+                        <input type="url" id="hook-post-url" placeholder="http://127.0.0.1:8080/webhook">
+                    </div>
+                    <div class="hook-channel-note">Hermes 渠道会从 <code>HERMES_HOME</code> 或 <code>~/.hermes</code> 自动发现现有配置；需要修改时展开下面的高级设置。</div>
+                </section>
+            </div>
+
+            <div class="hook-channel-details-grid">
+                <details id="hook-hermes-weixin-section" class="hook-channel-details">
+                    <summary><span><strong>Hermes 微信高级设置</strong><small>account、token、Home Channel 与 CDN</small></span><span class="details-chevron">⌄</span></summary>
+                    <div class="hook-details-body form-grid">
+                        <div class="form-group"><label>Hermes Home</label><input type="text" id="hook-hermes-home" placeholder="默认自动检测 ~/.hermes 或 HERMES_HOME"></div>
+                        <div class="form-group"><label>Weixin Home Channel</label><input type="text" id="hook-weixin-home-channel" placeholder="wxid_xxx 或 channel id"></div>
+                        <div class="form-group"><label>Channel 名称</label><input type="text" id="hook-weixin-home-channel-name" placeholder="可选，便于识别"></div>
+                        <div class="form-group"><label>Weixin Account ID</label><input type="text" id="hook-weixin-account-id" placeholder="Hermes 微信账号 account_id"></div>
+                        <div class="form-group"><label>Weixin Token</label><input type="password" id="hook-weixin-token" placeholder="Hermes 微信 bot token" autocomplete="new-password"></div>
+                        <div class="form-group"><label>Weixin Base URL</label><input type="url" id="hook-weixin-base-url" placeholder="https://ilinkai.weixin.qq.com"></div>
+                        <div class="form-group"><label>Weixin CDN Base URL</label><input type="url" id="hook-weixin-cdn-base-url" placeholder="https://novac2c.cdn.weixin.qq.com/c2c"></div>
+                    </div>
+                    <div class="hook-details-actions"><button class="btn btn-secondary" type="button" id="hook-save-hermes-btn" data-on-click="saveHermesWeixinConfig">保存微信渠道</button></div>
+                </details>
+                <details id="hook-hermes-qq-section" class="hook-channel-details">
+                    <summary><span><strong>Hermes QQ 高级设置</strong><small>App ID、Secret 与 Home Channel</small></span><span class="details-chevron">⌄</span></summary>
+                    <div class="hook-details-body form-grid">
+                        <div class="form-group"><label>QQ Home Channel</label><input type="text" id="hook-qq-home-channel" placeholder="user_openid / group:group_openid / channel:channel_id"></div>
+                        <div class="form-group"><label>QQ Channel 名称</label><input type="text" id="hook-qq-home-channel-name" placeholder="可选，便于识别"></div>
+                        <div class="form-group"><label>QQ App ID</label><input type="text" id="hook-qq-app-id" placeholder="QQ Bot App ID"></div>
+                        <div class="form-group"><label>QQ Client Secret</label><input type="password" id="hook-qq-client-secret" placeholder="QQ Bot App Secret" autocomplete="new-password"></div>
+                    </div>
+                    <div class="hook-details-actions"><button class="btn btn-secondary" type="button" id="hook-save-hermes-qq-btn" data-on-click="saveHermesQQConfig">保存 QQ 渠道</button></div>
+                </details>
+            </div>
+
+            <section id="hook-events" class="hook-events-panel">
+                <div class="hook-events-heading">
+                <div><span class="page-kicker">DELIVERY LOG</span><h3>最近推送事件</h3><p>每 5 秒刷新一次，仅在本页激活且窗口可见时请求。</p></div>
+                    <div class="hook-events-actions"><span id="hook-poll-state" class="badge">等待刷新</span><button class="btn btn-secondary btn-sm" type="button" data-on-click="toggleAllHookEvents">全选/取消</button><button class="btn btn-secondary btn-sm" type="button" data-on-click="batchHookEventAction" data-action-args="[&quot;retry&quot;]">批量重试</button><button class="btn btn-danger btn-sm" type="button" data-on-click="batchHookEventAction" data-action-args="[&quot;delete&quot;]">批量删除</button><button class="btn btn-secondary btn-sm" type="button" data-on-click="loadHookEvents">立即刷新</button><button class="btn btn-danger btn-sm" type="button" data-on-click="clearHookEvents">清空</button></div>
+                </div>
+                <div id="hook-events-list" class="hook-events-list"><div class="hook-empty-state">暂无事件</div></div>
+            </section>
+        </div>
+
+        <!-- OCR operations -->
+        <div id="ocr-center" class="tab-content">
+            <div class="page-heading ocr-page-heading">
+                <div>
+                    <span class="page-kicker">IMAGE INTELLIGENCE</span>
+                    <h2>OCR 识别中心</h2>
+                    <p>按“选择调用方式 → 设置监听范围 → 开启识别 → 查看结果”完成配置，运行状态与部署说明集中展示。</p>
+                </div>
+                <div class="ocr-heading-actions">
+                    <span id="ocr-page-state" class="badge">正在读取状态</span>
+                    <button class="btn btn-secondary" type="button" data-on-click="ocrCenterRefresh">立即刷新</button>
+                </div>
+            </div>
+
+            <section class="ocr-route-overview" aria-label="当前 OCR 调用链">
+                <div class="ocr-route-copy">
+                    <span class="ocr-route-eyebrow">当前调用链</span>
+                    <strong id="ocr-route-title">正在读取 OCR 配置</strong>
+                    <small id="ocr-route-detail">Chatlog 将自动展示实际调用的服务与模型</small>
+                </div>
+                <div class="ocr-route-flow">
+                    <div><span>1</span><strong id="ocr-route-service">识别服务</strong><small>选择本地或 API</small></div>
+                    <i>→</i>
+                    <div><span>2</span><strong id="ocr-route-scope">监听范围</strong><small>联系人与群组</small></div>
+                    <i>→</i>
+                    <div><span>3</span><strong id="ocr-route-queue">持久队列</strong><small>失败可恢复</small></div>
+                    <i>→</i>
+                    <div><span>4</span><strong>中文索引</strong><small>识别结果可搜索</small></div>
+                </div>
+                <div id="ocr-retry-sync-note" class="ocr-retry-sync-note">切换调用方式后，未完成任务会自动同步到新服务。</div>
+            </section>
+
+            <section class="ocr-control-hero">
+                <div class="ocr-master-switches">
+                    <div class="ocr-power-card" data-ocr-power="realtime">
+                        <div class="ocr-power-copy">
+                            <strong>实时 OCR</strong>
+                            <small>仅监听开启之后收到的新图片</small>
+                            <span id="ocr-realtime-power-state" class="ocr-power-state is-off">已关闭</span>
+                        </div>
+                        <div class="ocr-power-actions" role="group" aria-label="实时 OCR 开关">
+                            <button id="ocr-realtime-open" class="btn btn-primary btn-sm" type="button" data-on-click="ocrCenterSetPower" data-action-args="[&quot;realtime&quot;,true]">打开</button>
+                            <button id="ocr-realtime-close" class="btn btn-secondary btn-sm" type="button" data-on-click="ocrCenterSetPower" data-action-args="[&quot;realtime&quot;,false]">关闭</button>
+                        </div>
+                        <input id="ocr-realtime-enabled" type="checkbox" hidden>
+                    </div>
+                    <div class="ocr-power-card" data-ocr-power="backfill">
+                        <div class="ocr-power-copy">
+                            <strong>历史补录</strong>
+                            <small>允许扫描历史图片并进入持久处理队列</small>
+                            <span id="ocr-backfill-power-state" class="ocr-power-state is-off">已关闭</span>
+                        </div>
+                        <div class="ocr-power-actions" role="group" aria-label="历史补录开关">
+                            <button id="ocr-backfill-open" class="btn btn-primary btn-sm" type="button" data-on-click="ocrCenterSetPower" data-action-args="[&quot;backfill&quot;,true]">打开</button>
+                            <button id="ocr-backfill-close" class="btn btn-secondary btn-sm" type="button" data-on-click="ocrCenterSetPower" data-action-args="[&quot;backfill&quot;,false]">关闭</button>
+                        </div>
+                        <input id="ocr-backfill-enabled" type="checkbox" hidden>
+                    </div>
+                </div>
+                <button id="ocr-save-top" class="btn btn-primary" type="button" data-on-click="ocrCenterSaveConfig">保存其他配置</button>
+            </section>
+
+            <div class="ocr-status-grid">
+                <article class="ocr-status-card"><span>运行状态</span><strong id="ocr-status-running">-</strong><small id="ocr-status-mode">-</small></article>
+                <article class="ocr-status-card"><span>队列</span><strong id="ocr-status-queue">-</strong><small id="ocr-status-current">当前无任务</small></article>
+                <article class="ocr-status-card"><span>处理成功</span><strong id="ocr-status-success">-</strong><small id="ocr-status-rate">-</small></article>
+                <article class="ocr-status-card"><span>处理失败</span><strong id="ocr-status-failed">-</strong><small id="ocr-status-error">无错误</small></article>
+                <article class="ocr-status-card"><span>可搜索图片</span><strong id="ocr-status-searchable">-</strong><small id="ocr-status-index">-</small></article>
+                <article class="ocr-status-card"><span>最近扫描</span><strong id="ocr-status-scan">-</strong><small id="ocr-status-scan-detail">-</small></article>
+            </div>
+            <div id="ocr-process-status" class="ocr-process-status">
+                <div class="ocr-process-status-head">
+                    <strong>当前处理详情</strong>
+                    <span id="ocr-process-stage" class="ocr-power-state is-off">空闲</span>
+                </div>
+                <p id="ocr-process-detail">等待任务…</p>
+                <div class="ocr-process-meta">
+                    <span id="ocr-process-task">任务：-</span>
+                </div>
+            </div>
+
+            <section class="feature-panel ocr-model-panel">
+                <div class="feature-panel-heading"><div><span class="feature-index">MODEL</span><h3>本地模型进程</h3></div><p>MLX 推理后端与 GLM-OCR SDK 作为一个进程组同步启动、停止和回滚。主动停止时会同步关闭异常自动重启。</p></div>
+                <div class="ocr-model-runtime-grid">
+                    <article><span>MLX 推理后端</span><strong id="ocr-model-backend-state">-</strong><small id="ocr-model-backend-detail">等待状态</small></article>
+                    <article><span>GLM-OCR SDK</span><strong id="ocr-model-sdk-state">-</strong><small id="ocr-model-sdk-detail">等待状态</small></article>
+                    <article><span>托管状态</span><strong id="ocr-model-managed-state">-</strong><small id="ocr-model-managed-detail">-</small></article>
+                </div>
+                <div class="ocr-model-controls">
+                    <label class="switch-row"><span><strong>跟随主进程自动启动</strong><small>本地 OCR 开启后自动拉起模型</small></span><input id="ocr-local-auto-start" type="checkbox" checked></label>
+                    <label class="switch-row"><span><strong>进程异常自动重启</strong><small>模型曾就绪后退出时重新拉起</small></span><input id="ocr-local-auto-restart" type="checkbox" checked></label>
+                    <div class="actions"><button id="ocr-local-start" class="btn btn-primary" type="button" data-on-click="ocrCenterLocalServiceAction" data-action-args="[&quot;start&quot;]">同步启动模型服务</button><button id="ocr-local-stop" class="btn btn-danger" type="button" data-on-click="ocrCenterLocalServiceAction" data-action-args="[&quot;stop&quot;]">同步停止模型服务</button></div>
+                </div>
+            </section>
+
+            <div class="ocr-layout-grid">
+                <section class="feature-panel ocr-config-panel">
+                    <div class="feature-panel-heading"><div><span class="feature-index">01</span><h3>选择识别方式</h3></div><p>本地数据留在设备内；API 模式适合不部署模型的场景。</p></div>
+                    <div class="ocr-mode-selector" role="radiogroup" aria-label="OCR 识别模式">
+                        <label><input type="radio" name="ocr-mode" value="local" data-on-change="ocrCenterModeChanged"><span><strong>本地 GLM-OCR</strong><small>Apple MLX 自动托管，或连接 NVIDIA vLLM</small></span></label>
+                        <label><input type="radio" name="ocr-mode" value="api" data-on-change="ocrCenterModeChanged"><span><strong>智谱 API</strong><small>使用 GLM-OCR MaaS，需要 API Key</small></span></label>
+                    </div>
+                    <div id="ocr-mode-explainer" class="ocr-mode-explainer">本地模式由 GLM-OCR SDK 统一提供接口。</div>
+                    <div class="form-grid compact-grid">
+                        <div class="form-group ocr-wide-field"><label>识别服务地址</label><input id="ocr-endpoint" type="url" spellcheck="false" placeholder="http://127.0.0.1:8081/glmocr/parse"><small>本地 MLX 与 vLLM 都通过 GLM-OCR SDK 的 8081 接口调用。</small></div>
+                        <div class="form-group"><label>模型标识</label><input id="ocr-model" type="text" value="glm-ocr"></div>
+                        <div class="form-group"><label>API Key</label><input id="ocr-api-key" type="password" autocomplete="new-password" placeholder="仅 API 模式需要"></div>
+                    </div>
+                    <div class="ocr-inline-options">
+                        <label><input id="ocr-received-only" type="checkbox" checked> 仅处理收到的图片</label>
+                    </div>
+                    <details class="ocr-advanced-config">
+                        <summary>高级运行参数</summary>
+                        <div class="form-grid compact-grid">
+                            <div class="form-group"><label>实时触发方式</label><div class="ocr-mode-explainer">数据库文件变化事件</div><small>新消息落库后触发增量查询；空闲时不扫描消息分片。</small></div>
+                            <div class="form-group"><label>请求超时（秒）</label><input id="ocr-request-timeout" type="number" min="10" max="1800" value="180"></div>
+                        </div>
+                        <label class="ocr-clear-key"><input id="ocr-clear-api-key" type="checkbox"> 清除已保存的 API Key</label>
+                    </details>
+                    <div id="ocr-environment-note" class="ocr-environment-note hidden"></div>
+                </section>
+
+                <section class="feature-panel ocr-scope-panel">
+                    <div class="feature-panel-heading"><div><span class="feature-index">02</span><h3>实时监听范围</h3></div><p>可监听全部会话，或只选择指定联系人和群组。</p></div>
+                    <div class="form-group">
+                        <label>范围模式</label>
+                        <select id="ocr-scope-mode" data-on-change="ocrCenterScopeModeChanged">
+                            <option value="all">全部联系人与群组</option>
+                            <option value="selected">仅选择的联系人与群组</option>
+                        </select>
+                    </div>
+                    <div id="ocr-scope-selected" class="ocr-scope-picker hidden">
+                        <div class="ocr-picker-column">
+                            <div class="ocr-picker-heading"><strong>联系人</strong><span id="ocr-contact-count">0 已选</span></div>
+                            <input id="ocr-contact-filter" type="search" placeholder="搜索昵称、备注或 wxid" data-on-input="ocrCenterFilterScope" data-action-args="[&quot;contact&quot;]">
+                            <div id="ocr-contact-options" class="ocr-option-list"><div class="analytics-empty">正在加载联系人…</div></div>
+                        </div>
+                        <div class="ocr-picker-column">
+                            <div class="ocr-picker-heading"><strong>群组</strong><span id="ocr-chatroom-count">0 已选</span></div>
+                            <input id="ocr-chatroom-filter" type="search" placeholder="搜索群名称或群 ID" data-on-input="ocrCenterFilterScope" data-action-args="[&quot;chatroom&quot;]">
+                            <div id="ocr-chatroom-options" class="ocr-option-list"><div class="analytics-empty">正在加载群组…</div></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <section class="feature-panel ocr-deployment-panel">
+                <div class="feature-panel-heading">
+                    <div><span class="feature-index">03</span><h3>本地服务部署</h3></div>
+                    <p>先按设备选择推理后端；两种方案都由 GLM-OCR SDK 在 8081 端口对外提供识别接口。</p>
+                </div>
+                <div class="ocr-deploy-tabs" role="tablist" aria-label="OCR 本地部署方式">
+                    <button id="ocr-deploy-tab-mlx" class="is-active" type="button" data-on-click="ocrCenterDeploymentGuide" data-action-args="[&quot;mlx&quot;]"><strong>Apple MLX</strong><small>M 系列 Mac · Metal</small></button>
+                    <button id="ocr-deploy-tab-vllm" type="button" data-on-click="ocrCenterDeploymentGuide" data-action-args="[&quot;vllm&quot;]"><strong>NVIDIA vLLM</strong><small>Linux/服务器 · CUDA</small></button>
+                </div>
+                <article id="ocr-deploy-guide-mlx" class="ocr-deploy-guide is-active">
+                    <div class="ocr-deploy-summary">
+                        <span class="badge">当前设备推荐</span>
+                        <strong>MLX + GLM-OCR SDK</strong>
+                        <p>Chatlog 使用内置运行资产在 Apple Silicon 上自动安装隔离环境与模型，并统一启停 8080 推理服务和 8081 SDK 服务。</p>
+                    </div>
+                    <ol>
+                        <li><strong>准备：</strong>使用 Apple Silicon Mac，并确保首次安装时网络可用。</li>
+                        <li><strong>启动：</strong>点击上方“同步启动模型服务”；Chatlog 自动安装内置运行资产、下载模型并启动进程组。</li>
+                        <li><strong>配置：</strong>选择“本地 GLM-OCR”，服务地址保持 <code>http://127.0.0.1:8081/glmocr/parse</code>。</li>
+                        <li><strong>验证：</strong>健康接口返回 <code>{"status":"ok"}</code> 后即可识别。</li>
+                    </ol>
+                    <div class="ocr-command-block"><strong>无需仓库脚本</strong><p>安装、启动、停止与异常重启均由 Chatlog 内置运行资产管理；模型状态和操作结果会实时显示在本页。</p></div>
+                </article>
+                <article id="ocr-deploy-guide-vllm" class="ocr-deploy-guide">
+                    <div class="ocr-deploy-summary">
+                        <span class="badge">NVIDIA GPU</span>
+                        <strong>vLLM + GLM-OCR SDK</strong>
+                        <p>Docker Compose 同时启动 CUDA vLLM 推理服务与 GLM-OCR SDK，适用于带 NVIDIA GPU 的 Linux 主机。</p>
+                    </div>
+                    <ol>
+                        <li><strong>准备：</strong>Docker、Compose v2、NVIDIA Container Toolkit，确认 GPU 对容器可见。</li>
+                        <li><strong>启动：</strong>构建并启动 <code>vllm</code> 与 <code>sdk</code> 两个服务。</li>
+                        <li><strong>配置：</strong>同机使用默认 8081 地址；远端部署时填写 SDK 所在主机地址。</li>
+                        <li><strong>验证：</strong>先检查 SDK 健康状态，再在本页保存本地模式。</li>
+                    </ol>
+                    <div class="ocr-command-block"><pre id="ocr-deploy-vllm-command">cd deploy/ocr
+docker compose -f docker-compose.vllm.yml up -d --build
+curl -fsS http://127.0.0.1:8081/health
+docker compose -f docker-compose.vllm.yml logs -f vllm sdk</pre><button class="btn btn-secondary btn-sm" type="button" data-on-click="ocrCenterCopyDeployment">复制命令</button></div>
+                </article>
+            </section>
+
+            <div class="ocr-layout-grid">
+                <section class="feature-panel">
+                    <div class="feature-panel-heading"><div><span class="feature-index">04</span><h3>历史图片补录</h3></div><p>补录任务与实时监听独立，可限制数量并遵循当前监听范围。</p></div>
+                    <div class="form-grid compact-grid">
+                        <div class="form-group"><label>本次最多加入</label><input id="ocr-backfill-limit" type="number" min="1" max="10000" value="1000"></div>
+                        <label class="switch-row"><span>仅收到的图片</span><input id="ocr-backfill-received-only" type="checkbox" checked></label>
+                        <label class="switch-row"><span>仅当前监听范围</span><input id="ocr-backfill-respect-scope" type="checkbox" checked></label>
+                    </div>
+                    <div class="actions">
+                        <button id="ocr-backfill-start" class="btn btn-primary" type="button" data-on-click="ocrCenterStartBackfill">启动历史补录</button>
+                        <button id="ocr-backfill-stop" class="btn btn-danger" type="button" data-on-click="ocrCenterStopBackfill">停止补录</button>
+                    </div>
+                    <div id="ocr-backfill-progress" class="ocr-progress-panel"><span>尚未启动补录任务</span></div>
+                </section>
+
+            </div>
+
+            <section class="feature-panel ocr-task-panel">
+                <div class="feature-panel-heading">
+                    <div><span class="feature-index">06</span><h3>详细处理状态</h3></div>
+                    <div class="ocr-task-heading-actions">
+                        <p>点击任务查看完整 OCR 文字、Markdown 与版面结果。</p>
+                        <div class="ocr-task-heading-buttons">
+                            <button class="btn btn-danger btn-sm" type="button" data-on-click="ocrCenterClearSucceeded">清空已识别内容</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="ocr-task-list" class="ocr-task-list"><div class="analytics-empty">正在读取处理记录…</div></div>
+            </section>
+
+            <section class="feature-panel ocr-technical-panel">
+                <div class="feature-panel-heading"><div><span class="feature-index">07</span><h3>运行与索引详情</h3></div><p>用于排查扫描水位、索引路径、吞吐和最后错误。</p></div>
+                <div id="ocr-technical-details" class="ocr-technical-grid"><div class="analytics-empty">正在读取详细状态…</div></div>
+            </section>
+        </div>
+
+        <!-- Data query tabs -->
+        <div id="message-center" class="tab-content">
+            <div class="page-heading">
+                <div>
+                    <span class="page-kicker">MESSAGE CENTER</span>
+                    <h2>统一消息中心</h2>
+                    <p>全文搜索、未读会话、增量消息和群成员集中处理；结果支持消息卡片与媒体预览。</p>
+                </div>
+                <span id="message-center-state" class="badge">等待查询</span>
+            </div>
+
+            <div class="feature-grid">
+                <section class="feature-panel">
+                    <div class="feature-panel-heading"><div><span class="feature-index">01</span><h3>全文搜索</h3></div><p>跨会话按关键词和时间范围检索。</p></div>
+                    <div class="form-grid compact-grid">
+                        <div class="form-group"><label>关键词 *</label><input id="mc-search-keyword" type="search" placeholder="消息内容"></div>
+                        <div class="form-group"><label>会话 ID</label><input id="mc-search-chats" type="text" placeholder="多个会话使用逗号分隔"></div>
+                        <div class="form-group"><label>时间范围</label><input id="mc-search-time" type="text" placeholder="last-7d 或 2026-01-01~2026-01-31"></div>
+                        <div class="form-group"><label>消息类型</label><input id="mc-search-msg-type" type="number" min="0" step="1" placeholder="例如 1 / 3 / 49"></div>
+                        <div class="form-group"><label>匹配模式</label><select id="mc-search-match"><option value="phrase">完整短语</option><option value="all">全部关键词</option><option value="any">任一关键词</option></select></div>
+                        <div class="form-group"><label>排序</label><select id="mc-search-sort"><option value="time">时间优先</option><option value="relevance">相关度优先</option></select></div>
+                        <div class="form-group"><label>Limit</label><input id="mc-search-limit" type="number" value="50" min="1"></div>
+                        <div class="form-group"><label>Offset</label><input id="mc-search-offset" type="number" value="0" min="0"></div>
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-primary" type="button" data-on-click="messageCenterSearch">搜索消息</button>
+                        <button class="btn btn-secondary" type="button" data-on-click="messageCenterSearchPage" data-action-args="[-1]">上一页</button>
+                        <button class="btn btn-secondary" type="button" data-on-click="messageCenterSearchPage" data-action-args="[1]">下一页</button>
+                        <button class="btn btn-secondary" type="button" data-on-click="messageCenterSearchNextCursor">下一批（稳定游标）</button>
+                    </div>
+                    <div id="mc-search-result" class="structured-result"><div class="analytics-empty">尚未搜索</div></div>
+                </section>
+
+                <section class="feature-panel">
+                    <div class="feature-panel-heading"><div><span class="feature-index">02</span><h3>未读会话</h3></div><p>按会话类型筛选未读摘要。</p></div>
+                    <div class="form-grid compact-grid">
+                        <div class="form-group">
+                            <label>会话类型</label>
+                            <select id="mc-unread-filter">
+                                <option value="">全部</option>
+                                <option value="private">私聊</option>
+                                <option value="group">群聊</option>
+                                <option value="official_account">公众号</option>
+                                <option value="folded">折叠消息</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>Limit</label><input id="mc-unread-limit" type="number" value="20" min="1"></div>
+                    </div>
+                    <div class="actions"><button class="btn btn-primary" type="button" data-on-click="messageCenterLoadUnread">读取未读</button></div>
+                    <div id="mc-unread-result" class="structured-result"><div class="analytics-empty">尚未读取</div></div>
+                </section>
+
+                <section class="feature-panel">
+                    <div class="feature-panel-heading"><div><span class="feature-index">03</span><h3>增量新消息</h3></div><p>保存服务端游标，可手动读取或按 5 秒轮询。</p></div>
+                    <div class="form-grid compact-grid">
+                        <div class="form-group"><label>Limit</label><input id="mc-new-limit" type="number" value="100" min="1"></div>
+                        <label class="switch-row"><span>自动轮询</span><input id="mc-new-auto" type="checkbox" data-on-change="messageCenterTogglePolling"></label>
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-primary" type="button" data-on-click="messageCenterLoadNew">读取新消息</button>
+                        <button class="btn btn-secondary" type="button" data-on-click="messageCenterResetState">重置游标</button>
+                    </div>
+                    <div id="mc-new-result" class="structured-result"><div class="analytics-empty">尚未读取</div></div>
+                </section>
+
+                <section class="feature-panel">
+                    <div class="feature-panel-heading"><div><span class="feature-index">04</span><h3>群成员</h3></div><p>按群 ID 查看成员、群主和显示名称。</p></div>
+                    <div class="form-group"><label>群聊 ID *</label><input id="mc-members-chat" type="text" placeholder="123456789@chatroom"></div>
+                    <div class="actions"><button class="btn btn-primary" type="button" data-on-click="messageCenterLoadMembers">读取成员</button></div>
+                    <div id="mc-members-result" class="structured-result"><div class="analytics-empty">尚未读取</div></div>
+                </section>
+
+            </div>
+
+            <section class="feature-panel media-workbench">
+                <div class="feature-panel-heading"><div><span class="feature-index">05</span><h3>媒体与数据文件工具</h3></div><p>预览图片、视频、语音和附件，也可读取数据目录文件或代理朋友圈媒体。</p></div>
+                <div class="media-tool-grid">
+                    <div class="media-tool-card">
+                        <h4>消息媒体</h4>
+                        <div class="form-group"><label>类型</label><select id="media-tool-type"><option value="image">图片</option><option value="video">视频</option><option value="voice">语音</option><option value="file">附件</option></select></div>
+                        <div class="form-group"><label>Media Key</label><input id="media-tool-key" type="text" placeholder="MD5 或资源 key"></div>
+                        <label class="switch-row"><span>只读取元数据</span><input id="media-tool-info" type="checkbox"></label>
+                        <button class="btn btn-primary" type="button" data-on-click="mediaToolOpenMessage">打开媒体</button>
+                    </div>
+                    <div class="media-tool-card">
+                        <h4>账号数据文件</h4>
+                        <div class="form-group"><label>相对路径</label><input id="media-tool-data-path" type="text" spellcheck="false" placeholder="目录/文件名（不能包含 ..）"></div>
+                        <button class="btn btn-primary" type="button" data-on-click="mediaToolOpenData">读取文件</button>
+                    </div>
+                    <div class="media-tool-card">
+                        <h4>朋友圈媒体代理</h4>
+                        <div class="form-group"><label>预览类型（API 自动识别内容）</label><select id="media-tool-sns-type"><option value="image">图片</option><option value="video">视频</option></select></div>
+                        <div class="form-group"><label>远程 URL</label><input id="media-tool-sns-url" type="url" placeholder="https://..."></div>
+                        <div class="form-group"><label>解密 Key</label><input id="media-tool-sns-key" type="text" inputmode="numeric" pattern="[0-9]*" spellcheck="false" placeholder="可选，uint64 十进制整数"></div>
+                        <button class="btn btn-primary" type="button" data-on-click="mediaToolOpenSNS">下载并预览</button>
+                    </div>
+                </div>
+                <div id="media-tool-preview" class="media-preview"><div class="analytics-empty">输入参数后打开媒体</div></div>
+            </section>
+        </div>
+
+        <div id="session" class="tab-content">
+             <div class="page-heading"><div><span class="page-kicker">SESSIONS</span><h2>最近会话</h2><p>按昵称、备注或 wxid 快速定位最近活跃会话。</p></div></div>
+             <div class="form-grid">
+                <div class="form-group">
+                    <label>关键词搜索 (可选)</label>
+                    <input type="text" id="session-keyword" placeholder="昵称 / 备注 / wxid">
+                </div>
+                <div class="form-group">
+                    <label>返回数量 (Limit)</label>
+                    <input type="number" id="session-limit" value="20" min="1" max="500">
+                </div>
+            </div>
+            <div class="actions">
+                <button class="btn btn-primary" data-on-click="queryAPI" data-action-args="[&quot;session&quot;]">查询会话</button>
+            </div>
+            <div id="session-result" class="result-area hidden"></div>
+        </div>
+	        <div id="chatroom" class="tab-content">
+	             <div class="page-heading"><div><span class="page-kicker">CHATROOMS</span><h2>群聊管理</h2><p>搜索群名称或群 ID，并控制单次返回数量。</p></div></div>
+	             <div class="form-grid">
+	                <div class="form-group">
+	                    <label>搜索群聊 (可选)</label>
+	                    <input type="text" id="chatroom-keyword" placeholder="群名称 / 群ID">
+	                </div>
+	                <div class="form-group">
+	                    <label>限制数量 (Limit)</label>
+	                    <input type="number" id="chatroom-limit" value="500" min="1">
+	                </div>
+                    <div class="form-group">
+                        <label>分页偏移 (Offset)</label>
+                        <input type="number" id="chatroom-offset" value="0" min="0">
+                    </div>
+            </div>
+            <div class="actions">
+                <button class="btn btn-primary" data-on-click="queryAPI" data-action-args="[&quot;chatroom&quot;]">查询群聊</button>
+            </div>
+            <div id="chatroom-result" class="result-area hidden"></div>
+        </div>
+	        <div id="contact" class="tab-content">
+	             <div class="page-heading"><div><span class="page-kicker">CONTACTS</span><h2>联系人</h2><p>按身份和关键词筛选联系人资料。</p></div></div>
+	             <div class="form-grid">
+	                <div class="form-group">
+	                    <label>搜索联系人 (可选)</label>
+	                    <input type="text" id="contact-keyword" placeholder="昵称 / 备注 / wxid">
+	                </div>
+	                <div class="form-group">
+	                    <label>是否好友 (可选)</label>
+	                    <select id="contact-is-friend">
+	                        <option value="">全部</option>
+	                        <option value="1">仅好友</option>
+	                        <option value="0">仅非好友</option>
+	                    </select>
+	                </div>
+	                <div class="form-group">
+	                    <label>限制数量 (Limit)</label>
+	                    <input type="number" id="contact-limit" value="500" min="1">
+	                </div>
+                    <div class="form-group">
+                        <label>分页偏移 (Offset)</label>
+                        <input type="number" id="contact-offset" value="0" min="0">
+                    </div>
+            </div>
+            <div class="actions">
+                <button class="btn btn-primary" data-on-click="queryAPI" data-action-args="[&quot;contact&quot;]">查询联系人</button>
+            </div>
+            <div id="contact-result" class="result-area hidden"></div>
+            <section class="feature-panel contact-corp-panel">
+                <div class="feature-panel-heading"><div><span class="feature-index">OPENIM</span><h3>企业微信联系人</h3></div><p>读取 <code>@openim</code> 联系人的企业 ID 与企业名称。</p></div>
+                <div class="form-grid compact-grid">
+                    <div class="form-group"><label>OpenIM wxid</label><input id="contact-openim-wxid" type="text" placeholder="wxid_xxx@openim"></div>
+                    <div class="actions"><button class="btn btn-primary" type="button" data-on-click="contactLoadOpenIMCorp">读取企业信息</button></div>
+                </div>
+                <div id="contact-openim-result" class="structured-result"><div class="analytics-empty">尚未读取</div></div>
+            </section>
+        </div>
+        <div id="sns" class="tab-content">
+            <div class="page-heading"><div><span class="page-kicker">SOCIAL DATA</span><h2>朋友圈与收藏</h2><p>统一查看动态、全文搜索、互动通知和微信收藏。</p></div></div>
+            <div class="feature-grid social-feature-grid">
+                <section class="feature-panel">
+                    <div class="feature-panel-heading"><div><span class="feature-index">01</span><h3>朋友圈动态</h3></div></div>
+                    <div class="form-grid compact-grid">
+                        <div class="form-group"><label>发布者</label><input id="sns-feed-user" type="text" placeholder="wxid / 微信号"></div>
+                        <div class="form-group"><label>时间范围</label><input id="sns-feed-time" type="text" placeholder="last-30d 或日期范围"></div>
+                        <div class="form-group"><label>Limit</label><input id="sns-feed-limit" type="number" value="50" min="1"></div>
+                    </div>
+                    <button class="btn btn-primary" type="button" data-on-click="socialLoadFeed">读取动态</button>
+                    <div id="sns-feed-result" class="structured-result"><div class="analytics-empty">尚未读取</div></div>
+                </section>
+                <section class="feature-panel">
+                    <div class="feature-panel-heading"><div><span class="feature-index">02</span><h3>朋友圈搜索</h3></div></div>
+                    <div class="form-grid compact-grid">
+                        <div class="form-group"><label>关键词 *</label><input id="sns-search-keyword" type="search" placeholder="动态正文"></div>
+                        <div class="form-group"><label>发布者</label><input id="sns-search-user" type="text" placeholder="可选"></div>
+                        <div class="form-group"><label>时间范围</label><input id="sns-search-time" type="text" placeholder="last-30d 或日期范围"></div>
+                        <div class="form-group"><label>Limit</label><input id="sns-search-limit" type="number" value="50" min="1"></div>
+                    </div>
+                    <button class="btn btn-primary" type="button" data-on-click="socialSearch">搜索朋友圈</button>
+                    <div id="sns-search-result" class="structured-result"><div class="analytics-empty">尚未搜索</div></div>
+                </section>
+                <section class="feature-panel">
+                    <div class="feature-panel-heading"><div><span class="feature-index">03</span><h3>互动通知</h3></div></div>
+                    <div class="form-grid compact-grid">
+                        <div class="form-group"><label>时间范围</label><input id="sns-notification-time" type="text" placeholder="last-7d 或日期范围"></div>
+                        <div class="form-group"><label>Limit</label><input id="sns-notification-limit" type="number" value="50" min="1"></div>
+                        <label class="switch-row"><span>包含已读</span><input id="sns-notification-read" type="checkbox"></label>
+                    </div>
+                    <button class="btn btn-primary" type="button" data-on-click="socialLoadNotifications">读取通知</button>
+                    <div id="sns-notification-result" class="structured-result"><div class="analytics-empty">尚未读取</div></div>
+                </section>
+                <section class="feature-panel">
+                    <div class="feature-panel-heading"><div><span class="feature-index">04</span><h3>微信收藏</h3></div></div>
+                    <div class="form-grid compact-grid">
+                        <div class="form-group"><label>关键词</label><input id="favorite-query" type="search" placeholder="标题或内容"></div>
+                        <div class="form-group"><label>收藏类型</label><input id="favorite-type" type="number" min="0" step="1" placeholder="留空表示全部"></div>
+                        <div class="form-group"><label>Limit</label><input id="favorite-limit" type="number" value="50" min="1"></div>
+                    </div>
+                    <button class="btn btn-primary" type="button" data-on-click="socialLoadFavorites">读取收藏</button>
+                    <div id="favorite-result" class="structured-result"><div class="analytics-empty">尚未读取</div></div>
+                </section>
+            </div>
+        </div>
+        <div id="chatlog" class="tab-content">
+             <div class="page-heading"><div><span class="page-kicker">MESSAGES</span><h2>消息检索</h2><p>组合时间、会话、发送者、消息类型和媒体条件精确定位聊天记录。</p></div></div>
+             <div class="form-grid">
+                <div class="form-group">
+                    <label>时间范围 (可选)</label>
+                    <input type="text" id="chatlog-time" placeholder="例如: 2023-01-01~2023-12-31">
+                </div>
+                <div class="form-group">
+                    <label>聊天对象 (Talker) <span class="text-danger">*</span></label>
+                    <input type="text" id="chatlog-talker" placeholder="wxid / 群ID / 备注">
+                </div>
+                <div class="form-group">
+                    <label>发送者 (Sender) (可选)</label>
+                    <input type="text" id="chatlog-sender" placeholder="仅群聊有效，指定发送人">
+                </div>
+                <div class="form-group">
+                    <label>内容关键词 (可选)</label>
+                    <input type="text" id="chatlog-keyword" placeholder="按字面量匹配消息内容">
+                </div>
+                <div class="form-group">
+                    <label>限制数量 (Limit)</label>
+                    <input type="number" id="chatlog-limit" value="100" min="1" max="50000">
+                </div>
+                <div class="form-group">
+                    <label>分页偏移 (Offset)</label>
+                    <input type="number" id="chatlog-offset" value="0" min="0">
+                </div>
+	                <div class="form-group">
+	                    <label>消息类型 (可选)</label>
+	                    <select id="chatlog-msg-type">
+                        <option value="">全部</option>
+                        <option value="1">text</option>
+                        <option value="3">image</option>
+                        <option value="34">voice</option>
+                        <option value="42">card</option>
+                        <option value="43">video</option>
+                        <option value="47">sticker</option>
+                        <option value="48">location</option>
+                        <option value="49">share</option>
+                        <option value="50">voip</option>
+	                        <option value="10000">system</option>
+	                    </select>
+	                </div>
+	                <div class="form-group">
+	                    <label>消息子类型 SubType (可选)</label>
+	                    <input type="number" id="chatlog-sub-type" placeholder="例如 6(file), 57(quote)">
+	                </div>
+	                <div class="form-group">
+	                    <label>小时过滤 Hour (可选)</label>
+	                    <select id="chatlog-hour">
+	                        <option value="">全部小时</option>
+	                        <option value="0">00</option>
+	                        <option value="1">01</option>
+	                        <option value="2">02</option>
+	                        <option value="3">03</option>
+	                        <option value="4">04</option>
+	                        <option value="5">05</option>
+	                        <option value="6">06</option>
+	                        <option value="7">07</option>
+	                        <option value="8">08</option>
+	                        <option value="9">09</option>
+	                        <option value="10">10</option>
+	                        <option value="11">11</option>
+	                        <option value="12">12</option>
+	                        <option value="13">13</option>
+	                        <option value="14">14</option>
+	                        <option value="15">15</option>
+	                        <option value="16">16</option>
+	                        <option value="17">17</option>
+	                        <option value="18">18</option>
+	                        <option value="19">19</option>
+	                        <option value="20">20</option>
+	                        <option value="21">21</option>
+	                        <option value="22">22</option>
+	                        <option value="23">23</option>
+	                    </select>
+	                </div>
+	                <div class="form-group">
+	                    <label>发送方向 (可选)</label>
+	                    <select id="chatlog-is-self">
+	                        <option value="">全部</option>
+	                        <option value="1">仅我发送</option>
+	                        <option value="0">仅对方发送</option>
+	                    </select>
+	                </div>
+	                <div class="form-group">
+	                    <label>是否含媒体 (可选)</label>
+	                    <select id="chatlog-has-media">
+	                        <option value="">全部</option>
+	                        <option value="1">仅媒体消息</option>
+	                        <option value="0">仅非媒体消息</option>
+	                    </select>
+	                </div>
+            </div>
+            <div class="actions">
+                <button class="btn btn-secondary" type="button" data-on-click="changeChatlogPage" data-action-args="[-1]">上一页</button>
+                <button class="btn btn-primary" data-on-click="queryAPI" data-action-args="[&quot;chatlog&quot;]">查询消息</button>
+                <button class="btn btn-secondary" type="button" data-on-click="changeChatlogPage" data-action-args="[1]">下一页</button>
+            </div>
+            <div id="chatlog-result" class="result-area hidden"></div>
+        </div>
+
+        <div id="settings" class="tab-content">
+            <div class="page-heading control-page-heading">
+                <div>
+                    <span class="page-kicker">SYSTEM SETTINGS</span>
+                    <h2>系统设置</h2>
+                    <p>集中管理当前微信账号、数据库路径、本机监听与日志策略，并在浏览器中跟踪密钥提取任务。</p>
+                </div>
+                <div class="control-heading-actions">
+                    <span id="control-page-state" class="badge">等待同步</span>
+                    <button id="control-refresh-button" class="btn btn-secondary" type="button">刷新状态</button>
+                </div>
+            </div>
+
+            <section class="control-overview" aria-live="polite">
+                <div class="control-overview-heading">
+                    <span id="control-status-dot" class="control-status-dot is-loading" aria-hidden="true"></span>
+                    <div>
+                        <span class="runtime-eyebrow">当前运行环境</span>
+                        <strong id="control-status-title">正在读取控制平面</strong>
+                        <small id="control-status-subtitle">本机配置与数据库状态即将显示</small>
+                    </div>
+                </div>
+                <div class="control-overview-grid">
+                    <div><span>当前账号</span><strong id="control-status-account">-</strong></div>
+                    <div><span>微信进程</span><strong id="control-status-pid">-</strong></div>
+                    <div><span>微信版本</span><strong id="control-status-version">-</strong></div>
+                    <div><span>控制台监听</span><strong id="control-status-http">-</strong></div>
+                </div>
+            </section>
+
+            <div class="control-settings-grid">
+                <section class="control-card control-card-wide">
+                    <div class="control-card-heading">
+                        <div class="control-card-icon is-blue" aria-hidden="true">人</div>
+                        <div><h3>微信账号</h3><p>运行中的微信进程优先显示；已保存账号可直接重新载入。</p></div>
+                    </div>
+                    <div class="control-account-controls">
+                        <label class="control-field control-field-grow" for="control-account-select">
+                            <span>可用账号</span>
+                            <select id="control-account-select">
+                                <option value="">正在发现本机账号…</option>
+                            </select>
+                        </label>
+                        <button id="control-account-apply" class="btn btn-primary" type="button">切换账号</button>
+                    </div>
+                    <div id="control-account-detail" class="control-inline-note">账号列表尚未载入。</div>
+                </section>
+
+                <section class="control-card control-card-wide">
+                    <div class="control-card-heading">
+                        <div class="control-card-icon is-purple" aria-hidden="true">⌘</div>
+                        <div><h3>路径、监听与日志</h3><p>路径使用 macOS 绝对路径；监听地址只接受本机地址。</p></div>
+                    </div>
+                    <form id="control-config-form" class="control-config-form">
+                        <label class="control-field control-field-wide" for="control-data-dir">
+                            <span>微信数据目录</span>
+                            <input id="control-data-dir" name="data_dir" type="text" spellcheck="false" autocomplete="off" placeholder="/Users/name/Library/Containers/…">
+                            <small>当前账号的数据库源目录</small>
+                        </label>
+                        <label class="control-field control-field-wide" for="control-work-dir">
+                            <span>Chatlog 工作目录</span>
+                            <input id="control-work-dir" name="work_dir" type="text" spellcheck="false" autocomplete="off" placeholder="/Users/name/.chatlog/account">
+                            <small>解密数据库、索引和缓存的存放位置</small>
+                        </label>
+                        <label class="control-field" for="control-http-addr">
+                            <span>本机监听地址</span>
+                            <input id="control-http-addr" name="http_addr" type="text" spellcheck="false" autocomplete="off" placeholder="127.0.0.1:5030">
+                            <small>修改后重启 Chatlog 生效</small>
+                        </label>
+                        <label class="control-field" for="control-log-retention">
+                            <span>日志保留天数</span>
+                            <input id="control-log-retention" name="log_retention_days" type="number" inputmode="numeric" min="1" max="365" step="1">
+                            <small>范围 1–365 天</small>
+                        </label>
+                        <div id="control-config-restart" class="control-restart-note hidden" role="status">
+                            监听地址已保存，重启 Chatlog 后使用新地址。
+                        </div>
+                        <div class="control-form-footer">
+                            <span id="control-config-state" class="control-inline-note">没有待保存的修改。</span>
+                            <div class="control-form-actions">
+                                <button id="control-config-reset" class="btn btn-secondary" type="button">还原</button>
+                                <button id="control-config-save" class="btn btn-primary" type="submit">保存设置</button>
+                            </div>
+                        </div>
+                    </form>
+                </section>
+
+                <section class="control-card control-key-card">
+                    <div class="control-card-heading">
+                        <div class="control-card-icon is-orange" aria-hidden="true">图</div>
+                        <div><h3>图片密钥</h3><p>用于读取当前账号的加密图片。</p></div>
+                    </div>
+                    <div class="control-key-state">
+                        <span id="control-image-key-indicator" class="control-key-indicator">未检测</span>
+                        <strong id="control-image-key-label">等待状态</strong>
+                    </div>
+                    <button id="control-image-key-start" class="btn btn-primary control-action-button" type="button">提取图片密钥</button>
+                    <div id="control-image-key-job" class="control-job is-idle" aria-live="polite">
+                        <strong>尚未运行任务</strong><span>开始后可留在当前页面查看进度。</span>
+                    </div>
+                </section>
+
+                <section class="control-card control-key-card">
+                    <div class="control-card-heading">
+                        <div class="control-card-icon is-green" aria-hidden="true">钥</div>
+                        <div><h3>数据库密钥</h3><p>提取当前微信进程的数据库访问密钥。</p></div>
+                    </div>
+                    <div class="control-key-state">
+                        <span id="control-database-key-indicator" class="control-key-indicator">未检测</span>
+                        <strong id="control-database-key-label">等待状态</strong>
+                    </div>
+                    <button id="control-database-key-start" class="btn btn-primary control-action-button" type="button">提取数据库密钥</button>
+                    <div id="control-database-key-job" class="control-job is-idle" aria-live="polite">
+                        <strong>尚未运行任务</strong><span>任务完成后数据库会自动重新载入。</span>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <div id="api-inspector" class="tab-content">
+            <div class="page-heading">
+                <div><span class="page-kicker">API CONTRACT</span><h2>API 状态与契约</h2><p>直接读取 Ping、Catalog 和 OpenAPI，检查当前服务能力与前端接入状态。</p></div>
+                <button class="btn btn-primary" type="button" data-on-click="apiInspectorLoad" data-action-args="[true]">刷新契约</button>
+            </div>
+            <div id="api-inspector-summary" class="api-summary-grid">
+                <div class="hook-status-card is-loading"><span>契约状态</span><strong>等待加载…</strong></div>
+            </div>
+            <section class="feature-panel">
+                <div class="feature-panel-heading">
+                    <div><span class="feature-index">01</span><h3>接口目录</h3></div>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" type="button" data-on-click="apiInspectorCopyCatalog">复制 Catalog</button>
+                        <button class="btn btn-secondary btn-sm" type="button" data-on-click="apiInspectorDownloadOpenAPI">下载 OpenAPI</button>
+                    </div>
+                </div>
+                <div class="form-group"><label>按名称、路径或分类筛选</label><input id="api-inspector-filter" type="search" placeholder="history / database / hook" data-on-input="apiInspectorRenderCatalog"></div>
+                <div id="api-inspector-catalog" class="api-catalog-table"><div class="analytics-empty">尚未加载</div></div>
+            </section>
+        </div>
+
+    </div>
+
+    <!-- DB Viewer Modal -->
+    <div id="db-viewer-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-content database-modal-content">
+            <div class="modal-header">
+                <div>
+                    <span class="page-kicker">DATABASE EXPLORER</span>
+                    <h3 id="modal-title">数据库查看器</h3>
+                    <div id="modal-database-meta" class="modal-database-meta"></div>
+                </div>
+                <button class="close-btn" type="button" aria-label="关闭数据库查看器" data-on-click="closeModal">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-nav" role="tablist" aria-label="数据库工具">
+                    <button class="nav-btn active" id="btn-view-browser" type="button" data-on-click="switchModalView" data-action-args="[&quot;browser&quot;]">▦ 表浏览器</button>
+                    <button class="nav-btn" id="btn-view-sql" type="button" data-on-click="switchModalView" data-action-args="[&quot;sql&quot;]">›_ 只读 SQL</button>
+                </div>
+
+                <div id="view-browser" class="modal-view active">
+                    <div id="table-list-view">
+                        <div class="table-list-toolbar">
+                            <div>
+                                <h4>选择数据表</h4>
+                                <p id="table-list-count" class="text-gray">正在读取表结构...</p>
+                            </div>
+                            <label class="search-box" for="table-list-filter">
+                                <span aria-hidden="true">⌕</span>
+                                <input id="table-list-filter" type="search" placeholder="筛选表名" data-on-input="filterTableCards">
+                            </label>
+                        </div>
+                        <div id="table-list" class="db-table-list"></div>
+                    </div>
+
+                    <div id="table-data-view" class="data-view-container hidden">
+                        <div class="data-controls">
+                            <button class="btn btn-secondary btn-sm" type="button" data-on-click="backToTableList">← 全部表</button>
+                            <div class="current-table-heading">
+                                <strong id="current-table-name"></strong>
+                                <span id="current-table-meta" class="text-gray text-sm"></span>
+                            </div>
+                            <label class="search-box data-search-box" for="data-search-input">
+                                <span aria-hidden="true">⌕</span>
+                                <input type="search" id="data-search-input" placeholder="搜索当前表" data-on-keydown="performTableSearch" data-action-key="Enter">
+                            </label>
+                            <button class="btn btn-secondary btn-sm" type="button" data-on-click="performTableSearch">搜索</button>
+                            <label class="page-size-control">每页
+                                <select id="db-page-size" data-on-change="changePageSize">
+                                    <option value="25">25</option>
+                                    <option value="50" selected>50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </label>
+                            <div class="spacer"></div>
+                            <button class="btn btn-success btn-sm" type="button" data-on-click="exportTableData" data-action-args="[&quot;xlsx&quot;]">导出 Excel</button>
+                            <button class="btn btn-secondary btn-sm" type="button" data-on-click="exportTableData" data-action-args="[&quot;csv&quot;]">导出 CSV</button>
+                        </div>
+
+                        <div class="table-result-shell">
+                            <div class="table-scroll">
+                                <table id="data-table">
+                                    <thead></thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                            <div id="browser-loading" class="table-loading hidden">正在读取数据...</div>
+                        </div>
+
+                        <div class="pagination">
+                            <span id="db-row-summary" class="text-sm text-gray">尚未加载</span>
+                            <div class="pagination-actions">
+                                <button id="db-prev-page" class="btn btn-secondary btn-sm" type="button" data-on-click="prevPage">上一页</button>
+                                <span id="page-info" class="text-sm font-bold">第 1 页</span>
+                                <button id="db-next-page" class="btn btn-secondary btn-sm" type="button" data-on-click="nextPage">下一页</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-sql" class="modal-view">
+                    <div class="sql-editor-container">
+                        <div class="sql-editor-header">
+                            <div>
+                                <strong>只读查询</strong>
+                                <span class="text-gray text-sm">Cmd/Ctrl + Enter 执行，服务端会拒绝写操作</span>
+                            </div>
+                            <div class="sql-templates">
+                                <button class="btn btn-secondary btn-sm" type="button" data-on-click="setSQLTemplate" data-action-args="[&quot;tables&quot;]">列出表</button>
+                                <button class="btn btn-secondary btn-sm" type="button" data-on-click="setSQLTemplate" data-action-args="[&quot;count&quot;]">统计当前表</button>
+                            </div>
+                        </div>
+                        <textarea id="sql-input" class="sql-editor" spellcheck="false" placeholder="SELECT * FROM message LIMIT 50;"></textarea>
+                        <div class="toolbar">
+                            <button class="btn btn-primary btn-sm" type="button" data-on-click="runSQL">执行查询</button>
+                            <div class="spacer"></div>
+                            <button class="btn btn-success btn-sm" type="button" data-on-click="exportSQLResult" data-action-args="[&quot;xlsx&quot;]">导出 Excel</button>
+                            <button class="btn btn-secondary btn-sm" type="button" data-on-click="exportSQLResult" data-action-args="[&quot;csv&quot;]">导出 CSV</button>
+                        </div>
+                    </div>
+
+                    <div class="table-result-shell sql-result-shell">
+                        <div class="table-scroll">
+                            <table id="sql-result-table">
+                                <thead></thead>
+                                <tbody></tbody>
+                            </table>
+                            <div id="sql-msg" class="table-empty-state">请执行查询以查看结果</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="ocr-detail-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="ocr-detail-title">
+        <div class="modal-content ocr-detail-modal-content">
+            <div class="modal-header">
+                <div>
+                    <span class="page-kicker">OCR RESULT</span>
+                    <h3 id="ocr-detail-title">完整识别内容</h3>
+                    <div id="ocr-detail-meta" class="modal-database-meta">正在读取…</div>
+                </div>
+                <button class="close-btn" type="button" aria-label="关闭 OCR 详情" data-on-click="ocrCenterCloseDetail">×</button>
+            </div>
+            <div class="ocr-detail-body">
+                <aside class="ocr-detail-preview-panel">
+                    <img id="ocr-detail-image" class="ocr-detail-image hidden" alt="OCR 原图预览">
+                    <div id="ocr-detail-image-empty" class="analytics-empty">暂无可预览图片</div>
+                    <dl id="ocr-detail-facts" class="ocr-detail-facts"></dl>
+                </aside>
+                <main class="ocr-detail-content">
+                    <section><h4>内容描述</h4><pre id="ocr-detail-description">-</pre></section>
+                    <section><h4>完整 OCR 文字</h4><pre id="ocr-detail-text">-</pre></section>
+                    <section><h4>Markdown</h4><pre id="ocr-detail-markdown">-</pre></section>
+                    <section><h4>版面结构 JSON</h4><pre id="ocr-detail-layout">-</pre></section>
+                </main>
+            </div>
+        </div>
+    </div>
+    <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+</body>
+</html>
