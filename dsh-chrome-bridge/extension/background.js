@@ -7,6 +7,7 @@
 import { snapshotFn, linksFn, containsTextFn, clickFn, typeFn, scrollFn } from './page_fns.js';
 import {
   MAX_AGENT_TABS,
+  NO_EXPIRY,
   DENYLIST,
   originOf,
   getShared,
@@ -152,7 +153,7 @@ async function requireActions() {
   const { actionsUntil = 0 } = await chrome.storage.session.get('actionsUntil');
   if (Date.now() > actionsUntil) {
     throw new Error(
-      'Actions are disabled. Ask the user to tick "Allow actions" in the DSH Chrome Bridge popup (it switches itself off after 10 minutes).',
+      'Actions are disabled. Ask the user to tick "Allow actions" in the DSH Chrome Bridge popup (by default it switches itself off after 10 minutes).',
     );
   }
 }
@@ -217,7 +218,8 @@ async function dispatch(method, params) {
   switch (method) {
     case 'tabs.list': {
       const { actionsUntil = 0 } = await chrome.storage.session.get('actionsUntil');
-      const left = Math.max(0, Math.round((actionsUntil - Date.now()) / 1000));
+      const noExpiry = actionsUntil >= NO_EXPIRY;
+      const left = noExpiry ? null : Math.max(0, Math.round((actionsUntil - Date.now()) / 1000));
       const tabs = [];
       const agent = await getAgentTabs();
       for (const tabId of await getShared()) {
@@ -228,7 +230,7 @@ async function dispatch(method, params) {
           await removeShared(tabId);
         }
       }
-      return { actionsEnabled: left > 0, actionsSecondsLeft: left, sharedTabs: tabs };
+      return { actionsEnabled: noExpiry || left > 0, actionsSecondsLeft: left, actionsNoExpiry: noExpiry, sharedTabs: tabs };
     }
 
     case 'page.snapshot': {

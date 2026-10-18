@@ -48,7 +48,7 @@ Status: v0.2. Tested with automated tests only; the real-Chrome checklist in `do
 1. Open the page you want help with and click the extension icon.
 2. Click **Share this tab**. Chrome asks you to approve access to that one site. Approve it.
 3. Ask DSH to work. Start with: "Call `tabs_list`, then `page_snapshot` on the first tab."
-4. Reading is on by default. To let DSH click, type, scroll or navigate, tick **Allow actions**. It turns itself off after 10 minutes.
+4. Reading is on by default. To let DSH click, type, scroll or navigate, tick **Allow actions**. By default it turns itself off after 10 minutes. If you only use a model you trust, tick **Keep actions on until I switch them off** to remove the expiry; **Stop sharing all** and Alt+Shift+K still switch actions off.
 5. When done, click **Stop sharing this tab** or **Stop sharing all**. Both remove the site approval, except for allowed sites (below).
 6. Emergency stop: press **Alt+Shift+K** (change it at `chrome://extensions/shortcuts`). It stops all sharing, closes tabs DSH opened, and switches actions off. The badge is red while actions are on.
 
@@ -85,7 +85,7 @@ Refs (like `e12`) are only valid until the next `page_snapshot`, and are lost wh
 - Only tabs you share are visible. Nothing else, including other tabs, history, cookies, saved passwords and downloads, is reachable. The manifest does not request those permissions.
 - Site access is per site, granted through Chrome's own prompt, and removed when you stop sharing (allowed sites keep it until you remove them).
 - At most 120 commands per minute per connection (`DSH_BRIDGE_RATE_LIMIT`).
-- Actions are off by default and expire after 10 minutes.
+- Actions are off by default and expire after 10 minutes, unless you tick "Keep actions on until I switch them off" in the popup.
 - The extension refuses to type into password fields, payment fields (`cc-*`), one-time-code fields, and file pickers, and refuses `javascript:` links. Password field values never appear in snapshots.
 - Navigation is limited to http and https.
 - The server listens on 127.0.0.1 only, rejects connections whose Origin is not a browser extension (so web pages cannot connect), and requires the token from a file only you can read.
