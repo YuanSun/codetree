@@ -8,10 +8,11 @@
 // They run in the extension's isolated world, so the element refs stored on
 // `window.__dshRefs` are not visible to the page's own scripts.
 
-export function snapshotFn(maxChars) {
+export function snapshotFn(maxChars, maxElements) {
   try {
     const limit = Math.min(Math.max(Number(maxChars) || 8000, 500), 30000);
-    const MAX_ELEMENTS = 150;
+    const maxEl = Math.min(Math.max(Math.round(Number(maxElements)) || 150, 1), 400);
+    const MAX_SCROLLABLE = 10;
     const doc = document;
     const win = window;
 
@@ -23,12 +24,15 @@ export function snapshotFn(maxChars) {
       return t.length > n ? t.slice(0, n - 1) + '…' : t;
     };
 
+    // Parent in the flattened tree: out of a shadow root into its host.
+    const up = (n) => n.parentElement || (n.getRootNode && n.getRootNode().host) || null;
+
     const isVisible = (el) => {
       if (typeof el.checkVisibility === 'function') {
         return el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true });
       }
       // Fallback: a hidden ancestor hides the element, so walk up the tree.
-      for (let n = el; n && n.nodeType === 1; n = n.parentElement) {
+      for (let n = el; n && n.nodeType === 1; n = up(n)) {
         if (n.hidden) return false;
         const cs = win.getComputedStyle(n);
         if (cs.display === 'none' || cs.opacity === '0') return false;
@@ -81,15 +85,51 @@ export function snapshotFn(maxChars) {
       return clean(el.getAttribute('placeholder') || el.getAttribute('title') || el.getAttribute('name') || '', 80);
     };
 
+    const scrollLabel = (el) => {
+      const aria = el.getAttribute('aria-label');
+      if (aria) return clean(aria, 60);
+      const heading = el.querySelector && el.querySelector('h1,h2,h3,h4,h5,h6');
+      if (heading && clean(heading.textContent, 60)) return clean(heading.textContent, 60);
+      return el.getAttribute('role') || el.tagName.toLowerCase();
+    };
+
+    // One walk over the page, including open shadow roots, in document order.
+    const found = [];
+    const scrollers = [];
+    const walk = (root) => {
+      for (const el of root.querySelectorAll('*')) {
+        if (el.matches(selector) && isVisible(el)) found.push(el);
+        if (
+          scrollers.length < MAX_SCROLLABLE &&
+          el !== doc.body &&
+          el !== doc.documentElement &&
+          el.scrollHeight > el.clientHeight + 1 &&
+          /(auto|scroll|overlay)/.test(win.getComputedStyle(el).overflowY) &&
+          isVisible(el)
+        ) {
+          scrollers.push(el);
+        }
+        if (el.shadowRoot) walk(el.shadowRoot);
+      }
+    };
+    walk(doc);
+
     const lines = [];
-    let total = 0;
+    let refN = 0;
+    for (const el of scrollers) {
+      const ref = 'e' + ++refN;
+      refs.set(ref, el);
+      lines.push(
+        `[${ref}] scrollable "${scrollLabel(el)}" (scrolled ${Math.round(el.scrollTop)} of ${el.scrollHeight})`,
+      );
+    }
+
+    const total = found.length;
     let n = 0;
-    for (const el of doc.querySelectorAll(selector)) {
-      if (!isVisible(el)) continue;
-      total++;
-      if (n >= MAX_ELEMENTS) continue;
+    for (const el of found) {
+      if (n >= maxEl) break;
       n++;
-      const ref = 'e' + n;
+      const ref = 'e' + ++refN;
       refs.set(ref, el);
 
       const tag = el.tagName.toLowerCase();
@@ -135,12 +175,13 @@ export function snapshotFn(maxChars) {
       text = text.slice(0, limit);
     }
 
+    const cutNote = n < total ? `, list truncated: pass a larger maxElements (max 400) or narrow the page` : '';
     const out = [
       `Title: ${doc.title}`,
       `URL: ${win.location.href}`,
       `--- Page text (main frame only${truncatedNote}) ---`,
       text,
-      `--- Interactive elements (${n} shown of ${total}) ---`,
+      `--- Interactive elements (${n} shown of ${total}${cutNote}) ---`,
       ...lines,
     ].join('\n');
     return { ok: true, value: out };
@@ -149,11 +190,84 @@ export function snapshotFn(maxChars) {
   }
 }
 
+export function linksFn(contains, maxItems, stripQuery) {
+  try {
+    const cap = Math.min(Math.max(Math.round(Number(maxItems)) || 100, 1), 500);
+    const needle = String(contains || '').toLowerCase();
+    const win = window;
+    const doc = document;
+
+    const clean = (s, n) => {
+      const t = String(s ?? '').replace(/\s+/g, ' ').trim();
+      return t.length > n ? t.slice(0, n - 1) + '…' : t;
+    };
+    const up = (n) => n.parentElement || (n.getRootNode && n.getRootNode().host) || null;
+    const isVisible = (el) => {
+      if (typeof el.checkVisibility === 'function') {
+        return el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true });
+      }
+      for (let n = el; n && n.nodeType === 1; n = up(n)) {
+        if (n.hidden) return false;
+        const cs = win.getComputedStyle(n);
+        if (cs.display === 'none' || cs.opacity === '0') return false;
+        if (n === el && cs.visibility === 'hidden') return false;
+      }
+      return true;
+    };
+    const labelFor = (el) => {
+      const aria = el.getAttribute('aria-label');
+      if (aria) return clean(aria, 100);
+      const text = clean(el.textContent, 100);
+      if (text) return text;
+      const alt = el.querySelector && el.querySelector('img[alt]');
+      if (alt) return clean(alt.getAttribute('alt'), 100);
+      return clean(el.getAttribute('title') || '', 100);
+    };
+
+    const byUrl = new Map(); // deduplicated by URL, first text wins, DOM order
+    const walk = (root) => {
+      for (const el of root.querySelectorAll('*')) {
+        if (el.matches('a[href]') && isVisible(el)) {
+          let u;
+          try {
+            u = new URL(el.href);
+          } catch {
+            u = null;
+          }
+          if (u && (u.protocol === 'http:' || u.protocol === 'https:')) {
+            const text = labelFor(el);
+            if (!needle || text.toLowerCase().includes(needle) || u.href.toLowerCase().includes(needle)) {
+              if (stripQuery) {
+                u.search = '';
+                u.hash = '';
+              }
+              if (!byUrl.has(u.href)) byUrl.set(u.href, text);
+            }
+          }
+        }
+        if (el.shadowRoot) walk(el.shadowRoot);
+      }
+    };
+    walk(doc);
+
+    const all = Array.from(byUrl, ([url, text]) => `${text || '(no text)'} → ${url}`);
+    if (!all.length) return { ok: true, value: 'No matching links found.' };
+    const shown = all.slice(0, cap);
+    const head =
+      shown.length < all.length
+        ? `${shown.length} of ${all.length} links (raise maxItems, max 500, or use contains)`
+        : `${all.length} links`;
+    return { ok: true, value: [head, ...shown].join('\n') };
+  } catch (e) {
+    return { ok: false, error: 'links failed: ' + (e && e.message ? e.message : String(e)) };
+  }
+}
+
 export function clickFn(ref) {
   try {
     const el = window.__dshRefs && window.__dshRefs.get(ref);
     if (!el || !el.isConnected) {
-      return { ok: false, error: 'Unknown or stale ref. Take a new page_snapshot and use a ref from it.' };
+      return { ok: false, error: 'Unknown or stale ref. Refs are lost when a new page_snapshot is taken or the page reloads or navigates. Take a new page_snapshot and use a ref from it.' };
     }
     if (el.disabled) return { ok: false, error: 'That element is disabled.' };
     const type = (el.getAttribute('type') || '').toLowerCase();
@@ -175,7 +289,7 @@ export function typeFn(ref, text, submit) {
   try {
     const el = window.__dshRefs && window.__dshRefs.get(ref);
     if (!el || !el.isConnected) {
-      return { ok: false, error: 'Unknown or stale ref. Take a new page_snapshot and use a ref from it.' };
+      return { ok: false, error: 'Unknown or stale ref. Refs are lost when a new page_snapshot is taken or the page reloads or navigates. Take a new page_snapshot and use a ref from it.' };
     }
     if (el.disabled || el.readOnly) return { ok: false, error: 'That element is disabled or read-only.' };
 
@@ -232,16 +346,56 @@ export function typeFn(ref, text, submit) {
   }
 }
 
-export function scrollFn(direction) {
+export function scrollFn(direction, ref) {
   try {
+    if (!['up', 'down', 'top', 'bottom'].includes(direction)) {
+      return { ok: false, error: 'direction must be up, down, top or bottom' };
+    }
+    const up = (n) => n.parentElement || (n.getRootNode && n.getRootNode().host) || null;
+
+    let container = null;
+    let note = '';
+    if (ref) {
+      const el = window.__dshRefs && window.__dshRefs.get(ref);
+      if (!el || !el.isConnected) {
+        return { ok: false, error: 'Unknown or stale ref. Refs are lost when a new page_snapshot is taken or the page reloads or navigates. Take a new page_snapshot and use a ref from it.' };
+      }
+      for (let n = el; n && n !== document.body && n !== document.documentElement; n = up(n)) {
+        if (n.scrollHeight > n.clientHeight + 1 && /(auto|scroll|overlay)/.test(window.getComputedStyle(n).overflowY)) {
+          container = n;
+          break;
+        }
+      }
+      if (!container) note = ` No scrollable container found around ${ref}, so the window was scrolled.`;
+    }
+
+    if (container) {
+      const step = Math.round(container.clientHeight * 0.8) || 200;
+      if (direction === 'down') container.scrollTop = container.scrollTop + step;
+      else if (direction === 'up') container.scrollTop = Math.max(0, container.scrollTop - step);
+      else if (direction === 'top') container.scrollTop = 0;
+      else container.scrollTop = container.scrollHeight;
+      const pos = Math.round(container.scrollTop);
+      const total = container.scrollHeight;
+      const more = pos + container.clientHeight < total - 1;
+      return {
+        ok: true,
+        value: `Scrolled ${direction} inside the container ${ref}. Position is now ${pos} of ${total} (${more ? 'more content below' : 'at the bottom'}). Take a new page_snapshot to see new content.`,
+      };
+    }
+
     const h = Math.max(document.documentElement.scrollHeight, document.body ? document.body.scrollHeight : 0);
     const step = Math.round(window.innerHeight * 0.8) || 600;
     if (direction === 'down') window.scrollBy(0, step);
     else if (direction === 'up') window.scrollBy(0, -step);
     else if (direction === 'top') window.scrollTo(0, 0);
-    else if (direction === 'bottom') window.scrollTo(0, h);
-    else return { ok: false, error: 'direction must be up, down, top or bottom' };
-    return { ok: true, value: `Scrolled ${direction}. Position is now ${Math.round(window.scrollY)} of ${h}.` };
+    else window.scrollTo(0, h);
+    const pos = Math.round(window.scrollY);
+    const more = pos + (window.innerHeight || 0) < h - 1;
+    return {
+      ok: true,
+      value: `Scrolled ${direction}. Position is now ${pos} of ${h} (${more ? 'more content below' : 'at the bottom'}).${note}`,
+    };
   } catch (e) {
     return { ok: false, error: 'scroll failed: ' + (e && e.message ? e.message : String(e)) };
   }

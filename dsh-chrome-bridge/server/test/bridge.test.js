@@ -105,13 +105,28 @@ test('token file is created with owner-only permissions', () => {
   assert.equal(st.mode & 0o077, 0, 'token file must not be group/world readable');
 });
 
-test('lists the six tools with read-only hints set correctly', async () => {
+test('lists the nine tools with read-only hints set correctly', async () => {
   const { tools } = await client.listTools();
   const names = tools.map((t) => t.name).sort();
-  assert.deepEqual(names, ['page_click', 'page_navigate', 'page_scroll', 'page_snapshot', 'page_type', 'tabs_list']);
+  assert.deepEqual(names, [
+    'page_click',
+    'page_close',
+    'page_links',
+    'page_navigate',
+    'page_open',
+    'page_scroll',
+    'page_snapshot',
+    'page_type',
+    'tabs_list',
+  ]);
   const byName = Object.fromEntries(tools.map((t) => [t.name, t]));
   assert.equal(byName.tabs_list.annotations.readOnlyHint, true);
   assert.equal(byName.page_snapshot.annotations.readOnlyHint, true);
+  assert.equal(byName.page_links.annotations.readOnlyHint, true);
+  // Opening and closing the agent's own tabs changes state but is not destructive.
+  assert.equal(byName.page_open.annotations.readOnlyHint, false);
+  assert.equal(byName.page_open.annotations.destructiveHint, false);
+  assert.equal(byName.page_close.annotations.destructiveHint, false);
   assert.equal(byName.page_click.annotations.readOnlyHint, false);
   assert.equal(byName.page_type.annotations.destructiveHint, true);
 });
@@ -240,4 +255,131 @@ test('pending call fails fast when the extension disconnects', async () => {
   assert.equal(r.isError, true);
   assert.match(r.content[0].text, /disconnected/i);
   assert.ok(Date.now() - t0 < 600, 'should not wait for the full timeout');
+});
+
+// ------------------------------------------- extra server instances (v0.2) ----
+
+async function startServer(env) {
+  const p = await freePort();
+  const h = fs.mkdtempSync(path.join(os.tmpdir(), 'dsh-bridge-test2-'));
+  const c = new Client({ name: 'test-client-2', version: '0.0.0' });
+  await c.connect(
+    new StdioClientTransport({
+      command: process.execPath,
+      args: [serverFile],
+      env: { ...process.env, DSH_BRIDGE_PORT: String(p), DSH_BRIDGE_HOME: h, DSH_BRIDGE_TIMEOUT_MS: '700', ...env },
+    }),
+  );
+  const tok = fs.readFileSync(path.join(h, 'token'), 'utf8').trim();
+  for (let i = 0; i < 50; i++) {
+    const ok = await new Promise((r) => {
+      const s = net.connect(p, '127.0.0.1');
+      s.on('connect', () => (s.destroy(), r(true)));
+      s.on('error', () => r(false));
+    });
+    if (ok) break;
+    await sleep(40);
+  }
+  return {
+    port: p,
+    token: tok,
+    client: c,
+    async close() {
+      await c.close();
+      fs.rmSync(h, { recursive: true, force: true });
+    },
+  };
+}
+
+function socketTo(srv, origin, helloToken) {
+  return new Promise((resolve) => {
+    const ws = new WebSocket(`ws://127.0.0.1:${srv.port}`, { headers: { Origin: origin } });
+    const state = { ws, received: [], rejectedStatus: null };
+    ws.on('message', (d) => state.received.push(JSON.parse(d.toString())));
+    ws.on('unexpected-response', (_q, res) => {
+      state.rejectedStatus = res.statusCode;
+      resolve(state);
+    });
+    ws.on('error', () => {});
+    ws.on('open', () => {
+      ws.send(JSON.stringify({ type: 'hello', token: helloToken ?? srv.token }));
+      resolve(state);
+    });
+  });
+}
+
+test('with DSH_BRIDGE_EXTENSION_ID set, a different extension origin is rejected', async () => {
+  const pinned = 'a'.repeat(32);
+  const srv = await startServer({ DSH_BRIDGE_EXTENSION_ID: pinned });
+  try {
+    const other = await socketTo(srv, 'chrome-extension://' + 'b'.repeat(32));
+    assert.equal(other.rejectedStatus, 403, 'another extension must be refused even with the right token');
+    const web = await socketTo(srv, 'https://evil.example');
+    assert.equal(web.rejectedStatus, 403);
+    const good = await socketTo(srv, 'chrome-extension://' + pinned);
+    await waitFor(() => good.received.some((m) => m.type === 'ready'));
+    good.ws.close();
+  } finally {
+    await srv.close();
+  }
+});
+
+test('without the pin, any extension origin with the token is accepted (documented default)', async () => {
+  const s = await openSocket({ origin: 'chrome-extension://' + 'c'.repeat(32) });
+  await waitFor(() => s.received.some((m) => m.type === 'ready'));
+  s.ws.close();
+  await waitFor(() => s.closeCode !== null);
+});
+
+test('rate limit: a burst beyond the limit is refused without reaching the extension', async () => {
+  const srv = await startServer({ DSH_BRIDGE_RATE_LIMIT: '3' });
+  try {
+    const s = await socketTo(srv, EXT_ORIGIN);
+    await waitFor(() => s.received.some((m) => m.type === 'ready'));
+    let reached = 0;
+    s.ws.on('message', (d) => {
+      const m = JSON.parse(d.toString());
+      if (m.method) {
+        reached++;
+        s.ws.send(JSON.stringify({ id: m.id, result: 'ok' }));
+      }
+    });
+    const results = [];
+    for (let i = 0; i < 5; i++) results.push(await srv.client.callTool({ name: 'tabs_list', arguments: {} }));
+    assert.deepEqual(results.map((r) => !!r.isError), [false, false, false, true, true]);
+    assert.match(results[3].content[0].text, /Rate limit reached.*Slow down/);
+    assert.equal(reached, 3);
+    s.ws.close();
+  } finally {
+    await srv.close();
+  }
+});
+
+test('new tools relay to the extension with their arguments', async () => {
+  const s = await openSocket();
+  await waitFor(() => s.received.some((m) => m.type === 'ready'));
+  const seen = [];
+  s.ws.on('message', (d) => {
+    const m = JSON.parse(d.toString());
+    if (m.method) {
+      seen.push([m.method, m.params]);
+      s.ws.send(JSON.stringify({ id: m.id, result: 'ok' }));
+    }
+  });
+  await client.callTool({ name: 'page_open', arguments: { url: 'https://www.linkedin.com/jobs/' } });
+  await client.callTool({ name: 'page_close', arguments: { tabId: 5 } });
+  await client.callTool({ name: 'page_links', arguments: { tabId: 5, contains: '/jobs/view', maxItems: 20, stripQuery: true } });
+  await client.callTool({ name: 'page_scroll', arguments: { tabId: 5, direction: 'down', ref: 'e7' } });
+  await client.callTool({ name: 'page_snapshot', arguments: { tabId: 5, maxElements: 300 } });
+  assert.deepEqual(seen, [
+    ['page.open', { url: 'https://www.linkedin.com/jobs/' }],
+    ['page.close', { tabId: 5 }],
+    ['page.links', { tabId: 5, contains: '/jobs/view', maxItems: 20, stripQuery: true }],
+    ['page.scroll', { tabId: 5, direction: 'down', ref: 'e7' }],
+    ['page.snapshot', { tabId: 5, maxElements: 300 }],
+  ]);
+  const bad = await client.callTool({ name: 'page_links', arguments: { tabId: 5, maxItems: 9999 } }).catch((e) => ({ isError: true, e }));
+  assert.equal(bad.isError, true, 'maxItems above 500 must be rejected');
+  s.ws.close();
+  await waitFor(() => s.closeCode !== null);
 });
