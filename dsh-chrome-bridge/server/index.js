@@ -15,7 +15,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 
-const VERSION = '0.1.0';
+const VERSION = '0.2.0';
 const HOST = '127.0.0.1';
 const PORT = Number(process.env.DSH_BRIDGE_PORT || 17373);
 const HOME_DIR = process.env.DSH_BRIDGE_HOME || path.join(os.homedir(), '.dsh-chrome-bridge');
@@ -23,6 +23,8 @@ const TOKEN_FILE = path.join(HOME_DIR, 'token');
 const PINNED_EXTENSION_ID = process.env.DSH_BRIDGE_EXTENSION_ID || '';
 const CALL_TIMEOUT_MS = Number(process.env.DSH_BRIDGE_TIMEOUT_MS || 30000);
 const MAX_RESULT_CHARS = 60000;
+const RATE_LIMIT_PER_MIN = Number(process.env.DSH_BRIDGE_RATE_LIMIT || 120);
+const DEBUG = process.env.DSH_BRIDGE_DEBUG === '1';
 
 const log = (...args) => console.error('[dsh-chrome-bridge]', ...args);
 
@@ -59,7 +61,7 @@ function safeEqual(a, b) {
 
 // ------------------------------------------------- extension connection ----
 
-let conn = null; // { ws } once the extension has authenticated
+let conn = null; // { ws, calls } once the extension has authenticated; calls = recent call times
 let nextId = 1;
 let listenError = null;
 const pending = new Map(); // id -> { resolve, reject, timer }
@@ -119,7 +121,7 @@ wss.on('connection', (ws) => {
         authed = true;
         clearTimeout(helloTimer);
         if (conn && conn.ws !== ws) conn.ws.close(1000, 'replaced by a newer connection');
-        conn = { ws };
+        conn = { ws, calls: [] };
         ws.send(JSON.stringify({ type: 'ready', version: VERSION }));
         log('extension connected');
       } else {
@@ -172,6 +174,15 @@ function callExtension(method, params) {
       ),
     );
   }
+  // Sliding one-minute window per connection (S1).
+  const now = Date.now();
+  conn.calls = conn.calls.filter((t) => now - t < 60000);
+  if (conn.calls.length >= RATE_LIMIT_PER_MIN) {
+    return Promise.reject(
+      new Error(`Rate limit reached (${RATE_LIMIT_PER_MIN} browser commands per minute). Slow down and retry in a few seconds.`),
+    );
+  }
+  conn.calls.push(now);
   const id = nextId++;
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
@@ -201,20 +212,23 @@ function wrapUntrusted(text) {
 
 const mcp = new McpServer({ name: 'dsh-chrome-bridge', version: VERSION });
 
-function registerBridgeTool(name, description, inputSchema, method, readOnly) {
+function registerBridgeTool(name, description, inputSchema, method, readOnly, annotations = {}) {
   mcp.registerTool(
     name,
     {
       description,
       inputSchema,
-      annotations: { readOnlyHint: readOnly, destructiveHint: !readOnly, openWorldHint: true },
+      annotations: { readOnlyHint: readOnly, destructiveHint: !readOnly, openWorldHint: true, ...annotations },
     },
     async (args) => {
+      const t0 = Date.now();
       try {
         const result = await callExtension(method, args);
         const text = typeof result === 'string' ? result : JSON.stringify(result, null, 2);
+        if (DEBUG) log(`debug ${name} tab=${args.tabId ?? '-'} ${Date.now() - t0}ms result=${text.length} chars`);
         return { content: [{ type: 'text', text: wrapUntrusted(text) }] };
       } catch (err) {
+        if (DEBUG) log(`debug ${name} tab=${args.tabId ?? '-'} ${Date.now() - t0}ms error`);
         return { isError: true, content: [{ type: 'text', text: err.message }] };
       }
     },
@@ -225,7 +239,7 @@ const tabId = z.number().int().describe('Tab id from tabs_list');
 
 registerBridgeTool(
   'tabs_list',
-  'List the Chrome tabs the user has chosen to share. Only shared tabs are visible. Also reports whether actions are currently enabled.',
+  'List the Chrome tabs that are shared with you: tabs the user shared and tabs you opened with page_open. Only these are visible. Also reports whether actions are currently enabled.',
   {},
   'tabs.list',
   true,
@@ -233,10 +247,45 @@ registerBridgeTool(
 
 registerBridgeTool(
   'page_snapshot',
-  'Read a shared tab: title, URL, visible text, and a numbered list of interactive elements with refs (like e12) that page_click and page_type accept. Read-only.',
-  { tabId, maxChars: z.number().int().min(500).max(30000).optional().describe('Limit for page text, default 8000') },
+  'Read a shared tab: title, URL, visible text, and a numbered list of interactive elements with refs (like e12) that page_click and page_type accept. Scrollable panels appear as "scrollable" elements: pass their ref to page_scroll. Read-only.',
+  {
+    tabId,
+    maxChars: z.number().int().min(500).max(30000).optional().describe('Limit for page text, default 8000'),
+    maxElements: z.number().int().min(1).max(400).optional().describe('Limit for the element list, default 150'),
+  },
   'page.snapshot',
   true,
+);
+
+registerBridgeTool(
+  'page_links',
+  'List the visible links of a shared tab as "text → URL", deduplicated, in page order. Use contains to filter by text or URL. Read-only.',
+  {
+    tabId,
+    contains: z.string().max(200).optional().describe('Case-insensitive filter on link text or URL'),
+    maxItems: z.number().int().min(1).max(500).optional().describe('Default 100, max 500'),
+    stripQuery: z.boolean().optional().describe('Drop ?query and #hash from URLs before deduplicating'),
+  },
+  'page.links',
+  true,
+);
+
+registerBridgeTool(
+  'page_open',
+  'Open an https URL in a new background tab and share it. Only works for sites the user put on the allowlist in the extension popup; otherwise it fails and the user has to allow the site. Returns the new tabId. Does not need "Allow actions".',
+  { url: z.string().url().describe('https URL on an allowed site') },
+  'page.open',
+  false,
+  { destructiveHint: false },
+);
+
+registerBridgeTool(
+  'page_close',
+  'Close a tab that page_open created. Refuses any other tab.',
+  { tabId },
+  'page.close',
+  false,
+  { destructiveHint: false },
 );
 
 registerBridgeTool(
@@ -270,8 +319,12 @@ registerBridgeTool(
 
 registerBridgeTool(
   'page_scroll',
-  'Scroll a shared tab. Needs the user to have enabled actions.',
-  { tabId, direction: z.enum(['up', 'down', 'top', 'bottom']) },
+  'Scroll a shared tab, or one scrollable panel inside it when you pass the ref of a "scrollable" element (or any element inside the panel) from page_snapshot. Reports position and whether more content is below. Needs the user to have enabled actions.',
+  {
+    tabId,
+    direction: z.enum(['up', 'down', 'top', 'bottom']),
+    ref: z.string().optional().describe('Ref of a scrollable container or an element inside it; omit to scroll the window'),
+  },
   'page.scroll',
   false,
 );

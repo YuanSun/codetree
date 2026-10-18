@@ -14,6 +14,11 @@
     .ok { color: #1a7f37; } .bad { color: #cf222e; } .muted { color: #656d76; }
     .note { font-size: 11px; color: #656d76; margin-top: 10px; }
     #tabinfo { word-break: break-all; margin-bottom: 4px; }
+    ul { list-style: none; margin: 4px 0; padding: 0; }
+    li { display: flex; justify-content: space-between; align-items: center; gap: 6px; word-break: break-all; font-size: 12px; }
+    #log { max-height: 140px; overflow-y: auto; display: block; }
+    #log li { display: block; font-size: 11px; }
+    #msg { font-size: 12px; color: #9a6700; min-height: 1em; }
   </style>
 </head>
 <body>
@@ -36,12 +41,26 @@
   </section>
 
   <section>
+    <h2>Allowed sites</h2>
+    <div>DSH may open and read these in tabs it creates itself. https only.</div>
+    <button id="allowsite">Allow this site</button>
+    <ul id="allowed"></ul>
+    <div id="msg"></div>
+  </section>
+
+  <section>
     <h2>Actions</h2>
     <label><input type="checkbox" id="allow"> Allow click / type / navigate / scroll</label>
     <div id="left" class="muted">Read-only. Switches itself off after 10 minutes.</div>
   </section>
 
-  <p class="note">DSH can only see tabs you share, and only on sites you approve in Chrome's prompt. It never gets cookies, saved passwords, or password fields.</p>
+  <section>
+    <h2>Recent activity</h2>
+    <ul id="log"></ul>
+    <button id="clearlog">Clear</button>
+  </section>
+
+  <p class="note">DSH can only see tabs you share or tabs it opens on sites you allowed, and only on sites you approve in Chrome's prompt. Shortcut Alt+Shift+K stops everything. It never gets cookies, saved passwords, or password fields.</p>
 
   <script type="module" src="popup.js"></script>
 </body>

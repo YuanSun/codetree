@@ -4,9 +4,24 @@
 // its commands, but only for tabs the user shared from the popup, and only for
 // sites the user approved in Chrome's own permission prompt.
 
-import { snapshotFn, clickFn, typeFn, scrollFn } from './page_fns.js';
+import { snapshotFn, linksFn, clickFn, typeFn, scrollFn } from './page_fns.js';
+import {
+  MAX_AGENT_TABS,
+  DENYLIST,
+  originOf,
+  getShared,
+  getAgentTabs,
+  getAllowed,
+  addShared,
+  removeShared,
+  addAgentTab,
+  allowOrigin,
+  stopAll,
+  refreshBadges,
+  logActivity,
+} from './core.js';
 
-const VERSION = '0.1.0';
+const VERSION = '0.2.0';
 const DEFAULT_PORT = 17373;
 const PING_MS = 20000;
 const NAV_TIMEOUT_MS = 20000;
@@ -18,35 +33,6 @@ let pingTimer = null;
 
 async function setStatus(status) {
   await chrome.storage.session.set({ status });
-}
-
-async function getShared() {
-  const { shared = [] } = await chrome.storage.session.get('shared');
-  return shared;
-}
-
-async function addShared(tabId) {
-  const shared = await getShared();
-  if (!shared.includes(tabId)) await chrome.storage.session.set({ shared: [...shared, tabId] });
-  try {
-    await chrome.action.setBadgeText({ tabId, text: 'ON' });
-  } catch {
-    // tab may be gone
-  }
-}
-
-async function removeShared(tabId) {
-  const shared = await getShared();
-  await chrome.storage.session.set({ shared: shared.filter((id) => id !== tabId) });
-}
-
-function originOf(url) {
-  try {
-    const u = new URL(url);
-    return u.protocol === 'http:' || u.protocol === 'https:' ? u.origin : null;
-  } catch {
-    return null;
-  }
 }
 
 // ------------------------------------------------------------ connection ----
@@ -124,12 +110,27 @@ function onMessage(sock, ev) {
   if (msg.id != null && msg.method) handleCommand(sock, msg);
 }
 
-async function handleCommand(sock, msg) {
+async function logOrigin(method, params) {
+  if (method === 'page.open') return originOf(params.url || '');
+  if (params.tabId == null) return null;
   try {
-    const result = await dispatch(msg.method, msg.params || {});
+    return originOf((await chrome.tabs.get(params.tabId)).url || '');
+  } catch {
+    return null;
+  }
+}
+
+async function handleCommand(sock, msg) {
+  const params = msg.params || {};
+  const origin = await logOrigin(msg.method, params);
+  try {
+    const result = await dispatch(msg.method, params);
+    await logActivity({ method: msg.method, tabId: params.tabId, origin, ok: true });
     sock.send(JSON.stringify({ id: msg.id, result }));
   } catch (e) {
-    sock.send(JSON.stringify({ id: msg.id, error: { message: e && e.message ? e.message : String(e) } }));
+    const message = e && e.message ? e.message : String(e);
+    await logActivity({ method: msg.method, tabId: params.tabId, origin, ok: false, error: message });
+    sock.send(JSON.stringify({ id: msg.id, error: { message } }));
   }
 }
 
@@ -199,6 +200,13 @@ function waitForLoad(tabId) {
     };
     const timer = setTimeout(finish, NAV_TIMEOUT_MS);
     chrome.tabs.onUpdated.addListener(listener);
+    // The tab may have finished loading before the listener was added.
+    chrome.tabs
+      .get(tabId)
+      .then((t) => {
+        if (t && t.status === 'complete') finish();
+      })
+      .catch(() => {});
   });
 }
 
@@ -208,10 +216,11 @@ async function dispatch(method, params) {
       const { actionsUntil = 0 } = await chrome.storage.session.get('actionsUntil');
       const left = Math.max(0, Math.round((actionsUntil - Date.now()) / 1000));
       const tabs = [];
+      const agent = await getAgentTabs();
       for (const tabId of await getShared()) {
         try {
           const t = await chrome.tabs.get(tabId);
-          tabs.push({ tabId, title: t.title || '', url: t.url || '(no access)' });
+          tabs.push({ tabId, title: t.title || '', url: t.url || '(no access)', openedByAgent: agent.includes(tabId) });
         } catch {
           await removeShared(tabId);
         }
@@ -222,7 +231,62 @@ async function dispatch(method, params) {
     case 'page.snapshot': {
       await requireShared(params.tabId);
       await getAccessibleTab(params.tabId);
-      return runInTab(params.tabId, snapshotFn, [params.maxChars ?? 8000]);
+      return runInTab(params.tabId, snapshotFn, [params.maxChars ?? 8000, params.maxElements ?? 150]);
+    }
+
+    case 'page.links': {
+      await requireShared(params.tabId);
+      await getAccessibleTab(params.tabId);
+      return runInTab(params.tabId, linksFn, [
+        String(params.contains ?? ''),
+        params.maxItems ?? 100,
+        !!params.stripQuery,
+      ]);
+    }
+
+    case 'page.open': {
+      // Reading a page the user has allowlisted needs no actions tick (D1).
+      const url = String(params.url || '');
+      const origin = originOf(url);
+      if (!origin || !url.startsWith('https:')) throw new Error('Only https URLs can be opened.');
+      if (DENYLIST.includes(origin)) throw new Error(`${origin} is a sign-in site and cannot be opened.`);
+      if (!(await getAllowed()).includes(origin)) {
+        throw new Error(
+          `${origin} is not on the allowlist. Ask the user to open that site and click "Allow this site" in the DSH Chrome Bridge popup, or to share a tab manually.`,
+        );
+      }
+      if (!(await chrome.permissions.contains({ origins: [origin + '/*'] }))) {
+        throw new Error(`Chrome no longer grants access to ${origin}. Ask the user to click "Allow this site" again.`);
+      }
+      if ((await getAgentTabs()).length >= MAX_AGENT_TABS) {
+        throw new Error(`Too many tabs opened by the agent (limit ${MAX_AGENT_TABS}). Close one with page_close first.`);
+      }
+      const tab = await chrome.tabs.create({ url, active: false });
+      await addAgentTab(tab.id);
+      await addShared(tab.id);
+      await waitForLoad(tab.id);
+      // A redirect to a site the user never allowed must not stay readable.
+      let finalUrl = url;
+      try {
+        finalUrl = (await chrome.tabs.get(tab.id)).url || url;
+      } catch {
+        throw new Error('The tab was closed while loading.');
+      }
+      const finalOrigin = originOf(finalUrl);
+      if (finalOrigin !== origin && !(await getAllowed()).includes(finalOrigin)) {
+        await chrome.tabs.remove(tab.id).catch(() => {});
+        throw new Error(`The page redirected to ${finalOrigin || 'another site'}, which is not on the allowlist. The tab was closed.`);
+      }
+      return { tabId: tab.id, note: 'Opened in the background and shared. Call page_snapshot to read it.' };
+    }
+
+    case 'page.close': {
+      if (!(await getAgentTabs()).includes(params.tabId)) {
+        throw new Error('page_close only closes tabs that page_open created. Ask the user to close other tabs.');
+      }
+      await chrome.tabs.remove(params.tabId);
+      await removeShared(params.tabId);
+      return `Closed tab ${params.tabId}.`;
     }
 
     case 'page.navigate': {
@@ -254,7 +318,7 @@ async function dispatch(method, params) {
       await requireActions();
       await requireShared(params.tabId);
       await getAccessibleTab(params.tabId);
-      return runInTab(params.tabId, scrollFn, [String(params.direction || '')]);
+      return runInTab(params.tabId, scrollFn, [String(params.direction || ''), params.ref ? String(params.ref) : '']);
     }
 
     default:
@@ -267,16 +331,30 @@ async function dispatch(method, params) {
 // If the popup closes while Chrome shows its permission prompt, the popup's
 // own code never finishes. This listener completes the share instead.
 chrome.permissions.onAdded.addListener(async (permissions) => {
-  const { pendingShare } = await chrome.storage.session.get('pendingShare');
-  if (!pendingShare) return;
-  if ((permissions.origins || []).includes(pendingShare.origin + '/*')) {
+  const { pendingShare, pendingAllow } = await chrome.storage.session.get(['pendingShare', 'pendingAllow']);
+  const granted = permissions.origins || [];
+  if (pendingShare && granted.includes(pendingShare.origin + '/*')) {
     await addShared(pendingShare.tabId);
     await chrome.storage.session.remove('pendingShare');
+  }
+  if (pendingAllow && granted.includes(pendingAllow.origin + '/*')) {
+    await allowOrigin(pendingAllow.origin);
+    await chrome.storage.session.remove('pendingAllow');
   }
 });
 
 chrome.tabs.onRemoved.addListener((tabId) => {
   removeShared(tabId);
+});
+
+// Kill switch: stop sharing everything and switch actions off.
+chrome.commands.onCommand.addListener((command) => {
+  if (command === 'kill-switch') stopAll();
+});
+
+// Keep badge colours in step with the "actions on" state.
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'session' && (changes.actionsUntil || changes.shared)) refreshBadges();
 });
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
@@ -297,7 +375,10 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.alarms.create('reconnect', { periodInMinutes: 0.5 });
 });
 chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === 'reconnect') connect();
+  if (alarm.name === 'reconnect') {
+    connect();
+    refreshBadges(); // also resets the red badge once actions expire
+  }
 });
 
 // Make sure the alarm exists after the worker restarts, then try to connect.

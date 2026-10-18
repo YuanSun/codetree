@@ -16,6 +16,7 @@ const snapshotFn = detached(fns.snapshotFn);
 const clickFn = detached(fns.clickFn);
 const typeFn = detached(fns.typeFn);
 const scrollFn = detached(fns.scrollFn);
+const linksFn = detached(fns.linksFn);
 
 function loadPage(html) {
   const dom = new JSDOM(html, { url: 'https://example.com/start', pretendToBeVisual: true });
@@ -180,8 +181,166 @@ test('every injected function returns a result object instead of throwing', () =
   // No DOM at all: the functions must catch their own errors.
   delete globalThis.window;
   delete globalThis.document;
-  for (const r of [snapshotFn(1000), clickFn('e1'), typeFn('e1', 'x', false), scrollFn('down')]) {
+  for (const r of [snapshotFn(1000), linksFn('', 10, false), clickFn('e1'), typeFn('e1', 'x', false), scrollFn('down'), scrollFn('down', 'e1')]) {
     assert.equal(r.ok, false);
     assert.equal(typeof r.error, 'string');
   }
+});
+
+// ------------------------------------------------------------------ v0.2 ----
+
+// jsdom has no layout, so give an element a scroll geometry by hand.
+function makeScrollable(el, { height = 1000, view = 200, top = 0 } = {}) {
+  let t = top;
+  Object.defineProperty(el, 'scrollHeight', { get: () => height, configurable: true });
+  Object.defineProperty(el, 'clientHeight', { get: () => view, configurable: true });
+  Object.defineProperty(el, 'scrollTop', {
+    get: () => t,
+    set: (v) => {
+      t = Math.max(0, Math.min(height - view, v));
+    },
+    configurable: true,
+  });
+}
+
+const PANEL = `<!doctype html><title>Jobs</title><body>
+  <div id="panel" aria-label="Results" style="overflow-y:auto">
+    <ul><li><a href="/jobs/view/1?trk=a" id="card1">Staff Engineer, Acme</a></li>
+        <li><a href="/jobs/view/2?trk=b">Principal Engineer, Globex</a></li></ul>
+  </div>
+  <div id="plain">not scrollable</div>
+  <button id="go">Go</button></body>`;
+
+test('snapshot lists scrollable containers with a ref and position', () => {
+  loadPage(PANEL);
+  makeScrollable(document.getElementById('panel'), { height: 3200, view: 400, top: 80 });
+  const t = snapshotFn(8000).value;
+  assert.match(t, /\[e\d+\] scrollable "Results" \(scrolled 80 of 3200\)/);
+  assert.doesNotMatch(t, /scrollable "div"/, 'a div that does not overflow is not listed');
+});
+
+test('scroll with a ref scrolls that container, not the window, and reports position', () => {
+  loadPage(PANEL);
+  const panel = document.getElementById('panel');
+  makeScrollable(panel, { height: 1000, view: 200 });
+  let windowCalls = 0;
+  window.scrollBy = () => windowCalls++;
+  window.scrollTo = () => windowCalls++;
+  const t = snapshotFn(8000).value;
+  const ref = t.match(/\[(e\d+)\] scrollable "Results"/)[1];
+
+  let r = scrollFn('down', ref);
+  assert.equal(r.ok, true);
+  assert.equal(panel.scrollTop, 160, '80% of the visible height');
+  assert.match(r.value, /Position is now 160 of 1000 \(more content below\)/);
+  r = scrollFn('bottom', ref);
+  assert.equal(panel.scrollTop, 800);
+  assert.match(r.value, /at the bottom/);
+  r = scrollFn('up', ref);
+  assert.equal(panel.scrollTop, 640);
+  r = scrollFn('top', ref);
+  assert.equal(panel.scrollTop, 0);
+  assert.equal(windowCalls, 0, 'the window must not scroll when a container is targeted');
+});
+
+test('scroll with the ref of an element inside a panel uses the nearest scrollable ancestor', () => {
+  loadPage(PANEL);
+  const panel = document.getElementById('panel');
+  makeScrollable(panel, { height: 1000, view: 200 });
+  const t = snapshotFn(8000).value;
+  const r = scrollFn('down', refOf(t, 'Staff Engineer, Acme'));
+  assert.equal(r.ok, true);
+  assert.equal(panel.scrollTop, 160);
+});
+
+test('scroll with a ref that has no scrollable ancestor falls back to the window and says so', () => {
+  loadPage(PANEL);
+  const calls = [];
+  window.scrollBy = (x, y) => calls.push(y);
+  const t = snapshotFn(8000).value;
+  const r = scrollFn('down', refOf(t, 'Go'));
+  assert.equal(r.ok, true);
+  assert.equal(calls.length, 1);
+  assert.match(r.value, /No scrollable container found/);
+});
+
+test('scroll with a stale ref explains how refs are lost', () => {
+  loadPage(PANEL);
+  const r = scrollFn('down', 'e42');
+  assert.equal(r.ok, false);
+  assert.match(r.error, /Unknown or stale ref.*reloads or navigates/);
+  assert.equal(scrollFn('sideways', 'e1').ok, false);
+});
+
+test('window scroll reports position and whether more content is below', () => {
+  loadPage(PANEL);
+  window.scrollBy = () => {};
+  const r = scrollFn('down');
+  assert.match(r.value, /Position is now 0 of \d+ \((more content below|at the bottom)\)/);
+});
+
+test('page_links lists visible http(s) links deduplicated in page order', () => {
+  loadPage(`<!doctype html><title>L</title><body>
+    <a href="/a?x=1">First</a><a href="/a?x=1">First again</a><a href="/a?x=2">Second</a>
+    <a href="mailto:me@example.com">Mail</a><a href="javascript:alert(1)">JS</a><a href="tel:123">Tel</a>
+    <div style="display:none"><a href="/hidden">Hidden</a></div>
+    <a href="/img"><img alt="Logo link" src="x.png"></a></body>`);
+  const r = linksFn('', 100, false);
+  assert.equal(r.ok, true);
+  const lines = r.value.split('\n');
+  assert.equal(lines[0], '3 links');
+  assert.deepEqual(lines.slice(1), [
+    'First → https://example.com/a?x=1',
+    'Second → https://example.com/a?x=2',
+    'Logo link → https://example.com/img',
+  ]);
+  assert.doesNotMatch(r.value, /mailto|javascript|tel:|hidden/i);
+});
+
+test('page_links filters with contains, strips queries, and enforces caps', () => {
+  const many = Array.from({ length: 600 }, (_, i) => `<a href="/p/${i}?s=${i}">Item ${i}</a>`).join('');
+  loadPage(`<!doctype html><title>L</title><body><a href="/jobs/view/1?trk=a">Staff Engineer</a><a href="/jobs/view/1?trk=b">Staff Engineer</a><a href="/about">About us</a>${many}</body>`);
+
+  const f = linksFn('JOBS/VIEW', 100, true).value.split('\n');
+  assert.deepEqual(f, ['1 links', 'Staff Engineer → https://example.com/jobs/view/1']);
+
+  assert.match(linksFn('about', 100, false).value, /About us → https:\/\/example\.com\/about/);
+  assert.match(linksFn('staff engineer', 100, false).value, /^2 links/, 'differing queries stay separate without stripQuery');
+
+  const dflt = linksFn('', undefined, false).value;
+  assert.match(dflt, /^100 of 60\d links/);
+  assert.equal(dflt.split('\n').length, 101);
+  const hard = linksFn('', 9999, false).value;
+  assert.match(hard, /^500 of 60\d links/);
+  assert.equal(hard.split('\n').length, 501);
+  assert.equal(linksFn('zzz-nothing', 10, false).value, 'No matching links found.');
+});
+
+test('snapshot and links see into open shadow roots, and refs from there work', () => {
+  loadPage(`<!doctype html><title>S</title><body><div id="host"></div><button id="light">Light</button></body>`);
+  const host = document.getElementById('host');
+  const root = host.attachShadow({ mode: 'open' });
+  root.innerHTML = '<button id="deep">Deep button</button><a href="/inside">Inside link</a>';
+  let clicked = 0;
+  root.getElementById('deep').addEventListener('click', () => clicked++);
+
+  const t = snapshotFn(8000).value;
+  assert.match(t, /button "Deep button"/);
+  assert.match(t, /link "Inside link"/);
+  assert.match(t, /button "Light"/);
+  assert.equal(clickFn(refOf(t, 'Deep button')).ok, true);
+  assert.equal(clicked, 1);
+  assert.match(linksFn('', 10, false).value, /Inside link → https:\/\/example\.com\/inside/);
+});
+
+test('snapshot maxElements limits the list and says it truncated', () => {
+  const many = Array.from({ length: 60 }, (_, i) => `<a href="/p${i}">Link ${i}</a>`).join('');
+  loadPage(`<!doctype html><title>Big</title><body>${many}</body>`);
+  const small = snapshotFn(8000, 10).value;
+  assert.match(small, /10 shown of 60, list truncated/);
+  assert.equal((small.match(/^\[e\d+\] link/gm) || []).length, 10);
+  const all = snapshotFn(8000, 400).value;
+  assert.match(all, /60 shown of 60\)/);
+  assert.doesNotMatch(all, /truncated: pass/);
+  assert.match(snapshotFn(8000, 99999).value, /60 shown of 60/, 'clamped to 400');
 });

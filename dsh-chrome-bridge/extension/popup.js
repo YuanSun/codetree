@@ -2,56 +2,35 @@
 // Opening the popup grants "activeTab", which is how we can read the current
 // tab's URL here without asking for the broader "tabs" permission.
 
-const ACTION_WINDOW_MS = 10 * 60 * 1000;
+import {
+  ACTION_WINDOW_MS,
+  originOf,
+  checkAllowable,
+  getShared,
+  getAllowed,
+  addShared,
+  unshareTab,
+  allowOrigin,
+  removeOrigin,
+  stopAll,
+  getLog,
+  clearLog,
+} from './core.js';
+
 const $ = (id) => document.getElementById(id);
 
-function originOf(url) {
-  try {
-    const u = new URL(url);
-    return u.protocol === 'http:' || u.protocol === 'https:' ? u.origin : null;
-  } catch {
-    return null;
-  }
-}
+// The https origin of the active tab, kept up to date by render() so the
+// "Allow this site" click can call chrome.permissions.request without any
+// awaits first (Chrome requires a fresh user gesture).
+let allowCandidate = null;
 
 async function activeTab() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   return tab;
 }
 
-async function getShared() {
-  const { shared = [] } = await chrome.storage.session.get('shared');
-  return shared;
-}
-
-async function addShared(tabId) {
-  const shared = await getShared();
-  if (!shared.includes(tabId)) await chrome.storage.session.set({ shared: [...shared, tabId] });
-  await chrome.action.setBadgeText({ tabId, text: 'ON' });
-}
-
-async function unshare(tab) {
-  const origin = originOf(tab.url);
-  const others = (await getShared()).filter((id) => id !== tab.id);
-  await chrome.storage.session.set({ shared: others });
-  await chrome.action.setBadgeText({ tabId: tab.id, text: '' });
-  if (!origin) return;
-  let stillUsed = false;
-  for (const id of others) {
-    try {
-      const t = await chrome.tabs.get(id);
-      if (originOf(t.url) === origin) stillUsed = true;
-    } catch {
-      // tab closed
-    }
-  }
-  if (!stillUsed) {
-    try {
-      await chrome.permissions.remove({ origins: [origin + '/*'] });
-    } catch {
-      // nothing to remove
-    }
-  }
+function say(text) {
+  $('msg').textContent = text;
 }
 
 async function render() {
@@ -81,12 +60,76 @@ async function render() {
     $('share').textContent = isShared ? 'Stop sharing this tab' : 'Share this tab';
   }
 
+  const chk = origin ? checkAllowable(origin) : { ok: false };
+  allowCandidate = chk.ok ? chk.origin : null;
+  const allowed = await getAllowed();
+  $('allowsite').disabled = !allowCandidate || allowed.includes(allowCandidate);
+  $('allowsite').textContent = allowCandidate && allowed.includes(allowCandidate) ? 'Site is allowed' : 'Allow this site';
+  renderAllowed(allowed);
+  renderLog(await getLog());
+
   const left = Math.max(0, actionsUntil - Date.now());
   $('allow').checked = left > 0;
   $('left').textContent =
     left > 0
       ? `Actions on for ${Math.floor(left / 60000)}m ${Math.floor((left % 60000) / 1000)}s more.`
       : 'Read-only. Switches itself off after 10 minutes.';
+}
+
+// render() runs every second; only rebuild a list when its data changed, so a
+// click on a button is never lost to a re-render.
+const lastDrawn = {};
+function changed(key, data) {
+  const s = JSON.stringify(data);
+  if (lastDrawn[key] === s) return false;
+  lastDrawn[key] = s;
+  return true;
+}
+
+function renderAllowed(allowed) {
+  if (!changed('allowed', allowed)) return;
+  const ul = $('allowed');
+  ul.replaceChildren();
+  if (!allowed.length) {
+    const li = document.createElement('li');
+    li.textContent = 'None yet';
+    li.className = 'muted';
+    ul.append(li);
+    return;
+  }
+  for (const origin of allowed) {
+    const li = document.createElement('li');
+    const name = document.createElement('span');
+    name.textContent = origin;
+    const btn = document.createElement('button');
+    btn.textContent = 'Remove';
+    btn.onclick = async () => {
+      await removeOrigin(origin);
+      render();
+    };
+    li.append(name, btn);
+    ul.append(li);
+  }
+}
+
+function renderLog(entries) {
+  if (!changed('log', entries)) return;
+  const ul = $('log');
+  ul.replaceChildren();
+  if (!entries.length) {
+    const li = document.createElement('li');
+    li.textContent = 'Nothing yet';
+    li.className = 'muted';
+    ul.append(li);
+    return;
+  }
+  for (const e of entries.slice(-30).reverse()) {
+    const li = document.createElement('li');
+    const time = new Date(e.t).toLocaleTimeString();
+    li.textContent = `${time} ${e.method}${e.tabId == null ? '' : ' #' + e.tabId}${e.origin ? ' ' + e.origin : ''} ${e.ok ? 'ok' : 'failed: ' + (e.error || '')}`;
+    if (!e.ok) li.className = 'bad';
+    ul.append(li);
+  }
 }
 
 $('connect').onclick = async () => {
@@ -110,7 +153,7 @@ $('share').onclick = async () => {
   if (!origin) return;
   const shared = await getShared();
   if (shared.includes(tab.id)) {
-    await unshare(tab);
+    await unshareTab(tab.id);
     render();
     return;
   }
@@ -123,23 +166,29 @@ $('share').onclick = async () => {
   render();
 };
 
+$('allowsite').onclick = async () => {
+  const origin = allowCandidate;
+  if (!origin) return;
+  // Both calls start before any await, so the click's user gesture is intact.
+  chrome.storage.session.set({ pendingAllow: { origin } });
+  const granted = await chrome.permissions.request({ origins: [origin + '/*'] });
+  if (granted) {
+    const r = await allowOrigin(origin);
+    say(r.ok ? `Allowed ${origin}.` : r.error);
+  } else {
+    say('Chrome access was not granted.');
+  }
+  await chrome.storage.session.remove('pendingAllow');
+  render();
+};
+
+$('clearlog').onclick = async () => {
+  await clearLog();
+  render();
+};
+
 $('stopall').onclick = async () => {
-  for (const id of await getShared()) {
-    try {
-      await chrome.action.setBadgeText({ tabId: id, text: '' });
-    } catch {
-      // tab closed
-    }
-  }
-  await chrome.storage.session.set({ shared: [], actionsUntil: 0 });
-  const perms = await chrome.permissions.getAll();
-  if (perms.origins && perms.origins.length) {
-    try {
-      await chrome.permissions.remove({ origins: perms.origins });
-    } catch {
-      // ignore
-    }
-  }
+  await stopAll();
   render();
 };
 
