@@ -271,6 +271,26 @@ registerBridgeTool(
 );
 
 registerBridgeTool(
+  'page_wait_for',
+  'Wait until text appears on a shared tab (case-insensitive), up to timeoutMs. Use after a click or scroll when content loads slowly. Read-only.',
+  {
+    tabId,
+    text: z.string().min(1).max(200),
+    timeoutMs: z.number().int().min(100).max(20000).optional().describe('Default 10000, max 20000'),
+  },
+  'page.wait_for',
+  true,
+);
+
+registerBridgeTool(
+  'page_back',
+  'Go back one step in a shared tab\'s history. Needs the user to have enabled actions. Refs from before are lost.',
+  { tabId },
+  'page.back',
+  false,
+);
+
+registerBridgeTool(
   'page_open',
   'Open an https URL in a new background tab and share it. Only works for sites the user put on the allowlist in the extension popup; otherwise it fails and the user has to allow the site. Returns the new tabId. Does not need "Allow actions".',
   { url: z.string().url().describe('https URL on an allowed site') },

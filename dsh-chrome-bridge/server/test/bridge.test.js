@@ -105,10 +105,11 @@ test('token file is created with owner-only permissions', () => {
   assert.equal(st.mode & 0o077, 0, 'token file must not be group/world readable');
 });
 
-test('lists the nine tools with read-only hints set correctly', async () => {
+test('lists the eleven tools with read-only hints set correctly', async () => {
   const { tools } = await client.listTools();
   const names = tools.map((t) => t.name).sort();
   assert.deepEqual(names, [
+    'page_back',
     'page_click',
     'page_close',
     'page_links',
@@ -117,12 +118,15 @@ test('lists the nine tools with read-only hints set correctly', async () => {
     'page_scroll',
     'page_snapshot',
     'page_type',
+    'page_wait_for',
     'tabs_list',
   ]);
   const byName = Object.fromEntries(tools.map((t) => [t.name, t]));
   assert.equal(byName.tabs_list.annotations.readOnlyHint, true);
   assert.equal(byName.page_snapshot.annotations.readOnlyHint, true);
   assert.equal(byName.page_links.annotations.readOnlyHint, true);
+  assert.equal(byName.page_wait_for.annotations.readOnlyHint, true);
+  assert.equal(byName.page_back.annotations.readOnlyHint, false);
   // Opening and closing the agent's own tabs changes state but is not destructive.
   assert.equal(byName.page_open.annotations.readOnlyHint, false);
   assert.equal(byName.page_open.annotations.destructiveHint, false);
@@ -371,12 +375,16 @@ test('new tools relay to the extension with their arguments', async () => {
   await client.callTool({ name: 'page_links', arguments: { tabId: 5, contains: '/jobs/view', maxItems: 20, stripQuery: true } });
   await client.callTool({ name: 'page_scroll', arguments: { tabId: 5, direction: 'down', ref: 'e7' } });
   await client.callTool({ name: 'page_snapshot', arguments: { tabId: 5, maxElements: 300 } });
+  await client.callTool({ name: 'page_wait_for', arguments: { tabId: 5, text: 'Results', timeoutMs: 5000 } });
+  await client.callTool({ name: 'page_back', arguments: { tabId: 5 } });
   assert.deepEqual(seen, [
     ['page.open', { url: 'https://www.linkedin.com/jobs/' }],
     ['page.close', { tabId: 5 }],
     ['page.links', { tabId: 5, contains: '/jobs/view', maxItems: 20, stripQuery: true }],
     ['page.scroll', { tabId: 5, direction: 'down', ref: 'e7' }],
     ['page.snapshot', { tabId: 5, maxElements: 300 }],
+    ['page.wait_for', { tabId: 5, text: 'Results', timeoutMs: 5000 }],
+    ['page.back', { tabId: 5 }],
   ]);
   const bad = await client.callTool({ name: 'page_links', arguments: { tabId: 5, maxItems: 9999 } }).catch((e) => ({ isError: true, e }));
   assert.equal(bad.isError, true, 'maxItems above 500 must be rejected');

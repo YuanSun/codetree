@@ -127,6 +127,14 @@ globalThis.chrome = {
       tabs.get(id).active = active;
       return { id, url, status: 'loading' };
     },
+    goBack: async (id) => {
+      const t = tabs.get(id);
+      if (!t.history || !t.history.length) throw new Error('Cannot find a next page in history.');
+      t.url = t.history.pop();
+      setTimeout(() => {
+        for (const f of [...listeners.onUpdated]) f(id, { status: 'complete' });
+      }, 0);
+    },
     remove: async (id) => {
       tabs.delete(id);
       for (const f of listeners.onRemoved) f(id);
@@ -516,6 +524,64 @@ test('the activity log keeps only the last 100 entries and can be cleared', asyn
   assert.equal(session.data.activityLog.at(-1).method, 'm129');
   await core.clearLog();
   assert.deepEqual(await core.getLog(), []);
+});
+
+test('page_wait_for finds text that is already there or appears later, and times out otherwise', async () => {
+  await reset();
+  granted.add('https://example.com/*');
+  await session.set({ shared: [1] });
+  const dom = tabs.get(1).dom;
+
+  let r = await cmd(sock, 'page.wait_for', { tabId: 1, text: 'hello' }); // matches "Hello", case-insensitive
+  assert.match(r.result, /appeared/);
+
+  setTimeout(() => dom.window.document.body.insertAdjacentHTML('beforeend', '<p>Results loaded</p>'), 300);
+  const t0 = Date.now();
+  r = await cmd(sock, 'page.wait_for', { tabId: 1, text: 'results loaded', timeoutMs: 3000 });
+  assert.match(r.result, /appeared/);
+  assert.ok(Date.now() - t0 >= 250 && Date.now() - t0 < 2500, 'returns soon after the text shows up');
+
+  r = await cmd(sock, 'page.wait_for', { tabId: 1, text: 'never-there-xyz', timeoutMs: 100 });
+  assert.equal(r.error, undefined);
+  assert.match(r.result, /did not appear within 100 ms/);
+});
+
+test('page_wait_for needs a shared tab, site access and non-empty text, and ignores the actions tick', async () => {
+  await reset();
+  assert.match((await cmd(sock, 'page.wait_for', { tabId: 1, text: 'x', timeoutMs: 100 })).error.message, /not shared/);
+  await session.set({ shared: [1] });
+  assert.match((await cmd(sock, 'page.wait_for', { tabId: 1, text: 'x', timeoutMs: 100 })).error.message, /no access/i);
+  granted.add('https://example.com/*');
+  assert.match((await cmd(sock, 'page.wait_for', { tabId: 1, text: '' })).error.message, /must not be empty/);
+  assert.equal((await cmd(sock, 'page.wait_for', { tabId: 1, text: 'hello', timeoutMs: 100 })).error, undefined);
+  assert.equal(session.data.actionsUntil, 0, 'read-only, no actions tick was needed');
+});
+
+test('page_wait_for stops reading when the tab leaves an approved site mid-wait', async () => {
+  await reset();
+  granted.add('https://example.com/*');
+  await session.set({ shared: [1] });
+  setTimeout(() => (tabs.get(1).url = 'https://unapproved.example/'), 150);
+  const r = await cmd(sock, 'page.wait_for', { tabId: 1, text: 'never-there-xyz', timeoutMs: 3000 });
+  assert.match(r.error.message, /no access/i);
+  tabs.get(1).url = 'https://example.com/page';
+});
+
+test('page_back needs actions and a shared tab, goes back, and reports an empty history', async () => {
+  await reset();
+  granted.add('https://example.com/*');
+  await session.set({ shared: [1] });
+  tabs.get(1).history = ['https://example.com/earlier'];
+  assert.match((await cmd(sock, 'page.back', { tabId: 1 })).error.message, /Actions are disabled/);
+  assert.equal(tabs.get(1).url, 'https://example.com/page', 'must not have moved');
+
+  await session.set({ actionsUntil: Date.now() + 60_000 });
+  assert.match((await cmd(sock, 'page.back', { tabId: 2 })).error.message, /not shared/);
+  const r = await cmd(sock, 'page.back', { tabId: 1 });
+  assert.equal(r.error, undefined);
+  assert.equal(tabs.get(1).url, 'https://example.com/earlier');
+  assert.match((await cmd(sock, 'page.back', { tabId: 1 })).error.message, /no earlier page/);
+  tabs.get(1).url = 'https://example.com/page';
 });
 
 test('unknown methods are rejected', async () => {

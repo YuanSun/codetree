@@ -17,6 +17,7 @@ const clickFn = detached(fns.clickFn);
 const typeFn = detached(fns.typeFn);
 const scrollFn = detached(fns.scrollFn);
 const linksFn = detached(fns.linksFn);
+const containsTextFn = detached(fns.containsTextFn);
 
 function loadPage(html) {
   const dom = new JSDOM(html, { url: 'https://example.com/start', pretendToBeVisual: true });
@@ -181,7 +182,7 @@ test('every injected function returns a result object instead of throwing', () =
   // No DOM at all: the functions must catch their own errors.
   delete globalThis.window;
   delete globalThis.document;
-  for (const r of [snapshotFn(1000), linksFn('', 10, false), clickFn('e1'), typeFn('e1', 'x', false), scrollFn('down'), scrollFn('down', 'e1')]) {
+  for (const r of [snapshotFn(1000), linksFn('', 10, false), containsTextFn('x'), clickFn('e1'), typeFn('e1', 'x', false), scrollFn('down'), scrollFn('down', 'e1')]) {
     assert.equal(r.ok, false);
     assert.equal(typeof r.error, 'string');
   }
@@ -343,4 +344,11 @@ test('snapshot maxElements limits the list and says it truncated', () => {
   assert.match(all, /60 shown of 60\)/);
   assert.doesNotMatch(all, /truncated: pass/);
   assert.match(snapshotFn(8000, 99999).value, /60 shown of 60/, 'clamped to 400');
+});
+
+test('containsTextFn matches case-insensitively and rejects empty text', () => {
+  loadPage('<!doctype html><title>T</title><body><p>Showing 25 Results</p></body>');
+  assert.deepEqual(containsTextFn('showing 25 RESULTS'), { ok: true, value: true });
+  assert.deepEqual(containsTextFn('nope'), { ok: true, value: false });
+  assert.equal(containsTextFn('').ok, false);
 });
