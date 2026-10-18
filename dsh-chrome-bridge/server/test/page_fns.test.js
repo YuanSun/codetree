@@ -352,3 +352,27 @@ test('containsTextFn matches case-insensitively and rejects empty text', () => {
   assert.deepEqual(containsTextFn('nope'), { ok: true, value: false });
   assert.equal(containsTextFn('').ok, false);
 });
+
+test('type (page lane) verifies the result and refuses code-editor widgets instead of reporting a false success', () => {
+  loadPage(`<!doctype html><title>E</title><body>
+    <input id="short" aria-label="Short">
+    <input id="num" type="number" aria-label="Num">
+    <div class="monaco-editor"><textarea id="inputarea" aria-label="Editor input"></textarea></div>
+    <div id="rich" contenteditable="true" aria-label="Rich"></div></body>`);
+  const t = snapshotFn(8000).value;
+
+  // A masking script cuts the text after the input event: the old code said ok, now it must say no.
+  document.getElementById('short').addEventListener('input', (e) => (e.target.value = e.target.value.slice(0, 3)));
+  const short = typeFn(refOf(t, 'Short'), 'abcdef', false);
+  assert.equal(short.ok, false);
+  assert.match(short.error, /did not take effect.*3 characters, expected 6/);
+  assert.doesNotMatch(short.error, /abcdef/, 'the typed text is not echoed');
+
+  assert.equal(typeFn(refOf(t, 'Num'), 'abc', false).ok, false, 'a number input drops letters');
+  assert.equal(typeFn(refOf(t, 'Num'), '42', false).ok, true);
+
+  const editor = typeFn(refOf(t, 'Editor input'), 'code', false);
+  assert.equal(editor.ok, false);
+  assert.match(editor.error, /code editor widget.*input_type/);
+  assert.equal(document.getElementById('inputarea').value, '', 'the widget was left untouched');
+});

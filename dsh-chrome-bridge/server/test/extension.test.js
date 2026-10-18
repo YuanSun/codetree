@@ -656,7 +656,7 @@ test('popup.js only references element ids that exist in popup.html', () => {
 test('all extension scripts parse as ES modules', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'dsh-syntax-'));
   try {
-    for (const f of ['background.js', 'popup.js', 'page_fns.js', 'core.js']) {
+    for (const f of ['background.js', 'popup.js', 'page_fns.js', 'core.js', 'cdp.js', 'cdp_tools.js']) {
       const copy = path.join(tmp, f.replace(/\.js$/, '.mjs'));
       fs.copyFileSync(path.join(extDir, f), copy);
       execFileSync(process.execPath, ['--check', copy]);
@@ -680,6 +680,8 @@ test('manifest pins the extension identity with a key that maps to a valid ID', 
 
 test('manifest, package.json and the extension code agree on the version', () => {
   const m = JSON.parse(fs.readFileSync(path.join(extDir, 'manifest.json'), 'utf8'));
+  const dm = JSON.parse(fs.readFileSync(path.join(extDir, 'manifest.debugger.json'), 'utf8'));
+  assert.equal(dm.version, m.version);
   const p = JSON.parse(fs.readFileSync(path.join(extDir, '..', 'server', 'package.json'), 'utf8'));
   assert.equal(m.version, p.version);
   assert.match(fs.readFileSync(path.join(extDir, 'background.js'), 'utf8'), new RegExp(`VERSION = '${m.version}'`));

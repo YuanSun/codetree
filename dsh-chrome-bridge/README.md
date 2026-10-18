@@ -8,7 +8,7 @@ It does not read Chrome's profile folder, so it needs no macOS Full Disk Access.
 DSH ──stdio MCP──> server/index.js ──ws://127.0.0.1:17373──> Chrome extension ──> shared tabs
 ```
 
-Status: v0.2. Tested with automated tests only; the real-Chrome checklist in `docs/verification.md` still needs a manual pass.
+Status: v0.3. Tested with automated tests only; the real-Chrome checklist in `docs/verification.md` still needs a manual pass.
 
 ## Install
 
@@ -62,6 +62,23 @@ Status: v0.2. Tested with automated tests only; the real-Chrome checklist in `do
 6. A page that redirects to a site you did not allow is closed.
 7. The popup's **Recent activity** list shows the last commands: method, tab, site, outcome. It never stores page content, typed text or full URLs.
 
+## Debugger build (v0.3)
+
+A second control lane that works the way Claude in Chrome does: it sends Chrome DevTools Protocol (CDP) commands through `chrome.debugger`. It adds screenshots, an accessibility tree, real mouse and keyboard input, iframe reading, console and network summaries, and an optional page-script tool. It needs a separate build because Chrome does not allow `debugger` as an optional permission.
+
+- Build it: `cd server && npm run build:debugger`, then load `dist/extension-debugger` unpacked **instead of** `extension/` (both have the same ID, so load only one). `npm run pack` also writes `dsh-chrome-bridge-<version>-debugger.zip`.
+- Chrome shows a **"started debugging this browser"** banner on attached tabs. That is by design and is never hidden. Pressing **Cancel** on it detaches the debugger and switches actions and script off.
+- The debugger only attaches to tabs that are **shared and on an allowlisted site**, and detaches on unshare, tab close, leaving the site, five idle minutes, and when the actions window ends (for tabs used for actions). Alt+Shift+K detaches everything.
+- Every CDP method goes through one allowlist in `extension/cdp.js` (`ALLOWED_METHODS`). Cookies, storage, request or response headers and bodies, and fetch interception are never reachable. Network tracking keeps only method, origin and path (no query string), status, type and size.
+- Typing and keys are refused when a password, payment, one-time-code or file field has focus. Paste is refused. Only select all, copy, cut, undo and redo are allowed with Ctrl or Cmd.
+- `input_type` reads the control back and fails if the content is not what it should be. A control it cannot read (for example some code editors) is reported as `verified: false`, never as success.
+- **`page_eval` runs JavaScript in the page.** It is off by default and needs three things: the popup's **Allow script** (5 minutes), **Allow actions**, and **Allow script on this site** for that origin. Cookie, storage and network APIs are refused by a text check. That check is a speed bump, not a sandbox, and a determined script can get around it. The toggles, the per-site list, the expiry and the activity log (first 120 characters of the expression) are the real controls.
+- Images and the accessibility tree come from web pages, so they are returned as untrusted data with a note.
+- `DSH_BRIDGE_IMAGE_MODE=file` saves screenshots to `~/.dsh-chrome-bridge/shots/` and returns the path, for MCP clients that drop images.
+- Screenshots use CSS-pixel coordinates: the result states the scale and origin. To click image point (ix, iy) use `x = ix / scale + origin x`.
+
+The page lane stays as it was. Use `page_snapshot` for text, `page_read` for app UIs, `input_*` when `page_click`/`page_type` are not enough.
+
 ## Tools
 
 | Tool | Needs "Allow actions" | What it does |
@@ -71,6 +88,12 @@ Status: v0.2. Tested with automated tests only; the real-Chrome checklist in `do
 | `page_links` | no | Visible links as `text → URL`, deduplicated. `contains`, `maxItems` (default 100, max 500), `stripQuery` |
 | `page_wait_for` | no | Wait until text appears (case-insensitive), `timeoutMs` default 10000, max 20000 |
 | `page_back` | yes | One step back in the tab's history; refs are lost |
+| `page_screenshot` | no | Debugger build. Image of the tab, with size and scale |
+| `page_read` | no | Debugger build. Accessibility tree with `ax` refs, optional subtree and frame |
+| `page_console`, `page_network` | no | Debugger build. Console messages; request summaries without headers, bodies or queries |
+| `input_click`, `input_key`, `input_type`, `input_scroll` | yes | Debugger build. Real mouse and keyboard input; `input_type` verifies the result |
+| `page_eval` | yes, plus "Allow script" | Debugger build. JavaScript in the page; per-site opt-in |
+| `page_batch` | per step | Debugger build. Up to 10 click/type/key/scroll/wait/screenshot/read steps in one call |
 | `page_open` | no | Open an https URL on an allowed site in a background tab, shared automatically |
 | `page_close` | no | Close a tab that `page_open` created (refuses any other) |
 | `page_navigate` | yes | Go to an http(s) URL in a shared tab |
@@ -94,7 +117,7 @@ Refs (like `e12`) are only valid until the next `page_snapshot`, and are lost wh
 
 ## What was tested
 
-- `npm test` runs 80 tests: the MCP server end to end against a mock extension (auth, origin rejection, timeouts, tag-escaping), the page functions in jsdom, and the extension's permission gating against a fake Chrome API.
+- `npm test` runs 130 tests: the MCP server end to end against a mock extension (auth, origin rejection, timeouts, tag-escaping), the page functions in jsdom, and the extension's permission gating against a fake Chrome API.
 - **Not tested:** the extension inside real Chrome (popup rendering, Chrome's permission prompt, service-worker keepalive), and DSH itself. Expect small fixes on first run.
 
 ## Troubleshooting
@@ -110,7 +133,7 @@ Refs (like `e12`) are only valid until the next `page_snapshot`, and are lost wh
 
 ## Packaging
 
-`cd server && npm run pack` writes `dist/dsh-chrome-bridge-<version>.zip` without `node_modules`. It needs the `zip` command.
+`cd server && npm run pack` writes `dist/dsh-chrome-bridge-<version>.zip` and `dist/dsh-chrome-bridge-<version>-debugger.zip`, both without `node_modules`. It needs the `zip` command.
 
 ## Not included yet
 

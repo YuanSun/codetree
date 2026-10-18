@@ -308,6 +308,12 @@ export function typeFn(ref, text, submit) {
       return { ok: false, error: 'Refusing to type into a payment, one-time-code or password field.' };
     }
 
+    // Code editors keep their text in their own model, so setting the DOM value
+    // can report success while the editor holds something else.
+    if (el.closest && el.closest('.monaco-editor, .cm-editor, .CodeMirror, .ace_editor')) {
+      return { ok: false, error: 'This is a code editor widget, which this page lane cannot type into reliably. Use input_type (debugger build), which verifies the result.' };
+    }
+
     if (typeof el.scrollIntoView === 'function') el.scrollIntoView({ block: 'center' });
     el.focus();
 
@@ -317,6 +323,10 @@ export function typeFn(ref, text, submit) {
       setter.call(el, String(text));
       el.dispatchEvent(new window.Event('input', { bubbles: true }));
       el.dispatchEvent(new window.Event('change', { bubbles: true }));
+      // Verify: a maxlength, a masking script or a framework can undo the value.
+      if (el.value !== String(text)) {
+        return { ok: false, error: `Typing did not take effect: the field holds ${el.value.length} characters, expected ${String(text).length}.` };
+      }
     } else {
       let done = false;
       try {
@@ -328,6 +338,10 @@ export function typeFn(ref, text, submit) {
       if (!done) {
         el.textContent = String(text);
         el.dispatchEvent(new window.Event('input', { bubbles: true }));
+      }
+      const now = String(el.innerText ?? el.textContent ?? '');
+      if (!now.includes(String(text))) {
+        return { ok: false, error: 'Typing did not take effect: the editable area does not contain the text.' };
       }
     }
 

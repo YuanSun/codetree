@@ -51,3 +51,40 @@ Install: reload the extension at `chrome://extensions` (the ID changes once, to 
 
 - S7 real-browser end-to-end harness (investigation not started).
 - Section 6, porting the `linkedin-job-search` skill (the skill text is not in this repo).
+
+## v0.3 debugger lane: to verify in real Chrome (Milestone 4)
+
+Built and tested against a fake `chrome.debugger` only (130 tests). Nothing below has run in Chrome.
+
+Prerequisite from the v0.3 spec: finish the v0.2 checklist above first.
+
+- [ ] Install-time permission warning for the debugger build: ____________
+- [ ] Banner text and Cancel button; Cancel produces `canceled_by_user` and actions go off
+- [ ] `debugger` as an optional permission is not possible (assumed; the build is separate). Confirm by trying it
+- [ ] `page_screenshot` on a background (agent-opened, inactive) tab. If it hangs or is blank, open agent tabs active or activate before capture
+- [ ] Screenshot size and scale on your display (retina): image width <= 1024 and the reported scale matches
+- [ ] DSH's MCP client passes image blocks to the model; if not, use `DSH_BRIDGE_IMAGE_MODE=file`
+- [ ] `Input.dispatchKeyEvent` with `commands` (select all) works through `chrome.debugger`
+- [ ] DevTools open on the same tab gives the "another debugger" message
+- [ ] `page_read` size and time on LinkedIn and on a large MakeCode project; adjust caps
+- [ ] `Target.setAutoAttach` exposes the MakeCode simulator iframe (`https://trg-microbit.userpxt.io`, which must also be allowlisted)
+- [ ] `DOM.getBoxModel` / `DOM.focus` work without `DOM.enable` (the code enables it once per session anyway)
+- [ ] Clicking and typing inside a cross-origin iframe session land at the right place (coordinates are per frame)
+
+Acceptance tasks (v0.3 spec section 6), record pass or fail:
+
+| Task | Result |
+|---|---|
+| T1 Read the MakeCode Python without changing the project | |
+| T2 Replace the JavaScript editor content, `verified: true`, no residue | |
+| T3 Press the simulator's A button and describe the screenshot (3 of 5 runs) | |
+| T4 LinkedIn results panel: scroll and read all cards, no Apply clicks | |
+| T5 Read a cross-origin iframe on an allowlisted page; blocked on another | |
+| T6 Refusals: password, paste, `page_eval` toggle off, response bodies | |
+
+Known design choices to review:
+
+- Tool names: the debugger lane's input tools are `input_click`, `input_key`, `input_type`, `input_scroll` (not `page_click` etc.), so they do not clash with the page lane.
+- `page_eval` needs the script toggle **and** the actions tick (stricter than the spec's "independent").
+- Monaco (MakeCode's editor) keeps text in its own model, so `input_type` usually reports `verified: false (cannot be read back)`. The spec's route for a verified editor update is `page_eval` with `monaco.editor.getModels()[0].setValue(...)` on an opted-in site.
+- Not implemented: `page_drag`, `page_hover`, `page_zoom`, tab groups, the real-browser E2E harness.
