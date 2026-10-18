@@ -1,0 +1,19 @@
+{
+  "name": "dsh-chrome-bridge-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local MCP bridge between DeepSeek Harness (stdio) and the dsh-chrome-bridge Chrome extension (localhost WebSocket).",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "ws": "8.22.0",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "jsdom": "30.1.3"
+  }
+}
