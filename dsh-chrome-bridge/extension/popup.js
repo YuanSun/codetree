@@ -3,7 +3,8 @@
 // tab's URL here without asking for the broader "tabs" permission.
 
 import {
-  ACTION_WINDOW_MS,
+  NO_EXPIRY,
+  actionsUntilFor,
   originOf,
   checkAllowable,
   getShared,
@@ -68,12 +69,18 @@ async function render() {
   renderAllowed(allowed);
   renderLog(await getLog());
 
+  const { actionsNoExpiry = false } = await chrome.storage.local.get('actionsNoExpiry');
+  $('noexpiry').checked = actionsNoExpiry;
   const left = Math.max(0, actionsUntil - Date.now());
   $('allow').checked = left > 0;
   $('left').textContent =
-    left > 0
-      ? `Actions on for ${Math.floor(left / 60000)}m ${Math.floor((left % 60000) / 1000)}s more.`
-      : 'Read-only. Switches itself off after 10 minutes.';
+    left <= 0
+      ? actionsNoExpiry
+        ? 'Read-only. Actions stay on until you switch them off.'
+        : 'Read-only. Switches itself off after 10 minutes.'
+      : actionsUntil >= NO_EXPIRY
+        ? 'Actions are on until you switch them off.'
+        : `Actions on for ${Math.floor(left / 60000)}m ${Math.floor((left % 60000) / 1000)}s more.`;
 }
 
 // render() runs every second; only rebuild a list when its data changed, so a
@@ -193,7 +200,17 @@ $('stopall').onclick = async () => {
 };
 
 $('allow').onchange = async () => {
-  await chrome.storage.session.set({ actionsUntil: $('allow').checked ? Date.now() + ACTION_WINDOW_MS : 0 });
+  const noExpiry = $('noexpiry').checked;
+  await chrome.storage.session.set({ actionsUntil: $('allow').checked ? actionsUntilFor(noExpiry) : 0 });
+  render();
+};
+
+$('noexpiry').onchange = async () => {
+  const noExpiry = $('noexpiry').checked;
+  await chrome.storage.local.set({ actionsNoExpiry: noExpiry });
+  // Apply to actions that are already on.
+  const { actionsUntil = 0 } = await chrome.storage.session.get('actionsUntil');
+  if (actionsUntil > Date.now()) await chrome.storage.session.set({ actionsUntil: actionsUntilFor(noExpiry) });
   render();
 };
 

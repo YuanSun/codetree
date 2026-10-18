@@ -264,6 +264,27 @@ test('navigate only allows http(s) and loses read access on unapproved sites', a
   assert.match(after.error.message, /no access/i, 'new site was never approved by the user');
 });
 
+test('actions with no expiry stay on, show as such in tabs_list, and stop with the kill switch', async () => {
+  tabs.get(1).url = 'https://example.com/page';
+  granted.add('https://example.com/*');
+  await session.set({ shared: [1], actionsUntil: core.actionsUntilFor(true) });
+  const list = await cmd(sock, 'tabs.list');
+  assert.equal(list.result.actionsEnabled, true);
+  assert.equal(list.result.actionsNoExpiry, true);
+  assert.equal(list.result.actionsSecondsLeft, null);
+  const snap = await cmd(sock, 'page.snapshot', { tabId: 1 });
+  const ref = snap.result.match(/\[(e\d+)\] button "Go"/)[1];
+  assert.equal((await cmd(sock, 'page.click', { tabId: 1, ref })).error, undefined);
+
+  await core.stopAll();
+  assert.equal(session.data.actionsUntil, 0);
+  assert.match((await cmd(sock, 'page.click', { tabId: 1, ref })).error.message, /Actions are disabled/);
+  // The default is still a 10-minute window.
+  const t0 = Date.now();
+  const timed = core.actionsUntilFor(false);
+  assert.ok(timed > t0 + 9 * 60_000 && timed <= t0 + 10 * 60_000 + 50);
+});
+
 test('tabs.list returns shared tabs and drops closed ones', async () => {
   tabs.get(1).url = 'https://example.com/page';
   await session.set({ shared: [1, 99], actionsUntil: 0 });
