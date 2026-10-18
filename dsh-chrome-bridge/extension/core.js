@@ -13,6 +13,7 @@ export function actionsUntilFor(noExpiry) {
 }
 export const MAX_AGENT_TABS = 5;
 export const LOG_LIMIT = 100;
+export const SCRIPT_WINDOW_MS = 5 * 60 * 1000;
 
 // Sign-in hosts that can never be allowlisted (decision D3). Exact origins.
 export const DENYLIST = [
@@ -71,6 +72,11 @@ export async function getShared() {
 export async function getAgentTabs() {
   const { agentTabs = [] } = await chrome.storage.session.get('agentTabs');
   return agentTabs;
+}
+
+export async function getEvalOrigins() {
+  const { evalOrigins = [] } = await chrome.storage.local.get('evalOrigins');
+  return evalOrigins;
 }
 
 export async function getAllowed() {
@@ -152,10 +158,26 @@ export async function allowOrigin(input) {
   return chk;
 }
 
+// Script (page_eval) is enabled per origin, and only for origins already allowed.
+export async function allowEval(origin) {
+  const chk = checkAllowable(origin);
+  if (!chk.ok) return chk;
+  if (!(await getAllowed()).includes(chk.origin)) {
+    return { ok: false, error: 'Allow the site first, then enable script on it.' };
+  }
+  await updateKey('local', 'evalOrigins', (l) => (l.includes(chk.origin) ? l : [...l, chk.origin]), []);
+  return chk;
+}
+
+export async function removeEval(origin) {
+  await updateKey('local', 'evalOrigins', (l) => l.filter((o) => o !== origin), []);
+}
+
 // Removing a site unshares its tabs, closes the tabs the agent opened there,
 // and drops Chrome's permission for it.
 export async function removeOrigin(origin) {
   await updateKey('local', 'allowedOrigins', (l) => l.filter((o) => o !== origin), []);
+  await removeEval(origin);
   const agent = await getAgentTabs();
   for (const id of await getShared()) {
     if ((await tabOrigin(id)) !== origin) continue;
@@ -173,12 +195,29 @@ export async function removeOrigin(origin) {
   await removePermission(origin);
 }
 
-// Stop sharing everything, close agent-opened tabs, switch actions off.
+// Detaches the debugger from every tab it is attached to. Works from the popup
+// and the worker alike: the list of attached tabs lives in storage.
+export async function detachDebugger() {
+  if (typeof chrome === 'undefined' || !chrome.debugger || !chrome.debugger.detach) return;
+  const { cdpAttached = [] } = await chrome.storage.session.get('cdpAttached');
+  for (const tabId of cdpAttached) {
+    try {
+      await chrome.debugger.detach({ tabId });
+    } catch {
+      // already detached
+    }
+    await setBadge(tabId, '');
+  }
+  await chrome.storage.session.set({ cdpAttached: [] });
+}
+
+// Stop sharing everything, close agent-opened tabs, detach the debugger, switch actions and script off.
 // Allowlisted sites keep their permission, everything else loses it.
 export async function stopAll() {
+  await detachDebugger();
   const agent = await getAgentTabs();
   for (const id of await getShared()) await setBadge(id, '');
-  await chrome.storage.session.set({ shared: [], agentTabs: [], actionsUntil: 0 });
+  await chrome.storage.session.set({ shared: [], agentTabs: [], actionsUntil: 0, scriptUntil: 0 });
   for (const id of agent) {
     try {
       await chrome.tabs.remove(id);
@@ -202,7 +241,7 @@ export async function stopAll() {
 
 // Records what was asked, never page content or typed text: method, tab,
 // origin, time, and the outcome.
-export async function logActivity({ method, tabId = null, origin = null, ok, error = null }) {
+export async function logActivity({ method, tabId = null, origin = null, ok, error = null, detail }) {
   const entry = {
     t: Date.now(),
     method: String(method),
@@ -211,6 +250,7 @@ export async function logActivity({ method, tabId = null, origin = null, ok, err
     ok: !!ok,
     error: error ? String(error).slice(0, 200) : null,
   };
+  if (detail) entry.detail = String(detail).slice(0, 120);
   await updateKey('session', 'activityLog', (l) => [...l, entry].slice(-LOG_LIMIT), []);
 }
 

@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "DSH Chrome Bridge (debugger)",
+  "version": "0.3.0",
+  "description": "DSH Chrome Bridge with the debugger lane: screenshots, accessibility tree and real input on allowlisted sites. Chrome shows a debugging banner on attached tabs.",
+  "minimum_chrome_version": "125",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6THdDThzBeWyYaLbDghWdFqKWwaS4U/Y+ofWd1bmezzTMcppqHlAUuRPavJeoIMlQjX64pJRdW0xuUYKl074pAasY02GfGK86jt52Tqvra0rNE/H3Wu+Wg3nqujpIoT1hIdHx1iSqBbW+X39kjbeBtZedj/tIfBP/5DlfcHZhjFEFe7GNZgY0vqJ8iNZiXuzJJfI/49YwcmCQB/RlXfZ1f0rnrtC9CfEadEvDydt69AHu/jJCr8S5EVB/WjBD6TUFPUQ87wUggctgzmLwTD7a4mJBOJFkWMRsk/vui7VEdm0KyqIubWhnSdgfV54MvrZvYOSImhMU6+3MH/ExVtipwIDAQAB",
+  "permissions": [
+    "activeTab",
+    "alarms",
+    "debugger",
+    "scripting",
+    "storage"
+  ],
+  "optional_host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "DSH Chrome Bridge",
+    "default_popup": "popup.html"
+  },
+  "commands": {
+    "kill-switch": {
+      "suggested_key": {
+        "default": "Alt+Shift+K"
+      },
+      "description": "Stop sharing everything and switch actions off"
+    }
+  }
+}

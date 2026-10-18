@@ -4,6 +4,10 @@
 
 import {
   NO_EXPIRY,
+  SCRIPT_WINDOW_MS,
+  getEvalOrigins,
+  allowEval,
+  removeEval,
   actionsUntilFor,
   originOf,
   checkAllowable,
@@ -71,6 +75,8 @@ async function render() {
 
   const { actionsNoExpiry = false } = await chrome.storage.local.get('actionsNoExpiry');
   $('noexpiry').checked = actionsNoExpiry;
+  await renderDebugger(allowed, origin);
+
   const left = Math.max(0, actionsUntil - Date.now());
   $('allow').checked = left > 0;
   $('left').textContent =
@@ -91,6 +97,61 @@ function changed(key, data) {
   if (lastDrawn[key] === s) return false;
   lastDrawn[key] = s;
   return true;
+}
+
+const hasDebugger = typeof chrome.debugger !== 'undefined' && !!chrome.debugger.attach;
+
+async function renderDebugger(allowed, origin) {
+  $('debugnote').textContent = hasDebugger
+    ? 'Debugger build. Chrome shows a "started debugging this browser" banner on attached tabs; Cancel there revokes access.'
+    : 'Default build: no debugger. Load the debugger build to use screenshots, page_read and input_*.';
+  $('allowscript').disabled = !hasDebugger;
+  $('allowscriptsite').disabled = !hasDebugger || !origin || !allowed.includes(origin);
+
+  const { cdpAttached = [], scriptUntil = 0 } = await chrome.storage.session.get(['cdpAttached', 'scriptUntil']);
+  const scriptLeft = Math.max(0, scriptUntil - Date.now());
+  $('allowscript').checked = scriptLeft > 0;
+  $('scriptleft').textContent =
+    scriptLeft > 0
+      ? `Script on for ${Math.floor(scriptLeft / 60000)}m ${Math.floor((scriptLeft % 60000) / 1000)}s more.`
+      : 'Off. Switches itself off after 5 minutes.';
+
+  const evalOrigins = await getEvalOrigins();
+  if (changed('scriptsites', evalOrigins)) {
+    const ul = $('scriptsites');
+    ul.replaceChildren();
+    for (const o of evalOrigins) {
+      const li = document.createElement('li');
+      const name = document.createElement('span');
+      name.textContent = 'script: ' + o;
+      const btn = document.createElement('button');
+      btn.textContent = 'Remove';
+      btn.onclick = async () => {
+        await removeEval(o);
+        render();
+      };
+      li.append(name, btn);
+      ul.append(li);
+    }
+  }
+
+  if (changed('attached', cdpAttached)) {
+    const ul = $('attached');
+    ul.replaceChildren();
+    for (const id of cdpAttached) {
+      const li = document.createElement('li');
+      const name = document.createElement('span');
+      name.textContent = `Debugger attached to tab ${id}`;
+      const btn = document.createElement('button');
+      btn.textContent = 'Detach';
+      btn.onclick = async () => {
+        await chrome.runtime.sendMessage({ type: 'detach-debugger', tabId: id });
+        render();
+      };
+      li.append(name, btn);
+      ul.append(li);
+    }
+  }
 }
 
 function renderAllowed(allowed) {
@@ -186,6 +247,19 @@ $('allowsite').onclick = async () => {
     say('Chrome access was not granted.');
   }
   await chrome.storage.session.remove('pendingAllow');
+  render();
+};
+
+$('allowscript').onchange = async () => {
+  await chrome.storage.session.set({ scriptUntil: $('allowscript').checked ? Date.now() + SCRIPT_WINDOW_MS : 0 });
+  render();
+};
+
+$('allowscriptsite').onclick = async () => {
+  const origin = allowCandidate;
+  if (!origin) return;
+  const r = await allowEval(origin);
+  say(r.ok ? `Script enabled for ${origin}.` : r.error);
   render();
 };
 

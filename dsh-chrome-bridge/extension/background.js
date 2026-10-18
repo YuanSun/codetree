@@ -5,6 +5,8 @@
 // sites the user approved in Chrome's own permission prompt.
 
 import { snapshotFn, linksFn, containsTextFn, clickFn, typeFn, scrollFn } from './page_fns.js';
+import * as cdp from './cdp.js';
+import * as cdpTools from './cdp_tools.js';
 import {
   MAX_AGENT_TABS,
   NO_EXPIRY,
@@ -13,6 +15,7 @@ import {
   getShared,
   getAgentTabs,
   getAllowed,
+  getEvalOrigins,
   addShared,
   removeShared,
   addAgentTab,
@@ -22,7 +25,7 @@ import {
   logActivity,
 } from './core.js';
 
-const VERSION = '0.2.0';
+const VERSION = '0.3.0';
 const DEFAULT_PORT = 17373;
 const PING_MS = 20000;
 const NAV_TIMEOUT_MS = 20000;
@@ -124,17 +127,29 @@ async function logOrigin(method, params) {
   }
 }
 
-async function handleCommand(sock, msg) {
-  const params = msg.params || {};
-  const origin = await logOrigin(msg.method, params);
+// Runs one command and records the outcome. Used for single calls and for each
+// step of page_batch, so batched steps are gated and logged like single ones.
+async function runLogged(method, params) {
+  const origin = await logOrigin(method, params);
+  // page_eval is the one place the log keeps model-authored text, shortened (D14).
+  const detail = method === 'cdp.eval' && typeof params.expression === 'string' ? params.expression.slice(0, 120) : undefined;
   try {
-    const result = await dispatch(msg.method, params);
-    await logActivity({ method: msg.method, tabId: params.tabId, origin, ok: true });
-    sock.send(JSON.stringify({ id: msg.id, result }));
+    const result = await dispatch(method, params);
+    await logActivity({ method, tabId: params.tabId, origin, ok: true, detail });
+    return result;
   } catch (e) {
     const message = e && e.message ? e.message : String(e);
-    await logActivity({ method: msg.method, tabId: params.tabId, origin, ok: false, error: message });
-    sock.send(JSON.stringify({ id: msg.id, error: { message } }));
+    await logActivity({ method, tabId: params.tabId, origin, ok: false, error: message, detail });
+    throw e;
+  }
+}
+
+async function handleCommand(sock, msg) {
+  try {
+    const result = await runLogged(msg.method, msg.params || {});
+    sock.send(JSON.stringify({ id: msg.id, result }));
+  } catch (e) {
+    sock.send(JSON.stringify({ id: msg.id, error: { message: e && e.message ? e.message : String(e) } }));
   }
 }
 
@@ -214,6 +229,48 @@ function waitForLoad(tabId) {
   });
 }
 
+async function requireScript() {
+  const { scriptUntil = 0 } = await chrome.storage.session.get('scriptUntil');
+  if (Date.now() > scriptUntil) {
+    throw new Error('Script is disabled. Ask the user to tick "Allow script" in the DSH Chrome Bridge popup (it switches itself off after 5 minutes).');
+  }
+}
+
+// Gate for every debugger-lane tool: shared tab, site access, and an
+// allowlisted origin (rule 15). Then attach on demand.
+async function cdpGate(tabId, { actions = false } = {}) {
+  if (!cdp.available()) {
+    throw new Error('This build of the extension has no debugger permission. Load the debugger build (see README).');
+  }
+  const { debuggerCanceled } = await chrome.storage.session.get('debuggerCanceled');
+  if (debuggerCanceled) {
+    await chrome.storage.session.remove('debuggerCanceled');
+    throw new Error('The user pressed Cancel on Chrome\'s debugging banner, so the debugger was detached and actions were switched off. Ask the user before trying again.');
+  }
+  if (actions) await requireActions();
+  await requireShared(tabId);
+  const tab = await getAccessibleTab(tabId);
+  const origin = originOf(tab.url);
+  if (!origin || !(await getAllowed()).includes(origin)) {
+    await cdp.detach(tabId);
+    throw new Error(`The debugger only works on tabs whose site is on the allowlist (${origin || 'this page'} is not). Ask the user to click "Allow this site".`);
+  }
+  await cdp.detachIdle();
+  await cdp.attach(tabId);
+  if (actions) cdp.getState(tabId).usedActions = true;
+}
+
+const BATCH_TOOLS = {
+  click: 'cdp.click',
+  type: 'cdp.type',
+  key: 'cdp.key',
+  scroll: 'cdp.scroll',
+  wait: 'page.wait_for',
+  screenshot: 'cdp.screenshot',
+  read: 'cdp.read',
+};
+const BATCH_MAX_STEPS = 10;
+
 async function dispatch(method, params) {
   switch (method) {
     case 'tabs.list': {
@@ -278,6 +335,83 @@ async function dispatch(method, params) {
       }
       await waitForLoad(params.tabId);
       return 'Went back. If the previous page is on a site the user has not approved, page_snapshot will fail. Take a new page_snapshot, refs from before are lost.';
+    }
+
+    case 'cdp.screenshot':
+      await cdpGate(params.tabId);
+      return cdpTools.screenshot(params.tabId, params);
+
+    case 'cdp.read':
+      await cdpGate(params.tabId);
+      return cdpTools.readTree(params.tabId, params);
+
+    case 'cdp.click':
+      await cdpGate(params.tabId, { actions: true });
+      return cdpTools.click(params.tabId, params);
+
+    case 'cdp.key':
+      await cdpGate(params.tabId, { actions: true });
+      return cdpTools.key(params.tabId, params);
+
+    case 'cdp.type':
+      await cdpGate(params.tabId, { actions: true });
+      return cdpTools.type(params.tabId, params);
+
+    case 'cdp.scroll':
+      await cdpGate(params.tabId, { actions: true });
+      return cdpTools.scroll(params.tabId, params);
+
+    case 'cdp.console':
+      await cdpGate(params.tabId);
+      return cdpTools.consoleLog(params.tabId, params);
+
+    case 'cdp.network':
+      await cdpGate(params.tabId);
+      return cdpTools.networkLog(params.tabId, params);
+
+    case 'cdp.detach':
+      await cdp.detach(params.tabId);
+      return `Detached the debugger from tab ${params.tabId}.`;
+
+    case 'cdp.eval': {
+      // Strictest tool: needs the script toggle AND the actions tick AND a per-origin entry.
+      await requireScript();
+      await cdpGate(params.tabId, { actions: true });
+      const origin = originOf((await chrome.tabs.get(params.tabId)).url || '');
+      if (DENYLIST.includes(origin) || !(await getEvalOrigins()).includes(origin)) {
+        throw new Error(`Script is not enabled for ${origin}. Ask the user to click "Allow script on this site" in the popup.`);
+      }
+      const problem = cdpTools.checkExpression(params.expression);
+      if (problem) throw new Error(problem);
+      return cdpTools.evaluate(params.tabId, params);
+    }
+
+    case 'page.batch': {
+      const steps = Array.isArray(params.steps) ? params.steps : [];
+      if (!steps.length) throw new Error('steps must not be empty.');
+      if (steps.length > BATCH_MAX_STEPS) throw new Error(`A batch can have at most ${BATCH_MAX_STEPS} steps.`);
+      const content = [];
+      let stopped = false;
+      for (const [i, step] of steps.entries()) {
+        const label = `Step ${i + 1} (${step && step.tool})`;
+        const target = step && BATCH_TOOLS[step.tool];
+        try {
+          if (!target) throw new Error(`"${step && step.tool}" is not allowed in a batch. Allowed: ${Object.keys(BATCH_TOOLS).join(', ')}.`);
+          // The batch's tabId always wins, so a step cannot reach another tab.
+          const r = await runLogged(target, { ...(step.args || {}), tabId: params.tabId });
+          if (r && r.__content) {
+            content.push({ type: 'text', text: `${label}: ok` }, ...r.__content);
+          } else {
+            content.push({ type: 'text', text: `${label}: ${typeof r === 'string' ? r : JSON.stringify(r)}` });
+          }
+        } catch (e) {
+          content.push({ type: 'text', text: `${label}: ERROR ${e && e.message ? e.message : e}. Batch stopped; the remaining steps did not run.` });
+          stopped = true;
+          break;
+        }
+      }
+      if (!stopped) content.push({ type: 'text', text: `All ${steps.length} steps ran.` });
+      return { __content: content };
     }
 
     case 'page.open': {
@@ -381,11 +515,14 @@ chrome.permissions.onAdded.addListener(async (permissions) => {
 
 chrome.tabs.onRemoved.addListener((tabId) => {
   removeShared(tabId);
+  cdp.detach(tabId);
 });
+
+cdp.wire();
 
 // Kill switch: stop sharing everything and switch actions off.
 chrome.commands.onCommand.addListener((command) => {
-  if (command === 'kill-switch') stopAll();
+  if (command === 'kill-switch') stopAll().then(() => cdp.detachAll());
 });
 
 // Keep badge colours in step with the "actions on" state.
@@ -397,6 +534,10 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (sender.id !== chrome.runtime.id) return false;
   if (msg && msg.type === 'connect') {
     chrome.storage.local.set({ enabled: true }).then(reconnect).then(() => sendResponse({ ok: true }));
+    return true;
+  }
+  if (msg && msg.type === 'detach-debugger') {
+    cdp.detach(msg.tabId).then(() => sendResponse({ ok: true }));
     return true;
   }
   if (msg && msg.type === 'disconnect') {
@@ -414,8 +555,19 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === 'reconnect') {
     connect();
     refreshBadges(); // also resets the red badge once actions expire
+    cdp.detachIdle();
+    detachWhenActionsExpire();
   }
 });
+
+// Tabs where the debugger was used for actions detach when the actions window ends.
+async function detachWhenActionsExpire() {
+  const { actionsUntil = 0 } = await chrome.storage.session.get('actionsUntil');
+  if (Date.now() <= actionsUntil) return;
+  for (const id of cdp.attachedTabs()) {
+    if (cdp.getState(id).usedActions) await cdp.detach(id);
+  }
+}
 
 // Make sure the alarm exists after the worker restarts, then try to connect.
 chrome.alarms.get('reconnect').then((a) => {
