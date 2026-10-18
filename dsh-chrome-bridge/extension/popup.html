@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>DSH Chrome Bridge</title>
+  <style>
+    body { font: 13px/1.4 system-ui, sans-serif; width: 320px; margin: 12px; color: #1f2328; }
+    h1 { font-size: 15px; margin: 0 0 8px; }
+    h2 { font-size: 12px; margin: 14px 0 4px; text-transform: uppercase; letter-spacing: .04em; color: #656d76; }
+    section { border-top: 1px solid #d0d7de; padding-top: 6px; }
+    input[type=text], input[type=password], input[type=number] { width: 100%; box-sizing: border-box; padding: 4px 6px; margin: 2px 0 6px; }
+    button { padding: 5px 10px; margin: 2px 4px 2px 0; cursor: pointer; }
+    #status { font-weight: 600; }
+    .ok { color: #1a7f37; } .bad { color: #cf222e; } .muted { color: #656d76; }
+    .note { font-size: 11px; color: #656d76; margin-top: 10px; }
+    #tabinfo { word-break: break-all; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <h1>DSH Chrome Bridge</h1>
+
+  <section>
+    <h2>Connection</h2>
+    <div>Status: <span id="status" class="muted">unknown</span></div>
+    <label>Port <input type="number" id="port" value="17373" min="1024" max="65535"></label>
+    <label>Token <input type="password" id="token" placeholder="paste from: node server/index.js --print-token"></label>
+    <button id="connect">Save &amp; Connect</button>
+    <button id="disconnect">Disconnect</button>
+  </section>
+
+  <section>
+    <h2>This tab</h2>
+    <div id="tabinfo" class="muted">…</div>
+    <button id="share">Share this tab</button>
+    <button id="stopall">Stop sharing all</button>
+  </section>
+
+  <section>
+    <h2>Actions</h2>
+    <label><input type="checkbox" id="allow"> Allow click / type / navigate / scroll</label>
+    <div id="left" class="muted">Read-only. Switches itself off after 10 minutes.</div>
+  </section>
+
+  <p class="note">DSH can only see tabs you share, and only on sites you approve in Chrome's prompt. It never gets cookies, saved passwords, or password fields.</p>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
