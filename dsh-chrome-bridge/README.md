@@ -69,6 +69,8 @@ Status: v0.2. Tested with automated tests only; the real-Chrome checklist in `do
 | `tabs_list` | no | Shared tabs, plus whether actions are on |
 | `page_snapshot` | no | Title, URL, visible text (capped), numbered interactive elements, scrollable panels. `maxElements` (default 150, max 400) |
 | `page_links` | no | Visible links as `text → URL`, deduplicated. `contains`, `maxItems` (default 100, max 500), `stripQuery` |
+| `page_wait_for` | no | Wait until text appears (case-insensitive), `timeoutMs` default 10000, max 20000 |
+| `page_back` | yes | One step back in the tab's history; refs are lost |
 | `page_open` | no | Open an https URL on an allowed site in a background tab, shared automatically |
 | `page_close` | no | Close a tab that `page_open` created (refuses any other) |
 | `page_navigate` | yes | Go to an http(s) URL in a shared tab |
@@ -92,7 +94,7 @@ Refs (like `e12`) are only valid until the next `page_snapshot`, and are lost wh
 
 ## What was tested
 
-- `npm test` runs 75 tests: the MCP server end to end against a mock extension (auth, origin rejection, timeouts, tag-escaping), the page functions in jsdom, and the extension's permission gating against a fake Chrome API.
+- `npm test` runs 80 tests: the MCP server end to end against a mock extension (auth, origin rejection, timeouts, tag-escaping), the page functions in jsdom, and the extension's permission gating against a fake Chrome API.
 - **Not tested:** the extension inside real Chrome (popup rendering, Chrome's permission prompt, service-worker keepalive), and DSH itself. Expect small fixes on first run.
 
 ## Troubleshooting

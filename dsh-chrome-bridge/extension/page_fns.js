@@ -400,3 +400,15 @@ export function scrollFn(direction, ref) {
     return { ok: false, error: 'scroll failed: ' + (e && e.message ? e.message : String(e)) };
   }
 }
+
+export function containsTextFn(text) {
+  try {
+    const needle = String(text || '').toLowerCase();
+    if (!needle) return { ok: false, error: 'text must not be empty' };
+    const body = document.body;
+    const hay = String((body && (body.innerText ?? body.textContent)) || '').toLowerCase();
+    return { ok: true, value: hay.includes(needle) };
+  } catch (e) {
+    return { ok: false, error: 'wait failed: ' + (e && e.message ? e.message : String(e)) };
+  }
+}

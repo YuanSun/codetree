@@ -4,7 +4,7 @@
 // its commands, but only for tabs the user shared from the popup, and only for
 // sites the user approved in Chrome's own permission prompt.
 
-import { snapshotFn, linksFn, clickFn, typeFn, scrollFn } from './page_fns.js';
+import { snapshotFn, linksFn, containsTextFn, clickFn, typeFn, scrollFn } from './page_fns.js';
 import {
   MAX_AGENT_TABS,
   DENYLIST,
@@ -25,6 +25,9 @@ const VERSION = '0.2.0';
 const DEFAULT_PORT = 17373;
 const PING_MS = 20000;
 const NAV_TIMEOUT_MS = 20000;
+const WAIT_POLL_MS = 250;
+const WAIT_DEFAULT_MS = 10000;
+const WAIT_MAX_MS = 20000; // stays under the server's 30 s call timeout
 
 let ws = null;
 let pingTimer = null;
@@ -242,6 +245,37 @@ async function dispatch(method, params) {
         params.maxItems ?? 100,
         !!params.stripQuery,
       ]);
+    }
+
+    case 'page.wait_for': {
+      const text = String(params.text || '');
+      if (!text) throw new Error('text must not be empty.');
+      const timeout = Math.min(Math.max(Number(params.timeoutMs) || WAIT_DEFAULT_MS, 100), WAIT_MAX_MS);
+      await requireShared(params.tabId);
+      const end = Date.now() + timeout;
+      for (;;) {
+        // Checked on every poll, so a tab that navigates off an approved site stops being read.
+        await getAccessibleTab(params.tabId);
+        if (await runInTab(params.tabId, containsTextFn, [text])) {
+          return 'The text appeared on the page. Call page_snapshot to read it.';
+        }
+        if (Date.now() >= end) break;
+        await new Promise((r) => setTimeout(r, WAIT_POLL_MS));
+      }
+      return `The text did not appear within ${timeout} ms.`;
+    }
+
+    case 'page.back': {
+      await requireActions();
+      await requireShared(params.tabId);
+      await getAccessibleTab(params.tabId);
+      try {
+        await chrome.tabs.goBack(params.tabId);
+      } catch {
+        throw new Error('There is no earlier page in this tab\'s history.');
+      }
+      await waitForLoad(params.tabId);
+      return 'Went back. If the previous page is on a site the user has not approved, page_snapshot will fail. Take a new page_snapshot, refs from before are lost.';
     }
 
     case 'page.open': {
