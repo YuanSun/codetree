@@ -59,8 +59,10 @@
     <h2>Debugger</h2>
     <div id="debugnote" class="muted"></div>
     <ul id="attached"></ul>
+    <label><input type="checkbox" id="noidle"> Keep the debugger attached until I detach it</label>
     <label><input type="checkbox" id="allowscript"> Allow script (page_eval)</label>
-    <div id="scriptleft" class="muted">Off. Switches itself off after 5 minutes.</div>
+    <label><input type="checkbox" id="noscriptexpiry"> Keep script on until I switch it off</label>
+    <div id="scriptleft" class="muted">Off. By default it switches itself off after 5 minutes.</div>
     <button id="allowscriptsite">Allow script on this site</button>
     <ul id="scriptsites"></ul>
   </section>

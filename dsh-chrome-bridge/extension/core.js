@@ -8,6 +8,10 @@ export const ACTION_WINDOW_MS = 10 * 60 * 1000;
 // actionsUntil value meaning "on until the user switches it off" (JSON cannot store Infinity).
 export const NO_EXPIRY = Number.MAX_SAFE_INTEGER;
 
+export function scriptUntilFor(noExpiry) {
+  return noExpiry ? NO_EXPIRY : Date.now() + SCRIPT_WINDOW_MS;
+}
+
 export function actionsUntilFor(noExpiry) {
   return noExpiry ? NO_EXPIRY : Date.now() + ACTION_WINDOW_MS;
 }

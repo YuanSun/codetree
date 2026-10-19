@@ -4,7 +4,7 @@
 
 import {
   NO_EXPIRY,
-  SCRIPT_WINDOW_MS,
+  scriptUntilFor,
   getEvalOrigins,
   allowEval,
   removeEval,
@@ -109,12 +109,21 @@ async function renderDebugger(allowed, origin) {
   $('allowscriptsite').disabled = !hasDebugger || !origin || !allowed.includes(origin);
 
   const { cdpAttached = [], scriptUntil = 0 } = await chrome.storage.session.get(['cdpAttached', 'scriptUntil']);
+  const { debuggerNoIdle = false, scriptNoExpiry = false } = await chrome.storage.local.get(['debuggerNoIdle', 'scriptNoExpiry']);
+  $('noidle').checked = debuggerNoIdle;
+  $('noscriptexpiry').checked = scriptNoExpiry;
+  $('noidle').disabled = !hasDebugger;
+  $('noscriptexpiry').disabled = !hasDebugger;
   const scriptLeft = Math.max(0, scriptUntil - Date.now());
   $('allowscript').checked = scriptLeft > 0;
   $('scriptleft').textContent =
-    scriptLeft > 0
-      ? `Script on for ${Math.floor(scriptLeft / 60000)}m ${Math.floor((scriptLeft % 60000) / 1000)}s more.`
-      : 'Off. Switches itself off after 5 minutes.';
+    scriptLeft <= 0
+      ? scriptNoExpiry
+        ? 'Off. Once on, it stays on until you switch it off.'
+        : 'Off. By default it switches itself off after 5 minutes.'
+      : scriptUntil >= NO_EXPIRY
+        ? 'Script is on until you switch it off.'
+        : `Script on for ${Math.floor(scriptLeft / 60000)}m ${Math.floor((scriptLeft % 60000) / 1000)}s more.`;
 
   const evalOrigins = await getEvalOrigins();
   if (changed('scriptsites', evalOrigins)) {
@@ -251,7 +260,20 @@ $('allowsite').onclick = async () => {
 };
 
 $('allowscript').onchange = async () => {
-  await chrome.storage.session.set({ scriptUntil: $('allowscript').checked ? Date.now() + SCRIPT_WINDOW_MS : 0 });
+  await chrome.storage.session.set({ scriptUntil: $('allowscript').checked ? scriptUntilFor($('noscriptexpiry').checked) : 0 });
+  render();
+};
+
+$('noscriptexpiry').onchange = async () => {
+  const noExpiry = $('noscriptexpiry').checked;
+  await chrome.storage.local.set({ scriptNoExpiry: noExpiry });
+  const { scriptUntil = 0 } = await chrome.storage.session.get('scriptUntil');
+  if (scriptUntil > Date.now()) await chrome.storage.session.set({ scriptUntil: scriptUntilFor(noExpiry) });
+  render();
+};
+
+$('noidle').onchange = async () => {
+  await chrome.storage.local.set({ debuggerNoIdle: $('noidle').checked });
   render();
 };
 

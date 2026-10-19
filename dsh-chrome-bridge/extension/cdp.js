@@ -213,6 +213,9 @@ export async function detachAll() {
 
 // Called from an alarm and before every command.
 export async function detachIdle(now = Date.now()) {
+  // The user can turn the idle timeout off in the popup (like "Keep actions on").
+  const { debuggerNoIdle = false } = await chrome.storage.local.get('debuggerNoIdle');
+  if (debuggerNoIdle) return;
   for (const [id, s] of [...tabs]) if (now - s.lastUsed > IDLE_MS) await detach(id);
 }
 
