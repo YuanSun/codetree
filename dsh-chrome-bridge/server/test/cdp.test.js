@@ -306,6 +306,29 @@ test('C1: idle sessions detach after 5 minutes', async () => {
   assert.equal(badges.get(T), 'ON', 'back to the shared badge');
 });
 
+test('the idle timeout can be turned off, and script can be kept on without expiry', async () => {
+  await reset();
+  await local.set({ debuggerNoIdle: true });
+  await cdp.attach(T);
+  await cdp.detachIdle(Date.now() + 24 * 60 * 60_000);
+  assert.equal(cdp.isAttached(T), true, 'a day idle and still attached');
+  await local.set({ debuggerNoIdle: false });
+  await cdp.detachIdle(Date.now() + 6 * 60_000);
+  assert.equal(cdp.isAttached(T), false, 'default behaviour is back');
+
+  const t0 = Date.now();
+  const timed = core.scriptUntilFor(false);
+  assert.ok(timed > t0 + 4 * 60_000 && timed <= t0 + 5 * 60_000 + 50);
+  // With no expiry the script gate stays open however long it has been.
+  await reset();
+  await core.allowEval(SITE);
+  await session.set({ scriptUntil: core.scriptUntilFor(true) });
+  const r = await cmd(sock, 'cdp.eval', { tabId: T, expression: 'window.answer' });
+  assert.equal(r.error, undefined);
+  await core.stopAll();
+  assert.equal(session.data.scriptUntil, 0, 'the kill switch and stop-all still switch it off');
+});
+
 test('C1: Cancel on the Chrome banner revokes actions and script, and DSH is told once', async () => {
   await reset();
   await session.set({ scriptUntil: Date.now() + 60_000 });
