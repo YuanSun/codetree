@@ -10,7 +10,7 @@
 
 <div class="callout verify"><b>Verify names locally.</b> The sequence below is the standard logic. Exact menus, import tools and report names depend on your firm's Geneva set-up.</div>
 
-<h2>Daily checklist</h2>
+<h2 id="daily-checklist">Daily checklist</h2>
 <table>
 <tr><th>#</th><th>Step</th><th>What "good" looks like</th><th>Typical failure</th></tr>
 <tr><td>1</td><td><b>Load trades</b> from manager/OMS/broker files; review rejects and unmatched items.</td><td>Every trade on the manager blotter appears once, correct fund, correct side/qty/price.</td><td>Duplicate import; wrong identifier; trade booked to the wrong portfolio.</td></tr>
@@ -23,7 +23,7 @@
 <tr><td>8</td><td><b>Release &amp; archive</b> reports with the knowledge date used.</td><td>Reproducible later.</td><td>Reports saved without the parameters.</td></tr>
 </table>
 
-<h2>Month-end additions</h2>
+<h2 id="month-end-additions">Month-end additions</h2>
 <ol>
 <li><b>Final pricing</b> and FX at the month-end cut; resolve all challenges.</li>
 <li><b>Investor activity</b>: record subscriptions and redemptions; confirm with the transfer agent / bank.</li>
@@ -35,7 +35,7 @@
 <li><b>Deliver</b> NAV, statements, support schedules.</li>
 </ol>
 
-<h2>Corrections after the fact</h2>
+<h2 id="corrections-after-the-fact">Corrections after the fact</h2>
 <p>With a bitemporal system you can enter a back-dated transaction without overwriting history. The safe routine:</p>
 <ol>
 <li>Find the root cause and confirm in the audit trail how the data got there.</li>
@@ -46,7 +46,7 @@
 </ol>
 <div class="callout warn"><b>Order matters.</b> Fix upstream data first (trades, prices, corporate actions), then recalc accruals, fees and allocations. Fixing allocations before the portfolio-level error is resolved just moves the problem around.</div>
 
-<h2>Speed habits for seniors</h2>
+<h2 id="speed-habits-for-seniors">Speed habits for seniors</h2>
 <ul>
 <li>Keep saved report <b>templates</b> with parameters set (period, knowledge date, basis, currency).</li>
 <li>Build a standing <b>exception list</b>: items that always need attention (illiquid prices, FX forwards, swap resets).</li>
@@ -54,7 +54,7 @@
 <li>Write the "why" in the transaction comment/field where available; your future self and auditor will thank you.</li>
 </ul>
 
-<h2>Find it in your Geneva</h2>
+<h2 id="find-it-in-your-geneva">Find it in your Geneva</h2>
 <ol>
 <li>Where do trade files land, and which job/process loads them? What does a rejected record look like?</li>
 <li>Where are prices loaded; what are the primary/backup sources; what is the exception report called?</li>

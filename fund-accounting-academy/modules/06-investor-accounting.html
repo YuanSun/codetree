@@ -8,7 +8,7 @@
 <h1>Investor Accounting</h1>
 <p class="lead">The portfolio side tells you what the fund is worth. The investor side tells you who owns what. This is where most senior-level complexity lives.</p>
 
-<h2>Two models</h2>
+<h2 id="two-models">Two models</h2>
 <table>
 <tr><th></th><th>Share-based (corporation / mutual fund)</th><th>Capital-account-based (partnership / many hedge funds)</th></tr>
 <tr><td>Ownership</td><td>Shares × NAV per share</td><td>Each investor has a capital account in dollars</td></tr>
@@ -16,7 +16,7 @@
 <tr><td>Performance fees</td><td>Often series accounting or equalization to keep per-share fairness</td><td>Computed per investor (crystallised on their own HWM)</td></tr>
 </table>
 
-<h2>Capital account rollforward</h2>
+<h2 id="capital-account-rollforward">Capital account rollforward</h2>
 <table>
 <tr><th>Line</th><th class="num">Amount</th></tr>
 <tr><td>Opening capital</td><td class="num">1,000,000</td></tr>
@@ -30,7 +30,7 @@
 </table>
 <p>The sum of all investors' closing capital must equal fund NAV. That tie-out is the single most important check on the investor side.</p>
 
-<h2>Allocating P&amp;L</h2>
+<h2 id="allocating-p-l">Allocating P&amp;L</h2>
 <p>Common approaches:</p>
 <ul>
 <li><b>Pro-rata by beginning capital</b> (with a capital-weighted adjustment when money moves mid-period).</li>
@@ -39,7 +39,7 @@
 </ul>
 <p>Use the <a href="../tools.html#alloc">allocation calculator</a> to see how weighting changes who gets what.</p>
 
-<h2>Subscriptions and redemptions</h2>
+<h2 id="subscriptions-and-redemptions">Subscriptions and redemptions</h2>
 <ul>
 <li><b>Dealing day</b>: the NAV on which units are struck. Subscription money is typically received before (cash in a "subscriptions received in advance" liability) and units issued at the dealing NAV.</li>
 <li><b>Notice periods</b> and <b>lock-ups</b>: redemption requests (e.g. 45 days' notice, quarterly) are recorded as <b>redemptions payable</b> liabilities from the dealing day, reducing NAV even though cash leaves later.</li>
@@ -47,7 +47,7 @@
 <li><b>Holdbacks</b>: e.g. 5–10% of a full redemption withheld until audit.</li>
 </ul>
 
-<h2>Why equalization or series exist</h2>
+<h2 id="why-equalization-or-series-exist">Why equalization or series exist</h2>
 <p>If a fund charges a performance fee on <i>fund</i> performance, an investor joining after a good month would either pay a fee on gains made before they joined, or the older investors would be undercharged. Two fixes:</p>
 <h3>Series accounting</h3>
 <p>Each subscription month is a separate series with its own NAV and HWM. Gains are tracked per series; periodically (e.g. annually) series with positive performance roll up to a lead series. Fair, but more share classes to manage.</p>
@@ -55,17 +55,17 @@
 <p>Everyone is in one class. A late entrant who subscribes at a NAV already <i>net</i> of an accrued performance fee pays an <b>equalization credit</b> (or buys extra shares) to compensate; if the NAV is below the HWM they pay a <b>depreciation deposit</b>. The goal is that every investor's performance fee equals what they'd pay for their own return.</p>
 <div class="callout"><b>Key idea.</b> The fund can only have <i>one</i> NAV per share per class. Everything else (series, equalization) is machinery that lets each investor still pay a fee that reflects their own gain.</div>
 
-<h2>Side pockets and designated investments</h2>
+<h2 id="side-pockets-and-designated-investments">Side pockets and designated investments</h2>
 <p>An illiquid position is moved to a separate class; investors at that time receive a proportional special share class. New subscribers don't share. Redeemers get their main-class balance but keep the side pocket until realization. Fees often follow different rules: usually charged only on realised gains.</p>
 
-<h2>Transfers, tax and withholding</h2>
+<h2 id="transfers-tax-and-withholding">Transfers, tax and withholding</h2>
 <ul>
 <li>Transfers between investors need legal approval and carry cost basis and HWM.</li>
 <li>US partnerships issue K-1s (tax allocations differ from book allocations — "book/tax differences").</li>
 <li>Withholding on non-US investors is handled separately from NAV accounting.</li>
 </ul>
 
-<h2>Controls specific to investor accounting</h2>
+<h2 id="controls-specific-to-investor-accounting">Controls specific to investor accounting</h2>
 <ul>
 <li>Capital accounts sum to NAV every dealing date.</li>
 <li>Transfer-agent register ties to share counts.</li>

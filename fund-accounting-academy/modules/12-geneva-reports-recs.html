@@ -10,7 +10,7 @@
 
 <div class="callout verify"><b>Report names vary.</b> The categories below are the standard ones in portfolio accounting systems and exist in Geneva in some form (standard, Report Writer-based, or custom). Look up the actual names in your own report library.</div>
 
-<h2>Question → report type</h2>
+<h2 id="question-report-type">Question → report type</h2>
 <table>
 <tr><th>You want to know…</th><th>Report type</th><th>Check</th></tr>
 <tr><td>What do we hold and what is it worth?</td><td>Portfolio appraisal / holdings report</td><td>Quantity vs broker, price vs source, FX, % of NAV</td></tr>
@@ -24,7 +24,7 @@
 <tr><td>What changed since last release?</td><td>Same report at two knowledge dates; transaction audit report</td><td>Every change has a reason</td></tr>
 </table>
 
-<h2>Report parameters that bite</h2>
+<h2 id="report-parameters-that-bite">Report parameters that bite</h2>
 <ul>
 <li><b>Period start/end (effective date)</b> and <b>knowledge date</b>.</li>
 <li><b>Portfolio vs group</b>: is the report consolidating?</li>
@@ -33,7 +33,7 @@
 <li><b>Include/exclude</b> pending or unsettled items, closed positions, zero balances.</li>
 </ul>
 
-<h2>Reconciling Geneva to the outside world</h2>
+<h2 id="reconciling-geneva-to-the-outside-world">Reconciling Geneva to the outside world</h2>
 <h3>Positions</h3>
 <ol>
 <li>Run the Geneva holdings on the <b>same date and basis</b> (settle-date for custodian comparison; trade-date for broker trade positions).</li>
@@ -48,7 +48,7 @@
 <h3>Ledger vs administrator or manager books</h3>
 <p>Compare trial balances. Differences usually trace to classification (realized vs unrealized), accrual timing, or different treatment of fees.</p>
 
-<h2>Troubleshooting playbook</h2>
+<h2 id="troubleshooting-playbook">Troubleshooting playbook</h2>
 <table>
 <tr><th>Symptom</th><th>First checks</th></tr>
 <tr><td>NAV moved far more than the market</td><td>P&amp;L by position, top 10 movers: stale or wrong prices; missing corporate action (splits!); wrong FX; duplicate trade</td></tr>
@@ -63,7 +63,7 @@
 </table>
 <div class="callout tip"><b>Method.</b> Bisect. Is the difference in quantity, price, FX, or accrual? Which date does it first appear? Which transaction's knowledge date is after your last release? Narrowing the where-and-when almost always names the cause.</div>
 
-<h2>Report Writer and custom reporting</h2>
+<h2 id="report-writer-and-custom-reporting">Report Writer and custom reporting</h2>
 <p>Geneva includes a report-writing capability to build or modify layouts, plus data export for analysis in Excel/BI. Senior habits:</p>
 <ul>
 <li>Never overwrite a production report; copy, change, test against a known period, then promote under change control.</li>
@@ -71,7 +71,7 @@
 <li>Build a few validation reports whose only job is to catch breaks (e.g., positions with no price, flows not allocated, unbalanced investor capital).</li>
 </ul>
 
-<h2>Find it in your Geneva</h2>
+<h2 id="find-it-in-your-geneva">Find it in your Geneva</h2>
 <ol>
 <li>List the 10 reports you use most, and map each to the question table above.</li>
 <li>Find the report for a lot-level rollforward and trace one sale from purchase lot to realized P&amp;L.</li>

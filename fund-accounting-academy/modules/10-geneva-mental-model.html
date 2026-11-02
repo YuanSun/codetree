@@ -10,7 +10,7 @@
 
 <div class="callout verify"><b>Read this first.</b> Geneva is heavily configured per firm: menu names, custom fields, transaction type lists, report layouts and workflows differ between installations and versions. Treat this course as the <i>concepts and vocabulary</i> and verify the exact screens and report names with your Geneva administrator or your firm's own procedure manuals. Each module ends with "Find it in your Geneva" prompts to do exactly that.</div>
 
-<h2>The big picture</h2>
+<h2 id="the-big-picture">The big picture</h2>
 <div class="flow">
 <div><b>Inputs</b>Trades, cash, corporate actions, prices, FX, investor dealing</div>
 <div><b>Geneva engine</b>Transactions → lots/positions → ledger (journal entries)</div>
@@ -19,7 +19,7 @@
 </div>
 <p>The pivotal idea is that <b>transactions are the source of truth</b>. Positions, lots, P&amp;L and journal entries are <i>derived</i> from the transaction history plus prices and FX. You don't "edit a position"; you fix or add the transactions that produced it.</p>
 
-<h2>Core objects</h2>
+<h2 id="core-objects">Core objects</h2>
 <table>
 <tr><th>Geneva concept</th><th>Plain-English meaning</th><th>Accounting link</th></tr>
 <tr><td><b>Portfolio</b></td><td>A set of books for one entity (a fund, a master, a feeder, an account). Holds its own positions, cash and ledger.</td><td>The "entity" that has a NAV (Module 03)</td></tr>
@@ -33,7 +33,7 @@
 <tr><td><b>Accounting period</b></td><td>Month/quarter/year that can be opened and closed (locked).</td><td>Month-end close (Module 03)</td></tr>
 </table>
 
-<h2>Two clocks: effective date and knowledge date</h2>
+<h2 id="two-clocks-effective-date-and-knowledge-date">Two clocks: effective date and knowledge date</h2>
 <p>Geneva is <b>bitemporal</b>. Every transaction has:</p>
 <ul>
 <li><b>Effective date</b>: when it economically happened (trade date, ex-date, etc.). Determines which accounting period it belongs to.</li>
@@ -48,7 +48,7 @@
 </table>
 <div class="callout geneva"><b>Why seniors love this.</b> It makes back-dated corrections auditable. You can prove what was known when, reproduce a released report exactly, and quantify a NAV error by diffing two knowledge dates. If a report "doesn't match what we sent", your first check is the knowledge date.</div>
 
-<h2>How a trade flows through Geneva (conceptual)</h2>
+<h2 id="how-a-trade-flows-through-geneva-conceptual">How a trade flows through Geneva (conceptual)</h2>
 <ol>
 <li>Trade transaction recorded with trade date (effective date), settle date, quantity, price, commission, broker, fund allocation.</li>
 <li>On the trade date Geneva creates/updates a lot and records a payable (settlement liability) per ledger rules.</li>
@@ -58,13 +58,13 @@
 <li>Ledger entries aggregate to the trial balance which supports the NAV and financial statements.</li>
 </ol>
 
-<h2>Multi-currency and multi-basis</h2>
+<h2 id="multi-currency-and-multi-basis">Multi-currency and multi-basis</h2>
 <p>Geneva keeps local-currency and base-currency amounts and applies FX at the effective date. Positions, cost and P&amp;L can be split into <b>price effect</b> and <b>FX effect</b>. Many installations also run more than one <i>accounting basis</i> (e.g. book vs tax) side by side; know which basis a report is run on.</p>
 
-<h2>Audit trail and permissions</h2>
+<h2 id="audit-trail-and-permissions">Audit trail and permissions</h2>
 <p>Changes to transactions, prices, rules and users are logged. Role-based access separates people who enter, approve and close. Use the audit trail to answer "who changed this and when?" before making any correction.</p>
 
-<h2>Find it in your Geneva</h2>
+<h2 id="find-it-in-your-geneva">Find it in your Geneva</h2>
 <ol>
 <li>Which portfolios and portfolio groups exist for the funds you work on? Draw them.</li>
 <li>Open one trade and find: effective date, settle date, lot, ledger entries generated.</li>

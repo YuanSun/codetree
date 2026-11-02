@@ -33,7 +33,11 @@
        <a href="${ROOT}index.html" class="${page === "home" ? "on" : ""}">Roadmap</a>
        <a href="${ROOT}tools.html" class="${page === "tools" ? "on" : ""}">Calculators</a>
        <a href="${ROOT}glossary.html" class="${page === "glossary" ? "on" : ""}">Glossary</a>
-     </nav><span class="spacer"></span><button id="theme" title="Toggle dark mode">◐</button>`);
+     </nav><span class="spacer"></span>
+     <form class="search" action="${ROOT}search.html" method="get" role="search">
+       <input name="q" type="search" placeholder="Search concepts ( / )" autocomplete="off" aria-label="Search the course">
+       <div class="search-pop" role="listbox"></div></form>
+     <button id="theme" title="Toggle dark mode">◐</button>`);
   body.prepend(bar);
   bar.querySelector("#theme").onclick = () => {
     const dark = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() === "#12161c";
@@ -41,6 +45,46 @@
     document.documentElement.dataset.theme = next;
     try { localStorage.setItem("faa.theme", next); } catch (e) {}
   };
+
+  /* ----- search box: top matches as you type; Enter opens the full results page ----- */
+  (function () {
+    if (page === "search") { bar.querySelector(".search").style.display = "none"; return; }
+    const form = bar.querySelector(".search"), input = form.querySelector("input"), pop = form.querySelector(".search-pop");
+    let ready = null, sel = -1;
+    const load = () => ready || (ready = Promise.all(["assets/search-index.js", "assets/search.js"].map((f) => new Promise((ok, no) => {
+      const sc = document.createElement("script"); sc.src = ROOT + f; sc.onload = ok; sc.onerror = no; document.head.append(sc);
+    }))).catch(() => { ready = null; }));
+    const esc = (x) => x.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+    const kind = { module: "Lesson", term: "Glossary", tool: "Calculator" };
+    async function show() {
+      const q = input.value.trim();
+      if (!q) { pop.classList.remove("open"); return; }
+      await load();
+      if (!window.FAA_SEARCH || !window.FAA_INDEX) return;
+      const rows = FAA_SEARCH.search(window.FAA_INDEX, q, 6);
+      sel = -1;
+      pop.innerHTML = rows.length
+        ? rows.map(({ entry: e }) => `<a href="${ROOT}${e.u}"><b>${esc(e.h)}</b><small>${kind[e.k]}${e.k === "module" ? " · " + esc(e.t) : ""}</small></a>`).join("") +
+          `<div class="more">Enter for all results</div>`
+        : '<div class="none">No matches</div>';
+      pop.classList.add("open");
+    }
+    input.addEventListener("focus", load);
+    input.addEventListener("input", show);
+    input.addEventListener("keydown", (e) => {
+      const items = [...pop.querySelectorAll("a")];
+      if (e.key === "Escape") { pop.classList.remove("open"); input.blur(); }
+      else if ((e.key === "ArrowDown" || e.key === "ArrowUp") && items.length) {
+        e.preventDefault();
+        sel = (sel + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
+        items.forEach((a, i) => a.classList.toggle("sel", i === sel));
+      } else if (e.key === "Enter" && sel >= 0 && items[sel]) { e.preventDefault(); location.href = items[sel].href; }
+    });
+    document.addEventListener("click", (e) => { if (!form.contains(e.target)) pop.classList.remove("open"); });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "/" && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) { e.preventDefault(); input.focus(); }
+    });
+  })();
 
   /* ----- floating TOC (module list + this page's headings) and back-to-top ----- */
   const tocBtn = el("button", { id: "toc-btn", "aria-label": "Contents", title: "Contents" }, "☰");
