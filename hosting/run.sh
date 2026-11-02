@@ -10,7 +10,7 @@ load_env "$HERE/.env"
 export HOSTING_DIR="$HERE"
 export FUND_DIR="$REPO/fund-accounting-academy"
 export DOMAIN="${DOMAIN:-localhost}"
-export GATEWAY_PORT="${GATEWAY_PORT:-8080}"
+export GATEWAY_PORT="${GATEWAY_PORT:-12999}"
 export MATH_PORT="${MATH_PORT:-12998}"
 
 command -v caddy >/dev/null || { echo "Caddy is not installed. Run: brew install caddy" >&2; exit 1; }

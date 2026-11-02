@@ -16,20 +16,20 @@
 }
 
 # Portal: landing page linking to everything
-http://{$DOMAIN:localhost}:{$GATEWAY_PORT:8080} {
+http://{$DOMAIN:localhost}:{$GATEWAY_PORT:12999} {
 	import site_defaults
 	root * {$HOSTING_DIR}/portal
 	file_server
 }
 
 # MathCompetition (Python server on loopback; it only listens on 127.0.0.1)
-http://math.{$DOMAIN:localhost}:{$GATEWAY_PORT:8080} {
+http://math.{$DOMAIN:localhost}:{$GATEWAY_PORT:12999} {
 	import site_defaults
 	reverse_proxy 127.0.0.1:{$MATH_PORT:12998}
 }
 
 # Fund Accounting Academy (pure static files)
-http://fund.{$DOMAIN:localhost}:{$GATEWAY_PORT:8080} {
+http://fund.{$DOMAIN:localhost}:{$GATEWAY_PORT:12999} {
 	import site_defaults
 	root * {$FUND_DIR}
 	file_server {
@@ -39,7 +39,7 @@ http://fund.{$DOMAIN:localhost}:{$GATEWAY_PORT:8080} {
 
 # Family Obsidian notes (static site built by build-notes.sh). Private: password-protected here,
 # and you should also put Cloudflare Access / Tailscale in front of it.
-http://notes.{$DOMAIN:localhost}:{$GATEWAY_PORT:8080} {
+http://notes.{$DOMAIN:localhost}:{$GATEWAY_PORT:12999} {
 	import site_defaults
 	basic_auth {
 		{$NOTES_USER} {$NOTES_HASH}

@@ -24,7 +24,7 @@ caddy hash-password              # paste the output into NOTES_HASH in .env
 ./run.sh
 ```
 
-Open `http://localhost:8080` (portal), `http://fund.localhost:8080`, `http://math.localhost:8080`.
+Open `http://localhost:12999` (portal), `http://fund.localhost:12999`, `http://math.localhost:12999`.
 (`*.localhost` resolves to your own machine in Chrome, Firefox and recent Safari.)
 
 ## 2. Publish the family notes
@@ -43,7 +43,7 @@ Pick one:
 
 | Option | Good for | Setup |
 |---|---|---|
-| **Cloudflare Tunnel + Access** (recommended) | Family and friends anywhere, with email-code login | Needs a domain (~$10/yr) on Cloudflare. Create a tunnel, route `*.yourdomain` and `yourdomain` to `http://localhost:8080`, set `DOMAIN=yourdomain` in `.env`, then add a Cloudflare Access policy listing family emails. No ports opened on your router. |
+| **Cloudflare Tunnel + Access** (recommended) | Family and friends anywhere, with email-code login | Needs a domain (~$10/yr) on Cloudflare. Create a tunnel, route `*.yourdomain` and `yourdomain` to `http://localhost:12999`, set `DOMAIN=yourdomain` in `.env`, then add a Cloudflare Access policy listing family emails. No ports opened on your router. |
 | **Home Wi-Fi only** | Just the household | Run `./run.sh` on an always-on Mac, then add `192.168.x.x  fund.home math.home notes.home` style entries on devices (or run a local DNS such as your router's). Set `DOMAIN=home`. |
 | **Small VPS** | Machine that never sleeps, no home network exposure | Same files on a $5/mo VPS; use Caddy's automatic HTTPS (remove `auto_https off` and the `http://` prefixes). |
 
