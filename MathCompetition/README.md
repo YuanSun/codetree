@@ -12,13 +12,13 @@ build answers step by step, earn stars and badges — instead of reading slides 
 
 ```bash
 cd MathCompetition
-python3 server.py                  # → http://localhost:8000
+python3 server.py                  # → http://localhost:12998
 ```
 
 To use it on a tablet or another computer on the same Wi-Fi:
 
 ```bash
-python3 server.py --host 0.0.0.0   # then open http://<this-computer's-IP>:8000 on the tablet
+python3 server.py --host 0.0.0.0   # then open http://<this-computer's-IP>:12998 on the tablet
 ```
 
 Weeks are discovered automatically on every request — add or edit a week and just refresh the browser.

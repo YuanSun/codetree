@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """MathCompetition — a tiny dependency-free server for interactive contest-prep weeks.
 
-    python3 server.py                  # http://127.0.0.1:8000
+    python3 server.py                  # http://127.0.0.1:12998
     python3 server.py --host 0.0.0.0   # also reachable from a tablet on the home network
 
 Weeks are auto-discovered: every folder in ``weeks/`` that contains a ``week.json``
@@ -301,7 +301,7 @@ class Handler(BaseHTTPRequestHandler):
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--host", default="127.0.0.1", help="use 0.0.0.0 to open it to other devices on your network")
-    ap.add_argument("--port", type=int, default=8000)
+    ap.add_argument("--port", type=int, default=12998)
     args = ap.parse_args()
     httpd = ThreadingHTTPServer((args.host, args.port), Handler)
     weeks = load_weeks()
