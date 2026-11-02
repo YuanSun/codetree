@@ -10,6 +10,10 @@
 (function () {
   'use strict';
   const MC = (window.MC = { widgets: {} });
+  // URL prefix when a gateway mounts the site under a path (e.g. "/math"); derived from this script's own URL.
+  const BASE = (document.currentScript && document.currentScript.src
+    ? new URL(document.currentScript.src).pathname.replace(/\/static\/js\/core\.js$/, '') : '');
+  MC.base = BASE;
 
   /* ------------------------------------------------------------------ helpers */
   const $ = (s, r = document) => r.querySelector(s);
@@ -145,8 +149,8 @@
     const [, name, icon] = MC.level();
     host.replaceChildren(
       h('div', { class: 'nav' },
-        h('a', { href: '/' }, '🧪 Math Lab'),
-        d.week ? h('span', { class: 'crumb' }, '› ', h('a', { href: `/week/${d.week}/` }, d.weekTitle || d.week)) : null,
+        h('a', { href: BASE + '/' }, '🧪 Math Lab'),
+        d.week ? h('span', { class: 'crumb' }, '› ', h('a', { href: `${BASE}/week/${d.week}/` }, d.weekTitle || d.week)) : null,
         h('span', { class: 'spacer' }),
         skillList ? h('div', { class: 'skillbar', title: 'Skill badges' }, skillList.map((s) => h('span', { class: s.done ? 'done' : '', style: { '--c': s.color }, title: s.label }, s.emoji))) : null,
         h('span', { class: 'xp', title: 'Your level' }, `${icon} ${name} · `, h('b', {}, `${state.xp} XP`)),

@@ -9,7 +9,6 @@ REPO="$(dirname "$HERE")"
 load_env "$HERE/.env"
 export HOSTING_DIR="$HERE"
 export FUND_DIR="$REPO/fund-accounting-academy"
-export DOMAIN="${DOMAIN:-localhost}"
 export GATEWAY_PORT="${GATEWAY_PORT:-12999}"
 export MATH_PORT="${MATH_PORT:-12998}"
 
@@ -27,8 +26,8 @@ pids=()
 cleanup() { for p in "${pids[@]:-}"; do kill "$p" 2>/dev/null || true; done; }
 trap cleanup EXIT INT TERM
 
-( cd "$REPO/MathCompetition" && exec python3 server.py --host 127.0.0.1 --port "$MATH_PORT" ) &
+( cd "$REPO/MathCompetition" && exec python3 server.py --host 127.0.0.1 --port "$MATH_PORT" --base-path /math ) &
 pids+=($!)
 
-echo "Gateway on http://$DOMAIN:$GATEWAY_PORT  (math.$DOMAIN, fund.$DOMAIN, notes.$DOMAIN)"
+echo "Gateway on port $GATEWAY_PORT: http://<this-machine>:$GATEWAY_PORT/  (/fund/  /math/  /notes/)"
 caddy run --config "$HERE/Caddyfile" --adapter caddyfile
