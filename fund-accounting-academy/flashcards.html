@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flashcards · Fund Accounting Academy</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body data-root="" data-page="flashcards">
+<main>
+<div class="crumb">Drill the vocabulary</div>
+<h1>Flashcards</h1>
+<div class="fc-wrap">
+  <div class="fc-top">
+    <select id="fc-mod" aria-label="Deck"></select>
+    <label style="display:flex;gap:6px;align-items:center;font-size:14px"><input type="checkbox" id="fc-hide"> Hide cards I know</label>
+    <button class="btn ghost" id="fc-shuffle">Shuffle</button>
+    <button class="btn ghost" id="fc-reset">Reset deck</button>
+  </div>
+  <div class="bar fc-bar"><i id="fc-prog"></i></div>
+  <p id="fc-count" style="color:var(--muted);font-size:14px;margin:6px 0"></p>
+  <div class="fc-card" id="fc-card" tabindex="0" role="button" aria-label="Flip card">
+    <div class="fc-inner">
+      <div class="fc-face front"><div class="term" id="fc-term"></div><div class="hint">Click or press Space to flip</div></div>
+      <div class="fc-face back"><div class="def" id="fc-def"></div><div class="from" id="fc-from"></div></div>
+    </div>
+  </div>
+  <div class="fc-actions">
+    <button class="btn again" id="fc-again">Again</button>
+    <button class="btn good" id="fc-good">Got it</button>
+  </div>
+  <p style="text-align:center;color:var(--muted);font-size:13px">Keys: Space flips · → next · G got it · A again. Each new "got it" earns 2 XP.</p>
+</div>
+</main>
+<script src="assets/modules.js"></script>
+<script src="assets/glossary.js"></script>
+<script src="assets/app.js"></script>
+<script>
+(function () {
+  const G = window.FAA_GLOSSARY.map(([term, def, mod]) => ({ term, def, mod }));
+  const mods = Object.fromEntries(window.FAA_MODULES.map((m) => [m.id, m]));
+  const $ = (id) => document.getElementById(id);
+  const deckSel = $("fc-mod");
+  deckSel.innerHTML = '<option value="">All terms</option>' + window.FAA_MODULES.filter((m) => G.some((g) => g.mod === m.id)).map((m) => `<option value="${m.id}">${m.icon} ${m.id} · ${m.title}</option>`).join("");
+  const known = () => FAA_XP.state().cards || {};
+  let deck = [], i = 0;
+  const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+
+  function build(shuffle) {
+    const k = known();
+    deck = G.filter((g) => (!deckSel.value || g.mod === deckSel.value) && !($("fc-hide").checked && k[g.term]));
+    if (shuffle) for (let n = deck.length - 1; n > 0; n--) { const j = Math.floor(Math.random() * (n + 1)); [deck[n], deck[j]] = [deck[j], deck[n]]; }
+    i = 0; show();
+  }
+  function show() {
+    const k = known();
+    const all = G.filter((g) => !deckSel.value || g.mod === deckSel.value);
+    const nk = all.filter((g) => k[g.term]).length;
+    $("fc-prog").style.width = (all.length ? (nk / all.length) * 100 : 0) + "%";
+    $("fc-card").classList.remove("flip");
+    if (!deck.length) {
+      $("fc-term").textContent = "Deck complete 🎉"; $("fc-def").textContent = "You know every card here. Reset the deck to go again.";
+      $("fc-from").textContent = ""; $("fc-count").textContent = `${nk} of ${all.length} known`; return;
+    }
+    const c = deck[i % deck.length];
+    $("fc-term").textContent = c.term; $("fc-def").innerHTML = esc(c.def);
+    $("fc-from").innerHTML = `<a href="modules/${mods[c.mod].file}">${mods[c.mod].icon} Module ${c.mod}</a>`;
+    $("fc-count").textContent = `Card ${(i % deck.length) + 1} of ${deck.length} · ${nk} of ${all.length} known${k[c.term] ? " · ✓ known" : ""}`;
+  }
+  const flip = () => $("fc-card").classList.toggle("flip");
+  function mark(good) {
+    if (!deck.length) return;
+    const c = deck[i % deck.length], s = FAA_XP.state();
+    if (good && !s.cards[c.term]) { s.cards[c.term] = 1; FAA_XP.save(s); FAA_XP.award(2, "card learned"); }
+    if (!good && s.cards[c.term]) { delete s.cards[c.term]; FAA_XP.save(s); }
+    if (good && $("fc-hide").checked) { deck.splice(i % deck.length, 1); } else { i++; }
+    show();
+  }
+  $("fc-card").onclick = flip;
+  $("fc-good").onclick = () => mark(true);
+  $("fc-again").onclick = () => mark(false);
+  $("fc-shuffle").onclick = () => build(true);
+  $("fc-reset").onclick = () => { const s = FAA_XP.state(); G.filter((g) => !deckSel.value || g.mod === deckSel.value).forEach((g) => delete s.cards[g.term]); FAA_XP.save(s); build(false); };
+  deckSel.onchange = () => build(false);
+  $("fc-hide").onchange = () => build(false);
+  document.addEventListener("keydown", (e) => {
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
+    if (e.key === " ") { e.preventDefault(); flip(); }
+    else if (e.key === "ArrowRight") { i++; show(); }
+    else if (e.key.toLowerCase() === "g") mark(true);
+    else if (e.key.toLowerCase() === "a") mark(false);
+  });
+  build(true);
+})();
+</script>
+</body></html>
