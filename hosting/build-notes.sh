@@ -5,7 +5,8 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-if [ -f "$HERE/.env" ]; then set -a; . "$HERE/.env"; set +a; fi
+. "$HERE/load-env.sh"
+load_env "$HERE/.env"
 VAULT="${VAULT:?Set VAULT to the family Obsidian vault folder (in hosting/.env or the environment)}"
 QUARTZ="$HERE/.quartz"
 

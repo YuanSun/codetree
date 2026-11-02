@@ -5,7 +5,8 @@ set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(dirname "$HERE")"
 
-if [ -f "$HERE/.env" ]; then set -a; . "$HERE/.env"; set +a; fi
+. "$HERE/load-env.sh"
+load_env "$HERE/.env"
 export HOSTING_DIR="$HERE"
 export FUND_DIR="$REPO/fund-accounting-academy"
 export DOMAIN="${DOMAIN:-localhost}"
