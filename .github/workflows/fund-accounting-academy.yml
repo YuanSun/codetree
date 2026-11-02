@@ -1,0 +1,23 @@
+name: fund-accounting-academy tests
+
+on:
+  push:
+    paths:
+      - "fund-accounting-academy/**"
+      - ".github/workflows/fund-accounting-academy.yml"
+  pull_request:
+    paths:
+      - "fund-accounting-academy/**"
+      - ".github/workflows/fund-accounting-academy.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Run calculator tests
+        working-directory: fund-accounting-academy
+        run: node --test tests/calc.test.js

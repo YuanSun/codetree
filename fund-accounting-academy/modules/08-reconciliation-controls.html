@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reconciliation &amp; Controls · Fund Accounting Academy</title>
+<link rel="stylesheet" href="../assets/style.css"></head>
+<body data-root="../" data-module="08" data-page="module">
+<main>
+<div class="crumb"></div>
+<h1>Reconciliation &amp; Controls</h1>
+<p class="lead">Reconciliation is where your books meet reality. If you can't prove the book to an independent source, you don't know your NAV — you're guessing.</p>
+
+<h2>What gets reconciled</h2>
+<table>
+<tr><th>Rec</th><th>Your side</th><th>Their side</th><th>Common break causes</th></tr>
+<tr><td>Position</td><td>Books by security</td><td>Broker / custodian statement</td><td>Unbooked trade, corporate action, settle-date vs trade-date view</td></tr>
+<tr><td>Cash</td><td>Cash by account/currency</td><td>Bank / broker</td><td>Unmatched settlement, wrong value date, fees not booked</td></tr>
+<tr><td>Trade</td><td>Trade blotter</td><td>Broker confirms / manager</td><td>Price/quantity/fee differences, allocation splits</td></tr>
+<tr><td>Margin / collateral</td><td>Margin posted</td><td>Broker margin statement</td><td>Variation margin timing, haircut differences</td></tr>
+<tr><td>Interest / dividend</td><td>Accruals</td><td>Broker income statement</td><td>Withholding, record-date errors</td></tr>
+<tr><td>Capital</td><td>Investor register</td><td>Transfer agent, bank</td><td>Missed subs/reds, cut-off</td></tr>
+<tr><td>Fees</td><td>Calculated fee</td><td>Manager recalculation / invoice</td><td>Basis choice, day count, HWM</td></tr>
+</table>
+
+<h2>The anatomy of a break</h2>
+<ol>
+<li><b>Identify</b>: security, quantity or amount difference, currency, as-of date.</li>
+<li><b>Classify</b>: timing (settlement lag), data (wrong price/FX/identifier), missing event (corporate action or trade), or genuine error on either side.</li>
+<li><b>Resolve</b>: book the entry, or ask the counterparty to correct. Keep evidence.</li>
+<li><b>Age and escalate</b>: breaks older than policy thresholds (e.g. 5 / 30 / 60 days) go to a manager and appear in the control report.</li>
+</ol>
+<div class="callout tip"><b>Rule of thumb</b> Fix the <i>cause</i>, not the symptom. If the same break type recurs, change the process (an automated feed, a checklist, an instruction to the broker).</div>
+
+<h2>Controls framework</h2>
+<ul>
+<li><b>Segregation of duties</b>: whoever inputs doesn't approve. Four-eyes review on NAV, trades above threshold, manual journal entries, standing data changes.</li>
+<li><b>Preventive vs detective</b>: system validation (balanced entries, mandatory fields) vs reconciliations and exception reports.</li>
+<li><b>Evidence</b>: every control leaves a dated sign-off and a retained report.</li>
+<li><b>Access</b>: role-based permissions; periodic user access reviews; offboarding is immediate.</li>
+<li><b>Change management</b>: system configuration changes (fee rules, allocation rules, report logic) tested and approved before production.</li>
+<li><b>Business continuity</b>: tested recovery; documented manual fall-back for the NAV.</li>
+</ul>
+
+<h2>SOC 1 / ISAE 3402</h2>
+<p>Administrators often undergo a SOC 1 Type II audit (ISAE 3402 abroad): an auditor tests the design and <i>operating effectiveness</i> of control objectives over a period. Clients' auditors rely on it. As a practitioner you'll be asked for <b>evidence</b> of control operation: keep sign-offs complete and timely, because a missed sign-off is a deviation even when the underlying work was right.</p>
+
+<h2>Common failure patterns</h2>
+<ul>
+<li>"Plugging" a break with a miscellaneous account, which hides issues.</li>
+<li>Rec performed on a different date from the NAV (trade-date books vs settle-date broker positions).</li>
+<li>Relying on one source for both price and reconciliation.</li>
+<li>Workarounds that live in spreadsheets without review.</li>
+<li>Staff turnover: process knowledge not documented.</li>
+</ul>
+
+</main>
+<script src="../assets/modules.js"></script>
+<script src="../assets/quizzes.js"></script>
+<script src="../assets/app.js"></script>
+</body></html>

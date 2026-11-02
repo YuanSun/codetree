@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Calculators · Fund Accounting Academy</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body data-root="" data-page="tools">
+<main class="wide">
+<div class="crumb">Practice tools</div>
+<h1>Calculators &amp; trainers</h1>
+<p class="lead">Use these to check your own working, not to replace your firm's system. Everything runs in your browser; nothing is uploaded.</p>
+
+<section class="card tool" id="nav"><h2>NAV &amp; NAV per share</h2>
+<div class="fields">
+<label>Total assets<input id="nav-a" type="number" value="52500000"></label>
+<label>Total liabilities<input id="nav-l" type="number" value="1250000"></label>
+<label>Shares outstanding<input id="nav-s" type="number" value="4800000"></label></div>
+<div class="out" id="nav-out"></div></section>
+
+<section class="card tool" id="accrual"><h2>Bond accrued interest</h2>
+<div class="fields">
+<label>Par<input id="ac-par" type="number" value="1000000"></label>
+<label>Coupon %<input id="ac-rate" type="number" step="0.01" value="5"></label>
+<label>Day count<select id="ac-conv"><option>30/360</option><option>ACT/360</option><option>ACT/365</option><option>ACT/ACT</option></select></label>
+<label>Frequency (per year)<input id="ac-freq" type="number" value="2"></label>
+<label>Last coupon<input id="ac-last" type="date" value="2025-01-15"></label>
+<label>Settlement<input id="ac-settle" type="date" value="2025-03-10"></label>
+<label>Next coupon<input id="ac-next" type="date" value="2025-07-15"></label></div>
+<div class="out" id="ac-out"></div></section>
+
+<section class="card tool" id="perf"><h2>Management &amp; performance fee (one investor, no flows)</h2>
+<div class="fields">
+<label>Opening NAV<input id="pf-open" type="number" value="1000000"></label>
+<label>Closing NAV before performance fee<input id="pf-close" type="number" value="1100000"></label>
+<label>High-water mark<input id="pf-hwm" type="number" value="1000000"></label>
+<label>Fee rate %<input id="pf-rate" type="number" value="20"></label>
+<label>Period hurdle %<input id="pf-hurdle" type="number" value="0"></label>
+<label>Hurdle type<select id="pf-hard"><option value="0">Soft (fee on all profit once cleared)</option><option value="1">Hard (fee on excess only)</option></select></label></div>
+<div class="out" id="pf-out"></div>
+<h3>Management fee</h3>
+<div class="fields">
+<label>NAV basis<input id="mf-nav" type="number" value="1000000"></label>
+<label>Annual rate %<input id="mf-rate" type="number" step="0.05" value="2"></label>
+<label>Days in period<input id="mf-days" type="number" value="31"></label>
+<label>Day basis<select id="mf-basis"><option>365</option><option>360</option></select></label></div>
+<div class="out" id="mf-out"></div></section>
+
+<section class="card tool" id="wf"><h2>Private-fund waterfall (European, single contribution)</h2>
+<div class="fields">
+<label>LP contributed<input id="wf-c" type="number" value="100"></label>
+<label>Total distributions<input id="wf-d" type="number" value="200"></label>
+<label>Preferred return %<input id="wf-p" type="number" value="8"></label>
+<label>Years held<input id="wf-y" type="number" step="0.25" value="3"></label>
+<label>Carry %<input id="wf-k" type="number" value="20"></label>
+<label>GP catch-up %<input id="wf-u" type="number" value="100"></label></div>
+<div class="out" id="wf-out"></div></section>
+
+<section class="card tool" id="ret"><h2>IRR, MOIC, DPI, TVPI</h2>
+<p style="font-size:14px;color:var(--muted)">One cash flow per line: <code>YYYY-MM-DD, amount</code> (contributions negative, distributions positive). Final NAV is optional.</p>
+<div class="fields"><label style="grid-column:1/-1">Cash flows<textarea id="rt-flows" rows="5" style="font:13px ui-monospace,monospace;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--text)">2021-01-01, -100
+2022-06-30, -50
+2024-03-31, 60</textarea></label>
+<label>Remaining NAV (as of last date)<input id="rt-nav" type="number" value="140"></label></div>
+<div class="out" id="rt-out"></div></section>
+
+<section class="card tool" id="alloc"><h2>P&amp;L allocation by capital weight</h2>
+<div class="fields">
+<label>Total P&amp;L to allocate<input id="al-pnl" type="number" value="120000"></label>
+<label style="grid-column:1/-1">Investors (one per line: <code>name, capital</code>)<textarea id="al-inv" rows="4" style="font:13px ui-monospace,monospace;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--text)">Investor A, 5000000
+Investor B, 3000000
+Investor C, 2000000</textarea></label></div>
+<div class="out" id="al-out"></div>
+<p style="font-size:13px;color:var(--muted)">Simple pro-rata only. Real funds often weight by days held, or allocate daily. See Module 06.</p></section>
+
+<section class="card tool" id="je"><h2>Journal entry trainer</h2>
+<p>Pick a scenario, enter the debits and credits (blank = unused), then check.</p>
+<div class="fields"><label>Scenario<select id="je-pick"></select></label></div>
+<p id="je-text" style="font-weight:600"></p>
+<div class="tablewrap"><table class="je"><thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead><tbody id="je-rows"></tbody></table></div>
+<p><button class="btn" id="je-check">Check</button> <button class="btn ghost" id="je-show">Show answer</button> <span id="je-msg"></span></p></section>
+</main>
+<script src="assets/modules.js"></script>
+<script src="assets/calc.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/tools.js"></script>
+</body></html>

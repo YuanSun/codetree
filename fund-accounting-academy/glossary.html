@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Glossary · Fund Accounting Academy</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body data-root="" data-page="glossary">
+<main>
+<div class="crumb">Reference</div>
+<h1>Glossary</h1>
+<p><input id="q" type="search" placeholder="Search terms or definitions…" style="width:100%" aria-label="Search glossary"></p>
+<p id="count" style="color:var(--muted);font-size:14px"></p>
+<div id="list"></div>
+</main>
+<script src="assets/modules.js"></script>
+<script src="assets/glossary.js"></script>
+<script src="assets/app.js"></script>
+<script>
+(function(){
+  const G = window.FAA_GLOSSARY, list = document.getElementById("list"), q = document.getElementById("q"), count = document.getElementById("count");
+  const esc = s => s.replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+  const mods = Object.fromEntries(window.FAA_MODULES.map(m => [m.id, m]));
+  function draw(){
+    const t = q.value.trim().toLowerCase();
+    const rows = G.filter(([a,b]) => !t || a.toLowerCase().includes(t) || b.toLowerCase().includes(t));
+    count.textContent = rows.length + " of " + G.length + " terms";
+    list.innerHTML = rows.map(([a,b,m]) => `<div class="gl-item"><b>${esc(a)}</b> — ${esc(b)} <small>· <a href="modules/${mods[m].file}">Module ${m}</a></small></div>`).join("");
+  }
+  q.addEventListener("input", draw); draw();
+})();
+</script>
+</body></html>

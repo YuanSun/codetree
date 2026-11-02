@@ -217,3 +217,8 @@ antigravity-config.json
 
 .idea/
 /updates
+
+# hosting gateway (secrets, build output, cloned tooling)
+hosting/.env
+hosting/sites/
+hosting/.quartz/

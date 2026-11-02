@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Instruments &amp; How to Book Them · Fund Accounting Academy</title>
+<link rel="stylesheet" href="../assets/style.css"></head>
+<body data-root="../" data-module="04" data-page="module">
+<main>
+<div class="crumb"></div>
+<h1>Instruments &amp; How to Book Them</h1>
+<p class="lead">For each instrument ask four questions: <i>What is the position? What is the cash? What accrues daily? What does the broker statement show?</i></p>
+
+<h2>Equities (long and short)</h2>
+<ul>
+<li><b>Long</b>: buy at cost, carry at fair value, dividends from ex-date.</li>
+<li><b>Short</b>: borrow and sell. The position is a <i>liability</i> (securities sold short) at fair value. Proceeds are held by the PB. You owe dividends and pay a borrow fee on the market value. Gains come from falling prices.</li>
+<li><b>Commission and fees</b> affect cost (buys) or proceeds (sells).</li>
+</ul>
+
+<h2>Bonds and accrued interest</h2>
+<p>Bonds are quoted <b>clean</b> (without accrued interest). You pay <b>dirty = clean + accrued</b>. The accrued amount you pay a seller is not an expense; it's recorded as interest receivable purchased and netted against the first coupon.</p>
+<p><b>Accrued interest = Par × coupon rate × (days accrued ÷ day-count basis).</b></p>
+<table>
+<tr><th>Convention</th><th>Days</th><th>Typical use</th></tr>
+<tr><td>30/360</td><td>30-day months, 360-day year</td><td>US corporates, agencies, munis</td></tr>
+<tr><td>ACT/ACT</td><td>Actual days ÷ actual days in period</td><td>US Treasuries, many govvies</td></tr>
+<tr><td>ACT/360</td><td>Actual days ÷ 360</td><td>Money market, loans, floating rate notes</td></tr>
+<tr><td>ACT/365</td><td>Actual days ÷ 365</td><td>UK gilts (historic), some loans/swaps</td></tr>
+</table>
+<p>Also: <b>premium/discount amortization</b> (straight-line or effective yield per policy), <b>OID</b>, <b>inflation-linked</b> principal adjustments, and <b>paydowns</b> on amortizing securities (reduce face and cost proportionally).</p>
+<p>Try the <a href="../tools.html#accrual">accrued interest calculator</a>.</p>
+
+<h2>FX spot and forwards</h2>
+<ul>
+<li><b>Spot</b>: settles in T+2 for most pairs. Book on trade date.</li>
+<li><b>Forward</b>: value = (agreed forward rate − current forward rate for the remaining term) × notional, discounted. The unrealized P&amp;L appears as an asset or liability. At maturity it becomes realized when the currencies exchange.</li>
+<li><b>Hedged share classes</b>: the forward's P&amp;L is allocated <i>only</i> to the hedged class.</li>
+</ul>
+
+<h2>Futures</h2>
+<p>Futures carry no purchase price; you post <b>initial margin</b> (an asset held with the broker, not a cost) and receive/pay <b>variation margin</b> daily. Daily variation margin settles P&amp;L in cash, so the future's fair value after settlement is effectively zero and the gain flows through realized/unrealized P&amp;L. Remember contract multiplier (e.g. S&amp;P e-mini = $50 × index).</p>
+
+<h2>Options</h2>
+<ul>
+<li><b>Buying</b>: premium paid is cost; mark-to-market via market price or model. Expire worthless → realized loss of premium.</li>
+<li><b>Writing</b>: premium received creates a liability at fair value; closing or expiry realizes the difference.</li>
+<li><b>Exercise/assignment</b>: option cost/proceeds rolls into the cost of the underlying acquired or the proceeds of the underlying sold.</li>
+<li>Check: multiplier (100 for equity options), expiry dates (and after-hours exercise), early assignment risk on short in-the-money calls around ex-dividend.</li>
+</ul>
+
+<h2>Swaps</h2>
+<table>
+<tr><th>Swap</th><th>Cash flows</th><th>Valuation</th></tr>
+<tr><td>Interest-rate swap</td><td>Fixed vs floating on notional; net settlement per period</td><td>PV of fixed leg − PV of floating leg; accrue both legs daily</td></tr>
+<tr><td>Total-return swap (TRS)</td><td>Return on a reference asset vs financing (e.g. SOFR + spread)</td><td>Reference asset P&amp;L + financing accrual; resets monthly/quarterly</td></tr>
+<tr><td>Credit default swap (CDS)</td><td>Fixed premium for protection; payment on credit event</td><td>Upfront payment + MTM from spread curve; accrue premium</td></tr>
+</table>
+<p>Common pitfalls: reset dates, notional changes after partial unwinds, mismatch between the dealer's valuation and the fund's model.</p>
+
+<h2>Repos, loans, and others</h2>
+<p>Repo is a collateralized loan: the cash lent/borrowed accrues interest, the collateral isn't derecognised. Bank loans have floating rates with resets, PIK interest and agency fee notices. Treat each as "cash + schedule + accrual" and tie out to the agent's notices.</p>
+
+<h2>Corporate actions</h2>
+<table>
+<tr><th>Event</th><th>Effect on books</th></tr>
+<tr><td>Cash dividend</td><td>Receivable from ex-date; tax withholding creates a reclaimable asset if applicable</td></tr>
+<tr><td>Stock split / reverse split</td><td>Quantity changes, cost unchanged; price per share changes inversely</td></tr>
+<tr><td>Stock dividend / spin-off</td><td>New position; allocate cost between old and new by relative market value (per tax guidance)</td></tr>
+<tr><td>Merger (cash/stock)</td><td>Old position closed, cash and/or new shares received; realized gain and new cost basis</td></tr>
+<tr><td>Rights/warrants</td><td>Zero or allocated cost; exercise deadlines matter</td></tr>
+<tr><td>Name/ticker/identifier change</td><td>No P&amp;L; keep the history linked (identifier mapping)</td></tr>
+</table>
+<div class="callout tip"><b>Habit</b> Maintain a corporate-action calendar for each fund's holdings. Most nasty NAV errors are unprocessed corporate actions discovered when a position break appears.</div>
+
+</main>
+<script src="../assets/modules.js"></script>
+<script src="../assets/quizzes.js"></script>
+<script src="../assets/app.js"></script>
+</body></html>

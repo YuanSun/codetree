@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Geneva: Daily &amp; Month-End Workflow · Fund Accounting Academy</title>
+<link rel="stylesheet" href="../assets/style.css"></head>
+<body data-root="../" data-module="11" data-page="module">
+<main>
+<div class="crumb"></div>
+<h1>Geneva: Daily &amp; Month-End Workflow</h1>
+<p class="lead">A repeatable routine is what makes a senior fund accountant fast and safe. This is a template you adapt to your firm's procedures.</p>
+
+<div class="callout verify"><b>Verify names locally.</b> The sequence below is the standard logic. Exact menus, import tools and report names depend on your firm's Geneva set-up.</div>
+
+<h2>Daily checklist</h2>
+<table>
+<tr><th>#</th><th>Step</th><th>What "good" looks like</th><th>Typical failure</th></tr>
+<tr><td>1</td><td><b>Load trades</b> from manager/OMS/broker files; review rejects and unmatched items.</td><td>Every trade on the manager blotter appears once, correct fund, correct side/qty/price.</td><td>Duplicate import; wrong identifier; trade booked to the wrong portfolio.</td></tr>
+<tr><td>2</td><td><b>Load prices and FX</b>; run missing/stale/large-move checks.</td><td>No holdings at zero or missing; all exceptions explained.</td><td>Pence vs pounds; stale price; wrong FX cut.</td></tr>
+<tr><td>3</td><td><b>Process corporate actions</b> and income (dividends, coupons, maturities, paydowns).</td><td>Calendar items processed on ex-date with correct rate and withholding.</td><td>Missed split → huge P&amp;L swing.</td></tr>
+<tr><td>4</td><td><b>Book cash movements</b> and expenses; clear pending items.</td><td>Cash by currency ties to bank/broker statements.</td><td>Unbooked fees; wrong value date.</td></tr>
+<tr><td>5</td><td><b>Run accruals</b> (interest, financing, fees).</td><td>Accrual = balance × rate × days basis within rounding.</td><td>Rate reset missed; day count wrong.</td></tr>
+<tr><td>6</td><td><b>Reconcile</b> positions &amp; cash to prime broker/custodian.</td><td>All breaks explained and ageing within policy.</td><td>Trade-date vs settle-date comparison mismatch.</td></tr>
+<tr><td>7</td><td><b>Review the draft NAV</b> (appraisal, P&amp;L attribution, exposure).</td><td>Moves explained; reviewer signs off.</td><td>Self-review; checks skipped on busy days.</td></tr>
+<tr><td>8</td><td><b>Release &amp; archive</b> reports with the knowledge date used.</td><td>Reproducible later.</td><td>Reports saved without the parameters.</td></tr>
+</table>
+
+<h2>Month-end additions</h2>
+<ol>
+<li><b>Final pricing</b> and FX at the month-end cut; resolve all challenges.</li>
+<li><b>Investor activity</b>: record subscriptions and redemptions; confirm with the transfer agent / bank.</li>
+<li><b>Fees</b>: run management and performance fee calculations; reconcile to your independent calc (Module 07).</li>
+<li><b>Allocation</b>: run the P&amp;L allocation to investors; confirm capital accounts sum to NAV.</li>
+<li><b>True-ups</b>: expenses, amortisation, accrual reversals.</li>
+<li><b>Review package</b>: trial balance, appraisal, P&amp;L, capital rollforward, rec status, aged breaks.</li>
+<li><b>Close the period</b>: lock it once approved so no late changes sneak in.</li>
+<li><b>Deliver</b> NAV, statements, support schedules.</li>
+</ol>
+
+<h2>Corrections after the fact</h2>
+<p>With a bitemporal system you can enter a back-dated transaction without overwriting history. The safe routine:</p>
+<ol>
+<li>Find the root cause and confirm in the audit trail how the data got there.</li>
+<li>Check whether the period is closed; reopen only with approval and document it.</li>
+<li>Enter the correction with the right <b>effective date</b>; Geneva records today as the <b>knowledge date</b>.</li>
+<li>Re-run affected reports at the old and new knowledge dates to quantify impact by day; take it to the NAV-error process (Module 03).</li>
+<li>Re-run allocations and fees for any period affected.</li>
+</ol>
+<div class="callout warn"><b>Order matters.</b> Fix upstream data first (trades, prices, corporate actions), then recalc accruals, fees and allocations. Fixing allocations before the portfolio-level error is resolved just moves the problem around.</div>
+
+<h2>Speed habits for seniors</h2>
+<ul>
+<li>Keep saved report <b>templates</b> with parameters set (period, knowledge date, basis, currency).</li>
+<li>Build a standing <b>exception list</b>: items that always need attention (illiquid prices, FX forwards, swap resets).</li>
+<li>Keep a <b>day-by-day change log</b> for each fund: "what was different this month".</li>
+<li>Write the "why" in the transaction comment/field where available; your future self and auditor will thank you.</li>
+</ul>
+
+<h2>Find it in your Geneva</h2>
+<ol>
+<li>Where do trade files land, and which job/process loads them? What does a rejected record look like?</li>
+<li>Where are prices loaded; what are the primary/backup sources; what is the exception report called?</li>
+<li>How is the period locked, who can reopen it, and how is that logged?</li>
+<li>Write your own one-page "daily checklist" with real screen and report names.</li>
+</ol>
+
+</main>
+<script src="../assets/modules.js"></script>
+<script src="../assets/quizzes.js"></script>
+<script src="../assets/app.js"></script>
+</body></html>

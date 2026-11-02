@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Fund Industry &amp; Structures · Fund Accounting Academy</title>
+<link rel="stylesheet" href="../assets/style.css"></head>
+<body data-root="../" data-module="01" data-page="module">
+<main>
+<div class="crumb"></div>
+<h1>The Fund Industry &amp; Structures</h1>
+<p class="lead">Before you can account for a fund you need to know who else touches its money and data. Most "fund accounting problems" are really handoff problems between these parties.</p>
+
+<h2>The cast of characters</h2>
+<div class="tablewrap"><table>
+<tr><th>Party</th><th>What they do</th><th>Why you care</th></tr>
+<tr><td><b>Investor (LP / shareholder)</b></td><td>Puts money in and owns a share of the fund.</td><td>Their capital account or share balance is what you ultimately report.</td></tr>
+<tr><td><b>General Partner (GP) / Board</b></td><td>Legally controls the fund and appoints service providers. In a hedge fund the GP is often an affiliate of the manager.</td><td>Signs off financials and policy decisions (e.g. valuation policy).</td></tr>
+<tr><td><b>Investment manager (IM)</b></td><td>Makes the investment decisions; earns management and performance fees.</td><td>Source of trades, pricing views, and most urgent questions.</td></tr>
+<tr><td><b>Fund administrator</b></td><td>Independent party that keeps the books, strikes the NAV, processes investor dealing, produces statements. <i>This is usually you.</i></td><td>Independence from the manager is the whole value proposition.</td></tr>
+<tr><td><b>Custodian</b></td><td>Safekeeps assets (typically for long-only / regulated funds). Holds title.</td><td>Source of position and cash statements to reconcile to.</td></tr>
+<tr><td><b>Prime broker (PB)</b></td><td>Executes/clears, finances leverage, lends stock for shorts, holds collateral for hedge funds.</td><td>Daily statements; margin, financing and borrow charges.</td></tr>
+<tr><td><b>Auditor</b></td><td>Gives an opinion on annual financial statements.</td><td>Your records must support every number; expect PBC (provided-by-client) lists.</td></tr>
+<tr><td><b>Transfer agent</b></td><td>Maintains the shareholder register (common for mutual funds and ETFs).</td><td>Share counts must agree to the fund's books.</td></tr>
+<tr><td><b>Legal counsel / tax advisor</b></td><td>Offering documents, side letters, tax reporting (K-1, PFIC, etc.).</td><td>Define the rules your system has to implement.</td></tr>
+</table></div>
+
+<h2>Fund types and what changes in the accounting</h2>
+<div class="tablewrap"><table>
+<tr><th>Type</th><th>Typical features</th><th>Accounting emphasis</th></tr>
+<tr><td><b>Hedge fund</b></td><td>Long/short, derivatives, leverage; monthly (sometimes weekly/daily) dealing; partnership or corporation.</td><td>Daily P&amp;L, derivatives, financing, investor-level fees (HWM, equalization, series).</td></tr>
+<tr><td><b>Mutual fund / UCITS / ETF</b></td><td>Open-ended, daily NAV, regulated, strict diversification rules.</td><td>Daily NAV accuracy, shares and NAV per share, distributions, regulatory ratios.</td></tr>
+<tr><td><b>Private equity / venture</b></td><td>Capital calls and distributions over 8–12 years; illiquid holdings.</td><td>Commitments, waterfalls, fair-value marks, IRR/TVPI.</td></tr>
+<tr><td><b>Real estate / credit funds</b></td><td>Loans or property; income-driven.</td><td>Interest accruals, amortization, impairments, loan servicing data.</td></tr>
+<tr><td><b>Fund of funds</b></td><td>Invests in other funds.</td><td>Valuation off other funds' estimated NAVs; lag between estimate and final NAV.</td></tr>
+</table></div>
+
+<h2>Common structures</h2>
+<h3>Master–feeder</h3>
+<p>Onshore (US taxable) and offshore (non-US / tax-exempt) investors each invest in their own <b>feeder</b>; both feeders invest in a single <b>master</b> that holds the portfolio. The master's P&amp;L is allocated to feeders by their share of master capital; each feeder then allocates to its own investors and charges its own fees.</p>
+<div class="flow">
+<div><b>Feeder A</b>US LP</div><div><b>Feeder B</b>Cayman Ltd</div><div><b>Master fund</b>Holds all positions &amp; trades</div><div><b>Prime brokers</b>Custody &amp; financing</div>
+</div>
+<h3>Series and classes</h3>
+<p>One legal fund can offer different <b>classes</b> (different fee terms, currencies, or hedging) and, in some hedge funds, monthly <b>series</b> of shares so each subscription tracks its own performance-fee base. We cover this properly in Module 06.</p>
+<h3>Side pocket / SPV</h3>
+<p>Illiquid or hard-to-value investments can be segregated so redeeming investors don't take a mark they can't realise. Only investors who held at designation participate.</p>
+
+<div class="callout"><b>Dealing frequency drives workload.</b> A daily-NAV mutual fund can't rely on month-end clean-up; a monthly hedge fund can estimate daily but must be exactly right on the dealing day. Always ask: <i>"When is the NAV used to transact?"</i></div>
+
+<h2>What drives the cost of running a fund</h2>
+<p>Funds are priced on <b>asset-based fees</b> to the administrator (basis points on NAV) and often minimums per share class or investor. Complex structures (many series, side pockets, FX-hedged classes) cost more to run — useful context when someone asks "why does this take so long?".</p>
+
+<div class="callout tip"><b>Practice</b> Pick a fund you work on and draw its structure: investors → feeder(s) → master → brokers/custodian. Write beside each box which system holds the data. You'll use that map to chase breaks.</div>
+
+</main>
+<script src="../assets/modules.js"></script>
+<script src="../assets/quizzes.js"></script>
+<script src="../assets/app.js"></script>
+</body></html>
