@@ -114,3 +114,14 @@ input, select { font: inherit; padding: 7px 9px; border-radius: 8px; border: 1px
 #toc-panel a:hover { background: var(--accent-soft); }
 #toc-panel h4 { margin: 12px 8px 4px; font-size: 12px; text-transform: uppercase; color: var(--muted); letter-spacing: .06em; }
 @media print { .topbar, #toc-btn, #top-btn, #toc-panel, .pager, .quiz { display: none !important; } body { background: #fff; } }
+/* search */
+.search { position: relative; }
+.search input { width: 220px; max-width: 46vw; padding: 5px 10px; font-size: 14px; }
+.search-pop { position: absolute; right: 0; top: 36px; width: min(460px, 92vw); background: var(--surface); border: 1px solid var(--line);
+  border-radius: 10px; box-shadow: var(--shadow); display: none; z-index: 50; max-height: 70vh; overflow-y: auto; }
+.search-pop.open { display: block; }
+.search-pop a { display: block; padding: 8px 12px; text-decoration: none; color: var(--text); border-bottom: 1px solid var(--line); }
+.search-pop a:hover, .search-pop a.sel { background: var(--accent-soft); }
+.search-pop a small { color: var(--muted); display: block; font-size: 12px; }
+.search-pop .more, .search-pop .none { padding: 8px 12px; font-size: 13px; color: var(--muted); }
+mark { background: var(--warn-soft); color: inherit; border-radius: 3px; padding: 0 1px; }

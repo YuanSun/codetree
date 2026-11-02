@@ -23,7 +23,7 @@ To host it together with the other projects, see [../hosting/README.md](../hosti
 | **Senior skills** | 13 Review technique, materiality, escalation, owning the close |
 
 Plus: calculators and trainers (`tools.html`: NAV, accrued interest with day counts, management/performance fee with HWM and hurdles,
-PE waterfall, IRR/MOIC/DPI/TVPI, P&L allocation, journal-entry trainer), a searchable glossary, and a 5-question quiz at the end of every module.
+PE waterfall, IRR/MOIC/DPI/TVPI, P&L allocation, journal-entry trainer), a searchable glossary, **site-wide search** (type in the top bar, press `/` to focus it; Enter opens full results), and a 5-question quiz at the end of every module.
 Progress and quiz scores are saved in the browser's `localStorage` (per device).
 
 ## Layout
@@ -36,23 +36,27 @@ fund-accounting-academy/
 │   ├── modules.js           # course map: drives home page, nav, pager, progress
 │   ├── quizzes.js           # FAA_QUIZ[moduleId] = [{q, o[], a, w}]
 │   ├── glossary.js          # [term, definition, moduleId]
+│   ├── search.js, search-index.js  # ranking + GENERATED index (don't edit by hand)
 │   ├── calc.js              # pure calculation functions (browser + Node)
 │   ├── tools.js             # wires calculators to the DOM
 │   ├── app.js, style.css    # shared shell (top bar, TOC, progress, quiz engine)
-├── tests/calc.test.js       # node --test tests/calc.test.js
+├── search.html              # full search results
+├── scripts/build-search.js  # regenerates assets/search-index.js (and gives each h2 an id)
+├── tests/                   # calc.test.js, search.test.js
 └── server.py
 ```
 
 ## Tests
 
 ```bash
-node --test tests/calc.test.js
+node --test tests/calc.test.js tests/search.test.js
 ```
 
 ## Adding a module
 
 1. Copy an existing `modules/NN-*.html`, change `data-module`, the `<h1>` and content.
 2. Add an entry to `assets/modules.js` and questions to `assets/quizzes.js` under the same id.
+3. **Rebuild the search index after any content change:** `node scripts/build-search.js` (the search test fails if the committed index is stale).
 
 ## A note on the Geneva content
 

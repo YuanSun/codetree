@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Search · Fund Accounting Academy</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body data-root="" data-page="search">
+<main>
+<div class="crumb">Find a concept</div>
+<h1>Search</h1>
+<form action="search.html" method="get" role="search">
+  <input id="sq" name="q" type="search" placeholder="Try: high-water mark, accrued interest, knowledge date…" style="width:100%" autocomplete="off" aria-label="Search the course">
+</form>
+<p id="scount" style="color:var(--muted);font-size:14px"></p>
+<div id="results"></div>
+</main>
+<script src="assets/modules.js"></script>
+<script src="assets/search-index.js"></script>
+<script src="assets/search.js"></script>
+<script src="assets/app.js"></script>
+<script>
+(function () {
+  const input = document.getElementById("sq"), box = document.getElementById("results"), count = document.getElementById("scount");
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const mark = (s, q) => {
+    let out = esc(s);
+    FAA_SEARCH.tokens(q).forEach((t) => { out = out.replace(new RegExp("(^|[^A-Za-z0-9])(" + t.replace(/[.*+?^${}()|[\]\\\/]/g, "\\$&") + "[A-Za-z0-9]*)", "gi"), "$1<mark>$2</mark>"); });
+    return out;
+  };
+  const KIND = { module: "Lesson", term: "Glossary", tool: "Calculator" };
+  function draw() {
+    const q = input.value.trim();
+    history.replaceState(null, "", q ? "?q=" + encodeURIComponent(q) : "search.html");
+    if (!q) { box.innerHTML = ""; count.textContent = "Type a concept, instrument or Geneva term."; return; }
+    const rows = FAA_SEARCH.search(window.FAA_INDEX, q, 25);
+    count.textContent = rows.length ? rows.length + " result" + (rows.length > 1 ? "s" : "") : "No matches. Try a simpler word, e.g. “fee” or “NAV”.";
+    box.innerHTML = rows.map(({ entry: e }) => `<div class="gl-item"><a href="${e.u}"><b>${mark(e.h, q)}</b></a>
+      <small> · ${KIND[e.k]}${e.k === "module" ? " · " + esc(e.t) : ""}</small><br>${mark(FAA_SEARCH.snippet(e.x, q), q)}</div>`).join("");
+  }
+  input.value = new URLSearchParams(location.search).get("q") || "";
+  input.addEventListener("input", draw);
+  draw();
+  input.focus();
+})();
+</script>
+</body></html>

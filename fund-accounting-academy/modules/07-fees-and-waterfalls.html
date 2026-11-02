@@ -8,7 +8,7 @@
 <h1>Fees, Expenses &amp; Waterfalls</h1>
 <p class="lead">Fees are contractual math applied to NAV. Mistakes here create investor complaints, so read the offering document, not just the system configuration.</p>
 
-<h2>Management fee</h2>
+<h2 id="management-fee">Management fee</h2>
 <p><b>Fee = NAV × annual rate × days ÷ basis</b> (365 or 360; or rate ÷ 12 per month). Things the documents specify:</p>
 <ul>
 <li>Which NAV: <i>opening</i>, <i>closing</i>, <i>average</i>, <i>before or after accruing performance fee</i>, before or after redemptions.</li>
@@ -17,7 +17,7 @@
 <li>Fee on committed capital vs invested capital (private funds).</li>
 </ul>
 
-<h2>Performance (incentive) fee</h2>
+<h2 id="performance-incentive-fee">Performance (incentive) fee</h2>
 <p>Charged on profit above specified hurdles. The key terms:</p>
 <table>
 <tr><th>Term</th><th>Meaning</th></tr>
@@ -39,7 +39,7 @@
 <p>Try your own numbers in the <a href="../tools.html#perf">performance fee calculator</a>.</p>
 <div class="callout warn"><b>Redemptions mid-period.</b> A redeemer crystallizes the accrued fee on the redeemed part. Many errors come from forgetting that the fee on redeemed capital is paid out on that date.</div>
 
-<h2>Fund expenses</h2>
+<h2 id="fund-expenses">Fund expenses</h2>
 <ul>
 <li><b>Operating</b>: admin, audit, legal, directors, custody, registered office, regulatory fees.</li>
 <li><b>Trading-related</b>: commissions, financing, borrow, interest.</li>
@@ -48,7 +48,7 @@
 </ul>
 <p>Accrue to a budget daily and true-up when invoices arrive; large true-ups are a signal that the accrual basis was wrong.</p>
 
-<h2>Private-fund distribution waterfalls</h2>
+<h2 id="private-fund-distribution-waterfalls">Private-fund distribution waterfalls</h2>
 <p>Proceeds are applied in tiers. A common <b>European (whole-fund)</b> waterfall:</p>
 <ol>
 <li><b>Return of capital</b>: LPs get contributed capital back first.</li>
@@ -59,7 +59,7 @@
 <p>An <b>American (deal-by-deal)</b> waterfall applies the tiers to each investment as it's realised, which pays the GP sooner and usually requires a clawback.</p>
 <p>Example: LP contributes 100, three years, 8% pref, 20% carry, 100% catch-up, distributions total 200. Tier 1: 100. Tier 2 pref = 100×(1.08³−1) = 25.97. Tier 3 catch-up = 0.2×25.97 ÷ (1−0.2) = 6.49 to GP. Tier 4: remaining 67.54 split 80/20. GP total = 6.49 + 13.51 = <b>20.00 = 20% of the 100 profit</b>. The <a href="../tools.html#wf">waterfall calculator</a> does this for you.</p>
 
-<h2>Return metrics</h2>
+<h2 id="return-metrics">Return metrics</h2>
 <table>
 <tr><th>Metric</th><th>Formula</th><th>Reads as</th></tr>
 <tr><td>MOIC</td><td>(Distributions + NAV) ÷ paid-in</td><td>Multiple on invested capital (gross or net)</td></tr>

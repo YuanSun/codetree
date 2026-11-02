@@ -24,6 +24,7 @@
     count.textContent = rows.length + " of " + G.length + " terms";
     list.innerHTML = rows.map(([a,b,m]) => `<div class="gl-item"><b>${esc(a)}</b> — ${esc(b)} <small>· <a href="modules/${mods[m].file}">Module ${m}</a></small></div>`).join("");
   }
+  q.value = new URLSearchParams(location.search).get("q") || "";
   q.addEventListener("input", draw); draw();
 })();
 </script>

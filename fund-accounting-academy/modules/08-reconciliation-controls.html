@@ -8,7 +8,7 @@
 <h1>Reconciliation &amp; Controls</h1>
 <p class="lead">Reconciliation is where your books meet reality. If you can't prove the book to an independent source, you don't know your NAV — you're guessing.</p>
 
-<h2>What gets reconciled</h2>
+<h2 id="what-gets-reconciled">What gets reconciled</h2>
 <table>
 <tr><th>Rec</th><th>Your side</th><th>Their side</th><th>Common break causes</th></tr>
 <tr><td>Position</td><td>Books by security</td><td>Broker / custodian statement</td><td>Unbooked trade, corporate action, settle-date vs trade-date view</td></tr>
@@ -20,7 +20,7 @@
 <tr><td>Fees</td><td>Calculated fee</td><td>Manager recalculation / invoice</td><td>Basis choice, day count, HWM</td></tr>
 </table>
 
-<h2>The anatomy of a break</h2>
+<h2 id="the-anatomy-of-a-break">The anatomy of a break</h2>
 <ol>
 <li><b>Identify</b>: security, quantity or amount difference, currency, as-of date.</li>
 <li><b>Classify</b>: timing (settlement lag), data (wrong price/FX/identifier), missing event (corporate action or trade), or genuine error on either side.</li>
@@ -29,7 +29,7 @@
 </ol>
 <div class="callout tip"><b>Rule of thumb</b> Fix the <i>cause</i>, not the symptom. If the same break type recurs, change the process (an automated feed, a checklist, an instruction to the broker).</div>
 
-<h2>Controls framework</h2>
+<h2 id="controls-framework">Controls framework</h2>
 <ul>
 <li><b>Segregation of duties</b>: whoever inputs doesn't approve. Four-eyes review on NAV, trades above threshold, manual journal entries, standing data changes.</li>
 <li><b>Preventive vs detective</b>: system validation (balanced entries, mandatory fields) vs reconciliations and exception reports.</li>
@@ -39,10 +39,10 @@
 <li><b>Business continuity</b>: tested recovery; documented manual fall-back for the NAV.</li>
 </ul>
 
-<h2>SOC 1 / ISAE 3402</h2>
+<h2 id="soc-1-isae-3402">SOC 1 / ISAE 3402</h2>
 <p>Administrators often undergo a SOC 1 Type II audit (ISAE 3402 abroad): an auditor tests the design and <i>operating effectiveness</i> of control objectives over a period. Clients' auditors rely on it. As a practitioner you'll be asked for <b>evidence</b> of control operation: keep sign-offs complete and timely, because a missed sign-off is a deviation even when the underlying work was right.</p>
 
-<h2>Common failure patterns</h2>
+<h2 id="common-failure-patterns">Common failure patterns</h2>
 <ul>
 <li>"Plugging" a break with a miscellaneous account, which hides issues.</li>
 <li>Rec performed on a different date from the NAV (trade-date books vs settle-date broker positions).</li>
