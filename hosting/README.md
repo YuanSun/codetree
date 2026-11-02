@@ -67,6 +67,7 @@ launchctl load ~/Library/LaunchAgents/com.codetree.gateway.plist
 ```
 hosting/
 ├── Caddyfile                       # routing for all sites
+├── load-env.sh                     # reads .env literally
 ├── run.sh                          # starts MathCompetition + Caddy
 ├── build-notes.sh                  # vault -> static site (Quartz)
 ├── env.example                     # copy to .env
