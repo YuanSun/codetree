@@ -39,6 +39,9 @@
 <p>Try your own numbers in the <a href="../tools.html#perf">performance fee calculator</a>.</p>
 <div class="callout warn"><b>Redemptions mid-period.</b> A redeemer crystallizes the accrued fee on the redeemed part. Many errors come from forgetting that the fee on redeemed capital is paid out on that date.</div>
 
+<div data-widget="hwm-chart"></div>
+<details class="try"><summary>Try it: opening NAV 200, HWM 220, NAV before fee 230, 20% fee, no hurdle. What is the fee?</summary><p>The fund only clears the HWM by 10 (230 - 220), so the fee is 20% x 10 = <b>2.0</b>, not 20% of the 30 gain. New NAV is 228 and the HWM resets to 228.</p></details>
+
 <h2 id="fund-expenses">Fund expenses</h2>
 <ul>
 <li><b>Operating</b>: admin, audit, legal, directors, custody, registered office, regulatory fees.</li>
@@ -59,6 +62,8 @@
 <p>An <b>American (deal-by-deal)</b> waterfall applies the tiers to each investment as it's realised, which pays the GP sooner and usually requires a clawback.</p>
 <p>Example: LP contributes 100, three years, 8% pref, 20% carry, 100% catch-up, distributions total 200. Tier 1: 100. Tier 2 pref = 100×(1.08³−1) = 25.97. Tier 3 catch-up = 0.2×25.97 ÷ (1−0.2) = 6.49 to GP. Tier 4: remaining 67.54 split 80/20. GP total = 6.49 + 13.51 = <b>20.00 = 20% of the 100 profit</b>. The <a href="../tools.html#wf">waterfall calculator</a> does this for you.</p>
 
+<div data-widget="waterfall-chart"></div>
+
 <h2 id="return-metrics">Return metrics</h2>
 <table>
 <tr><th>Metric</th><th>Formula</th><th>Reads as</th></tr>
@@ -74,4 +79,6 @@
 <script src="../assets/modules.js"></script>
 <script src="../assets/quizzes.js"></script>
 <script src="../assets/app.js"></script>
+<script src="../assets/calc.js"></script>
+<script src="../assets/widgets.js"></script>
 </body></html>

@@ -22,6 +22,8 @@ To host it together with the other projects, see [../hosting/README.md](../hosti
 | **Advent Geneva** | 10 Mental model (entities, lots, ledger, effective vs knowledge date) · 11 Daily & month-end workflow · 12 Reports, recs & troubleshooting |
 | **Senior skills** | 13 Review technique, materiality, escalation, owning the close |
 
+**Interactive lessons:** eight live widgets with forms and charts (trade lifecycle stepper, NAV builder, bond accrual timeline, fair-value donut, capital-account tie-out, performance fee with high-water mark, PE waterfall, Geneva knowledge-date time machine), plus "try it" prompts with hidden answers. **Motivation:** XP, levels, a daily streak, a daily challenge question, confetti, and glossary flashcards (`flashcards.html`).
+
 Plus: calculators and trainers (`tools.html`: NAV, accrued interest with day counts, management/performance fee with HWM and hurdles,
 PE waterfall, IRR/MOIC/DPI/TVPI, P&L allocation, journal-entry trainer), a searchable glossary, **site-wide search** (type in the top bar, press `/` to focus it; Enter opens full results), and a 5-question quiz at the end of every module.
 Progress and quiz scores are saved in the browser's `localStorage` (per device).
@@ -30,31 +32,32 @@ Progress and quiz scores are saved in the browser's `localStorage` (per device).
 
 ```
 fund-accounting-academy/
-├── index.html, tools.html, glossary.html
+├── index.html, tools.html, glossary.html, flashcards.html
 ├── modules/NN-*.html        # one page per module (content lives in the HTML)
 ├── assets/
 │   ├── modules.js           # course map: drives home page, nav, pager, progress
 │   ├── quizzes.js           # FAA_QUIZ[moduleId] = [{q, o[], a, w}]
 │   ├── glossary.js          # [term, definition, moduleId]
 │   ├── search.js, search-index.js  # ranking + GENERATED index (don't edit by hand)
+│   ├── widgets.js           # interactive lesson widgets: <div data-widget="name">
 │   ├── calc.js              # pure calculation functions (browser + Node)
 │   ├── tools.js             # wires calculators to the DOM
 │   ├── app.js, style.css    # shared shell (top bar, TOC, progress, quiz engine)
 ├── search.html              # full search results
 ├── scripts/build-search.js  # regenerates assets/search-index.js (and gives each h2 an id)
-├── tests/                   # calc.test.js, search.test.js
+├── tests/                   # calc, search and site (static consistency) tests
 └── server.py
 ```
 
 ## Tests
 
 ```bash
-node --test tests/calc.test.js tests/search.test.js
+node --test tests/calc.test.js tests/search.test.js tests/site.test.js
 ```
 
 ## Adding a module
 
-1. Copy an existing `modules/NN-*.html`, change `data-module`, the `<h1>` and content.
+1. Copy an existing `modules/NN-*.html`, change `data-module`, the `<h1>` and content. Drop `<div data-widget="nav-builder"></div>` (any name in `assets/widgets.js`) wherever you want an interactive chart; the page then also needs the `calc.js` and `widgets.js` script tags.
 2. Add an entry to `assets/modules.js` and questions to `assets/quizzes.js` under the same id.
 3. **Rebuild the search index after any content change:** `node scripts/build-search.js` (the search test fails if the committed index is stale).
 
