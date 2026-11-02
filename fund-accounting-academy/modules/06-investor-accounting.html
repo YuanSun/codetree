@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Investor Accounting · Fund Accounting Academy</title>
+<link rel="stylesheet" href="../assets/style.css"></head>
+<body data-root="../" data-module="06" data-page="module">
+<main>
+<div class="crumb"></div>
+<h1>Investor Accounting</h1>
+<p class="lead">The portfolio side tells you what the fund is worth. The investor side tells you who owns what. This is where most senior-level complexity lives.</p>
+
+<h2>Two models</h2>
+<table>
+<tr><th></th><th>Share-based (corporation / mutual fund)</th><th>Capital-account-based (partnership / many hedge funds)</th></tr>
+<tr><td>Ownership</td><td>Shares × NAV per share</td><td>Each investor has a capital account in dollars</td></tr>
+<tr><td>Dealing</td><td>Issue/redeem shares at NAV per share</td><td>Add/withdraw capital at NAV; allocate P&amp;L to accounts</td></tr>
+<tr><td>Performance fees</td><td>Often series accounting or equalization to keep per-share fairness</td><td>Computed per investor (crystallised on their own HWM)</td></tr>
+</table>
+
+<h2>Capital account rollforward</h2>
+<table>
+<tr><th>Line</th><th class="num">Amount</th></tr>
+<tr><td>Opening capital</td><td class="num">1,000,000</td></tr>
+<tr><td>+ Subscriptions</td><td class="num">200,000</td></tr>
+<tr><td>− Redemptions</td><td class="num">(100,000)</td></tr>
+<tr><td>+ Allocated trading P&amp;L</td><td class="num">60,000</td></tr>
+<tr><td>− Management fee</td><td class="num">(2,000)</td></tr>
+<tr><td>− Performance fee</td><td class="num">(9,600)</td></tr>
+<tr><td>− Allocated expenses</td><td class="num">(1,400)</td></tr>
+<tr><td><b>Closing capital</b></td><td class="num"><b>1,147,000</b></td></tr>
+</table>
+<p>The sum of all investors' closing capital must equal fund NAV. That tie-out is the single most important check on the investor side.</p>
+
+<h2>Allocating P&amp;L</h2>
+<p>Common approaches:</p>
+<ul>
+<li><b>Pro-rata by beginning capital</b> (with a capital-weighted adjustment when money moves mid-period).</li>
+<li><b>Daily/valuation-date allocation</b>: P&amp;L each dealing date goes to capital at that time. Cleanest when flows occur intra-month.</li>
+<li><b>Special allocations</b>: expenses charged only to a class; hedged-class FX P&amp;L; side-pocket P&amp;L to participating investors only.</li>
+</ul>
+<p>Use the <a href="../tools.html#alloc">allocation calculator</a> to see how weighting changes who gets what.</p>
+
+<h2>Subscriptions and redemptions</h2>
+<ul>
+<li><b>Dealing day</b>: the NAV on which units are struck. Subscription money is typically received before (cash in a "subscriptions received in advance" liability) and units issued at the dealing NAV.</li>
+<li><b>Notice periods</b> and <b>lock-ups</b>: redemption requests (e.g. 45 days' notice, quarterly) are recorded as <b>redemptions payable</b> liabilities from the dealing day, reducing NAV even though cash leaves later.</li>
+<li><b>Gates</b>: the fund limits total redemptions in a period (e.g. 20% of NAV); excess is carried forward pro-rata.</li>
+<li><b>Holdbacks</b>: e.g. 5–10% of a full redemption withheld until audit.</li>
+</ul>
+
+<h2>Why equalization or series exist</h2>
+<p>If a fund charges a performance fee on <i>fund</i> performance, an investor joining after a good month would either pay a fee on gains made before they joined, or the older investors would be undercharged. Two fixes:</p>
+<h3>Series accounting</h3>
+<p>Each subscription month is a separate series with its own NAV and HWM. Gains are tracked per series; periodically (e.g. annually) series with positive performance roll up to a lead series. Fair, but more share classes to manage.</p>
+<h3>Equalization (equalisation factor / credit)</h3>
+<p>Everyone is in one class. A late entrant who subscribes at a NAV already <i>net</i> of an accrued performance fee pays an <b>equalization credit</b> (or buys extra shares) to compensate; if the NAV is below the HWM they pay a <b>depreciation deposit</b>. The goal is that every investor's performance fee equals what they'd pay for their own return.</p>
+<div class="callout"><b>Key idea.</b> The fund can only have <i>one</i> NAV per share per class. Everything else (series, equalization) is machinery that lets each investor still pay a fee that reflects their own gain.</div>
+
+<h2>Side pockets and designated investments</h2>
+<p>An illiquid position is moved to a separate class; investors at that time receive a proportional special share class. New subscribers don't share. Redeemers get their main-class balance but keep the side pocket until realization. Fees often follow different rules: usually charged only on realised gains.</p>
+
+<h2>Transfers, tax and withholding</h2>
+<ul>
+<li>Transfers between investors need legal approval and carry cost basis and HWM.</li>
+<li>US partnerships issue K-1s (tax allocations differ from book allocations — "book/tax differences").</li>
+<li>Withholding on non-US investors is handled separately from NAV accounting.</li>
+</ul>
+
+<h2>Controls specific to investor accounting</h2>
+<ul>
+<li>Capital accounts sum to NAV every dealing date.</li>
+<li>Transfer-agent register ties to share counts.</li>
+<li>Subscriptions agree to bank statements (don't issue units for unreceived cash without approval).</li>
+<li>Redemptions checked to documents, notice dates, lock-ups, gates, KYC/AML clearance.</li>
+</ul>
+
+</main>
+<script src="../assets/modules.js"></script>
+<script src="../assets/quizzes.js"></script>
+<script src="../assets/app.js"></script>
+</body></html>

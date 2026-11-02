@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Accounting Fundamentals for Funds · Fund Accounting Academy</title>
+<link rel="stylesheet" href="../assets/style.css"></head>
+<body data-root="../" data-module="02" data-page="module">
+<main>
+<div class="crumb"></div>
+<h1>Accounting Fundamentals for Funds</h1>
+<p class="lead">A fund is just a set of books where the "business" is holding investments. Everything in fund accounting reduces to double entry, applied to securities and investors.</p>
+
+<h2>The equation and the statements</h2>
+<p><b>Assets = Liabilities + Net assets (equity).</b> In a fund, net assets belong to investors; that figure is the <b>NAV</b>. Net assets are broken down into each investor's capital account (partnership) or shares × NAV per share (corporation/mutual fund).</p>
+<div class="tablewrap"><table>
+<tr><th>Type</th><th>Examples in a fund</th><th>Normal balance</th></tr>
+<tr><td>Assets</td><td>Investments at fair value, cash, receivable for investments sold, interest and dividends receivable, unrealized gain on derivatives, margin deposits</td><td>Debit</td></tr>
+<tr><td>Liabilities</td><td>Payable for investments purchased, accrued fees and expenses, redemptions payable, securities sold short, unrealized loss on derivatives</td><td>Credit</td></tr>
+<tr><td>Equity</td><td>Investor capital / shares</td><td>Credit</td></tr>
+<tr><td>Income</td><td>Dividends, interest, realized and unrealized gains</td><td>Credit</td></tr>
+<tr><td>Expenses</td><td>Management fee, performance fee, admin, audit, legal, interest expense, borrow fees</td><td>Debit</td></tr>
+</table></div>
+
+<h2>Double entry in 60 seconds</h2>
+<p>Every transaction has equal <b>debits</b> and <b>credits</b>. Debits increase assets and expenses; credits increase liabilities, equity and income. If the entry doesn't balance, something is missing — which is itself a useful control (a system that cannot post an unbalanced entry).</p>
+<h3>Worked example: buy 1,000 shares at $50, commission $25</h3>
+<table>
+<tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr>
+<tr><td>Investments at cost</td><td class="num">50,025</td><td></td></tr>
+<tr><td>Payable for investments purchased (until settlement)</td><td></td><td class="num">50,025</td></tr>
+</table>
+<p>Commissions on purchases normally become part of cost; on sales they reduce proceeds. Settlement day: debit the payable, credit cash.</p>
+
+<h2>Trade date vs settlement date</h2>
+<p>Investment companies book on <b>trade date</b>: the day the fund becomes economically exposed. The cash moves later, on <b>settlement date</b> (T+1 for most US equities since May 2024; varies by market). Between the two there's a payable or receivable. Get this wrong and your cash looks fine while your NAV is wrong.</p>
+<div class="flow">
+<div><b>Trade date (T)</b>Book position &amp; P&amp;L exposure; set up payable/receivable</div>
+<div><b>Between</b>Position is priced; cash unchanged</div>
+<div><b>Settle date</b>Cash moves; payable/receivable cleared</div>
+</div>
+
+<h2>Accrual accounting</h2>
+<p>Income and expenses are recognised when earned or incurred, not when cash moves. For funds this means daily accruals of bond interest, dividend income from the <b>ex-date</b> (not pay date), management fees, admin fees and interest on financing.</p>
+<div class="callout"><b>Ex-date, record date, pay date.</b> Dividends are recognised on the ex-dividend date. The fund records a dividend receivable; when cash arrives on the pay date the receivable clears. Short positions owe the dividend ("dividend on short") on the same ex-date.</div>
+
+<h2>Realized vs unrealized P&amp;L</h2>
+<ul>
+<li><b>Unrealized</b>: change in value of positions still held. Moves every time the price or FX rate moves.</li>
+<li><b>Realized</b>: locked in at sale or cover. Realized = proceeds − cost (of the lots relieved). When a position is sold, the previously recorded unrealized gain is <i>reversed</i> and realized gain recorded, so total P&amp;L doesn't double count.</li>
+</ul>
+<table>
+<tr><th>Event</th><th>Entry</th></tr>
+<tr><td>Buy at 100, price rises to 108</td><td>Dr Investments (unrealized appreciation) 8 / Cr Net change in unrealized gain (income) 8 &mdash; carrying value moves from cost 100 to fair value 108</td></tr>
+<tr><td>Sell at 108</td><td>Dr Cash (or receivable) 108 / Cr Investments at cost 100 / Cr Realized gain 8; then reverse the 8 of unrealized (Dr Net change in unrealized 8 / Cr Investments unrealized appreciation 8)</td></tr>
+</table>
+<p>Total period P&amp;L is the same either way; what changes is classification — and that matters for tax and for reporting realized vs unrealized.</p>
+
+<h2>Cost basis and lot relief</h2>
+<p>When you sell part of a position bought in several lots you must choose which lots are relieved. Methods: <b>FIFO</b>, <b>LIFO</b>, <b>HIFO</b> (highest cost first), <b>average cost</b>, or <b>specific lot</b>. The method set in the fund's policy drives realized P&amp;L and tax character. Always confirm the method before debugging a "wrong" gain.</p>
+
+<h2>Foreign currency</h2>
+<p>A fund has a <b>base (functional) currency</b>. Positions are held in local currency and translated at the daily FX rate. For investment funds, FX effects on holdings are often reported as part of the net realized/unrealized gain on investments; separating "market" from "currency" gain is a reporting choice (ASC 946 allows combining).</p>
+
+<h2>Try it</h2>
+<p>The <a href="../tools.html#je">journal entry trainer</a> gives you buy, sell, accrual and fee scenarios and checks your debits and credits.</p>
+<div class="callout verify"><b>Settlement cycle note</b> T+1 applies to most US/Canada securities since 28 May 2024; many other markets (and some instruments like FX or bonds) still differ. Check each market's convention, don't assume.</div>
+
+</main>
+<script src="../assets/modules.js"></script>
+<script src="../assets/quizzes.js"></script>
+<script src="../assets/app.js"></script>
+</body></html>

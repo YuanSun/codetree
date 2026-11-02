@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pricing &amp; Fair Value · Fund Accounting Academy</title>
+<link rel="stylesheet" href="../assets/style.css"></head>
+<body data-root="../" data-module="05" data-page="module">
+<main>
+<div class="crumb"></div>
+<h1>Pricing &amp; Fair Value</h1>
+<p class="lead">Price is the largest single driver of NAV. A senior accountant doesn't just load prices, they can defend them.</p>
+
+<h2>Where prices come from</h2>
+<ul>
+<li><b>Vendors</b> (Bloomberg, ICE, Refinitiv, Markit, etc.): exchange closes and evaluated prices for OTC instruments.</li>
+<li><b>Brokers / dealers</b>: quotes for illiquid bonds, loans, derivatives.</li>
+<li><b>Manager marks</b>: for hard-to-value assets, subject to the fund's valuation policy and administrator challenge.</li>
+<li><b>Models</b>: DCF, comparables, option models. Inputs must be observable where possible.</li>
+</ul>
+<p>The <b>valuation policy</b> defines primary and backup sources, cut-off time (e.g. 4 p.m. NY), which side of the market to use (bid for longs, ask for shorts, or mid), and who can override.</p>
+
+<h2>The fair value hierarchy (ASC 820 / IFRS 13)</h2>
+<table>
+<tr><th>Level</th><th>Inputs</th><th>Examples</th></tr>
+<tr><td><b>Level 1</b></td><td>Quoted prices in active markets for identical assets</td><td>Listed equities, open-ended mutual funds with daily NAV, exchange-traded futures</td></tr>
+<tr><td><b>Level 2</b></td><td>Observable inputs other than Level 1 quotes</td><td>Corporate bonds priced by evaluated vendor, OTC FX forwards, swaps with observable curves</td></tr>
+<tr><td><b>Level 3</b></td><td>Unobservable inputs; significant judgement</td><td>Private equity stakes, distressed loans, illiquid structured credit</td></tr>
+</table>
+<p>The level is determined by the <i>lowest</i> significant input. Level 3 positions need a rollforward and disclosure of unobservable inputs in the financial statements.</p>
+<div class="callout"><b>NAV-as-practical-expedient.</b> Investments in other funds can be valued at the investee's reported NAV per share and disclosed separately from the hierarchy when the practical expedient is used (ASC 820-10-35-59).</div>
+
+<h2>Price challenge process</h2>
+<ol>
+<li>Exception report: no price, stale price (unchanged for N days), large move vs prior day, move vs peers.</li>
+<li>Compare against a second source. Investigate corporate actions, currency, quote basis (clean/dirty, % of par vs absolute).</li>
+<li>Escalate to the manager with evidence, not opinion: "Vendor A 98.5, Vendor B 98.4, your mark 101.0 — please support."</li>
+<li>Where the manager insists, document the override, approver, rationale, and take it to the pricing/valuation committee if the policy requires.</li>
+</ol>
+
+<h2>Frequent pricing traps</h2>
+<ul>
+<li><b>Quote units</b>: UK equities in pence (GBp) vs pounds; bonds quoted as % of par; futures with tick values.</li>
+<li><b>Stale prices</b> on holidays; thinly traded names; delisted or suspended securities (price may be zero or last).</li>
+<li><b>FX timing</b>: FX rate cut (e.g. WM/Reuters 4pm London) must match policy.</li>
+<li><b>Bid/ask vs last</b>: consistent application matters more than which is "right".</li>
+<li><b>Same security, two identifiers</b> (CUSIP/ISIN/SEDOL/FIGI) → duplicate or missing prices.</li>
+</ul>
+
+<h2>Pricing committee &amp; independence</h2>
+<p>The administrator's value is independent verification. If the manager both provides and approves marks for Level 3 assets, make sure the administrator receives evidence (valuation reports, third-party appraisals) and records the review. For difficult cases, auditors will ask for this trail.</p>
+
+</main>
+<script src="../assets/modules.js"></script>
+<script src="../assets/quizzes.js"></script>
+<script src="../assets/app.js"></script>
+</body></html>

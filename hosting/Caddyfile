@@ -1,0 +1,49 @@
+# One gateway for every personal web project. Run with:  ./run.sh
+# Each project gets its own hostname:  <name>.$DOMAIN  (the portal lives at $DOMAIN itself).
+# TLS is NOT handled here: Cloudflare Tunnel / Tailscale terminate it, so Caddy speaks plain HTTP.
+{
+	auto_https off
+	admin off
+}
+
+(site_defaults) {
+	encode zstd gzip
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy same-origin
+		-Server
+	}
+}
+
+# Portal: landing page linking to everything
+http://{$DOMAIN:localhost}:{$GATEWAY_PORT:8080} {
+	import site_defaults
+	root * {$HOSTING_DIR}/portal
+	file_server
+}
+
+# MathCompetition (Python server on loopback; it only listens on 127.0.0.1)
+http://math.{$DOMAIN:localhost}:{$GATEWAY_PORT:8080} {
+	import site_defaults
+	reverse_proxy 127.0.0.1:{$MATH_PORT:12998}
+}
+
+# Fund Accounting Academy (pure static files)
+http://fund.{$DOMAIN:localhost}:{$GATEWAY_PORT:8080} {
+	import site_defaults
+	root * {$FUND_DIR}
+	file_server {
+		hide server.py tests README.md
+	}
+}
+
+# Family Obsidian notes (static site built by build-notes.sh). Private: password-protected here,
+# and you should also put Cloudflare Access / Tailscale in front of it.
+http://notes.{$DOMAIN:localhost}:{$GATEWAY_PORT:8080} {
+	import site_defaults
+	basic_auth {
+		{$NOTES_USER} {$NOTES_HASH}
+	}
+	root * {$HOSTING_DIR}/sites/notes
+	file_server
+}

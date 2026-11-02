@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Home Hub</title>
+<style>
+:root{--bg:#f7f8fa;--surface:#fff;--text:#1c2430;--muted:#5d6b7e;--line:#dde3ea;--accent:#1f5fbf}
+@media (prefers-color-scheme:dark){:root{--bg:#12161c;--surface:#1a2029;--text:#e6ebf2;--muted:#9aa8bb;--line:#2b3441;--accent:#6ea4f4}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,sans-serif}
+main{max-width:860px;margin:0 auto;padding:40px 16px}h1{margin:0 0 4px}p.sub{color:var(--muted);margin:0 0 24px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+a.card{display:block;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+a.card:hover{border-color:var(--accent)}a.card h2{margin:0 0 4px;font-size:1.1rem;color:var(--accent)}a.card p{margin:0;color:var(--muted);font-size:14px}
+</style></head><body><main>
+<h1>Home Hub</h1><p class="sub">Everything hosted on this machine, in one place.</p>
+<div class="grid">
+<a class="card" data-sub="fund" href="#"><h2>Fund Accounting Academy</h2><p>Training for fund accountants, with an Advent Geneva track.</p></a>
+<a class="card" data-sub="math" href="#"><h2>Math Contest Lab</h2><p>Interactive weekly math-contest prep.</p></a>
+<a class="card" data-sub="notes" href="#"><h2>Family Notes</h2><p>The family Obsidian vault (login required).</p></a>
+</div></main>
+<script>
+// Links are built from the current host: example.com -> fund.example.com, localhost:8080 -> fund.localhost:8080
+document.querySelectorAll("a[data-sub]").forEach(a => { a.href = location.protocol + "//" + a.dataset.sub + "." + location.host + "/"; });
+</script></body></html>

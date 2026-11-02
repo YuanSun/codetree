@@ -74,6 +74,30 @@ engine with hint ladders, "trap" explanations for wrong answers, stars, XP and s
 See [MathCompetition/README.md](MathCompetition/README.md) for how to run it and add a week, and
 [MathCompetition/CLAUDE.md](MathCompetition/CLAUDE.md) for the authoring playbook used to convert each week's PDFs.
 
+### Fund Accounting Academy
+
+A self-paced training website for fund accountants: 13 modules from fund structures and NAV mechanics to investor accounting,
+fees/waterfalls and audit, a dedicated **Advent Geneva** track (mental model, daily/month-end workflow, reports and
+troubleshooting), calculators (accrued interest, performance fee with HWM/hurdle, waterfall, IRR/TVPI, journal-entry trainer),
+a glossary, and a quiz per module.
+
+- **Location**: `fund-accounting-academy/`
+- **Status**: All 13 modules, tools and quizzes written; calculator logic unit-tested; pages checked in a browser
+- **Tech Stack**: Static HTML/CSS/vanilla JS, no build step (optional Python static server)
+
+See [fund-accounting-academy/README.md](fund-accounting-academy/README.md) for more details.
+
+### Hosting Gateway
+
+One Caddy gateway that serves several projects from one machine and one domain on subdomains (`fund.`, `math.`, `notes.`),
+plus a portal page. Includes a Quartz-based publisher for the family Obsidian vault (password-protected) and a launchd job.
+
+- **Location**: `hosting/`
+- **Status**: Config and scripts written; not yet run end to end (Caddy not installed when written)
+- **Tech Stack**: Caddy, Quartz, bash
+
+See [hosting/README.md](hosting/README.md) for setup and the options for reaching it from outside your home network.
+
 ## Structure
 
 Each subdirectory contains a self-contained project with its own documentation and dependencies.

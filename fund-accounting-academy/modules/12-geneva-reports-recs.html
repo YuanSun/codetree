@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Geneva: Reports, Recs &amp; Troubleshooting · Fund Accounting Academy</title>
+<link rel="stylesheet" href="../assets/style.css"></head>
+<body data-root="../" data-module="12" data-page="module">
+<main>
+<div class="crumb"></div>
+<h1>Geneva: Reports, Recs &amp; Troubleshooting</h1>
+<p class="lead">Geneva is only as useful as your ability to ask it the right question. This module is a reference: which report answers which accounting question, and how to diagnose a break.</p>
+
+<div class="callout verify"><b>Report names vary.</b> The categories below are the standard ones in portfolio accounting systems and exist in Geneva in some form (standard, Report Writer-based, or custom). Look up the actual names in your own report library.</div>
+
+<h2>Question → report type</h2>
+<table>
+<tr><th>You want to know…</th><th>Report type</th><th>Check</th></tr>
+<tr><td>What do we hold and what is it worth?</td><td>Portfolio appraisal / holdings report</td><td>Quantity vs broker, price vs source, FX, % of NAV</td></tr>
+<tr><td>Does the ledger balance and what's the NAV?</td><td>Trial balance, statement of net assets</td><td>Debits = credits; NAV ties to investor capital</td></tr>
+<tr><td>What drove performance?</td><td>Realized/unrealized gain-loss, P&amp;L by position/strategy</td><td>Largest contributors; price vs FX effect</td></tr>
+<tr><td>What happened to cash?</td><td>Cash activity / cash balances by currency</td><td>Ties to bank and broker statements</td></tr>
+<tr><td>How did the position move between two dates?</td><td>Position / lot rollforward (opening + buys − sells ± CA = closing)</td><td>Each movement traces to a transaction</td></tr>
+<tr><td>What are the journal entries behind a number?</td><td>Journal / ledger detail</td><td>Account mapping correct</td></tr>
+<tr><td>What did we accrue?</td><td>Accrual / income report, expense accruals</td><td>Rate × balance × days</td></tr>
+<tr><td>Who owns what?</td><td>Investor capital rollforward / allocation report</td><td>Sum = NAV; fees right</td></tr>
+<tr><td>What changed since last release?</td><td>Same report at two knowledge dates; transaction audit report</td><td>Every change has a reason</td></tr>
+</table>
+
+<h2>Report parameters that bite</h2>
+<ul>
+<li><b>Period start/end (effective date)</b> and <b>knowledge date</b>.</li>
+<li><b>Portfolio vs group</b>: is the report consolidating?</li>
+<li><b>Basis</b> (e.g. book vs tax) and <b>currency</b> (local vs base).</li>
+<li><b>Trade-date vs settle-date view</b>: critical for broker reconciliations.</li>
+<li><b>Include/exclude</b> pending or unsettled items, closed positions, zero balances.</li>
+</ul>
+
+<h2>Reconciling Geneva to the outside world</h2>
+<h3>Positions</h3>
+<ol>
+<li>Run the Geneva holdings on the <b>same date and basis</b> (settle-date for custodian comparison; trade-date for broker trade positions).</li>
+<li>Match by identifier (CUSIP/ISIN/SEDOL/FIGI) and account; mismatched identifiers create false breaks.</li>
+<li>Explain remaining differences: unbooked trade, unprocessed corporate action, free-of-payment transfers, short vs long sign.</li>
+</ol>
+<h3>Cash</h3>
+<ol>
+<li>Compare by currency and account on value date.</li>
+<li>Look for: missing fees and interest, FX settlement legs, margin movements, dividends and withholding differences.</li>
+</ol>
+<h3>Ledger vs administrator or manager books</h3>
+<p>Compare trial balances. Differences usually trace to classification (realized vs unrealized), accrual timing, or different treatment of fees.</p>
+
+<h2>Troubleshooting playbook</h2>
+<table>
+<tr><th>Symptom</th><th>First checks</th></tr>
+<tr><td>NAV moved far more than the market</td><td>P&amp;L by position, top 10 movers: stale or wrong prices; missing corporate action (splits!); wrong FX; duplicate trade</td></tr>
+<tr><td>Position quantity differs from broker</td><td>Trade vs settle-date view; unbooked trade/CA; transfers; short/long sign; identifier mismatch</td></tr>
+<tr><td>Realized P&amp;L looks wrong on a sale</td><td>Lot relief method; which lots were relieved; cost basis after corporate actions; FX in cost</td></tr>
+<tr><td>Cash negative</td><td>Unbooked inflow (subscription, sale settlement), FX trade leg, wrong value date</td></tr>
+<tr><td>Accrued interest differs from broker</td><td>Day-count convention; coupon schedule; settlement vs trade date; purchased-accrued treatment</td></tr>
+<tr><td>Capital accounts don't sum to NAV</td><td>Allocation run on older data; late transaction after allocation; fees not allocated; rounding on many investors</td></tr>
+<tr><td>Report differs from what was sent</td><td>Knowledge date used; period; basis; was the period reopened?</td></tr>
+<tr><td>Import fails or loads fewer rows</td><td>File format change; unknown identifier; missing required field; duplicate detection</td></tr>
+<tr><td>Journal entry posted to unexpected account</td><td>Transaction type/rule mapping; security master asset class; custom field</td></tr>
+</table>
+<div class="callout tip"><b>Method.</b> Bisect. Is the difference in quantity, price, FX, or accrual? Which date does it first appear? Which transaction's knowledge date is after your last release? Narrowing the where-and-when almost always names the cause.</div>
+
+<h2>Report Writer and custom reporting</h2>
+<p>Geneva includes a report-writing capability to build or modify layouts, plus data export for analysis in Excel/BI. Senior habits:</p>
+<ul>
+<li>Never overwrite a production report; copy, change, test against a known period, then promote under change control.</li>
+<li>Document the logic of every custom column (what's the source, what's excluded).</li>
+<li>Build a few validation reports whose only job is to catch breaks (e.g., positions with no price, flows not allocated, unbalanced investor capital).</li>
+</ul>
+
+<h2>Find it in your Geneva</h2>
+<ol>
+<li>List the 10 reports you use most, and map each to the question table above.</li>
+<li>Find the report for a lot-level rollforward and trace one sale from purchase lot to realized P&amp;L.</li>
+<li>Reproduce last month-end's NAV report exactly. Which parameters did you need?</li>
+<li>Build the first draft of your own "break triage" decision tree based on the playbook table.</li>
+</ol>
+
+</main>
+<script src="../assets/modules.js"></script>
+<script src="../assets/quizzes.js"></script>
+<script src="../assets/app.js"></script>
+</body></html>

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Geneva: The Mental Model · Fund Accounting Academy</title>
+<link rel="stylesheet" href="../assets/style.css"></head>
+<body data-root="../" data-module="10" data-page="module">
+<main>
+<div class="crumb"></div>
+<h1>Geneva: The Mental Model</h1>
+<p class="lead">Advent Geneva (now part of SS&amp;C) is a multi-currency, multi-asset portfolio accounting system widely used by hedge fund administrators and managers. You already know the accounting; this module maps it onto how Geneva thinks.</p>
+
+<div class="callout verify"><b>Read this first.</b> Geneva is heavily configured per firm: menu names, custom fields, transaction type lists, report layouts and workflows differ between installations and versions. Treat this course as the <i>concepts and vocabulary</i> and verify the exact screens and report names with your Geneva administrator or your firm's own procedure manuals. Each module ends with "Find it in your Geneva" prompts to do exactly that.</div>
+
+<h2>The big picture</h2>
+<div class="flow">
+<div><b>Inputs</b>Trades, cash, corporate actions, prices, FX, investor dealing</div>
+<div><b>Geneva engine</b>Transactions → lots/positions → ledger (journal entries)</div>
+<div><b>Outputs</b>Appraisal, trial balance, P&amp;L, investor allocations, statements</div>
+<div><b>Controls</b>Recon vs brokers/bank, period lock, audit trail</div>
+</div>
+<p>The pivotal idea is that <b>transactions are the source of truth</b>. Positions, lots, P&amp;L and journal entries are <i>derived</i> from the transaction history plus prices and FX. You don't "edit a position"; you fix or add the transactions that produced it.</p>
+
+<h2>Core objects</h2>
+<table>
+<tr><th>Geneva concept</th><th>Plain-English meaning</th><th>Accounting link</th></tr>
+<tr><td><b>Portfolio</b></td><td>A set of books for one entity (a fund, a master, a feeder, an account). Holds its own positions, cash and ledger.</td><td>The "entity" that has a NAV (Module 03)</td></tr>
+<tr><td><b>Portfolio group / consolidation</b></td><td>Combines portfolios for reporting (e.g. master + feeders).</td><td>Master–feeder structure (Module 01)</td></tr>
+<tr><td><b>Fund / investor allocation</b></td><td>Handles partner or shareholder capital accounts, subs/reds, fee allocation. Often a separate module/set-up.</td><td>Investor accounting (Module 06)</td></tr>
+<tr><td><b>Security master</b></td><td>Instrument definitions: identifiers, currency, asset type, coupon, maturity, multiplier, day count.</td><td>Instruments (Module 04)</td></tr>
+<tr><td><b>Transaction</b></td><td>An event: buy, sell, short, cover, dividend, interest, expense, journal, transfer, cash in/out, FX etc.</td><td>Every journal entry begins here</td></tr>
+<tr><td><b>Lot (tax lot)</b></td><td>A specific purchase with cost, quantity and date. Sales relieve lots using the configured method.</td><td>FIFO/LIFO/HIFO/average (Module 02)</td></tr>
+<tr><td><b>Price &amp; FX tables</b></td><td>Daily prices by security and rates by currency, loaded with sources.</td><td>Pricing (Module 05)</td></tr>
+<tr><td><b>Ledger / chart of accounts</b></td><td>Accounts that transactions post to via rules, giving trial balance and statements.</td><td>Double entry (Module 02)</td></tr>
+<tr><td><b>Accounting period</b></td><td>Month/quarter/year that can be opened and closed (locked).</td><td>Month-end close (Module 03)</td></tr>
+</table>
+
+<h2>Two clocks: effective date and knowledge date</h2>
+<p>Geneva is <b>bitemporal</b>. Every transaction has:</p>
+<ul>
+<li><b>Effective date</b>: when it economically happened (trade date, ex-date, etc.). Determines which accounting period it belongs to.</li>
+<li><b>Knowledge date</b>: when the system <i>knew</i> about it (when it was entered or changed).</li>
+</ul>
+<p>This lets you ask two different questions:</p>
+<table>
+<tr><th>Question</th><th>Settings</th></tr>
+<tr><td>"What were our positions at 31 March, as best we know <i>now</i>?"</td><td>Period end = 31 Mar; knowledge date = today (latest)</td></tr>
+<tr><td>"What did the NAV report <i>show</i> when we released it on 3 April?"</td><td>Period end = 31 Mar; knowledge date = 3 Apr (end of day)</td></tr>
+<tr><td>"What changed between the estimate and the final?"</td><td>Run the same report at two knowledge dates and compare</td></tr>
+</table>
+<div class="callout geneva"><b>Why seniors love this.</b> It makes back-dated corrections auditable. You can prove what was known when, reproduce a released report exactly, and quantify a NAV error by diffing two knowledge dates. If a report "doesn't match what we sent", your first check is the knowledge date.</div>
+
+<h2>How a trade flows through Geneva (conceptual)</h2>
+<ol>
+<li>Trade transaction recorded with trade date (effective date), settle date, quantity, price, commission, broker, fund allocation.</li>
+<li>On the trade date Geneva creates/updates a lot and records a payable (settlement liability) per ledger rules.</li>
+<li>Daily pricing updates market value and unrealized P&amp;L; accrual routines book interest, dividends, financing.</li>
+<li>On settlement the cash side posts and the payable clears.</li>
+<li>On sale, lots are relieved by method, realized P&amp;L is computed and unrealized is reversed.</li>
+<li>Ledger entries aggregate to the trial balance which supports the NAV and financial statements.</li>
+</ol>
+
+<h2>Multi-currency and multi-basis</h2>
+<p>Geneva keeps local-currency and base-currency amounts and applies FX at the effective date. Positions, cost and P&amp;L can be split into <b>price effect</b> and <b>FX effect</b>. Many installations also run more than one <i>accounting basis</i> (e.g. book vs tax) side by side; know which basis a report is run on.</p>
+
+<h2>Audit trail and permissions</h2>
+<p>Changes to transactions, prices, rules and users are logged. Role-based access separates people who enter, approve and close. Use the audit trail to answer "who changed this and when?" before making any correction.</p>
+
+<h2>Find it in your Geneva</h2>
+<ol>
+<li>Which portfolios and portfolio groups exist for the funds you work on? Draw them.</li>
+<li>Open one trade and find: effective date, settle date, lot, ledger entries generated.</li>
+<li>Run the same report with today's knowledge date and with last month-end's release date. What differs and why?</li>
+<li>Find where lot-relief method is configured, and what it is for your funds.</li>
+<li>Locate the chart of accounts and match three accounts to the categories in Module 02.</li>
+</ol>
+
+</main>
+<script src="../assets/modules.js"></script>
+<script src="../assets/quizzes.js"></script>
+<script src="../assets/app.js"></script>
+</body></html>
