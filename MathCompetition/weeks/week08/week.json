@@ -1,0 +1,38 @@
+{
+  "number": 8,
+  "title": "Rates, Ratio, Percent & Mean",
+  "tagline": "Four word-problem skills that show up on every CJMC and Gauss contest. One habit: turn it into ONE number.",
+  "level": "G6–G7 · Contest Prep",
+  "emoji": "🚀",
+  "skills": ["Rates", "Ratio", "Percent", "Mean"],
+  "credit": "Based on The Learning Lab · Week 8 slides & homework (Instructor: Sam Cai, MSc). Contest questions © CEMC, University of Waterloo — used here for personal study.",
+  "pages": [
+    {
+      "slug": "lesson",
+      "type": "html",
+      "file": "lesson.html",
+      "title": "The Quest",
+      "emoji": "🗺️",
+      "desc": "Play with each idea first — drag, tap, predict — then crack the real contest questions from class.",
+      "tasks": 17
+    },
+    {
+      "slug": "practice",
+      "type": "quiz",
+      "file": "exercises.json",
+      "scripts": ["figures.js"],
+      "title": "Exercise Bank",
+      "emoji": "🏋️",
+      "desc": "14 real contest questions, easiest first in each skill. Hints, trap-spotting and 3 optional boss levels."
+    },
+    {
+      "slug": "homework",
+      "type": "quiz",
+      "file": "homework.json",
+      "scripts": ["figures.js"],
+      "title": "Homework Week 8",
+      "emoji": "📝",
+      "desc": "6 questions + 1 optional challenge. Do them on paper first, then check here."
+    }
+  ]
+}

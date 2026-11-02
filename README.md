@@ -60,6 +60,20 @@ See [story-forge/README.md](story-forge/README.md) for more details. Projects li
 plain YAML/Markdown under `story-forge/projects/<slug>/`, so they're human-readable
 and git-diffable.
 
+### Math Contest Lab (MathCompetition)
+
+Weekly math-contest prep (CJMC / Gauss level) turned into interactive, kid-friendly web pages: hands-on labs (sliders,
+simulators, predict-then-check games), guided worked examples where the child answers every step, and a practice/homework
+engine with hint ladders, "trap" explanations for wrong answers, stars, XP and skill badges. Each week is a folder under
+`weeks/` and is auto-discovered by the server, so adding next week's material is just adding a folder.
+
+- **Location**: `MathCompetition/`
+- **Status**: Week 8 (Rates, Ratio, Percent & Mean) complete — 14 labs, 14 exercise-bank + 3 boss questions, 6 homework + 1 optional; tested in headless Chromium
+- **Tech Stack**: Python 3 standard library (no dependencies), vanilla HTML/CSS/JS
+
+See [MathCompetition/README.md](MathCompetition/README.md) for how to run it and add a week, and
+[MathCompetition/CLAUDE.md](MathCompetition/CLAUDE.md) for the authoring playbook used to convert each week's PDFs.
+
 ## Structure
 
 Each subdirectory contains a self-contained project with its own documentation and dependencies.

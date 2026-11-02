@@ -1,0 +1,4 @@
+# Original class PDFs: copyrighted, large, and not needed to run the site.
+weeks/*/source/
+__pycache__/
+*.pyc
