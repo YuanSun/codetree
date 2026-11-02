@@ -1,31 +1,31 @@
 # Hosting everything in one place
 
-One small gateway ([Caddy](https://caddyserver.com)) serves all the personal web projects from a single machine and a single
-domain, each on its own subdomain:
+One small gateway ([Caddy](https://caddyserver.com)) serves all the personal web projects from one machine, on one
+address and one port. Reach it by whatever name the machine has (`mac-studio.local`, an IP, a Tailscale name):
 
 | URL | What | How it's served |
 |---|---|---|
-| `DOMAIN` | Portal page linking to everything | static (`portal/`) |
-| `fund.DOMAIN` | [Fund Accounting Academy](../fund-accounting-academy) | static files |
-| `math.DOMAIN` | [MathCompetition](../MathCompetition) | reverse proxy to its Python server on `127.0.0.1:12998` |
-| `notes.DOMAIN` | Family Obsidian vault | static site built by [Quartz](https://quartz.jzhao.xyz); **password-protected** |
+| `http://<machine>:12999/` | Portal page linking to everything | static (`portal/`) |
+| `/fund/` | [Fund Accounting Academy](../fund-accounting-academy) | static files |
+| `/math/` | [MathCompetition](../MathCompetition) | reverse proxy to its Python server on `127.0.0.1:12998`, started with `--base-path /math` |
+| `/notes/` | Family Obsidian vault | static site built by [Quartz](https://quartz.jzhao.xyz); **password-protected** |
 
-Why subdomains and not `DOMAIN/math/`? MathCompetition emits absolute links (`/static/...`, `/week/...`), so it can't live under a path prefix without code changes.
+Because everything is a path on one host, there is no DNS or hosts-file setup on the devices that connect.
+Adding another project later = one more `handle_path` block in `Caddyfile` (static folder or `reverse_proxy`
+to a local port; a dynamic app needs to be able to run under a path prefix, like MathCompetition's `--base-path`).
 
-Adding another project later = one more block in `Caddyfile` (static folder or `reverse_proxy` to a local port).
-
-## 1. Try it locally
+## 1. Run it
 
 ```bash
 brew install caddy
 cd hosting
-cp env.example .env              # DOMAIN=localhost is fine for now
+cp env.example .env
 caddy hash-password              # paste the output into NOTES_HASH in .env
 ./run.sh
 ```
 
-Open `http://localhost:12999` (portal), `http://fund.localhost:12999`, `http://math.localhost:12999`.
-(`*.localhost` resolves to your own machine in Chrome, Firefox and recent Safari.)
+Open `http://localhost:12999/` on the same machine, or `http://mac-studio.local:12999/` (use your machine's name) from
+another device on your network. macOS may ask whether Caddy may accept incoming connections: allow it.
 
 ## 2. Publish the family notes
 
@@ -34,24 +34,26 @@ Open `http://localhost:12999` (portal), `http://fund.localhost:12999`, `http://m
 ./build-notes.sh
 ```
 
-Re-run it when notes change (cron/launchd can do it nightly). Only the vault folder you point it at is published; keep private
-notes outside it. Quartz can skip files marked `draft: true` in their frontmatter.
+The first run downloads Quartz (the tool that turns a vault into a website) into `hosting/.quartz`; later runs reuse it.
+Re-run it when notes change. Only the vault folder you point it at is published; keep private notes outside it.
+Quartz is served under `/notes/`; if its links or search misbehave there, set `baseUrl` in `.quartz/quartz.config.ts`
+to `<your-host>/notes`.
 
-## 3. Reach it from your phone / family devices
+## 3. Reaching it from outside your home network
 
-Pick one:
+The gateway speaks plain HTTP, so browsers show "not secure" and anything typed (like the notes password) is unencrypted.
+That is acceptable for the academy and math lab on your home Wi-Fi, but not for the notes or for the internet.
 
 | Option | Good for | Setup |
 |---|---|---|
-| **Cloudflare Tunnel + Access** (recommended) | Family and friends anywhere, with email-code login | Needs a domain (~$10/yr) on Cloudflare. Create a tunnel, route `*.yourdomain` and `yourdomain` to `http://localhost:12999`, set `DOMAIN=yourdomain` in `.env`, then add a Cloudflare Access policy listing family emails. No ports opened on your router. |
-| **Home Wi-Fi only** | Just the household | Run `./run.sh` on an always-on Mac, then add `192.168.x.x  fund.home math.home notes.home` style entries on devices (or run a local DNS such as your router's). Set `DOMAIN=home`. |
-| **Small VPS** | Machine that never sleeps, no home network exposure | Same files on a $5/mo VPS; use Caddy's automatic HTTPS (remove `auto_https off` and the `http://` prefixes). |
+| **Home Wi-Fi only** | Just the household | Nothing extra. Give the host a fixed IP in your router so the address stays stable. |
+| **Cloudflare Tunnel + Access** (recommended for outside access) | Family anywhere, real HTTPS, email-code login | Needs a domain (~$10/yr) on Cloudflare. Create a tunnel routing your hostname to `http://localhost:12999`, then add an Access policy listing family emails. No router ports opened. |
+| **Tailscale** | Your own devices anywhere, encrypted | Install on both machines; use the host's Tailscale name. `tailscale serve` can add HTTPS. |
+| **Small VPS** | Machine that never sleeps | Same files; use Caddy's automatic HTTPS (remove `auto_https off` and the `http://` prefix). |
 
-Things to know:
-
-- The host machine must stay awake and online. A laptop that sleeps takes everything offline; a Mac mini or Raspberry Pi is ideal. On macOS, `caffeinate -s ./run.sh` keeps it awake.
-- The family notes are private data. Don't expose them without authentication; the Caddy `basic_auth` is a second layer, so also use Access/VPN.
-- MathCompetition stores progress in each browser's `localStorage`, so progress is per device and per hostname. Moving to a new domain starts fresh.
+- The host machine must stay awake and online (`caffeinate -s ./run.sh` helps on macOS; a Mac mini or Raspberry Pi is ideal).
+- MathCompetition and the academy store progress in each browser's `localStorage`, which is per device and per address, so
+  changing the address you use starts progress afresh.
 
 ## 4. Start on login (macOS)
 
@@ -67,7 +69,7 @@ launchctl load ~/Library/LaunchAgents/com.codetree.gateway.plist
 ```
 hosting/
 ├── Caddyfile                       # routing for all sites
-├── load-env.sh                     # reads .env literally
+├── load-env.sh                     # reads .env literally (safe for "$" in hashes)
 ├── run.sh                          # starts MathCompetition + Caddy
 ├── build-notes.sh                  # vault -> static site (Quartz)
 ├── env.example                     # copy to .env

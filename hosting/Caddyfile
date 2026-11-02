@@ -1,5 +1,8 @@
 # One gateway for every personal web project. Run with:  ./run.sh
-# Each project gets its own hostname:  <name>.$DOMAIN  (the portal lives at $DOMAIN itself).
+# Everything lives under ONE address, whatever name you reach this machine by
+# (mac-studio.local, an IP, a Tailscale name, ...):
+#     /        portal        /fund/   Fund Accounting Academy
+#     /math/   MathCompetition        /notes/  family notes (password)
 # TLS is NOT handled here: Cloudflare Tunnel / Tailscale terminate it, so Caddy speaks plain HTTP.
 {
 	auto_https off
@@ -15,35 +18,39 @@
 	}
 }
 
-# Portal: landing page linking to everything
-http://{$DOMAIN:localhost}:{$GATEWAY_PORT:12999} {
+http://:{$GATEWAY_PORT:12999} {
 	import site_defaults
-	root * {$HOSTING_DIR}/portal
-	file_server
-}
 
-# MathCompetition (Python server on loopback; it only listens on 127.0.0.1)
-http://math.{$DOMAIN:localhost}:{$GATEWAY_PORT:12999} {
-	import site_defaults
-	reverse_proxy 127.0.0.1:{$MATH_PORT:12998}
-}
-
-# Fund Accounting Academy (pure static files)
-http://fund.{$DOMAIN:localhost}:{$GATEWAY_PORT:12999} {
-	import site_defaults
-	root * {$FUND_DIR}
-	file_server {
-		hide server.py tests README.md
+	# Fund Accounting Academy (pure static files, relative links)
+	redir /fund /fund/
+	handle_path /fund/* {
+		root * {$FUND_DIR}
+		file_server {
+			hide server.py tests README.md
+		}
 	}
-}
 
-# Family Obsidian notes (static site built by build-notes.sh). Private: password-protected here,
-# and you should also put Cloudflare Access / Tailscale in front of it.
-http://notes.{$DOMAIN:localhost}:{$GATEWAY_PORT:12999} {
-	import site_defaults
-	basic_auth {
-		{$NOTES_USER} {$NOTES_HASH}
+	# MathCompetition: the prefix is stripped here; the app is started with --base-path /math
+	# so the links it generates point back under /math/.
+	redir /math /math/
+	handle_path /math/* {
+		reverse_proxy 127.0.0.1:{$MATH_PORT:12998}
 	}
-	root * {$HOSTING_DIR}/sites/notes
-	file_server
+
+	# Family Obsidian notes (static site from build-notes.sh). Private: password-protected here;
+	# also put Cloudflare Access / Tailscale in front before exposing it beyond your home network.
+	redir /notes /notes/
+	handle_path /notes/* {
+		basic_auth {
+			{$NOTES_USER} {$NOTES_HASH}
+		}
+		root * {$HOSTING_DIR}/sites/notes
+		file_server
+	}
+
+	# Portal at the root
+	handle {
+		root * {$HOSTING_DIR}/portal
+		file_server
+	}
 }

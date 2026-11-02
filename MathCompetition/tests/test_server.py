@@ -102,3 +102,41 @@ class ContentTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class BasePathTests(unittest.TestCase):
+    """When a gateway mounts the site under /math, every generated link must carry the prefix."""
+
+    @classmethod
+    def setUpClass(cls):
+        server.set_base_path("/math/")
+        cls.httpd = ThreadingHTTPServer(("127.0.0.1", 0), server.Handler)
+        cls.base = f"http://127.0.0.1:{cls.httpd.server_address[1]}"
+        threading.Thread(target=cls.httpd.serve_forever, daemon=True).start()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.httpd.shutdown()
+        server.set_base_path("")
+
+    def get(self, path):
+        class NoRedirect(urllib.request.HTTPRedirectHandler):
+            def redirect_request(self, *a, **k):
+                return None
+
+        try:
+            with urllib.request.build_opener(NoRedirect).open(self.base + path) as r:
+                return r.status, r.read().decode("utf-8", "replace"), r.headers
+        except urllib.error.HTTPError as e:
+            return e.code, e.read().decode("utf-8", "replace"), e.headers
+
+    def test_generated_pages_are_prefixed(self):
+        for path in ("/", "/week/week08/", "/week/week08/practice", "/week/week08/lesson", "/nope"):
+            with self.subTest(path=path):
+                _, body, _ = self.get(path)
+                self.assertNotRegex(body, r'(?:href|src)="/(?!math/|/)', "unprefixed absolute link")
+        self.assertIn('href="/math/static/css/base.css"', self.get("/")[1])
+        self.assertIn('href="/math/week/week08/"', self.get("/")[1])
+
+    def test_redirect_is_prefixed(self):
+        self.assertEqual(self.get("/week/week08")[2]["Location"], "/math/week/week08/")

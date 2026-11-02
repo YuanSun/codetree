@@ -3,6 +3,7 @@
 
     python3 server.py                  # http://127.0.0.1:12998
     python3 server.py --host 0.0.0.0   # also reachable from a tablet on the home network
+    python3 server.py --base-path /math   # when a gateway serves it under /math/ (it strips the prefix)
 
 Weeks are auto-discovered: every folder in ``weeks/`` that contains a ``week.json``
 shows up on the home page. Nothing is cached, so dropping in a new week (or editing
@@ -23,6 +24,7 @@ import argparse
 import html
 import json
 import mimetypes
+import os
 import re
 import sys
 from http import HTTPStatus
@@ -34,6 +36,23 @@ ROOT = Path(__file__).resolve().parent
 WEEKS_DIR = ROOT / "weeks"
 STATIC_DIR = ROOT / "static"
 TEMPLATES_DIR = ROOT / "templates"
+
+# URL prefix when a reverse proxy mounts the site under a path (it must strip the prefix before
+# forwarding). Empty when served at the root. Set with --base-path or MATH_BASE_PATH.
+BASE_PATH = ""
+ABS_LINK_RE = re.compile(r'(\b(?:href|src)=")/(?!/)')
+
+
+def set_base_path(value: str) -> None:
+    global BASE_PATH
+    value = (value or "").strip().strip("/")
+    BASE_PATH = f"/{value}" if value else ""
+
+
+def rebase(text: str) -> str:
+    """Prefix root-relative href/src attributes with BASE_PATH (no-op when served at the root)."""
+    return ABS_LINK_RE.sub(lambda m: f"{m.group(1)}{BASE_PATH}/", text) if BASE_PATH else text
+
 
 ID_RE = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
 # Files a week folder may serve directly. Anything else (e.g. .py) is never exposed.
@@ -231,7 +250,7 @@ class Handler(BaseHTTPRequestHandler):
             self.wfile.write(body)
 
     def _html(self, text: str, status: int = 200) -> None:
-        self._send(status, text.encode("utf-8"), "text/html; charset=utf-8", self.command == "HEAD")
+        self._send(status, rebase(text).encode("utf-8"), "text/html; charset=utf-8", self.command == "HEAD")
 
     def _not_found(self) -> None:
         self._html(
@@ -255,7 +274,10 @@ class Handler(BaseHTTPRequestHandler):
         ctype = mimetypes.guess_type(target.name)[0] or "application/octet-stream"
         if ctype.startswith("text/") or ctype in ("application/javascript", "application/json"):
             ctype += "; charset=utf-8"
-        self._send(200, target.read_bytes(), ctype, self.command == "HEAD")
+        body = target.read_bytes()
+        if BASE_PATH and ctype.startswith("text/html"):
+            body = rebase(body.decode("utf-8")).encode("utf-8")
+        self._send(200, body, ctype, self.command == "HEAD")
 
     # -- routing
     def do_HEAD(self) -> None:  # noqa: N802
@@ -280,7 +302,7 @@ class Handler(BaseHTTPRequestHandler):
             if len(parts) == 2:
                 if not path.endswith("/"):  # keep relative links working
                     self.send_response(301)
-                    self.send_header("Location", f"/week/{week['id']}/")
+                    self.send_header("Location", f"{BASE_PATH}/week/{week['id']}/")
                     self.end_headers()
                     return
                 return self._html(hub_page(week))
@@ -302,7 +324,10 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--host", default="127.0.0.1", help="use 0.0.0.0 to open it to other devices on your network")
     ap.add_argument("--port", type=int, default=12998)
+    ap.add_argument("--base-path", default=os.environ.get("MATH_BASE_PATH", ""),
+                    help="URL prefix when mounted under a path by a gateway, e.g. /math")
     args = ap.parse_args()
+    set_base_path(args.base_path)
     httpd = ThreadingHTTPServer((args.host, args.port), Handler)
     weeks = load_weeks()
     print(f"Math Contest Lab — {len(weeks)} week(s) found")

@@ -89,7 +89,7 @@ See [fund-accounting-academy/README.md](fund-accounting-academy/README.md) for m
 
 ### Hosting Gateway
 
-One Caddy gateway that serves several projects from one machine and one domain on subdomains (`fund.`, `math.`, `notes.`),
+One Caddy gateway that serves several projects from one machine and one address on paths (`/fund/`, `/math/`, `/notes/`),
 plus a portal page. Includes a Quartz-based publisher for the family Obsidian vault (password-protected) and a launchd job.
 
 - **Location**: `hosting/`
