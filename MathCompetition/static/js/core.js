@@ -135,8 +135,9 @@
   };
 
   /* ---------------------------------------------------------------------- nav */
-  let skillList = null;
+  let skillList = null, navPct = 0;
   MC.setSkillBar = (list) => { skillList = list; renderNav(); };
+  MC.setProgress = (pct) => { navPct = pct; const b = $('.nav-progress'); if (b) b.style.width = pct + '%'; };
   function renderNav() {
     const host = $('#mc-nav');
     if (!host) return;
@@ -148,7 +149,8 @@
         d.week ? h('span', { class: 'crumb' }, '› ', h('a', { href: `/week/${d.week}/` }, d.weekTitle || d.week)) : null,
         h('span', { class: 'spacer' }),
         skillList ? h('div', { class: 'skillbar', title: 'Skill badges' }, skillList.map((s) => h('span', { class: s.done ? 'done' : '', style: { '--c': s.color }, title: s.label }, s.emoji))) : null,
-        h('span', { class: 'xp', title: 'Your level' }, `${icon} ${name} · `, h('b', {}, `${state.xp} XP`))));
+        h('span', { class: 'xp', title: 'Your level' }, `${icon} ${name} · `, h('b', {}, `${state.xp} XP`)),
+        h('div', { class: 'nav-progress', style: { width: navPct + '%' } })));
   }
   MC.renderNav = renderNav;
 
@@ -434,9 +436,18 @@
   };
 
   /* ------------------------------------------------------------------- boot */
+  function reveal() {
+    if (!('IntersectionObserver' in window)) return;
+    const items = $$('.rv');
+    if (!items.length) return;
+    document.documentElement.classList.add('reveal-ready');
+    const io = new IntersectionObserver((entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
+    items.forEach((el) => io.observe(el));
+  }
   function boot() {
     renderNav();
     paintMeters();
+    reveal();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();

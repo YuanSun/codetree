@@ -27,11 +27,13 @@ Weeks are discovered automatically on every request — add or edit a week and j
 
 | Page | What it is |
 |---|---|
-| **The Quest** (`lesson`) | 14 hands-on labs, one or more per concept, each followed by a *guided* contest example where the child answers every step (the next step only appears when they get the current one). Skill badges unlock as each level is completed. |
+| **The Quest** (`lesson`) | 18 hands-on labs, one or more per concept, each followed by a *guided* contest example where the child answers every step (the next step only appears when they get the current one). Skill badges unlock as each level is completed. |
 | **Exercise Bank** (`practice`) | The 14 exercise-bank questions + 3 optional "boss levels". Pick a skill, then a question. 3-level hint ladder, per-choice *trap* explanations on wrong answers, stars (3 = first try, no hints), contest-pace timer, full written solution afterwards. |
 | **Homework** (`homework`) | The 6 homework questions + the optional challenge, same engine. |
 
-Week 8 labs: match-the-skill game · printer (find the amount for ONE) · Elizabeth's walk · meet-up/catch-up car simulator with a
+Each skill "world" opens with a concept **explorer** — speed triangle (cover a corner to get the formula) · ratio scaler (make copies, the mix never changes) · 100-square percent grid · balance beam (the mean is the see-saw's balance point; drag the weights and the pivot) — guided by a friendly fox, Nova. Contest questions appear as short kid-language *mission cards*, with the exact contest wording one tap away.
+
+Week 8 labs: flashcard match-the-skill game · printer (find the amount for ONE) · Elizabeth's walk · meet-up/catch-up car simulator with a
 predict-the-time game · share-the-cake ratio bars · change-one-side dressing blocks · multiplier lightning round · price-chain builder ·
 undo machine · does-order-matter · level-it-out cube bars · remove-a-number · cumulative-mean decoder · combine-two-groups tug-of-war · median/mode playground.
 After solving the Betty & Ann boss question there is also an interactive park simulator.
