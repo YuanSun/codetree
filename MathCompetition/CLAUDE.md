@@ -35,6 +35,18 @@ for an **11-year-old**. Goal: the child *understands the concept by interacting*
     "solution": ["step", "step → **(D)**"], "idea": "one-line skill reminder" } ] }
 ```
 
+## Lesson structure (what made Week 8 work after the first version felt like "the PDF in HTML")
+
+- Each skill is a **world**: coloured `.world-banner` → Nova line → big idea → an **explorer** that teaches the *concept* (no contest numbers yet:
+  speed triangle, ratio scaler, 100-square, balance beam) → labs → **mission cards** for the slide questions.
+- A **mission card** (`.mission`) = source tag + one kid-language `.ask` (+ a small emoji `.scene`); the verbatim contest wording lives in a
+  collapsed `<details>`. Never paste the slide text as the main content.
+- Every explorer/lab ends in a short `MC.guided` challenge that registers a task id — that is what gives badges/progress meaning.
+- Keep feedback **inside the viewport**: the first matching game put the answers below the fold and only toasted on mistakes, so it felt dead.
+  One big card + answer buttons directly under it + inline message fixed that.
+- Never re-render a node the user is dragging (slider/pointer drags die if the element is replaced) — update values, don't rebuild.
+- SVG that rotates (balance beam) needs a tall enough `viewBox` for the worst-case tilt; test the extremes with screenshots.
+
 ## Voice & design rules
 
 - Reading level ~Grade 5–6, short sentences, warm, never shaming. A wrong answer is a *clue about the trap*, not a red cross.

@@ -6,14 +6,14 @@
   const WEEK = 'week08', PAGE = 'lesson';
 
   // the static HTML uses [[a/b]] fractions — render them
-  $$('.problem, .callout').forEach((el) => { el.innerHTML = MC.fmt(el.innerHTML); });
+  $$('.problem, .callout, .mission .ask, .mission .orig, .nova .say').forEach((el) => { el.innerHTML = MC.fmt(el.innerHTML); });
 
   /* ------------------------------------------------------------ badges / progress */
   const SKILLS = {
-    rates:   { label: 'Rates',   emoji: '🚗', color: '#3b82f6', tasks: ['rates.printer', 'rates.walk', 'rates.predict', 'rates.meet'] },
-    ratio:   { label: 'Ratio',   emoji: '🍰', color: '#10b981', tasks: ['ratio.cake', 'ratio.dressing'] },
-    percent: { label: 'Percent', emoji: '🏷️', color: '#f59e0b', tasks: ['percent.lightning', 'percent.chain', 'percent.shirt', 'percent.undo', 'percent.order'] },
-    mean:    { label: 'Mean',    emoji: '⚖️', color: '#8b5cf6', tasks: ['mean.level', 'mean.remove', 'mean.cumulative', 'mean.tug', 'mean.stats'] },
+    rates:   { label: 'Rates',   emoji: '🚗', color: '#3b82f6', tasks: ['rates.triangle', 'rates.printer', 'rates.walk', 'rates.predict', 'rates.meet'] },
+    ratio:   { label: 'Ratio',   emoji: '🍰', color: '#10b981', tasks: ['ratio.scaler', 'ratio.cake', 'ratio.dressing'] },
+    percent: { label: 'Percent', emoji: '🏷️', color: '#f59e0b', tasks: ['percent.grid', 'percent.lightning', 'percent.chain', 'percent.shirt', 'percent.undo', 'percent.order'] },
+    mean:    { label: 'Mean',    emoji: '⚖️', color: '#8b5cf6', tasks: ['mean.balance', 'mean.level', 'mean.remove', 'mean.cumulative', 'mean.tug', 'mean.stats'] },
   };
   const isDone = (id) => !!(MC.store.get(WEEK, PAGE, id) || {}).done;
   const BADGE_TEXT = {
@@ -23,6 +23,8 @@
     mean: 'Work with the total. Means are yours!',
   };
   function refreshSkills(announce) {
+    const all = ['intro.match', ...Object.values(SKILLS).flatMap((s) => s.tasks)];
+    MC.setProgress(Math.round((all.filter(isDone).length / all.length) * 100));
     MC.setSkillBar(Object.values(SKILLS).map((s) => ({ label: s.label, emoji: s.emoji, color: s.color, done: s.tasks.every(isDone) })));
     if (!announce) return;
     for (const [k, s] of Object.entries(SKILLS)) {
@@ -44,38 +46,62 @@
   };
 
   /* ======================================================================= intro: match */
+  /** One big flashcard at a time with the four skill buttons right underneath — everything stays in view. */
   function labMatch() {
     const root = $('#lab-match');
     const skills = [
-      { id: 'rates', label: 'Rates', emoji: '🚗', color: 'var(--rates)', one: 'the amount for ONE' },
-      { id: 'ratio', label: 'Ratio', emoji: '🍰', color: 'var(--ratio)', one: 'the number of parts' },
-      { id: 'percent', label: 'Percent', emoji: '🏷️', color: 'var(--percent)', one: 'the multiplier' },
-      { id: 'mean', label: 'Mean', emoji: '⚖️', color: 'var(--mean)', one: 'the total' },
+      { id: 'rates', label: 'Rates', emoji: '🚗', one: 'the amount for ONE', cls: 'sk-rates' },
+      { id: 'ratio', label: 'Ratio', emoji: '🍰', one: 'the number of parts', cls: 'sk-ratio' },
+      { id: 'percent', label: 'Percent', emoji: '🏷️', one: 'the multiplier', cls: 'sk-percent' },
+      { id: 'mean', label: 'Mean', emoji: '⚖️', one: 'the total', cls: 'sk-mean' },
     ];
-    const clues = [['km per hour', 'rates'], ['pages per day', 'rates'], ['3 : 1', 'ratio'], ['scale on a map', 'ratio'], ['20% off', 'percent'], ['15% tax added', 'percent'], ['average of 5 numbers', 'mean'], ['remove a number from a set', 'mean']];
-    let sel = null, placed = 0;
-    const slots = {};
-    const grid = h('div', { class: 'match' }, skills.map((s) => {
-      const el = h('div', { class: 'slot', style: { '--c': s.color } }, h('h4', {}, `${s.emoji} ${s.label}`), h('div', { class: 'one' }, `ONE number → ${s.one}`));
-      el.onclick = () => pick(s.id); slots[s.id] = el; return el;
+    const clues = shuffle([
+      ['km per hour', 'rates', 'it’s an amount per ONE hour'], ['pages per day', 'rates', 'it’s pages for ONE day'],
+      ['3 : 1', 'ratio', 'a ratio counts PARTS'], ['scale on a map', 'ratio', '1 : 600 000 compares two lengths — a ratio'],
+      ['20% off', 'percent', 'it’s × 0.80 — a multiplier'], ['15% tax added', 'percent', 'it’s × 1.15 — a multiplier'],
+      ['average of 5 numbers', 'mean', 'mean = total ÷ count'], ['remove a number from a set', 'mean', 'it changes the total AND the count'],
+    ]);
+    let i = 0, misses = 0, locked = false;
+    const card = h('div', { class: 'mg-card' }), msg = h('div', { class: 'mg-msg' }), count = h('span', { class: 'pill' });
+    const btns = {};
+    const grid = h('div', { class: 'mg-btns' }, skills.map((s) => {
+      const hint = h('small', {}, ' '), got = h('div', { class: 'got' });
+      const b = h('button', { class: `mg-btn ${s.cls}`, type: 'button' }, `${s.emoji} ${s.label}`, hint, got);
+      b.addEventListener('click', () => answer(s));
+      btns[s.id] = { b, hint, got }; return b;
     }));
-    const clueRow = h('div', { class: 'clues' }, shuffle(clues).map(([t, skill]) => {
-      const b = h('button', { class: 'clue' }, t);
-      b.onclick = () => { if (b.classList.contains('placed')) return; $$('.clue.sel', clueRow).forEach((x) => x.classList.remove('sel')); b.classList.add('sel'); sel = { skill, b }; };
-      return b;
-    }));
-    const win = h('div', { class: 'win', style: { display: 'none' } });
-    root.append(clueRow, grid, win);
-    function pick(skill) {
-      if (!sel) { MC.toast('Tap a clue first 👆'); return; }
-      if (sel.skill !== skill) { slots[skill].classList.remove('shake'); void slots[skill].offsetWidth; slots[skill].classList.add('shake'); MC.toast('Hmm, not that one. Is it per-ONE, parts, a multiplier, or a total?'); return; }
-      sel.b.classList.remove('sel'); sel.b.classList.add('placed'); slots[skill].append(sel.b); sel = null;
-      if (++placed === clues.length) {
-        $$('.slot', grid).forEach((s) => s.classList.add('revealed'));
-        win.style.display = ''; win.innerHTML = '🎯 Every problem becomes easy once you turn it into <b>ONE number</b> you can scale.';
-        finish('intro.match');
-      }
+    root.append(h('div', { class: 'mg' }, h('div', { class: 'mg-top' }, h('b', {}, 'Which skill is this clue about?'), count), card, msg, grid));
+
+    function show() {
+      card.className = 'mg-card'; void card.offsetWidth; card.classList.add('deal');
+      card.textContent = clues[i][0]; count.textContent = `Clue ${i + 1} of ${clues.length}`;
+      misses = 0; msg.className = 'mg-msg'; msg.textContent = 'Tap a skill 👇';
+      Object.values(btns).forEach((x) => x.b.classList.remove('glow'));
     }
+    function answer(s) {
+      if (locked) return;
+      const [text, skill, why] = clues[i], r = btns[s.id];
+      if (s.id !== skill) {
+        misses++; r.b.classList.remove('shake'); void r.b.offsetWidth; r.b.classList.add('shake');
+        msg.className = 'mg-msg bad';
+        msg.textContent = misses >= 2 ? `Look at the glowing button 👀 — ${why}.` : `Not ${s.label}. Is it per-ONE, parts, a multiplier, or a total? Try again!`;
+        if (misses >= 2) btns[skill].b.classList.add('glow');
+        return;
+      }
+      locked = true;
+      msg.className = 'mg-msg ok'; msg.textContent = `✅ “${text}” → ${s.label}: ${why}.`;
+      r.hint.textContent = `ONE number → ${s.one}`; r.got.append(h('span', {}, text));
+      r.b.classList.remove('bump'); void r.b.offsetWidth; r.b.classList.add('bump');
+      card.classList.add('fly');
+      setTimeout(() => {
+        locked = false;
+        if (++i < clues.length) { show(); return; }
+        card.className = 'mg-card'; card.textContent = '🎯 All matched!'; count.textContent = 'Done!';
+        msg.className = 'mg-msg ok'; msg.innerHTML = 'Every problem becomes easy once you turn it into <b>ONE number</b> you can scale.';
+        finish('intro.match');
+      }, 750);
+    }
+    show();
   }
 
   /* ========================================================================= rates */
@@ -570,8 +596,214 @@
     });
   }
 
+  /* ===================================================================== concept explorers */
+
+  /** Rates: the distance–speed–time triangle. Cover a corner to see its formula; the covered value is computed live. */
+  function labTriangle() {
+    const root = $('#tri-lab');
+    const COL = { D: '#3b82f6', S: '#10b981', T: '#f59e0b' }, NAME = { D: 'Distance', S: 'Speed', T: 'Time' }, UNIT = { D: 'km', S: 'km/h', T: 'h' };
+    const FORM = { D: 'D = S × T', S: 'S = D ÷ T', T: 'T = D ÷ S' };
+    const RANGE = { D: [10, 200, 10], S: [5, 60, 5], T: [0.5, 8, 0.5] };
+    const v = { D: 60, S: 20, T: 3 }, st = { cover: 'T' };
+    const recompute = () => { if (st.cover === 'D') v.D = v.S * v.T; else if (st.cover === 'S') v.S = v.D / v.T; else v.T = v.D / v.S; };
+    const svgBox = h('div'), formulaEl = h('div', { class: 'formula' }), textEl = h('p'), rowsBox = h('div');
+    const runner = h('div', { class: 'runner' }, '🏃'), track = h('div', { class: 'track' }, runner, h('div', { class: 'flag' }, '🏁'));
+    let raf = 0;
+    const sliders = {};
+    for (const k of ['D', 'S', 'T']) {
+      const [min, max, step] = RANGE[k];
+      sliders[k] = slider(NAME[k], min, max, step, v[k], UNIT[k], (val) => { v[k] = val; recompute(); refresh(); });
+    }
+    root.append(h('div', { class: 'tri' }, svgBox, h('div', {}, formulaEl, textEl, rowsBox, track,
+      h('div', { class: 'row' }, h('button', { class: 'btn small go', onclick: run }, '🏃 Run it!'), h('span', { class: 'muted' }, 'Tap a different corner to cover it.')))));
+
+    function cover(k) {                       // rebuild the triangle + which two sliders show (slider drags never rebuild anything)
+      st.cover = k; recompute();
+      const S = MC.svg, pos = { D: [150, 82], S: [78, 196], T: [222, 196] };
+      const svg = S('svg', { viewBox: '0 0 300 250' });
+      svg.append(S('polygon', { points: '150,8 292,240 8,240', fill: '#fff', stroke: '#1b1f5e', 'stroke-width': 5, 'stroke-linejoin': 'round' }),
+        S('line', { x1: 60, x2: 240, y1: 150, y2: 150, stroke: '#1b1f5e', 'stroke-width': 4 }),
+        S('line', { x1: 150, x2: 150, y1: 160, y2: 232, stroke: '#1b1f5e', 'stroke-width': 4 }),
+        S('text', { x: 150, y: 212, 'text-anchor': 'middle', 'font-size': 30, 'font-weight': 800, fill: '#1b1f5e' }, '×'));
+      for (const c of ['D', 'S', 'T']) {
+        const [x, y] = pos[c], covered = st.cover === c;
+        const g = S('g', { class: 'corner', tabindex: 0, role: 'button', 'aria-label': `Cover ${NAME[c]}` });
+        g.append(S('circle', { cx: x, cy: y, r: 36, fill: covered ? '#ffc83d' : COL[c], stroke: '#fff', 'stroke-width': 4 }),
+          S('text', { x, y: y + 12, 'text-anchor': 'middle', 'font-size': 34, 'font-weight': 800, fill: covered ? '#1b1f5e' : '#fff', 'font-family': 'Fredoka, sans-serif' }, covered ? '?' : c));
+        g.addEventListener('click', () => cover(c));
+        g.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') cover(c); });
+        svg.append(g);
+      }
+      svgBox.replaceChildren(svg);
+      rowsBox.replaceChildren(...['D', 'S', 'T'].filter((c) => c !== k).map((c) => sliders[c].row));
+      refresh();
+    }
+    function refresh() {
+      cancelAnimationFrame(raf); runner.style.left = '0%';
+      const c = st.cover, shown = (k) => `${num(v[k])} ${UNIT[k]}`;
+      formulaEl.innerHTML = FORM[c].replace(c, `<em>${c}</em>`);
+      textEl.innerHTML = `<b>${NAME[c]}</b> = ${c === 'D' ? `${shown('S')} × ${shown('T')}` : c === 'S' ? `${shown('D')} ÷ ${shown('T')}` : `${shown('D')} ÷ ${shown('S')}`} = <b>${shown(c)}</b>`;
+      ['D', 'S', 'T'].filter((k) => k !== c).forEach((k) => { sliders[k].inp.value = v[k]; sliders[k].sync(); });
+    }
+    function run() {
+      cancelAnimationFrame(raf);
+      const dur = MC.clamp(v.T * 650, 1400, 4500), t0 = performance.now();
+      const tick = (now) => { const f = Math.min(1, (now - t0) / dur); runner.style.left = f * 94 + '%'; if (f < 1) raf = requestAnimationFrame(tick); };
+      raf = requestAnimationFrame(tick);
+    }
+    cover('T');
+    guided('#tri-steps', 'rates.triangle', {
+      finale: '🎉 **Cover what you want, do what’s left:** side-by-side letters multiply (S × T); one over the other divides (D ÷ S).',
+      steps: [
+        { type: 'choice', q: 'Tap the **T** corner so it’s covered. Which formula do you get for **time**?', choices: ['T = D ÷ S', 'T = D × S', 'T = S ÷ D'], answer: 0, ok: 'Time = distance ÷ speed. D sits on top of S, so we divide.', wrongMsgs: { 1: 'Cover T: what’s left is D on top, S underneath — one over the other means divide.', 2: 'Careful about which is on top: D is the top corner.' } },
+        { q: 'A cyclist rides **36 km** at **12 km/h**. How many **hours** does it take?', type: 'number', answer: 3, unit: 'h', nudge: 'Cover T → D ÷ S = 36 ÷ 12.', ok: '36 ÷ 12 = 3 hours.' },
+        { q: 'A train goes **80 km/h** for **2.5 hours**. How **far** does it go?', type: 'number', answer: 200, unit: 'km', nudge: 'Cover D → S × T = 80 × 2.5.', ok: '80 × 2.5 = 200 km.' },
+      ],
+    });
+  }
+
+  /** Ratio: make k copies of a recipe — the numbers grow, the mix stays the same. */
+  function labScaler() {
+    const root = $('#scale-lab'), st = { k: 1 };
+    const s = slider('🔁 Copies of the recipe', 1, 8, 1, 1, '', (val) => { st.k = val; draw(); });
+    const recipe = h('div', { class: 'recipe stage' }), bar = h('div', { class: 'sharebar' }), pills = h('div', { class: 'readout' });
+    root.append(h('p', {}, 'One recipe = ', h('b', {}, '2 red'), ' + ', h('b', {}, '3 blue'), ' marbles.'), s.row, recipe, bar, pills);
+    function draw() {
+      const k = st.k, a = 2 * k, b = 3 * k;
+      recipe.replaceChildren(...Array.from({ length: k }, () => h('div', { class: 'batch' }, ...Array.from({ length: 2 }, () => h('span', { class: 'dot a' })), ...Array.from({ length: 3 }, () => h('span', { class: 'dot b' })))));
+      bar.replaceChildren(h('div', { style: { flex: a, background: '#ef4444' } }, `${a} red`), h('div', { style: { flex: b, background: '#3b82f6' } }, `${b} blue`));
+      pills.replaceChildren(h('span', { class: 'pill hot' }, `red : blue = ${a} : ${b}`), h('span', { class: 'pill', html: MC.fmt(`red share = [[${a}/${a + b}]] = 40%`) }), h('span', { class: 'pill good' }, 'Same mix! ✅ (just ×' + k + ' on BOTH sides)'));
+    }
+    draw();
+    guided('#scale-steps', 'ratio.scaler', {
+      finale: '🎉 **Equivalent ratios:** multiply (or divide) BOTH sides by the same number and the mix doesn’t change.',
+      steps: [
+        { q: 'Fill in: **2 : 3 = 10 : ?**', type: 'number', answer: 15, nudge: 'How did 2 turn into 10? Do the same to the 3.', ok: '2 × 5 = 10, so 3 × 5 = **15**. Look at 5 copies in the slider!' },
+        { type: 'choice', q: 'Which of these is **NOT** the same mix as 2 : 3?', choices: ['4 : 6', '6 : 9', '8 : 10', '10 : 15'], answer: 2, ok: '8 : 10 simplifies to 4 : 5 — a different mix. The others are 2 : 3 times 2, 3 and 5.', wrongMsgs: { 0: '4 : 6 is 2 : 3 ×2 — the same mix.', 1: '6 : 9 is 2 : 3 ×3 — the same mix.', 3: '10 : 15 is 2 : 3 ×5 — the same mix.' } },
+        { q: 'A mix is red : blue = **2 : 3** and there are **30** marbles in all. How many are **red**?', type: 'number', answer: 12, nudge: 'Total parts = 2 + 3 = 5. How many marbles in one part?', ok: '5 parts → 30 ÷ 5 = 6 per part. Red = 2 × 6 = **12**.' },
+      ],
+    });
+  }
+
+  /** Percent: 100 squares = the whole. "of", "reduced by", "increased by" and the multiplier they make. */
+  function labGrid() {
+    const root = $('#grid-lab'), st = { mode: 'less', p: 35 };
+    const modes = { of: 'p% OF it', less: 'REDUCED by p%', more: 'INCREASED by p%' };
+    const mBtns = Object.entries(modes).map(([k, label]) => { const b = h('button', {}, label); b.onclick = () => { st.mode = k; draw(); }; b.dataset.k = k; return b; });
+    const toggle = h('div', { class: 'toggle' }, mBtns);
+    const sl = slider('Percent', 0, 100, 5, st.p, '%', (val) => { st.p = val; draw(); });
+    const gridA = h('div', { class: 'grid100' }), gridB = h('div', { class: 'grid100' }), info = h('div');
+    root.append(toggle, sl.row, h('div', { class: 'gridwrap' }, gridA, gridB, info));
+    function draw() {
+      mBtns.forEach((b) => b.classList.toggle('on', b.dataset.k === st.mode));
+      const { mode, p } = st;
+      const mult = mode === 'of' ? p / 100 : mode === 'less' ? 1 - p / 100 : 1 + p / 100;
+      gridA.replaceChildren(...Array.from({ length: 100 }, (_, i) => {
+        const on = mode === 'of' ? i < p : mode === 'less' ? i < 100 - p : true;
+        return h('div', { class: 'sq' + (on ? ' on' : mode === 'less' ? ' off' : '') });
+      }));
+      gridB.style.display = mode === 'more' ? '' : 'none';
+      gridB.replaceChildren(...Array.from({ length: 100 }, (_, i) => h('div', { class: 'sq' + (i < p ? ' add' : '') })));
+      const why = mode === 'of' ? `${p}% = ${p}/100` : mode === 'less' ? `100% − ${p}% = ${100 - p}%` : `100% + ${p}% = ${100 + p}%`;
+      info.replaceChildren(h('div', { class: 'multi' }, `× ${num(mult)}`, h('small', {}, why)),
+        h('p', { class: 'muted', html: mode === 'of' ? `<b>${p}</b> of the 100 squares are filled.` : mode === 'less' ? `<b>${100 - p}</b> squares stay · <b>${p}</b> are crossed out.` : `<b>100</b> squares + <b>${p}</b> new green ones = <b>${100 + p}</b>.` }));
+      sl.sync();
+    }
+    draw();
+    guided('#grid-steps', 'percent.grid', {
+      finale: '🎉 **“Reduced by” → 100% minus it. “Increased by” → 100% plus it.** Then move the decimal point: that’s the multiplier.',
+      steps: [
+        { type: 'action', q: 'Choose **REDUCED by p%** and slide to **35%**.', btn: 'Check', check: () => (st.mode === 'less' && st.p === 35) || 'Pick the “REDUCED” button and set the slider to 35%.', ok: 'See it: 35 squares are crossed out.' },
+        { q: 'How many squares are **left** (not crossed out)?', type: 'number', answer: 65, nudge: '100 − 35.', ok: '65 squares → that’s 65% of the price.' },
+        { q: 'So “reduced by 35%” is the same as multiplying by…', type: 'number', answer: 0.65, nudge: '65% = 65/100 = 0.__', ok: '× **0.65**.' },
+        { q: 'Now try “increased by **40%**”. What is the multiplier?', type: 'number', answer: 1.4, nudge: '100% + 40% = 140% = 1.__', ok: '100% + 40% = 140% → × **1.4**.' },
+      ],
+    });
+  }
+
+  /** Mean: the balance point of a see-saw. Drag the fulcrum or the weights. */
+  function labBalance() {
+    const root = $('#bal-lab'), S = MC.svg;
+    const W = 600, H = 340, X0 = 40, X1 = 560, YB = 170, X = (val) => X0 + (val / 10) * (X1 - X0);
+    const start = [1, 2, 2, 6, 9];
+    let weights = start.slice(), f = 2, drag = null;
+    const svg = S('svg', { viewBox: `0 0 ${W} ${H}`, class: 'bal' });
+    const beam = S('g'), wLayer = S('g'), ful = S('g', { class: 'fulcrum' });
+    beam.append(S('rect', { x: X0 - 24, y: YB, width: X1 - X0 + 48, height: 14, rx: 7, fill: '#8b5cf6' }));
+    for (let t = 0; t <= 10; t++) beam.append(S('line', { x1: X(t), x2: X(t), y1: YB + 14, y2: YB + 22, stroke: '#1b1f5e', 'stroke-width': 2 }), S('text', { x: X(t), y: YB + 42, 'text-anchor': 'middle', 'font-size': 15, 'font-weight': 800, fill: '#666d96' }, t));
+    beam.append(wLayer);
+    ful.append(S('polygon', { points: '0,0 -26,60 26,60', fill: '#ff7a3d', stroke: '#fff', 'stroke-width': 3 }), S('text', { x: 0, y: 50, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 800, fill: '#fff' }, 'drag'));
+    svg.append(beam, ful);
+    const out = h('div', { class: 'readout' });
+    const btn = (label, fn, cls) => h('button', { class: 'btn small ' + (cls || ''), onclick: fn }, label);
+    root.append(h('div', { class: 'stage' }, svg), out, h('div', { class: 'row', style: { marginTop: '10px' } },
+      btn('＋ Add a weight', () => { if (weights.length < 9) { weights.push(Math.floor(Math.random() * 11)); build(); } }),
+      btn('− Remove last', () => { if (weights.length > 2) { weights.pop(); build(); } }),
+      btn('✨ Show me the mean', showMean, 'go'), btn('↺ Reset', () => { weights = start.slice(); f = 2; build(); }, 'ghost')));
+
+    const mean = () => sum(weights) / weights.length;
+    const angle = () => MC.clamp((sum(weights.map((x) => x - f)) / weights.length) * 6, -10, 10);   // + = right side down
+    const els = [];
+    function build() {
+      wLayer.replaceChildren(); els.length = 0;
+      weights.forEach((_, i) => {
+        const c = S('circle', { r: 15, fill: '#ff5fa2', stroke: '#fff', 'stroke-width': 3, class: 'w' });
+        const t = S('text', { 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 800, fill: '#fff', 'pointer-events': 'none' });
+        const g = S('g', { class: 'w' }); g.append(c, t);
+        g.addEventListener('pointerdown', (e) => { drag = { type: 'w', i }; g.setPointerCapture(e.pointerId); e.preventDefault(); });
+        wLayer.append(g); els.push({ g, t });
+      });
+      update();
+    }
+    function local(e) {                                   // pointer → beam coordinates (un-rotated)
+      const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+      const p = pt.matrixTransform(svg.getScreenCTM().inverse()), a = (angle() * Math.PI) / 180, fx = X(f);
+      return { x: fx + (p.x - fx) * Math.cos(a) + (p.y - YB) * Math.sin(a), raw: p };
+    }
+    const valueAt = (x) => MC.clamp(((x - X0) / (X1 - X0)) * 10, 0, 10);
+    svg.addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      if (drag.type === 'f') f = Math.round(valueAt(local(e).raw.x) * 20) / 20;
+      else weights[drag.i] = Math.round(valueAt(local(e).x));
+      update();
+    });
+    const stop = () => { drag = null; };
+    svg.addEventListener('pointerup', stop); svg.addEventListener('pointercancel', stop);
+    ful.addEventListener('pointerdown', (e) => { drag = { type: 'f' }; ful.setPointerCapture(e.pointerId); e.preventDefault(); });
+
+    function update() {
+      const a = angle(), fx = X(f), stack = {};
+      beam.setAttribute('transform', `rotate(${a} ${fx} ${YB})`);
+      ful.setAttribute('transform', `translate(${fx} ${YB + 14})`);
+      weights.forEach((x, i) => {
+        const lvl = (stack[x] = (stack[x] || 0) + 1) - 1;
+        els[i].g.firstChild.setAttribute('cx', X(x)); els[i].g.firstChild.setAttribute('cy', YB - 17 - lvl * 31);
+        els[i].t.setAttribute('x', X(x)); els[i].t.setAttribute('y', YB - 12 - lvl * 31); els[i].t.textContent = x;
+      });
+      const left = sum(weights.map((x) => Math.max(f - x, 0))), right = sum(weights.map((x) => Math.max(x - f, 0))), ok = Math.abs(a) < 0.6;
+      out.replaceChildren(h('span', { class: 'pill' }, `Mean = ${sum(weights)} ÷ ${weights.length} = ${num(mean())}`),
+        h('span', { class: 'pill' }, `Left pull: ${num(left)}  ·  Right pull: ${num(right)}`),
+        h('span', { class: 'pill ' + (ok ? 'good' : 'hot') }, ok ? '⚖️ Balanced!' : a > 0 ? '↘ tips right — slide the triangle right' : '↙ tips left — slide the triangle left'));
+    }
+    let raf = 0;
+    function showMean() {
+      cancelAnimationFrame(raf); const from = f, to = mean(), t0 = performance.now();
+      const tick = (now) => { const k = Math.min(1, (now - t0) / 900); f = from + (to - from) * (1 - Math.pow(1 - k, 3)); update(); if (k < 1) raf = requestAnimationFrame(tick); };
+      raf = requestAnimationFrame(tick);
+    }
+    build();
+    guided('#bal-steps', 'mean.balance', {
+      finale: '🎉 **The mean is the balance point.** Left pull = right pull. That’s why a far-away number drags the mean toward it.',
+      steps: [
+        { type: 'action', q: 'Drag the orange triangle until the beam is **perfectly level** (it says ⚖️ Balanced!).', btn: 'It’s level!', check: () => Math.abs(f - mean()) < 0.2 || (f < mean() ? 'Still tipping — the balance point is a bit further right.' : 'Still tipping — the balance point is a bit further left.'), ok: 'You found the balance point by feel!' },
+        { q: 'Now by math: add up the positions of all the weights and divide by how many weights. What do you get?', type: 'number', answer: () => mean(), tol: 0.06, nudge: 'Add the numbers on the weights, then ÷ the number of weights. It should match where you balanced!', ok: 'Same spot! **Mean = the balance point.**' },
+        { type: 'choice', q: 'Drag the weight at **9** further right (to 10). The balance point…', choices: ['moves right', 'moves left', 'stays exactly the same'], answer: 0, ok: 'A weight further out pulls the balance point toward itself — total goes up, so mean goes up.', wrongMsgs: { 1: 'Try it: after you move the weight right, press “Show me the mean”.', 2: 'The total changed (9 → 10), so the mean must change too.' } },
+      ],
+    });
+  }
+
   /* ------------------------------------------------------------------- boot */
-  [labMatch, labPrinter, labWalk, labMeet, labCake, labDressing, labLightning, labChain, labShirt, labUndo, labOrder, labLevel, labRemove, labCumulative, labTug, labStats]
+  [labMatch, labTriangle, labPrinter, labWalk, labMeet, labScaler, labCake, labDressing, labGrid, labLightning, labChain, labShirt, labUndo, labOrder, labLevel, labRemove, labCumulative, labBalance, labTug, labStats]
     .forEach((fn) => { try { fn(); } catch (e) { console.error('lab failed:', fn.name, e); } });
   refreshSkills(false);
 })();

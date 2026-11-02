@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Week 8 · The Quest</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/base.css">
   <link rel="stylesheet" href="lesson.css">
 </head>
@@ -11,184 +13,235 @@
 <div id="mc-nav"></div>
 <main class="wrap">
 
-  <section class="hero hero-quest">
-    <div class="eyebrow">Week 8 · The Quest</div>
-    <h1>Four Skills, One Habit:<br>Turn It Into ONE Number</h1>
-    <p>Roughly one question in four on the CJMC (outside geometry and counting) is a rate, ratio, percent or mean word problem — and it’s the biggest group on the Gauss too. These are points you win by staying calm and organised. Let’s play with each idea first, <b>then</b> beat the real contest questions.</p>
-    <div class="four">
-      <a class="skill" href="#rates"   style="--c:var(--rates)"><b>1 · Rates</b><span>Find the amount for ONE, then scale.</span></a>
-      <a class="skill" href="#ratio"   style="--c:var(--ratio)"><b>2 · Ratio</b><span>Count the parts, then share the whole.</span></a>
-      <a class="skill" href="#percent" style="--c:var(--percent)"><b>3 · Percent</b><span>A percent is a multiplier.</span></a>
-      <a class="skill" href="#mean"    style="--c:var(--mean)"><b>4 · Mean</b><span>Work with the total, not the average.</span></a>
+  <!-- ================================================================== HERO -->
+  <section class="hero-quest">
+    <div class="floaters" aria-hidden="true">
+      <span style="left:5%;top:14%;font-size:54px">+</span><span style="left:90%;top:18%;font-size:46px;animation-delay:-2s">%</span>
+      <span style="left:18%;top:70%;font-size:60px;animation-delay:-4s">×</span><span style="left:78%;top:62%;font-size:52px;animation-delay:-1s">÷</span>
+      <span style="left:50%;top:6%;font-size:40px;animation-delay:-3s">=</span><span style="left:93%;top:80%;font-size:44px;animation-delay:-5s">½</span>
     </div>
+    <div class="eyebrow">Week 8 · The Quest</div>
+    <h1>Turn It Into <span class="one">ONE</span> Number</h1>
+    <p>Four skills show up on <b>every</b> CJMC &amp; Gauss contest. Don’t just read about them — <b>play with them</b>, and the contest questions become easy points.</p>
+    <div class="four">
+      <a class="skill sk-rates"   href="#rates"><i>🚗</i><b>Rates</b><span>Find the amount for <u>ONE</u>, then scale.</span></a>
+      <a class="skill sk-ratio"   href="#ratio"><i>🍰</i><b>Ratio</b><span>Count the <u>parts</u>, then share the whole.</span></a>
+      <a class="skill sk-percent" href="#percent"><i>🏷️</i><b>Percent</b><span>A percent is a <u>multiplier</u>.</span></a>
+      <a class="skill sk-mean"    href="#mean"><i>⚖️</i><b>Mean</b><span>Work with the <u>total</u>, not the average.</span></a>
+    </div>
+    <a class="btn warm start" href="#intro">▶ Start the quest</a>
   </section>
 
-  <!-- ============================================================ INTRO -->
-  <section class="level" id="intro">
-    <div class="level-head"><div class="level-badge">🎯</div><div><div class="eyebrow">Warm-up</div><h2>Which skill is it?</h2></div></div>
-    <p>Tap a clue, then tap the skill it belongs to. Each skill hides a secret “ONE number”.</p>
+  <!-- ================================================================== INTRO -->
+  <section class="level rv" id="intro">
+    <div class="nova"><div class="face">🦊</div><div class="say">Hi, I’m <b>Nova</b>! I’ll be your guide. Here’s a secret: <b>every</b> word problem this week gets easy when you squeeze it into <b>ONE number</b>. First, a quick game — can you tell which skill each clue belongs to?</div></div>
     <div class="card"><div id="lab-match"></div></div>
   </section>
 
-  <!-- ============================================================ RATES -->
-  <section class="level" id="rates" style="--c:var(--rates)">
-    <div class="level-head"><div class="level-badge">🚗</div><div><div class="eyebrow">Level 1</div><h2>Rates: an amount per ONE</h2></div></div>
-    <div class="big-idea"><span>⚡</span><div>Find the amount for ONE first.<small>km per hour, pages per day, dollars per item… then scale up or down.</small></div></div>
+  <!-- ================================================================== RATES -->
+  <section class="level rv sk-rates" id="rates">
+    <div class="world-banner" data-bg="÷"><div class="big">🚗</div><div><div class="eyebrow">World 1</div><h2>Rates</h2><p>An amount per <b>ONE</b>: km per hour, pages per minute, dollars per item.</p></div></div>
+    <div class="big-idea"><span>⚡</span><div>Find the amount for ONE first.<small>Then scaling up or down is just multiplying.</small></div></div>
 
-    <div class="lab">
+    <div class="lab rv">
+      <div class="lab-title">🔺 Explore · The speed triangle</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Distance, speed and time are secretly <b>one</b> idea. <b>Tap a corner to cover it</b> — the triangle tells you how to find it!</div></div>
+      <div id="tri-lab"></div>
+      <div id="tri-steps"></div>
+    </div>
+
+    <div class="lab rv">
       <div class="lab-title">🖨️ Lab 1 · The printer</div>
-      <p>A printer prints <b>12 pages in 4 minutes</b>. Can you work out how long any job takes?</p>
+      <p>A printer prints <b>12 pages in 4 minutes</b>. How long does any job take?</p>
       <div class="stage" id="printer-stage"></div>
       <div id="printer-slider"></div>
       <div id="printer-steps"></div>
     </div>
 
-    <div class="lab">
-      <div class="lab-title">🚶‍♀️ Lab 2 · Elizabeth walks home <span class="tag easy">Easy</span></div>
-      <div class="problem"><b>CJMC (Canada Jay) 2022 — Q3.</b> Elizabeth walks at a constant speed. She walks [[4/5]] of the way home in 40 minutes. How long will it take for her to walk the rest of the way?
-        <div class="opts"><span>(A) 6 minutes</span><span>(B) 8 minutes</span><span>(C) 10 minutes</span><span>(D) 32 minutes</span><span>(E) 50 minutes</span></div></div>
-      <div class="callout blue">Speed = distance ÷ time. If the speed is <b>constant</b>, equal pieces of the way take equal time.</div>
+    <div class="mission rv">
+      <div class="mission-top"><span class="src">📜 CJMC 2022 · Q3</span><span class="tag easy">Easy</span></div>
+      <p class="ask">🚶‍♀️ Elizabeth walks home at a steady speed. After <b>40 minutes</b> she has walked [[4/5]] of the way. How long for the rest?</p>
+      <details><summary>Show the exact contest wording</summary><div class="orig">Elizabeth walks at a constant speed. She walks [[4/5]] of the way home in 40 minutes. How long will it take for her to walk the rest of the way?
+        <div class="opts"><span>(A) 6 minutes</span><span>(B) 8 minutes</span><span>(C) 10 minutes</span><span>(D) 32 minutes</span><span>(E) 50 minutes</span></div></div></details>
       <div class="stage" id="walk-stage"></div>
       <div id="walk-steps"></div>
     </div>
 
-    <div class="lab">
+    <div class="lab rv">
       <div class="lab-title">🚙 Lab 3 · Meet-up or catch-up?</div>
-      <p>Two cars start <b>gap</b> km apart. Drag the sliders, press <b>Go</b>, and watch the gap shrink. Flip the switch to make them drive the <i>same</i> way.</p>
+      <div class="nova"><div class="face">🦊</div><div class="say">Two cars, one road. Drive them <b>towards</b> each other, or have one <b>chase</b> the other. <b>Guess the time first</b> — then watch!</div></div>
       <div id="meet-lab"></div>
     </div>
 
-    <div class="card">
-      <h3>Contest time</h3>
-      <div class="problem"><b>Gauss 2017, Grade 8 — Q18 <span class="tag medium">Medium</span></b><br>Brodie and Ryan are driving directly towards each other. Brodie is driving at a constant speed of 50 km/h. Ryan is driving at a constant speed of 40 km/h. If they are 120 km apart, how long will it take before they meet?
-        <div class="opts"><span>(A) 1 h 12 min</span><span>(B) 1 h 25 min</span><span>(C) 1 h 15 min</span><span>(D) 1 h 33 min</span><span>(E) 1 h 20 min</span></div></div>
+    <div class="mission rv">
+      <div class="mission-top"><span class="src">📜 Gauss 2017 · Grade 8 · Q18</span><span class="tag medium">Medium</span></div>
+      <div class="scene">🚗 50 km/h ➜ &nbsp;······ 120 km ······ &nbsp;⬅ 40 km/h 🚙</div>
+      <p class="ask">Brodie and Ryan drive <b>straight towards each other</b>, 120 km apart. How long until they meet?</p>
+      <details><summary>Show the exact contest wording</summary><div class="orig">Brodie and Ryan are driving directly towards each other. Brodie is driving at a constant speed of 50 km/h. Ryan is driving at a constant speed of 40 km/h. If they are 120 km apart, how long will it take before they meet?
+        <div class="opts"><span>(A) 1 h 12 min</span><span>(B) 1 h 25 min</span><span>(C) 1 h 15 min</span><span>(D) 1 h 33 min</span><span>(E) 1 h 20 min</span></div></div></details>
       <div id="meet-steps"></div>
-      <div class="callout green"><b>Meet-up:</b> speed₁ + speed₂. &nbsp; <b>Catch-up:</b> speed₁ − speed₂. &nbsp; Speeds (rates) can be added or subtracted — as long as they are the same kind of quantity.</div>
+      <div class="callout green"><b>Meet-up:</b> speed₁ + speed₂. &nbsp; <b>Catch-up:</b> speed₁ − speed₂.</div>
     </div>
   </section>
 
-  <!-- ============================================================ RATIO -->
-  <section class="level" id="ratio" style="--c:var(--ratio)">
-    <div class="level-head"><div class="level-badge">🍰</div><div><div class="eyebrow">Level 2</div><h2>Ratio: parts of a whole</h2></div></div>
-    <div class="big-idea"><span>🧩</span><div>Count the parts, then share the whole.<small>a : b means “a parts for every b parts”. Total parts = a + b.</small></div></div>
+  <!-- ================================================================== RATIO -->
+  <section class="level rv sk-ratio" id="ratio">
+    <div class="world-banner" data-bg=":"><div class="big">🍰</div><div><div class="eyebrow">World 2</div><h2>Ratio</h2><p>Parts of a whole. <b>a : b</b> means “a parts for every b parts”.</p></div></div>
+    <div class="big-idea"><span>🧩</span><div>Count the parts, then share the whole.<small>Total parts = a + b.</small></div></div>
 
-    <div class="lab">
-      <div class="lab-title">🍫 Lab 4 · Share the cake <span class="tag easy">Easy</span></div>
-      <div class="problem"><b>Gauss 2018, Grade 8 — Q8.</b> Rich and Ben ate an entire chocolate cake. The ratio of the amount eaten by Rich to the amount eaten by Ben is 3 : 1. What percentage of the cake did Ben eat?
-        <div class="opts"><span>(A) 66%</span><span>(B) 50%</span><span>(C) 75%</span><span>(D) 25%</span><span>(E) 10%</span></div></div>
+    <div class="lab rv">
+      <div class="lab-title">🔍 Explore · The ratio scaler</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Make <b>more copies</b> of a recipe. The numbers get bigger… but does the <b>mix</b> change? Slide to find out!</div></div>
+      <div id="scale-lab"></div>
+      <div id="scale-steps"></div>
+    </div>
+
+    <div class="lab rv">
+      <div class="lab-title">🍫 Lab 4 · Share the cake</div>
+      <div class="mission" style="box-shadow:none;border:3px solid var(--line);border-left-width:10px;margin:8px 0 14px">
+        <div class="mission-top"><span class="src">📜 Gauss 2018 · Grade 8 · Q8</span><span class="tag easy">Easy</span></div>
+        <p class="ask">Rich and Ben ate a whole cake. Rich : Ben = <b>3 : 1</b>. What <b>percent</b> of the cake did <b>Ben</b> eat?</p>
+        <details><summary>Show the exact contest wording</summary><div class="orig">Rich and Ben ate an entire chocolate cake. The ratio of the amount eaten by Rich to the amount eaten by Ben is 3 : 1. What percentage of the cake did Ben eat?
+          <div class="opts"><span>(A) 66%</span><span>(B) 50%</span><span>(C) 75%</span><span>(D) 25%</span><span>(E) 10%</span></div></div></details>
+      </div>
       <div id="cake-lab"></div>
       <div id="cake-steps"></div>
-      <div class="callout">3 : 1 is <b>part-to-part</b> (Rich to Ben). A fraction like [[1/4]] is <b>part-to-whole</b>. Always ask: <i>which one is the question asking about?</i></div>
+      <div class="callout">3 : 1 compares <b>part to part</b>. A fraction like [[1/4]] compares <b>part to whole</b>. Always ask: <i>who is the question about?</i></div>
     </div>
 
-    <div class="lab">
-      <div class="lab-title">🥗 Lab 5 · Change only one side <span class="tag easy">Easy</span></div>
-      <div class="problem"><b>Gauss 2023, Grade 8 — Q8.</b> In a salad dressing, the ratio of oil to vinegar is 3 : 1. To make the dressing more acidic, the amount of vinegar is doubled. What is the new ratio of oil to vinegar?
-        <div class="opts"><span>(A) 3 : 2</span><span>(B) 6 : 1</span><span>(C) 1 : 3</span><span>(D) 2 : 3</span><span>(E) 4 : 3</span></div></div>
+    <div class="lab rv">
+      <div class="lab-title">🥗 Lab 5 · Change only one side</div>
+      <div class="mission" style="box-shadow:none;border:3px solid var(--line);border-left-width:10px;margin:8px 0 14px">
+        <div class="mission-top"><span class="src">📜 Gauss 2023 · Grade 8 · Q8</span><span class="tag easy">Easy</span></div>
+        <p class="ask">Oil : vinegar is <b>3 : 1</b>. Make it more sour by <b>doubling the vinegar</b>. New ratio?</p>
+        <details><summary>Show the exact contest wording</summary><div class="orig">In a salad dressing, the ratio of oil to vinegar is 3 : 1. To make the dressing more acidic, the amount of vinegar is doubled. What is the new ratio of oil to vinegar?
+          <div class="opts"><span>(A) 3 : 2</span><span>(B) 6 : 1</span><span>(C) 1 : 3</span><span>(D) 2 : 3</span><span>(E) 4 : 3</span></div></div></details>
+      </div>
       <div id="dress-lab"></div>
       <div id="dress-steps"></div>
-      <div class="callout green"><b>Equivalent ratios:</b> multiply or divide BOTH sides by the same number (3 : 1 = 6 : 2 = 9 : 3). <b>Changing one amount?</b> Change only that side, then re-read the ratio and simplify.</div>
+      <div class="callout green"><b>Equivalent ratios:</b> multiply or divide BOTH sides by the same number. <b>Changing one amount?</b> Change only that side, then re-read the ratio.</div>
     </div>
   </section>
 
-  <!-- ============================================================ PERCENT -->
-  <section class="level" id="percent" style="--c:var(--percent)">
-    <div class="level-head"><div class="level-badge">🏷️</div><div><div class="eyebrow">Level 3</div><h2>Percent: a multiplier</h2></div></div>
+  <!-- ================================================================== PERCENT -->
+  <section class="level rv sk-percent" id="percent">
+    <div class="world-banner" data-bg="%"><div class="big">🏷️</div><div><div class="eyebrow">World 3</div><h2>Percent</h2><p>“Per cent” means <b>out of 100</b>. And that makes it a <b>multiplier</b>.</p></div></div>
     <div class="big-idea"><span>✖️</span><div>A percent is a multiplier.<small>30% of N → × 0.30 · reduced by 30% → × 0.70 · increased by 30% → × 1.30</small></div></div>
 
-    <div class="lab">
+    <div class="lab rv">
+      <div class="lab-title">💯 Explore · The 100-square</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">100 little squares = <b>the whole price</b>. Pick “of”, “reduced” or “increased”, drag the slider, and watch the squares — and the <b>multiplier</b>.</div></div>
+      <div id="grid-lab"></div>
+      <div id="grid-steps"></div>
+    </div>
+
+    <div class="lab rv">
       <div class="lab-title">⚡ Lab 6 · Multiplier lightning round</div>
-      <p>Turn each phrase into its multiplier. Get <b>6 right</b> to finish the round.</p>
+      <p>Turn each phrase into its multiplier. Get <b>6 right</b> to finish.</p>
       <div id="lightning"></div>
     </div>
 
-    <div class="lab">
+    <div class="lab rv">
       <div class="lab-title">🔗 Lab 7 · The price-chain builder</div>
-      <p>Start with a $100 price tag, then tap changes to chain them together. <b>Successive changes MULTIPLY — they don’t add.</b></p>
+      <p>Start with a $100 tag. Tap changes to chain them. <b>Successive changes MULTIPLY — they don’t add.</b></p>
       <div id="chain-lab"></div>
       <div id="chain-steps"></div>
     </div>
 
-    <div class="card">
-      <h3>Contest time</h3>
-      <div class="problem"><b>Gauss 2021, Grade 7 — Q17 <span class="tag medium">Medium</span></b><br>The original price of a shirt is reduced by 50% to obtain a second price. The store advertises an additional sale, and so this second price is reduced by 40% to obtain a third price. What is the discount of the third price off the original price?
-        <div class="opts"><span>(A) 80%</span><span>(B) 10%</span><span>(C) 70%</span><span>(D) 65%</span><span>(E) 45%</span></div></div>
-      <div class="callout">The original price isn’t given — so <b>pick an easy one</b>, like $100. (Be careful: the real price isn’t $100, but the <i>percent</i> answer is the same for any price!)</div>
+    <div class="mission rv">
+      <div class="mission-top"><span class="src">📜 Gauss 2021 · Grade 7 · Q17</span><span class="tag medium">Medium</span></div>
+      <div class="scene">🏷️ 100% ➜ −50% ➜ −40% ➜ <b>?</b></div>
+      <p class="ask">A shirt’s price drops <b>50%</b>, then drops another <b>40%</b>. What’s the <b>total discount</b> off the original price?</p>
+      <details><summary>Show the exact contest wording</summary><div class="orig">The original price of a shirt is reduced by 50% to obtain a second price. The store advertises an additional sale, and so this second price is reduced by 40% to obtain a third price. What is the discount of the third price off the original price?
+        <div class="opts"><span>(A) 80%</span><span>(B) 10%</span><span>(C) 70%</span><span>(D) 65%</span><span>(E) 45%</span></div></div></details>
+      <div class="callout">No starting price given? <b>Pick an easy one</b> — $100. The <i>percent</i> answer is the same for any price.</div>
       <div id="shirt-steps"></div>
     </div>
 
-    <div class="lab">
+    <div class="lab rv">
       <div class="lab-title">⏪ Lab 8 · The undo machine</div>
       <p>A shirt costs <b>$76</b> <i>after</i> a 20% discount. What was the original price? Try both ways, then let the machine check you.</p>
       <div id="undo-lab"></div>
       <div id="undo-steps"></div>
     </div>
 
-    <div class="lab">
-      <div class="lab-title">🔀 Lab 9 · Does the order matter? <span class="tag medium">Medium</span></div>
-      <div class="problem"><b>Gauss 2017, Grade 7 — Q18.</b> Sara goes to a bookstore and wants to buy a book that is originally priced at $100. Which of the following options gives her the best discounted price?
-        <div class="opts" style="flex-direction:column;gap:2px"><span>(A) A discount of 20%</span><span>(B) A discount of 10%, then a discount of 10% off the new price</span><span>(C) A discount of 15%, then a discount of 5% off the new price</span><span>(D) A discount of 5%, then a discount of 15% off the new price</span><span>(E) All four options above give the same price</span></div></div>
+    <div class="lab rv">
+      <div class="lab-title">🔀 Lab 9 · Does the order matter?</div>
+      <div class="mission" style="box-shadow:none;border:3px solid var(--line);border-left-width:10px;margin:8px 0 14px">
+        <div class="mission-top"><span class="src">📜 Gauss 2017 · Grade 7 · Q18</span><span class="tag medium">Medium</span></div>
+        <p class="ask">Sara wants a <b>$100</b> book. Which deal gives her the <b>lowest price</b>?</p>
+        <details><summary>Show the exact contest wording</summary><div class="orig">Sara goes to a bookstore and wants to buy a book that is originally priced at $100. Which of the following options gives her the best discounted price?
+          <div class="opts" style="flex-direction:column"><span>(A) A discount of 20%</span><span>(B) A discount of 10%, then a discount of 10% off the new price</span><span>(C) A discount of 15%, then a discount of 5% off the new price</span><span>(D) A discount of 5%, then a discount of 15% off the new price</span><span>(E) All four options above give the same price</span></div></div></details>
+      </div>
       <div id="order-lab"></div>
       <div id="order-steps"></div>
     </div>
   </section>
 
-  <!-- ============================================================ MEAN -->
-  <section class="level" id="mean" style="--c:var(--mean)">
-    <div class="level-head"><div class="level-badge">⚖️</div><div><div class="eyebrow">Level 4</div><h2>Mean: total ÷ count</h2></div></div>
-    <div class="big-idea"><span>📦</span><div>Work with the total, not the average.<small>Mean = sum ÷ how many. Flip it: sum = mean × count.</small></div></div>
+  <!-- ================================================================== MEAN -->
+  <section class="level rv sk-mean" id="mean">
+    <div class="world-banner" data-bg="x̄"><div class="big">⚖️</div><div><div class="eyebrow">World 4</div><h2>Mean</h2><p>The “fair share” number. <b>Mean = total ÷ count</b>.</p></div></div>
+    <div class="big-idea"><span>📦</span><div>Work with the total, not the average.<small>Flip it around: total = mean × count.</small></div></div>
 
-    <div class="lab">
+    <div class="lab rv">
+      <div class="lab-title">🎪 Explore · The balance beam</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">The <b>mean</b> is the exact spot where a see-saw balances! <b>Drag the triangle</b> until the beam is level. Then <b>drag the weights</b> and see what happens.</div></div>
+      <div id="bal-lab"></div>
+      <div id="bal-steps"></div>
+    </div>
+
+    <div class="lab rv">
       <div class="lab-title">🧱 Lab 10 · Level it out</div>
-      <p>Each bar is a number. <b>Tap a bar</b> to pick it up, then <b>tap another bar</b> to give it one cube. Watch the orange mean line.</p>
+      <p><b>Tap a bar</b> to pick it up, then <b>tap another</b> to give it one cube. Watch the orange mean line.</p>
       <div id="level-lab"></div>
       <div id="level-steps"></div>
     </div>
 
-    <div class="lab">
-      <div class="lab-title">➖ Lab 11 · Take a number away <span class="tag easy">Easy</span></div>
-      <div class="problem"><b>Gauss 2016, Grade 7 — Q18.</b> The mean (average) of a set of six numbers is 10. When the number 25 is removed from the set, the mean of the remaining numbers is
-        <div class="opts"><span>(A) 6</span><span>(B) 7</span><span>(C) 8</span><span>(D) 9</span><span>(E) 10</span></div></div>
+    <div class="mission rv">
+      <div class="mission-top"><span class="src">📜 Gauss 2016 · Grade 7 · Q18</span><span class="tag easy">Easy</span></div>
+      <p class="ask">Six numbers have a mean of <b>10</b>. Take away the number <b>25</b>. What’s the new mean?</p>
+      <details><summary>Show the exact contest wording</summary><div class="orig">The mean (average) of a set of six numbers is 10. When the number 25 is removed from the set, the mean of the remaining numbers is
+        <div class="opts"><span>(A) 6</span><span>(B) 7</span><span>(C) 8</span><span>(D) 9</span><span>(E) 10</span></div></div></details>
       <div id="remove-lab"></div>
       <div id="remove-steps"></div>
       <div class="callout">Adding or removing a value changes the total <b>and</b> the count — recompute from those.</div>
     </div>
 
-    <div class="lab">
-      <div class="lab-title">📊 Lab 12 · Decode the cumulative mean <span class="tag medium">Medium–Hard</span></div>
-      <div class="problem"><b>CJMC (Canada Jay) 2022 — Q8.</b> Zaria practiced ring toss by taking 15 tosses a day for 5 days. The graph is her <b>cumulative</b> mean (average) number of tosses scored each day. For example, the bar labelled 3 shows she had a mean of 6 tosses scored each day over the first 3 days. Which day did Zaria score the <b>fewest</b> number of her tosses?
-        <div class="opts"><span>(A) day 1</span><span>(B) day 2</span><span>(C) day 3</span><span>(D) day 4</span><span>(E) day 5</span></div></div>
+    <div class="mission rv" style="--c:var(--mean)">
+      <div class="mission-top"><span class="src">📜 CJMC 2022 · Q8</span><span class="tag medium">Medium–Hard</span></div>
+      <p class="ask">Zaria’s <b>cumulative mean</b> after each of 5 days is in the graph (after day 3 her mean was 6). Which day did she score the <b>fewest</b> tosses?</p>
+      <details><summary>Show the exact contest wording</summary><div class="orig">Zaria practiced ring toss by taking 15 tosses a day for 5 days. The graph is her cumulative mean (average) number of tosses scored each day. For example, the bar labelled 3 shows she had a mean of 6 tosses scored each day over the first 3 days. Which day did Zaria score the fewest number of her tosses?
+        <div class="opts"><span>(A) day 1</span><span>(B) day 2</span><span>(C) day 3</span><span>(D) day 4</span><span>(E) day 5</span></div></div></details>
       <div class="row" style="align-items:flex-start;gap:18px"><div id="cum-chart" style="flex:1;min-width:260px"></div><div id="cum-table" style="flex:1.3;min-width:300px"></div></div>
       <div id="cum-steps"></div>
     </div>
 
-    <div class="lab">
+    <div class="lab rv">
       <div class="lab-title">🪢 Lab 13 · Tug-of-war: combining two groups</div>
-      <p>Two classes took the same quiz. <b>Never just average the averages!</b> The bigger group pulls harder. Slide things around and see.</p>
+      <p>Two classes took the same quiz. <b>Never just average the averages!</b> The bigger group pulls harder.</p>
       <div id="tug-lab"></div>
       <div id="tug-steps"></div>
     </div>
 
-    <div class="lab">
+    <div class="lab rv">
       <div class="lab-title">🎲 Lab 14 · Median &amp; mode playground</div>
-      <p><b>Median</b> = the middle value once the numbers are in order. <b>Mode</b> = the value that appears most often. Type some numbers and see.</p>
+      <p><b>Median</b> = the middle value once the numbers are in order. <b>Mode</b> = the value that appears most often.</p>
       <div id="stats-lab"></div>
       <div id="stats-steps"></div>
     </div>
   </section>
 
-  <!-- ============================================================ FINALE -->
-  <section class="level" id="finale">
-    <div class="card" style="background:var(--navy);color:#fff">
-      <div class="eyebrow" style="color:#b9c2ff">The point to land</div>
-      <h2 style="color:#fff">Every one of these problems becomes easy once you turn it into <u>ONE number</u> you can scale.</h2>
+  <!-- ================================================================== FINALE -->
+  <section class="level rv" id="finale">
+    <div class="finale">
+      <div class="eyebrow" style="color:var(--gold)">The point to land</div>
+      <h2>Every one of these problems becomes easy once you turn it into <u>ONE number</u> you can scale.</h2>
       <ul class="finale-list">
         <li style="--c:#8fbaff"><b>Rate</b> → the amount for ONE</li>
         <li style="--c:#7ee8c0"><b>Ratio</b> → the number of parts</li>
         <li style="--c:#ffd08a"><b>Percent</b> → the multiplier</li>
         <li style="--c:#c9b5ff"><b>Mean</b> → the total</li>
       </ul>
-      <p>Next stop: the Exercise Bank — pick a skill, then pick a question.</p>
       <div class="row"><a class="btn warm" href="practice">🏋️ Go to the Exercise Bank</a> <a class="btn ghost" href="homework">📝 Homework</a></div>
     </div>
   </section>

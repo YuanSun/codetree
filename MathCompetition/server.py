@@ -108,6 +108,16 @@ def json_for_script(data: object) -> str:
     return json.dumps(data, ensure_ascii=False).replace("</", "<\\/").replace("<!--", "<\\!--")
 
 
+def floaters() -> str:
+    """Decorative drifting math symbols for hero banners."""
+    spec = [("+", 6, 12, 54), ("−", 88, 20, 46), ("×", 20, 62, 60), ("÷", 74, 58, 52), ("%", 48, 8, 44), ("=", 92, 70, 40), ("π", 8, 80, 48), ("½", 60, 76, 42)]
+    spans = "".join(
+        f'<span style="left:{x}%;top:{y}%;font-size:{size}px;animation-delay:-{i * 1.1:.1f}s">{ch}</span>'
+        for i, (ch, x, y, size) in enumerate(spec)
+    )
+    return f'<div class="floaters" aria-hidden="true">{spans}</div>'
+
+
 def home_page() -> str:
     cards = []
     for w in load_weeks():
@@ -137,6 +147,7 @@ def home_page() -> str:
         head="",
         body=f"""
       <section class="hero hero-home">
+        {floaters()}
         <h1>Math Contest Lab <span class="wiggle">🧪</span></h1>
         <p>Every week a new mission. Play with the ideas first — the contest questions get easy after that.</p>
       </section>
@@ -168,7 +179,8 @@ def hub_page(week: dict) -> str:
         body_attrs=f'data-page="hub" data-week="{esc(week["id"])}" data-week-title="Week {esc(week["number"])}"',
         head="",
         body=f"""
-      <section class="hero">
+      <section class="hero hero-home">
+        {floaters()}
         <div class="eyebrow">Week {esc(week['number'])} · {esc(week.get('level', ''))}</div>
         <h1>{esc(week['title'])}</h1>
         <p>{esc(week.get('tagline', ''))}</p>

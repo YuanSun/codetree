@@ -68,7 +68,7 @@ engine with hint ladders, "trap" explanations for wrong answers, stars, XP and s
 `weeks/` and is auto-discovered by the server, so adding next week's material is just adding a folder.
 
 - **Location**: `MathCompetition/`
-- **Status**: Week 8 (Rates, Ratio, Percent & Mean) complete — 14 labs, 14 exercise-bank + 3 boss questions, 6 homework + 1 optional; tested in headless Chromium
+- **Status**: Week 8 (Rates, Ratio, Percent & Mean) complete — 4 concept explorers + 14 labs, 14 exercise-bank + 3 boss questions, 6 homework + 1 optional; tested in headless Chromium
 - **Tech Stack**: Python 3 standard library (no dependencies), vanilla HTML/CSS/JS
 
 See [MathCompetition/README.md](MathCompetition/README.md) for how to run it and add a week, and
