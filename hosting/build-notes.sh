@@ -16,6 +16,13 @@ QUARTZ="$HERE/.quartz"
 [ -d "$VAULT" ] || { echo "Vault not found: $VAULT" >&2; exit 1; }
 [ -d "$QUARTZ" ] || git clone --depth 1 https://github.com/jackyzha0/quartz.git "$QUARTZ"
 ( cd "$QUARTZ" && npm ci --silent )
+# Quartz is served under /notes/ by the gateway, so its baseUrl must carry that path or its
+# links (explorer tree, search, graph) point at /<page> instead of /notes/<page>.
+# NOTES_BASE_URL is host[:port] only (no http://); it matters little beyond the sitemap/RSS.
+[ -f "$QUARTZ/quartz.config.yaml" ] || cp "$QUARTZ/quartz.config.default.yaml" "$QUARTZ/quartz.config.yaml"
+sed -i.bak "s#^  baseUrl:.*#  baseUrl: ${NOTES_BASE_URL:-localhost:${GATEWAY_PORT:-12999}}/notes#; s#^  pageTitle:.*#  pageTitle: Family Notes#" "$QUARTZ/quartz.config.yaml"
+rm -f "$QUARTZ/quartz.config.yaml.bak"
+
 # Content to publish: the whole vault, or a copy holding only the chosen folders.
 # (Hidden folders such as .obsidian and .trash are never copied.)
 CONTENT="$VAULT"
