@@ -83,3 +83,8 @@ hosting/
 ├── com.codetree.gateway.plist      # optional launchd job
 └── portal/index.html               # landing page
 ```
+
+## Exam prep site (/exam/)
+
+Built from the Apple Notes folder by the `exam-prep-site/` subproject (see its README). The page is private and sits behind the
+same login as `/notes/`. Build it into `hosting/sites/exam` and the gateway serves it; no restart is needed for content changes.

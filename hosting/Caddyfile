@@ -31,6 +31,16 @@ http://:{$GATEWAY_PORT:12999} {
 		}
 	}
 
+	# Exam-prep site (built by exam-prep-site/build.py into sites/exam; private, so behind the same login)
+	redir /exam /exam/
+	handle_path /exam/* {
+		basic_auth {
+			{$NOTES_USER} {$NOTES_HASH}
+		}
+		root * {$HOSTING_DIR}/sites/exam
+		file_server
+	}
+
 	# MathCompetition: the prefix is stripped here; the app is started with --base-path /math
 	# so the links it generates point back under /math/.
 	redir /math /math/
@@ -46,6 +56,8 @@ http://:{$GATEWAY_PORT:12999} {
 			{$NOTES_USER} {$NOTES_HASH}
 		}
 		root * {$HOSTING_DIR}/sites/notes
+		# Quartz links have no extension (/page, not /page.html): try the .html file and folder index.
+		try_files {path} {path}.html {path}/index.html
 		file_server
 	}
 
@@ -59,6 +71,16 @@ http://:{$GATEWAY_PORT:12999} {
 			{$NOTES_USER} {$NOTES_HASH}
 		}
 		reverse_proxy 127.0.0.1:{$BUDGET_PORT:12997}
+	}
+
+	# Safety net for the notes site: if Quartz emits a root-absolute link (/some/page instead of
+	# /notes/some/page), the click arrives here with the notes page as Referer. Send it back under /notes/.
+	@notes_stray {
+		header_regexp Referer ^https?://[^/]+/notes/
+		not path / /fund/* /math/* /budget/* /notes/*
+	}
+	handle @notes_stray {
+		redir /notes{uri} 302
 	}
 
 	# Portal at the root
