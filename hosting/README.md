@@ -42,7 +42,7 @@ admin login, because the data is financial.
 ```
 
 The first run downloads Quartz (the tool that turns a vault into a website) into `hosting/.quartz`; later runs reuse it.
-Re-run it when notes change. Only the vault folder you point it at is published; keep private notes outside it.
+Re-run it when notes change. To publish only some folders, set `VAULT_DIRS="Family,Recipes"` in `.env` (comma-separated, relative to `VAULT`). Only the vault folder you point it at is published; keep private notes outside it.
 Quartz is served under `/notes/`; if its links or search misbehave there, set `baseUrl` in `.quartz/quartz.config.ts`
 to `<your-host>/notes`.
 
