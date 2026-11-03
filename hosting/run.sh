@@ -11,6 +11,7 @@ export HOSTING_DIR="$HERE"
 export FUND_DIR="$REPO/fund-accounting-academy"
 export GATEWAY_PORT="${GATEWAY_PORT:-12999}"
 export MATH_PORT="${MATH_PORT:-12998}"
+export BUDGET_PORT="${BUDGET_PORT:-12997}"
 
 command -v caddy >/dev/null || { echo "Caddy is not installed. Run: brew install caddy" >&2; exit 1; }
 if [ -z "${NOTES_HASH:-}" ]; then
@@ -29,5 +30,17 @@ trap cleanup EXIT INT TERM
 ( cd "$REPO/MathCompetition" && exec python3 server.py --host 127.0.0.1 --port "$MATH_PORT" --base-path /math ) &
 pids+=($!)
 
-echo "Gateway on port $GATEWAY_PORT: http://<this-machine>:$GATEWAY_PORT/  (/fund/  /math/  /notes/)"
+# Family budget dashboard: needs its Python deps (prefers its own .venv) and the Postgres in its .env.
+BUDGET_DIR="$REPO/budget-advisor/budget-dashboard"
+if "$BUDGET_DIR/.venv/bin/streamlit" --version >/dev/null 2>&1; then STREAMLIT="$BUDGET_DIR/.venv/bin/streamlit"
+else STREAMLIT="$(command -v streamlit || true)"; fi
+if [ -n "$STREAMLIT" ] && [ -f "$BUDGET_DIR/.env" ]; then
+  ( cd "$BUDGET_DIR" && exec "$STREAMLIT" run app.py --server.address 127.0.0.1 --server.port "$BUDGET_PORT" \
+      --server.baseUrlPath budget --server.headless true --browser.gatherUsageStats false ) &
+  pids+=($!)
+else
+  echo "Skipping /budget/: need streamlit installed and $BUDGET_DIR/.env (see budget-advisor/budget-dashboard/README.md)." >&2
+fi
+
+echo "Gateway on port $GATEWAY_PORT: http://<this-machine>:$GATEWAY_PORT/  (/fund/  /math/  /notes/  /budget/)"
 caddy run --config "$HERE/Caddyfile" --adapter caddyfile

@@ -9,6 +9,7 @@ address and one port. Reach it by whatever name the machine has (`mac-studio.loc
 | `/fund/` | [Fund Accounting Academy](../fund-accounting-academy) | static files |
 | `/math/` | [MathCompetition](../MathCompetition) | reverse proxy to its Python server on `127.0.0.1:12998`, started with `--base-path /math` |
 | `/notes/` | Family Obsidian vault | static site built by [Quartz](https://quartz.jzhao.xyz); **password-protected** |
+| `/budget/` | [Family budget dashboard](../budget-advisor/budget-dashboard) | reverse proxy to its Streamlit app on `127.0.0.1:12997` (`--server.baseUrlPath budget`); **same login as the notes** |
 
 Because everything is a path on one host, there is no DNS or hosts-file setup on the devices that connect.
 Adding another project later = one more `handle_path` block in `Caddyfile` (static folder or `reverse_proxy`
@@ -26,6 +27,12 @@ caddy hash-password              # paste the output into NOTES_HASH in .env
 
 Open `http://localhost:12999/` on the same machine, or `http://mac-studio.local:12999/` (use your machine's name) from
 another device on your network. macOS may ask whether Caddy may accept incoming connections: allow it.
+
+The budget dashboard reads the `family_budget` Postgres database, so before `./run.sh` it needs
+`pip install -r budget-advisor/budget-dashboard/requirements.txt` (in its `.venv`, which `run.sh` prefers) and a
+`budget-advisor/budget-dashboard/.env` with the database credentials. If either is missing, `run.sh` skips `/budget/`
+and starts everything else. The gateway login (`NOTES_USER` / `NOTES_HASH`) guards it in addition to the dashboard's own
+admin login, because the data is financial.
 
 ## 2. Publish the family notes
 
@@ -70,7 +77,7 @@ launchctl load ~/Library/LaunchAgents/com.codetree.gateway.plist
 hosting/
 ├── Caddyfile                       # routing for all sites
 ├── load-env.sh                     # reads .env literally (safe for "$" in hashes)
-├── run.sh                          # starts MathCompetition + Caddy
+├── run.sh                          # starts MathCompetition + budget dashboard + Caddy
 ├── build-notes.sh                  # vault -> static site (Quartz)
 ├── env.example                     # copy to .env
 ├── com.codetree.gateway.plist      # optional launchd job

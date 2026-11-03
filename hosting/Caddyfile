@@ -3,6 +3,7 @@
 # (mac-studio.local, an IP, a Tailscale name, ...):
 #     /        portal        /fund/   Fund Accounting Academy
 #     /math/   MathCompetition        /notes/  family notes (password)
+#     /budget/ family budget dashboard (Streamlit + Postgres, password)
 # TLS is NOT handled here: Cloudflare Tunnel / Tailscale terminate it, so Caddy speaks plain HTTP.
 {
 	auto_https off
@@ -46,6 +47,18 @@ http://:{$GATEWAY_PORT:12999} {
 		}
 		root * {$HOSTING_DIR}/sites/notes
 		file_server
+	}
+
+	# Family budget dashboard (Streamlit). Unlike /math/ the prefix is NOT stripped: Streamlit is
+	# started with --server.baseUrlPath budget and serves everything under /budget/ itself.
+	# Private financial data: same login as the notes, on top of the dashboard's own admin login.
+	# reverse_proxy passes the websocket Streamlit uses for live updates.
+	redir /budget /budget/
+	handle /budget/* {
+		basic_auth {
+			{$NOTES_USER} {$NOTES_HASH}
+		}
+		reverse_proxy 127.0.0.1:{$BUDGET_PORT:12997}
 	}
 
 	# Portal at the root
