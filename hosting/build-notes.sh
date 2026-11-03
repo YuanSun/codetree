@@ -16,17 +16,25 @@ QUARTZ="$HERE/.quartz"
 [ -d "$VAULT" ] || { echo "Vault not found: $VAULT" >&2; exit 1; }
 [ -d "$QUARTZ" ] || git clone --depth 1 https://github.com/jackyzha0/quartz.git "$QUARTZ"
 ( cd "$QUARTZ" && npm ci --silent )
+# Quartz is served under /notes/ by the gateway, so its baseUrl must carry that path or its
+# links (explorer tree, search, graph) point at /<page> instead of /notes/<page>.
+# NOTES_BASE_URL is host[:port] only (no http://); it matters little beyond the sitemap/RSS.
+[ -f "$QUARTZ/quartz.config.yaml" ] || cp "$QUARTZ/quartz.config.default.yaml" "$QUARTZ/quartz.config.yaml"
+sed -i.bak "s#^  baseUrl:.*#  baseUrl: ${NOTES_BASE_URL:-localhost:${GATEWAY_PORT:-12999}}/notes#; s#^  pageTitle:.*#  pageTitle: Family Notes#" "$QUARTZ/quartz.config.yaml"
+rm -f "$QUARTZ/quartz.config.yaml.bak"
+
 # Content to publish: the whole vault, or a copy holding only the chosen folders.
 # (Hidden folders such as .obsidian and .trash are never copied.)
 CONTENT="$VAULT"
 if [ -n "$VAULT_DIRS" ]; then
-  CONTENT="$HERE/sites/content.tmp"
-  rm -rf "$CONTENT"; mkdir -p "$CONTENT"
+  # Must be OUTSIDE the repo: Quartz honours .gitignore, and hosting/sites/ is ignored, so it would see 0 files.
+  CONTENT="$(mktemp -d "${TMPDIR:-/tmp}/notes-content.XXXXXX")"
+  trap 'rm -rf "$CONTENT"' EXIT
   IFS=',' read -r -a dirs <<< "$VAULT_DIRS"
   for d in "${dirs[@]}"; do
     d="$(echo "$d" | sed 's#^ *##; s# *$##; s#/*$##')"
     [ -n "$d" ] || continue
-    [ -d "$VAULT/$d" ] || { echo "Folder not found in vault: $d" >&2; rm -rf "$CONTENT"; exit 1; }
+    [ -d "$VAULT/$d" ] || { echo "Folder not found in vault: $d" >&2; exit 1; }
     mkdir -p "$CONTENT/$(dirname "$d")"
     rsync -a --exclude '.*' "$VAULT/$d" "$CONTENT/$(dirname "$d")/"
   done
@@ -41,5 +49,4 @@ rm -rf "$HERE/sites/notes.old"
 [ -d "$HERE/sites/notes" ] && mv "$HERE/sites/notes" "$HERE/sites/notes.old"
 mv "$OUT" "$HERE/sites/notes"
 rm -rf "$HERE/sites/notes.old"
-[ "$CONTENT" = "$VAULT" ] || rm -rf "$CONTENT"
 echo "Notes published to $HERE/sites/notes"
