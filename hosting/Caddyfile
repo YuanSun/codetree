@@ -31,6 +31,16 @@ http://:{$GATEWAY_PORT:12999} {
 		}
 	}
 
+	# Exam-prep site (built by exam-prep-site/build.py into sites/exam; private, so behind the same login)
+	redir /exam /exam/
+	handle_path /exam/* {
+		basic_auth {
+			{$NOTES_USER} {$NOTES_HASH}
+		}
+		root * {$HOSTING_DIR}/sites/exam
+		file_server
+	}
+
 	# MathCompetition: the prefix is stripped here; the app is started with --base-path /math
 	# so the links it generates point back under /math/.
 	redir /math /math/

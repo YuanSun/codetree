@@ -84,15 +84,7 @@ hosting/
 └── portal/index.html               # landing page
 ```
 
-## Apple Notes → family notes site
+## Exam prep site (/exam/)
 
-`export-apple-notes.py` turns one Apple Notes folder into Markdown (plus the PDFs/HTML reports attached to each note) so the
-notes site can publish it. Run it on the Mac that has the notes (needs `pandoc`; allow Terminal to control Notes when asked):
-
-```bash
-SKIP="紫微" ./export-apple-notes.py ExamPreparation "$VAULT/Grace/ExamPreparation"
-VAULT_DIRS="Grace/SecondarySchool,Grace/ExamPreparation" ./build-notes.sh
-```
-
-The output is private, so write it into the vault (not the git repo). If the notes are on a different Mac than the gateway,
-export there and `rsync -a` the folder into the gateway's vault.
+Built from the Apple Notes folder by the `exam-prep-site/` subproject (see its README). The page is private and sits behind the
+same login as `/notes/`. Build it into `hosting/sites/exam` and the gateway serves it; no restart is needed for content changes.

@@ -222,3 +222,5 @@ antigravity-config.json
 hosting/.env
 hosting/sites/
 hosting/.quartz/
+# exam-prep-site: private exported notes
+exam-prep-site/content/
