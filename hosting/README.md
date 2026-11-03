@@ -83,3 +83,16 @@ hosting/
 ├── com.codetree.gateway.plist      # optional launchd job
 └── portal/index.html               # landing page
 ```
+
+## Apple Notes → family notes site
+
+`export-apple-notes.py` turns one Apple Notes folder into Markdown (plus the PDFs/HTML reports attached to each note) so the
+notes site can publish it. Run it on the Mac that has the notes (needs `pandoc`; allow Terminal to control Notes when asked):
+
+```bash
+SKIP="紫微" ./export-apple-notes.py ExamPreparation "$VAULT/Grace/ExamPreparation"
+VAULT_DIRS="Grace/SecondarySchool,Grace/ExamPreparation" ./build-notes.sh
+```
+
+The output is private, so write it into the vault (not the git repo). If the notes are on a different Mac than the gateway,
+export there and `rsync -a` the folder into the gateway's vault.
