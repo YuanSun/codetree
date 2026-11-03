@@ -46,6 +46,8 @@ http://:{$GATEWAY_PORT:12999} {
 			{$NOTES_USER} {$NOTES_HASH}
 		}
 		root * {$HOSTING_DIR}/sites/notes
+		# Quartz links have no extension (/page, not /page.html): try the .html file and folder index.
+		try_files {path} {path}.html {path}/index.html
 		file_server
 	}
 
