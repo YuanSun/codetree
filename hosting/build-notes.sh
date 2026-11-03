@@ -20,13 +20,14 @@ QUARTZ="$HERE/.quartz"
 # (Hidden folders such as .obsidian and .trash are never copied.)
 CONTENT="$VAULT"
 if [ -n "$VAULT_DIRS" ]; then
-  CONTENT="$HERE/sites/content.tmp"
-  rm -rf "$CONTENT"; mkdir -p "$CONTENT"
+  # Must be OUTSIDE the repo: Quartz honours .gitignore, and hosting/sites/ is ignored, so it would see 0 files.
+  CONTENT="$(mktemp -d "${TMPDIR:-/tmp}/notes-content.XXXXXX")"
+  trap 'rm -rf "$CONTENT"' EXIT
   IFS=',' read -r -a dirs <<< "$VAULT_DIRS"
   for d in "${dirs[@]}"; do
     d="$(echo "$d" | sed 's#^ *##; s# *$##; s#/*$##')"
     [ -n "$d" ] || continue
-    [ -d "$VAULT/$d" ] || { echo "Folder not found in vault: $d" >&2; rm -rf "$CONTENT"; exit 1; }
+    [ -d "$VAULT/$d" ] || { echo "Folder not found in vault: $d" >&2; exit 1; }
     mkdir -p "$CONTENT/$(dirname "$d")"
     rsync -a --exclude '.*' "$VAULT/$d" "$CONTENT/$(dirname "$d")/"
   done
@@ -41,5 +42,4 @@ rm -rf "$HERE/sites/notes.old"
 [ -d "$HERE/sites/notes" ] && mv "$HERE/sites/notes" "$HERE/sites/notes.old"
 mv "$OUT" "$HERE/sites/notes"
 rm -rf "$HERE/sites/notes.old"
-[ "$CONTENT" = "$VAULT" ] || rm -rf "$CONTENT"
 echo "Notes published to $HERE/sites/notes"
