@@ -89,8 +89,8 @@ See [fund-accounting-academy/README.md](fund-accounting-academy/README.md) for m
 
 ### Hosting Gateway
 
-One Caddy gateway that serves several projects from one machine and one address on paths (`/fund/`, `/math/`, `/notes/`),
-plus a portal page. Includes a Quartz-based publisher for the family Obsidian vault (password-protected) and a launchd job.
+One Caddy gateway that serves several projects from one machine and one address on paths (`/fund/`, `/math/`, `/notes/`, `/budget/`),
+plus a portal page. Includes the Streamlit family budget dashboard (behind the same login) and a Quartz-based publisher for the family Obsidian vault (password-protected) and a launchd job.
 
 - **Location**: `hosting/`
 - **Status**: Config and scripts written; not yet run end to end (Caddy not installed when written)
