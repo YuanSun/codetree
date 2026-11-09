@@ -1,0 +1,40 @@
+/* Week 6 lesson — beep race, prime bubbles, ladder, bags, sorter */
+.race svg, .venn svg { width: 100%; display: block; background: #fff; border: 3px solid var(--line); border-radius: 14px; }
+.venn svg text { font-family: var(--head); font-weight: 600; }
+.chips2 { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+.chips2 button { font: inherit; font-family: var(--head); font-weight: 600; border: 3px solid var(--line); background: #fff; border-radius: 14px; padding: 6px 12px; cursor: pointer; color: var(--navy); }
+.chips2 button.on { border-color: var(--navy-2); background: #e6e9ff; }
+
+/* ladder */
+.ladder { border-collapse: collapse; font-family: var(--head); font-size: 24px; margin: 10px 0; }
+.ladder td, .ladder th { padding: 4px 16px; text-align: center; min-width: 64px; }
+.ladder th { color: var(--muted); font-size: 14px; font-family: "Nunito", sans-serif; font-weight: 800; }
+.ladder td.p { color: #fff; font-size: 20px; }
+.ladder td.p span { display: inline-block; background: var(--c, #8b5cf6); border-radius: 10px; padding: 0 10px; min-width: 36px; }
+.ladder tr.n td:not(.p) { border-left: 3px solid var(--navy); }
+.ladder tr.n td { border-top: 2px dashed var(--line); }
+.ladder tr.n:first-of-type td { border-top: 0; }
+.ladder td.one { color: var(--green); }
+.primebtns { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 8px 0; }
+.primebtns .btn { min-width: 52px; }
+
+/* bags */
+.chipsrow { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0; }
+.chipsrow span { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-weight: 800; background: #f0f0fa; color: var(--muted); border: 2px solid var(--line); }
+.chipsrow span.ok { background: #d8f2e4; color: #0c7a47; border-color: #2fa77a; }
+.chipsrow span.cur { outline: 4px solid var(--gold); outline-offset: 1px; }
+.baglist { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; min-height: 40px; }
+.bag { background: #fff; border: 3px solid var(--line); border-radius: 14px; padding: 4px 8px; font-size: 14px; font-weight: 800; line-height: 1.25; animation: pop .25s; }
+.bag.leftover { border-color: #e5484d; background: #fff0f0; }
+
+/* sorter */
+.sorter { display: grid; gap: 14px; }
+.sorter-card { text-align: center; font-family: var(--head); font-weight: 600; font-size: clamp(20px, 3.4vw, 28px); color: var(--navy); background: linear-gradient(135deg, #fff, #f1eeff); border: 4px solid var(--line); border-radius: 26px; padding: 26px 18px; box-shadow: var(--shadow); min-height: 120px; display: grid; place-items: center; }
+.sorter-card.deal { animation: pop .35s; }
+.sorter-msg { min-height: 48px; text-align: center; font-weight: 800; font-size: 17px; display: grid; place-items: center; }
+.sorter-msg.bad { color: var(--red); } .sorter-msg.ok { color: #0c7a47; }
+.sorter-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.sorter-btns button { font: inherit; font-family: var(--head); font-weight: 600; font-size: 22px; color: #fff; border: 0; border-radius: 22px; padding: 14px 10px 12px; cursor: pointer; box-shadow: 0 7px 0 rgba(0, 0, 0, .22); }
+.sorter-btns button:active { transform: translateY(5px); box-shadow: 0 2px 0 rgba(0, 0, 0, .22); }
+.sorter-btns small { display: block; font-family: "Nunito", sans-serif; font-weight: 800; font-size: 13px; opacity: .92; }
+.mission .ask small { font-weight: 700; color: var(--muted); }

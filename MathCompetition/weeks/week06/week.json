@@ -1,0 +1,32 @@
+{
+  "number": 6,
+  "title": "PPCM, PGCD & Fractions Review",
+  "tagline": "PPCM = when do they meet again? PGCD = how many equal groups? Prime factors answer both — and the PPCM finds your common denominator too.",
+  "level": "G5–G6 · Class sheet",
+  "emoji": "🔔",
+  "skills": [
+    "PPCM",
+    "PGCD",
+    "Prime factors"
+  ],
+  "credit": "Based on Hu Education · 190-Grace · Sem-6 class sheet (retyped for personal study).",
+  "pages": [
+    {
+      "slug": "lesson",
+      "type": "html",
+      "file": "lesson.html",
+      "title": "The Quest",
+      "emoji": "🗺️",
+      "desc": "Play with each idea first — drag, tap, predict — then solve the questions from this week's sheet.",
+      "tasks": 7
+    },
+    {
+      "slug": "practice",
+      "type": "quiz",
+      "file": "exercises.json",
+      "title": "Class Sheet",
+      "emoji": "🏋️",
+      "desc": "11 questions from the sheet + the fractions review. Hints, trap-spotting and full solutions."
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "number": 5,
+  "title": "Fractions",
+  "tagline": "A fraction OF a fraction is a multiplication. Brackets first, then × ÷, then + −. And always ask: a fraction of WHAT?",
+  "level": "G5–G6 · Class sheet",
+  "emoji": "🍰",
+  "skills": [
+    "Fraction of a fraction",
+    "Brackets",
+    "Common denominator"
+  ],
+  "credit": "Based on Hu Education · 190-Grace · Sem-5 class sheet (retyped for personal study).",
+  "pages": [
+    {
+      "slug": "lesson",
+      "type": "html",
+      "file": "lesson.html",
+      "title": "The Quest",
+      "emoji": "🗺️",
+      "desc": "Play with each idea first — drag, tap, predict — then solve the questions from this week's sheet.",
+      "tasks": 7
+    },
+    {
+      "slug": "practice",
+      "type": "quiz",
+      "file": "exercises.json",
+      "title": "Class Sheet",
+      "emoji": "🏋️",
+      "desc": "9 questions from the sheet, split into small steps. Hints, trap-spotting and full solutions."
+    }
+  ]
+}

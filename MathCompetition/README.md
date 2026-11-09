@@ -38,6 +38,20 @@ predict-the-time game · share-the-cake ratio bars · change-one-side dressing b
 undo machine · does-order-matter · level-it-out cube bars · remove-a-number · cumulative-mean decoder · combine-two-groups tug-of-war · median/mode playground.
 After solving the Betty & Ann boss question there is also an interactive park simulator.
 
+## Other weeks
+
+| Week | Topic | Source |
+|---|---|---|
+| 5 | **Fractions** — a fraction *of* a fraction, brackets & dividing by a fraction, the farm problem | Hu Education 190-Grace, Sem-5 sheet |
+| 6 | **PPCM & PGCD** — beep race, prime-factor bubbles, divide-down ladder, marble bags, fractions review | Hu Education 190-Grace, Sem-6 sheet |
+| 7 | **Area & Perimeter** — *Math Detective* (standalone page, see below) | The Learning Lab, Week 7 homework |
+| 8 | Rates, Ratio, Percent & Mean (described above) | The Learning Lab, Week 8 |
+
+Weeks 5 and 6 each have **The Quest** (7 hands-on labs + guided examples, skill badges) and a **Class Sheet** (every question from the PDF, split into
+small steps, with hints, trap explanations and solutions). The questions keep the sheet's original French; help text is in English.
+The French-grammar pages of those PDFs (pronoms relatifs, subordonnées) are not part of this math site.
+Shared lesson styling lives in `static/css/lesson-common.css` (new weeks can link it instead of copying Week 8's CSS).
+
 ## Layout
 
 ```

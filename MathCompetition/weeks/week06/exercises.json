@@ -1,0 +1,360 @@
+{
+  "eyebrow": "Week 6 · Sem-6",
+  "title": "Class Sheet — PPCM & PGCD",
+  "intro": "**PPCM** = smallest number they all share as a multiple (“meet again”). **PGCD** = biggest number that divides them all (“share equally”). Prime factors do both jobs.",
+  "groups": [
+    {
+      "id": "ppcm",
+      "label": "PPCM",
+      "emoji": "🔔",
+      "color": "#8b5cf6"
+    },
+    {
+      "id": "pgcd",
+      "label": "PGCD",
+      "emoji": "🎒",
+      "color": "#10b981"
+    },
+    {
+      "id": "both",
+      "label": "Both together",
+      "emoji": "🧩",
+      "color": "#3b82f6"
+    },
+    {
+      "id": "story",
+      "label": "Word problems",
+      "emoji": "📖",
+      "color": "#f59e0b"
+    }
+  ],
+  "questions": [
+    {
+      "id": "pp01",
+      "skill": "ppcm",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-6 · Exercice 1)",
+      "text": "**PPCM (36, 48) = ?**",
+      "choices": [
+        "12",
+        "72",
+        "144",
+        "1728"
+      ],
+      "answer": 2,
+      "hints": [
+        "List the first multiples of 48: 48, 96, 144 … which one is also in the 36 table?",
+        "Or use primes: 36 = 2² × 3² and 48 = 2⁴ × 3. For the PPCM keep the BIGGEST power of every prime.",
+        "2⁴ × 3² = 16 × 9."
+      ],
+      "traps": {
+        "0": "12 is the PGCD (the biggest number that divides both). The PPCM is a multiple of both.",
+        "1": "72 is a multiple of 36, but 72 ÷ 48 = 1.5 — 48 doesn't fit in it.",
+        "3": "36 × 48 is a common multiple, but not the smallest: the shared factors are counted twice."
+      },
+      "solution": [
+        "36 = 2² × 3²",
+        "48 = 2⁴ × 3",
+        "PPCM: biggest power of each prime → 2⁴ × 3² = 16 × 9 = **144**"
+      ],
+      "idea": "PPCM = every prime, **highest** power."
+    },
+    {
+      "id": "pp02",
+      "skill": "pgcd",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-6 · Exercice 2)",
+      "text": "**PGCD (36, 48) = ?**",
+      "choices": [
+        "6",
+        "12",
+        "24",
+        "144"
+      ],
+      "answer": 1,
+      "hints": [
+        "Which numbers divide BOTH 36 and 48? Find the biggest.",
+        "36 = 2² × 3² and 48 = 2⁴ × 3. For the PGCD keep only the primes they SHARE, with the SMALLEST power.",
+        "2² × 3 = 4 × 3."
+      ],
+      "traps": {
+        "0": "6 divides both, but it isn't the greatest — 12 does too.",
+        "2": "24 divides 48, but 36 ÷ 24 is not a whole number.",
+        "3": "144 is the PPCM (a common multiple), not the PGCD."
+      },
+      "solution": [
+        "36 = 2² × 3²",
+        "48 = 2⁴ × 3",
+        "PGCD: shared primes, smallest power → 2² × 3 = **12**"
+      ],
+      "idea": "PGCD = shared primes, **lowest** power."
+    },
+    {
+      "id": "pp03",
+      "skill": "both",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-6 · Exercice 3)",
+      "text": "**PPCM (36, 48) × PGCD (36, 48) = ?**",
+      "choices": [
+        "1728",
+        "156",
+        "144",
+        "12"
+      ],
+      "answer": 0,
+      "hints": [
+        "You found both numbers in the last two questions: 144 and 12.",
+        "“×” means multiply.",
+        "Look at 36 × 48 — what do you notice?"
+      ],
+      "traps": {
+        "1": "156 = 144 + 12. The question says ×, not +.",
+        "2": "144 is only the PPCM — don't forget to multiply by the PGCD.",
+        "3": "12 is only the PGCD — multiply it by the PPCM."
+      },
+      "solution": [
+        "144 × 12 = **1728**.",
+        "And 36 × 48 = 1728 too! For two numbers: **PPCM × PGCD = the two numbers multiplied.**"
+      ],
+      "idea": "For TWO numbers: PPCM × PGCD = a × b (a great way to check!)."
+    },
+    {
+      "id": "pp04",
+      "skill": "both",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-6 · Exercice 4)",
+      "text": "Nombres **consécutifs** : PPCM (11, 12) = ? et PGCD (11, 12) = ?",
+      "choices": [
+        "PPCM 132, PGCD 1",
+        "PPCM 1, PGCD 132",
+        "PPCM 12, PGCD 11",
+        "PPCM 23, PGCD 1"
+      ],
+      "answer": 0,
+      "hints": [
+        "Does any number bigger than 1 divide both 11 and 12?",
+        "11 is prime. Does 11 divide 12?",
+        "If the PGCD is 1, then PPCM = 11 × 12."
+      ],
+      "traps": {
+        "1": "You swapped them. The PGCD can never be bigger than the numbers.",
+        "2": "A PGCD must divide BOTH numbers — 11 doesn't divide 12.",
+        "3": "23 = 11 + 12. The PPCM is a product, not a sum."
+      },
+      "solution": [
+        "Consecutive numbers share no prime factor, so PGCD = **1**.",
+        "PPCM = 11 × 12 = **132**."
+      ],
+      "idea": "Consecutive numbers: PGCD = 1 and PPCM = their product."
+    },
+    {
+      "id": "pp05",
+      "skill": "both",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-6 · Exercice 5)",
+      "text": "Nombres **premiers** : PPCM (7, 11) = ? et PGCD (7, 11) = ?",
+      "choices": [
+        "PPCM 1, PGCD 77",
+        "PPCM 77, PGCD 1",
+        "PPCM 77, PGCD 7",
+        "PPCM 18, PGCD 1"
+      ],
+      "answer": 1,
+      "hints": [
+        "Two different primes: what can divide both?",
+        "Only 1. So the PGCD is 1.",
+        "Then PPCM = 7 × 11."
+      ],
+      "traps": {
+        "0": "Swapped: the PGCD is the small one (it divides both).",
+        "2": "7 doesn't divide 11. Only 1 divides both.",
+        "3": "18 = 7 + 11. The PPCM is a product, not a sum."
+      },
+      "solution": [
+        "Different primes share nothing → PGCD = **1**.",
+        "PPCM = 7 × 11 = **77**."
+      ],
+      "idea": "Two different primes: PGCD = 1, PPCM = their product."
+    },
+    {
+      "id": "pp06",
+      "skill": "ppcm",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-6 · Exercice 1, no 1",
+      "text": "**PPCM (72, 80, 180) = ?**",
+      "choices": [
+        "4",
+        "360",
+        "720",
+        "1440"
+      ],
+      "answer": 2,
+      "hints": [
+        "Use primes (or the divide-down ladder). 72 = 2³ × 3², 80 = 2⁴ × 5, 180 = 2² × 3² × 5.",
+        "Biggest power of each prime: 2 → 2⁴, 3 → 3², 5 → 5.",
+        "16 × 9 × 5."
+      ],
+      "traps": {
+        "0": "4 is the PGCD of the three numbers. The PPCM is a common multiple.",
+        "1": "360 works for 72 and 180, but 360 ÷ 80 = 4.5 — it isn't a multiple of 80.",
+        "3": "1440 is a common multiple (twice the answer), but not the smallest."
+      },
+      "solution": [
+        "72 = 2³ × 3² · 80 = 2⁴ × 5 · 180 = 2² × 3² × 5",
+        "PPCM = 2⁴ × 3² × 5 = 16 × 9 × 5 = **720**",
+        "Check: 720 ÷ 72 = 10, 720 ÷ 80 = 9, 720 ÷ 180 = 4 ✅"
+      ],
+      "idea": "Three numbers? Same rule: every prime, highest power."
+    },
+    {
+      "id": "pp07",
+      "skill": "pgcd",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-6 · Exercice 1, no 2",
+      "text": "**PGCD (48, 60, 90) = ?**",
+      "choices": [
+        "3",
+        "6",
+        "12",
+        "720"
+      ],
+      "answer": 1,
+      "hints": [
+        "A prime must divide ALL THREE to count. 48 = 2⁴ × 3, 60 = 2² × 3 × 5, 90 = 2 × 3² × 5.",
+        "Shared by all three: 2 (smallest power 2¹) and 3 (smallest power 3¹). 5 is missing from 48.",
+        "2 × 3."
+      ],
+      "traps": {
+        "0": "3 divides all three, but it's not the greatest — 6 does too.",
+        "2": "12 divides 48 and 60, but 90 ÷ 12 = 7.5. It must divide ALL three.",
+        "3": "720 is the PPCM of these three numbers."
+      },
+      "solution": [
+        "48 = 2⁴ × 3 · 60 = 2² × 3 × 5 · 90 = 2 × 3² × 5",
+        "Shared by all three: 2¹ and 3¹ → PGCD = **6**",
+        "Check: 48 ÷ 6 = 8, 60 ÷ 6 = 10, 90 ÷ 6 = 15 ✅"
+      ],
+      "idea": "PGCD: the prime must be in EVERY number."
+    },
+    {
+      "id": "pp08",
+      "skill": "story",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-6 · Exercice 2, no 1",
+      "text": "Trois horloges sont déréglées. Elles viennent de sonner ensemble. L'une sonne à toutes les **20 minutes**, l'autre à toutes les **15 minutes** et la dernière à toutes les **24 minutes**. Dans combien de minutes sonneront-elles de nouveau ensemble ?",
+      "choices": [
+        "60",
+        "120",
+        "240",
+        "7200"
+      ],
+      "answer": 1,
+      "hints": [
+        "“Ring together AGAIN” — will you use the PPCM or the PGCD?",
+        "PPCM (20, 15, 24): 20 = 2² × 5, 15 = 3 × 5, 24 = 2³ × 3.",
+        "2³ × 3 × 5"
+      ],
+      "traps": {
+        "0": "60 is the PPCM of 20 and 15 — but the 24-minute clock isn't ringing at 60 (60 ÷ 24 = 2.5).",
+        "2": "240 is a time they all ring together, but not the FIRST time.",
+        "3": "7200 = 20 × 15 × 24. A common multiple, but far from the smallest."
+      },
+      "solution": [
+        "“Again together” = common multiple → the smallest one: PPCM.",
+        "20 = 2² × 5 · 15 = 3 × 5 · 24 = 2³ × 3",
+        "PPCM = 2³ × 3 × 5 = **120 minutes** (2 hours)"
+      ],
+      "idea": "“Together again / at the same time” → PPCM."
+    },
+    {
+      "id": "pp09",
+      "skill": "story",
+      "difficulty": "hard",
+      "source": "Hu Education 190-Grace · Sem-6 · Exercice 2, no 2 (a)",
+      "text": "Julien veut mettre des billes dans de petits sacs. Il possède **48 billes rouges, 64 billes bleues et 112 billes vertes**. Il veut faire <u>le plus grand nombre possible de sacs</u> contenant chacun le même nombre de billes de chaque couleur.<br><b>Combien remplit-il de sacs s'il ne reste aucune bille ?</b>",
+      "choices": [
+        "8",
+        "16",
+        "32",
+        "224"
+      ],
+      "answer": 1,
+      "hints": [
+        "“Same in every bag, nothing left over” → the number of bags must divide 48, 64 AND 112.",
+        "“Biggest number of bags” → the biggest such number. PPCM or PGCD?",
+        "PGCD (48, 64, 112): 48 = 2⁴ × 3, 64 = 2⁶, 112 = 2⁴ × 7 → 2⁴."
+      ],
+      "traps": {
+        "0": "8 bags works (6, 8, 14 per bag), but it isn't the BIGGEST possible number.",
+        "2": "32 doesn't divide 48 (48 ÷ 32 = 1.5), so marbles would be left over.",
+        "3": "224 = 48 + 64 + 112 is the total number of marbles."
+      },
+      "solution": [
+        "Number of bags must divide 48, 64 and 112, and we want the greatest → **PGCD**.",
+        "48 = 2⁴ × 3 · 64 = 2⁶ · 112 = 2⁴ × 7 → PGCD = 2⁴ = **16 bags**"
+      ],
+      "idea": "“Share equally, biggest number of groups” → PGCD."
+    },
+    {
+      "id": "pp10",
+      "skill": "story",
+      "difficulty": "hard",
+      "source": "Hu Education 190-Grace · Sem-6 · Exercice 2, no 2 (b)",
+      "text": "Julien fait <u>16 sacs</u> avec ses 48 billes rouges, 64 bleues et 112 vertes (même nombre de billes de chaque couleur dans chaque sac).<br><b>Combien de billes retrouvera-t-on dans chaque sac ?</b>",
+      "choices": [
+        "7",
+        "14",
+        "16",
+        "224"
+      ],
+      "answer": 1,
+      "hints": [
+        "Work out each colour separately: how many red marbles go in ONE bag?",
+        "Red: 48 ÷ 16, blue: 64 ÷ 16, green: 112 ÷ 16.",
+        "3 + 4 + 7 — the question asks for the whole bag."
+      ],
+      "traps": {
+        "0": "7 is only the green marbles. Add the red and blue ones too.",
+        "2": "16 is the number of BAGS, not the marbles in one bag.",
+        "3": "224 is every marble in all 16 bags."
+      },
+      "solution": [
+        "Red: 48 ÷ 16 = 3 · Blue: 64 ÷ 16 = 4 · Green: 112 ÷ 16 = 7",
+        "One bag: 3 + 4 + 7 = **14 marbles**",
+        "Check: 14 × 16 = 224 ✅"
+      ],
+      "idea": "Find ONE bag first, then check by scaling back up."
+    },
+    {
+      "id": "pp11",
+      "skill": "story",
+      "difficulty": "hard",
+      "source": "Hu Education 190-Grace · Sem-6 · Révision (fractions)",
+      "text": "Un travailleur gagne **1200 $** par semaine. Les [[3/10]] de cette somme sont retenus pour les impôts, les [[3/20]] pour la caisse de retraite et le [[1/50]] pour l'assurance-chômage.<br><b>Combien reste-t-il à ce travailleur sur une paye de deux semaines ?</b>",
+      "choices": [
+        "564 $",
+        "636 $",
+        "1128 $",
+        "1272 $"
+      ],
+      "answer": 3,
+      "hints": [
+        "Add the three “taken away” fractions first. They need a common denominator — which number do 10, 20 and 50 all divide?",
+        "That's the PPCM (10, 20, 50) = 100. [[30/100]] + [[15/100]] + [[2/100]].",
+        "He keeps 1 − [[47/100]] of his pay. Do one week, then double it."
+      ],
+      "traps": {
+        "0": "564 $ is what is taken OUT in one week. The question asks what REMAINS.",
+        "1": "636 $ is what remains after ONE week. The pay is for two weeks.",
+        "2": "1128 $ is what is taken out over two weeks, not what remains."
+      },
+      "solution": [
+        "Common denominator = PPCM (10, 20, 50) = 100.",
+        "[[30/100]] + [[15/100]] + [[2/100]] = [[47/100]] is taken.",
+        "He keeps [[53/100]] of 1200 $ = 636 $ per week.",
+        "Two weeks: 2 × 636 = **1272 $**"
+      ],
+      "idea": "Common denominator = PPCM of the denominators. Then: total − the parts taken."
+    }
+  ]
+}

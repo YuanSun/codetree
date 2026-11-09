@@ -1,0 +1,294 @@
+{
+  "eyebrow": "Week 5 · Sem-5",
+  "title": "Class Sheet — Fractions",
+  "intro": "The questions from this week's sheet, one step at a time. Remember: **“of” means ×**, and always ask **“a fraction of WHAT?”**",
+  "groups": [
+    {
+      "id": "of",
+      "label": "Fraction of a fraction",
+      "emoji": "🍰",
+      "color": "#10b981"
+    },
+    {
+      "id": "brackets",
+      "label": "Brackets",
+      "emoji": "🧮",
+      "color": "#3b82f6"
+    },
+    {
+      "id": "farm",
+      "label": "The farm",
+      "emoji": "🐄",
+      "color": "#f59e0b"
+    }
+  ],
+  "questions": [
+    {
+      "id": "fr01",
+      "skill": "of",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-5 · Exercice 2a",
+      "text": "Un berger a perdu le [[1/7]] de ses 56 chèvres l'an dernier et le [[1/6]] du reste cette année.<br><b>a) Quelle fraction de ses chèvres lui reste-t-il ?</b>",
+      "choices": [
+        "[[29/42]]",
+        "[[5/7]]",
+        "[[5/6]]",
+        "[[6/7]]"
+      ],
+      "answer": 1,
+      "hints": [
+        "How much of the flock is left after the FIRST loss? Write it as a fraction of the whole flock.",
+        "The second loss is [[1/6]] of the REST — so [[1/6]] of what you found. Then [[5/6]] of that rest survives.",
+        "Survivors = [[5/6]] of [[6/7]]. “Of” means ×."
+      ],
+      "traps": {
+        "0": "That takes [[1/6]] away from the WHOLE flock. The second loss is [[1/6]] of the REST, which is [[6/7]] of the flock.",
+        "2": "[[5/6]] is only what survives the second loss. The first loss ([[1/7]]) happened too.",
+        "3": "[[6/7]] is what is left after the first year only. Don't forget the second loss."
+      },
+      "solution": [
+        "After year 1 the shepherd keeps [[6/7]] of the flock.",
+        "In year 2 he loses [[1/6]] of that rest, so he keeps [[5/6]] of the rest.",
+        "[[5/6]] × [[6/7]] = [[5/7]] (the 6s cancel!) → **[[5/7]]**"
+      ],
+      "idea": "A fraction **of** a fraction: multiply. Work with the rest, not the whole."
+    },
+    {
+      "id": "fr02",
+      "skill": "of",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-5 · Exercice 2b",
+      "text": "Un berger a perdu le [[1/7]] de ses **56** chèvres l'an dernier et le [[1/6]] du reste cette année.<br><b>b) Combien de chèvres lui reste-t-il ?</b>",
+      "choices": [
+        "48",
+        "40",
+        "32",
+        "8"
+      ],
+      "answer": 1,
+      "hints": [
+        "You already know the fraction that is left (part a).",
+        "Fraction left × the number of goats.",
+        "[[5/7]] of 56 — divide by 7 first, then × 5."
+      ],
+      "traps": {
+        "0": "48 goats is what is left after only the first year (56 − 8).",
+        "3": "8 is how many goats he lost EACH year (they happen to be equal). The question asks how many are LEFT."
+      },
+      "solution": [
+        "56 ÷ 7 = 8 goats per seventh, so [[5/7]] of 56 = 5 × 8 = 40.",
+        "Check step by step: year 1 loses 8 → 48 left; year 2 loses [[1/6]] of 48 = 8 → **40** ✅"
+      ],
+      "idea": "Find ONE piece first (56 ÷ 7), then count the pieces you keep."
+    },
+    {
+      "id": "fr03",
+      "skill": "brackets",
+      "difficulty": "medium-hard",
+      "source": "Hu Education 190-Grace · Sem-5 · Exercice 1",
+      "text": "Calcule :<br><div style=\"font-size:22px;margin:8px 0\">[[1/5]] ÷ [ ( [[7/10]] + [[1/5]] ) × ( [[3/4]] − [[1/3]] ) ] − [[2/5]] = ?</div>",
+      "choices": [
+        "[[8/15]]",
+        "[[2/15]]",
+        "[[3/8]]",
+        "[[-13/40]]"
+      ],
+      "answer": 1,
+      "hints": [
+        "Brackets first — the INNERMOST ones. Two small calculations, each needs a common denominator.",
+        "( [[7/10]] + [[1/5]] ) = [[9/10]] and ( [[3/4]] − [[1/3]] ) = [[5/12]]. Multiply them to get the value of the big bracket.",
+        "The big bracket is [[3/8]]. Now [[1/5]] ÷ [[3/8]] means [[1/5]] × [[8/3]] — flip the second fraction — then subtract [[2/5]]."
+      ],
+      "traps": {
+        "0": "[[8/15]] is [[1/5]] ÷ [[3/8]] — correct so far! But the last step, − [[2/5]], is still waiting.",
+        "2": "[[3/8]] is the value of the square bracket. You still have to divide [[1/5]] by it, then subtract [[2/5]].",
+        "3": "You multiplied [[1/5]] × [[3/8]]. Dividing by [[3/8]] means multiplying by the flipped fraction [[8/3]]."
+      },
+      "solution": [
+        "( [[7/10]] + [[1/5]] ) = [[7/10]] + [[2/10]] = [[9/10]]",
+        "( [[3/4]] − [[1/3]] ) = [[9/12]] − [[4/12]] = [[5/12]]",
+        "[[9/10]] × [[5/12]] = [[45/120]] = [[3/8]]",
+        "[[1/5]] ÷ [[3/8]] = [[1/5]] × [[8/3]] = [[8/15]]",
+        "[[8/15]] − [[2/5]] = [[8/15]] − [[6/15]] = **[[2/15]]**"
+      ],
+      "idea": "Brackets → × and ÷ → + and −. Dividing by a fraction = multiplying by its flip."
+    },
+    {
+      "id": "fr04",
+      "skill": "farm",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-5 · Exercice 3a",
+      "text": "<b>a) Quelle fraction des animaux sont des poules ?</b>",
+      "choices": [
+        "[[5/6]]",
+        "[[1/6]]",
+        "[[1/3]]",
+        "[[2/15]]"
+      ],
+      "answer": 1,
+      "hints": [
+        "Hens are “the rest” — what is left when you remove the other animals?",
+        "Add the fractions for pigs, rabbits and cows. Use a common denominator (30).",
+        "[[4/30]] + [[9/30]] + [[12/30]] = [[25/30]]. The whole farm is [[30/30]]."
+      ],
+      "traps": {
+        "0": "[[5/6]] is the part that is NOT hens (pigs + rabbits + cows).",
+        "3": "[[2/15]] shows up twice in the story — it is the pigs' share, and the share of hens that lay well. Neither is the hens' share of the farm."
+      },
+      "solution": [
+        "Pigs [[2/15]] = [[4/30]], rabbits [[3/10]] = [[9/30]], cows [[2/5]] = [[12/30]].",
+        "Together: [[25/30]] = [[5/6]].",
+        "Hens = 1 − [[5/6]] = **[[1/6]]**"
+      ],
+      "idea": "“The rest” = the whole (1) minus the parts.",
+      "figure": "<div class=\"farm-fig\" style=\"line-height:1.55;font-size:16px\"><b>Monsieur Matheux</b> possède une ferme sur laquelle on retrouve <b>450 animaux</b>.<br>Les 2/15 animaux sont des <b>cochons</b> dont les 7/12 iront à l'abattoir cette semaine.<br>Les 3/10 des animaux sont des <b>lapins</b> et les 2/9 de ceux-ci sont noirs.<br>Les 2/5 des animaux sont des <b>vaches</b>. Malheureusement le 1/10 de ces vaches sont malades.<br>Le reste de ses animaux sont des <b>poules</b>. Monsieur Matheux considère que les 2/15 de ses poules sont de très bonnes pondeuses.</div>"
+    },
+    {
+      "id": "fr05",
+      "skill": "farm",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-5 · Exercice 3b",
+      "text": "<b>b) Quelle fraction des animaux représentent les quadrupèdes ?</b>",
+      "choices": [
+        "[[8/15]]",
+        "[[7/10]]",
+        "[[5/6]]",
+        "[[1/6]]"
+      ],
+      "answer": 2,
+      "hints": [
+        "Quadrupeds have FOUR legs. Which animals on this farm are they?",
+        "Pigs, rabbits and cows. Hens have two legs.",
+        "Add the three shares (denominator 30), or use 1 − hens."
+      ],
+      "traps": {
+        "0": "That leaves out the rabbits — rabbits are quadrupeds too.",
+        "1": "That leaves out the pigs.",
+        "3": "[[1/6]] is the hens' share — hens have only 2 legs."
+      },
+      "solution": [
+        "Quadrupeds = pigs + rabbits + cows = [[4/30]] + [[9/30]] + [[12/30]] = [[25/30]] = **[[5/6]]**",
+        "Shortcut: everything except the hens: 1 − [[1/6]] = [[5/6]] ✅"
+      ],
+      "idea": "Read the word: quadruped = 4 legs. Then choose the right groups.",
+      "figure": "<div class=\"farm-fig\" style=\"line-height:1.55;font-size:16px\"><b>Monsieur Matheux</b> possède une ferme sur laquelle on retrouve <b>450 animaux</b>.<br>Les 2/15 animaux sont des <b>cochons</b> dont les 7/12 iront à l'abattoir cette semaine.<br>Les 3/10 des animaux sont des <b>lapins</b> et les 2/9 de ceux-ci sont noirs.<br>Les 2/5 des animaux sont des <b>vaches</b>. Malheureusement le 1/10 de ces vaches sont malades.<br>Le reste de ses animaux sont des <b>poules</b>. Monsieur Matheux considère que les 2/15 de ses poules sont de très bonnes pondeuses.</div>"
+    },
+    {
+      "id": "fr06",
+      "skill": "farm",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-5 · Exercice 3c",
+      "text": "<b>c) Quelle fraction des animaux sont des vaches malades ?</b>",
+      "choices": [
+        "[[1/10]]",
+        "[[1/25]]",
+        "[[3/10]]",
+        "[[1/2]]"
+      ],
+      "answer": 1,
+      "hints": [
+        "Sick cows are a fraction of the COWS. Cows are a fraction of ALL the animals.",
+        "A fraction of a fraction → multiply.",
+        "[[1/10]] of [[2/5]] = [[1/10]] × [[2/5]]."
+      ],
+      "traps": {
+        "0": "[[1/10]] is a fraction of the COWS, not of all the animals.",
+        "2": "You subtracted ([[2/5]] − [[1/10]]). “Of” means multiply.",
+        "3": "You added ([[2/5]] + [[1/10]]). “Of” means multiply."
+      },
+      "solution": [
+        "Sick cows = [[1/10]] of the cows = [[1/10]] × [[2/5]] = [[2/50]] = **[[1/25]]** of all the animals."
+      ],
+      "idea": "Fraction of WHAT? Here: [[1/10]] of the cows, not of the farm.",
+      "figure": "<div class=\"farm-fig\" style=\"line-height:1.55;font-size:16px\"><b>Monsieur Matheux</b> possède une ferme sur laquelle on retrouve <b>450 animaux</b>.<br>Les 2/15 animaux sont des <b>cochons</b> dont les 7/12 iront à l'abattoir cette semaine.<br>Les 3/10 des animaux sont des <b>lapins</b> et les 2/9 de ceux-ci sont noirs.<br>Les 2/5 des animaux sont des <b>vaches</b>. Malheureusement le 1/10 de ces vaches sont malades.<br>Le reste de ses animaux sont des <b>poules</b>. Monsieur Matheux considère que les 2/15 de ses poules sont de très bonnes pondeuses.</div>"
+    },
+    {
+      "id": "fr07",
+      "skill": "farm",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-5 · Exercice 3d",
+      "text": "<b>d) Combien y a-t-il de vaches malades ?</b>",
+      "choices": [
+        "18",
+        "180",
+        "45",
+        "90"
+      ],
+      "answer": 0,
+      "hints": [
+        "Use the fraction from part c.",
+        "[[1/25]] of 450.",
+        "450 ÷ 25 = ?"
+      ],
+      "traps": {
+        "1": "180 is ALL the cows ([[2/5]] of 450). Only [[1/10]] of them are sick.",
+        "2": "45 is [[1/10]] of ALL 450 animals. The sick fraction is of the cows."
+      },
+      "solution": [
+        "450 ÷ 25 = **18**.",
+        "Check the long way: cows = [[2/5]] × 450 = 180, sick = [[1/10]] × 180 = 18 ✅"
+      ],
+      "idea": "Two roads, same answer — use one to check the other.",
+      "figure": "<div class=\"farm-fig\" style=\"line-height:1.55;font-size:16px\"><b>Monsieur Matheux</b> possède une ferme sur laquelle on retrouve <b>450 animaux</b>.<br>Les 2/15 animaux sont des <b>cochons</b> dont les 7/12 iront à l'abattoir cette semaine.<br>Les 3/10 des animaux sont des <b>lapins</b> et les 2/9 de ceux-ci sont noirs.<br>Les 2/5 des animaux sont des <b>vaches</b>. Malheureusement le 1/10 de ces vaches sont malades.<br>Le reste de ses animaux sont des <b>poules</b>. Monsieur Matheux considère que les 2/15 de ses poules sont de très bonnes pondeuses.</div>"
+    },
+    {
+      "id": "fr08",
+      "skill": "farm",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-5 · Exercice 3e",
+      "text": "<b>e) Combien y a-t-il d'animaux quadrupèdes ?</b>",
+      "choices": [
+        "340",
+        "375",
+        "75",
+        "450"
+      ],
+      "answer": 1,
+      "hints": [
+        "Use the fraction of quadrupeds from part b.",
+        "[[5/6]] of 450.",
+        "450 ÷ 6 = 75 for each sixth; take 5 of them."
+      ],
+      "traps": {
+        "0": "340 = 375 − 35. The 35 pigs go to the slaughterhouse in the FUTURE (“iront … cette semaine”) — they are still on the farm now.",
+        "2": "75 is the number of HENS (one sixth). The quadrupeds are the other five sixths."
+      },
+      "solution": [
+        "450 ÷ 6 = 75, so [[5/6]] of 450 = 5 × 75 = **375**.",
+        "Check: pigs 60 + rabbits 135 + cows 180 = 375 ✅"
+      ],
+      "idea": "Divide by the denominator, multiply by the numerator."
+    },
+    {
+      "id": "fr09",
+      "skill": "farm",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-5 · Exercice 3f",
+      "text": "<b>f) Les cochons et les poules représentent quelle fraction des animaux ?</b>",
+      "choices": [
+        "[[4/15]]",
+        "[[3/10]]",
+        "[[1/7]]",
+        "[[5/6]]"
+      ],
+      "answer": 1,
+      "hints": [
+        "You already know both fractions (pigs: given; hens: part a).",
+        "Pigs [[2/15]] + hens [[1/6]]. Common denominator?",
+        "[[4/30]] + [[5/30]]"
+      ],
+      "traps": {
+        "0": "That uses [[2/15]] for the hens too — but [[2/15]] is the share of hens that lay well. The hens' share of the farm is [[1/6]].",
+        "2": "You added the tops (2 + 1) and the bottoms (15 + 6). Fractions need a COMMON denominator first.",
+        "3": "[[5/6]] is all the quadrupeds, not pigs + hens."
+      },
+      "solution": [
+        "Pigs [[2/15]] = [[4/30]]. Hens [[1/6]] = [[5/30]].",
+        "[[4/30]] + [[5/30]] = [[9/30]] = **[[3/10]]**",
+        "Check: pigs 60 + hens 75 = 135, and 135 ÷ 450 = [[3/10]] ✅"
+      ],
+      "idea": "Add fractions only when the pieces are the same size (common denominator).",
+      "figure": "<div class=\"farm-fig\" style=\"line-height:1.55;font-size:16px\"><b>Monsieur Matheux</b> possède une ferme sur laquelle on retrouve <b>450 animaux</b>.<br>Les 2/15 animaux sont des <b>cochons</b> dont les 7/12 iront à l'abattoir cette semaine.<br>Les 3/10 des animaux sont des <b>lapins</b> et les 2/9 de ceux-ci sont noirs.<br>Les 2/5 des animaux sont des <b>vaches</b>. Malheureusement le 1/10 de ces vaches sont malades.<br>Le reste de ses animaux sont des <b>poules</b>. Monsieur Matheux considère que les 2/15 de ses poules sont de très bonnes pondeuses.</div>"
+    }
+  ]
+}
