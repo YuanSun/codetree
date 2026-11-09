@@ -1,0 +1,20 @@
+{
+  "number": 7,
+  "title": "Area & Perimeter",
+  "tagline": "Eight detective missions about area, perimeter and composite figures. Play with the picture, guess, then open the clues.",
+  "level": "G6–G7 · Contest Prep",
+  "emoji": "📐",
+  "skills": ["Area", "Perimeter", "Composite figures"],
+  "credit": "Based on The Learning Lab · Week 7 homework. Contest questions © CEMC, University of Waterloo — used here for personal study.",
+  "pages": [
+    {
+      "slug": "detective",
+      "type": "html",
+      "standalone": true,
+      "file": "math_detective.html",
+      "title": "Math Detective",
+      "emoji": "🕵️",
+      "desc": "8 mystery missions with a toolbox of formulas. Solve them on your own for ⭐⭐⭐."
+    }
+  ]
+}

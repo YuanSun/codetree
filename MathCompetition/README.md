@@ -69,6 +69,20 @@ Then refresh the browser. The lesson is custom HTML per week (the interesting pa
 the practice/homework pages are just JSON — see `CLAUDE.md` for the question schema and the authoring recipe
 (it is written so a future Claude session can turn a new pair of PDFs into a week the same way).
 
+## Adding an extra page to an existing week (e.g. a standalone HTML tool from class)
+
+Got a ready-made page — like the Week 7 *Math Detective*? Drop the file into the week's folder and list it in that week's `week.json`:
+
+```jsonc
+{ "slug": "detective", "type": "html", "standalone": true, "file": "math_detective.html",
+  "title": "Math Detective", "emoji": "🕵️", "desc": "8 mystery missions…" }
+```
+
+`"standalone": true` means the page has its own `<html>`, styles and scripts, so the server serves it as-is and only adds a small
+**🧪 Math Lab / ‹ Week N** pill (bottom-left) for getting back. It appears as a new card on that week's hub — refresh, no restart.
+Standalone pages keep their own state, so omit `"tasks"` (the hub then hides the progress bar for that card).
+Pages built with the shared engine (`MC.guided`, quizzes) should leave `standalone` off and use the nav bar as in Week 8.
+
 ## Tests
 
 ```bash
