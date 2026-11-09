@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Math Detective</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#fff8ec;--card:#ffffff;--soft:#fdf3e1;--ink:#2b2d42;--mut:#686d88;--line:#efe4d0;
+  --sun:#ffb703;--sun-d:#8a5700;--sun-l:#fff1c9;
+  --mint:#0f857a;--mint-d:#0b6e63;--mint-l:#d9f7f2;
+  --coral:#f2557a;--coral-d:#b81f45;--coral-l:#ffe3ea;
+  --sky:#2577b8;--sky-d:#1f6fae;--sky-l:#e0f0fc;
+  --grape:#7c4dea;--grape-d:#6d3fe0;--grape-l:#efe8ff;
+  --shadow:0 2px 0 rgba(43,45,66,.06),0 10px 28px -12px rgba(43,45,66,.22);
+  --r:22px;
+  --head:"Fredoka","Nunito",system-ui,sans-serif;
+  --fig:#fffdf8;--topbar:rgba(255,248,236,.92);--gridline:rgba(59,155,224,.07);--hint-ink:#7a4f00;--grape-ink:#3d2a7a;
+  color-scheme:light;
+}
+/* night mode: soft indigo, never pure black; same hues, lighter text tints */
+html[data-theme="dark"]{
+  --paper:#1c1e30;--card:#26293f;--soft:#30344f;--ink:#ecebf5;--mut:#a9acc6;--line:#3a3e5e;
+  --sun:#ffc23d;--sun-d:#ffd27a;--sun-l:#45391a;
+  --mint:#0f857a;--mint-d:#6ee7d8;--mint-l:#163f3c;
+  --coral:#f2668a;--coral-d:#ff9db5;--coral-l:#4a2232;
+  --sky:#2577b8;--sky-d:#8cc8f5;--sky-l:#1b3550;
+  --grape:#7c4dea;--grape-d:#c4b1ff;--grape-l:#332a58;
+  --fig:#202338;--topbar:rgba(28,30,48,.92);--gridline:rgba(140,170,255,.06);--hint-ink:#ffd27a;--grape-ink:#ddd2ff;
+  --shadow:0 2px 0 rgba(0,0,0,.2),0 12px 30px -14px rgba(0,0,0,.6);
+  color-scheme:dark;
+}
+html[data-theme="dark"] .btn.main{box-shadow:0 4px 0 #a8770a}
+html[data-theme="dark"] .btn.go{box-shadow:0 4px 0 #0d6e64}
+html[data-theme="dark"] .mhead .big-no{box-shadow:0 4px 0 #5b36c9}
+html[data-theme="dark"] .tool svg>*{fill-opacity:.35}
+body{transition:background-color .3s,color .3s}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;color:var(--ink);font:17px/1.6 "Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--gridline) 1px,transparent 1px),linear-gradient(90deg,var(--gridline) 1px,transparent 1px);
+  background-size:28px 28px}
+button{font:inherit;cursor:pointer;color:inherit}
+a{color:var(--sky-d)}
+b{font-weight:800}
+.m{font-family:var(--head);font-weight:600;background:var(--sky-l);color:var(--sky-d);padding:1px 7px;border-radius:8px;white-space:nowrap}
+.k{font-family:var(--head);font-weight:700;background:var(--sun-l);color:var(--sun-d);padding:1px 8px;border-radius:8px;white-space:nowrap}
+
+/* ---------- top bar ---------- */
+.topbar{position:sticky;top:0;z-index:50;background:var(--topbar);backdrop-filter:blur(8px);border-bottom:2px solid var(--line)}
+.topbar .in{max-width:1180px;margin:0 auto;padding:10px 18px 10px 72px;display:flex;align-items:center;gap:14px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--head);font-weight:700;font-size:20px;text-decoration:none;color:var(--ink)}
+.brand svg{width:38px;height:38px}
+.brand small{font-family:"Nunito";font-weight:700;font-size:13px;color:var(--mut);display:block;line-height:1}
+.pdots{display:flex;gap:6px;margin-left:auto}
+.pdots button{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);background:var(--card);font:700 13px var(--head);color:var(--mut);padding:0;transition:.15s}
+.pdots button:hover{border-color:var(--sun);transform:translateY(-2px)}
+.pdots button.done{background:var(--mint);border-color:var(--mint);color:#fff}
+.pdots button.here{box-shadow:0 0 0 3px var(--sun)}
+.starcount{white-space:nowrap;display:flex;align-items:center;gap:6px;background:var(--card);border:2px solid var(--line);border-radius:999px;padding:4px 12px;font:700 16px var(--head)}
+.starcount .st{color:var(--sun);font-size:19px}
+.tbtn{background:var(--card);border:2px solid var(--line);border-radius:999px;padding:5px 12px;font-weight:800;font-size:14px}
+.tbtn:hover{border-color:var(--grape)}
+@media(max-width:820px){.pdots{display:none}.starcount{margin-left:auto}.brand small{display:none}}
+@media(max-width:480px){.tbtn span{display:none}.brand>span:last-child{display:none}.topbar .in{gap:8px;padding-right:12px}}
+
+.wrap{max-width:1180px;margin:0 auto;padding:0 18px 70px}
+.view[hidden]{display:none}
+
+/* ---------- map / home ---------- */
+.hero{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;background:var(--card);border-radius:28px;padding:26px 30px;margin:26px 0 8px;box-shadow:var(--shadow);border:2px solid var(--line);position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;background:var(--sun-l);border-radius:50%;z-index:0}
+.hero>*{position:relative;z-index:1}
+.hero .fox{width:120px;height:120px}
+.hero h1{font-family:var(--head);font-size:clamp(28px,4vw,42px);line-height:1.15;margin:0 0 6px}
+.hero h1 em{font-style:normal;color:var(--coral)}
+.hero p{margin:4px 0;color:var(--mut);max-width:640px}
+.howto{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.howto span{background:var(--soft);border-radius:999px;padding:4px 12px;font-weight:700;font-size:14px}
+.howto i{font-style:normal;display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;color:#fff;font:700 12px var(--head);margin-right:6px}
+@media(max-width:600px){.hero{grid-template-columns:1fr;text-align:center}.hero .fox{margin:0 auto;width:96px;height:96px}.howto{justify-content:center}}
+
+.sec-h{font-family:var(--head);font-size:clamp(22px,2.8vw,28px);margin:34px 0 12px;display:flex;align-items:center;gap:10px}
+.missions{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.mcard{background:var(--card);border:2px solid var(--line);border-radius:var(--r);padding:12px;text-align:left;box-shadow:var(--shadow);transition:transform .15s,border-color .15s;display:flex;flex-direction:column;gap:8px}
+.mcard:hover{transform:translateY(-4px) rotate(-.4deg);border-color:var(--sun)}
+.mcard .thumb{background:var(--fig);border-radius:14px;aspect-ratio:16/10;display:grid;place-items:center;overflow:hidden;border:1px solid var(--line)}
+.mcard .thumb svg{width:100%;height:100%}
+.mcard .row{display:flex;align-items:center;gap:8px}
+.mcard .no{width:30px;height:30px;flex:none;border-radius:10px;background:var(--grape);color:#fff;display:grid;place-items:center;font:700 16px var(--head)}
+.mcard.done .no{background:var(--mint)}
+.mcard .tt{font-family:var(--head);font-weight:600;font-size:17px;line-height:1.2}
+.mcard .meta{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--mut);font-weight:700}
+.stars3{letter-spacing:1px;font-size:17px}
+.off,.stars3 .off{filter:grayscale(1);opacity:.28}
+
+.toolbox{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.tool{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:12px 14px;box-shadow:var(--shadow)}
+.tool svg{width:84px;height:66px;display:block;margin-bottom:4px}
+.tool b{font-family:var(--head);font-weight:600;font-size:16px;display:block}
+.tool .f{font-family:var(--head);font-weight:600;color:var(--grape-d);display:block;margin:2px 0}
+.tool p{margin:0;font-size:14px;color:var(--mut);line-height:1.45}
+
+details.grown{margin-top:34px;background:var(--card);border:2px dashed var(--line);border-radius:18px;padding:10px 16px}
+details.grown summary{cursor:pointer;font-weight:800;color:var(--mut)}
+.tbl{overflow-x:auto}
+table.ans{width:100%;border-collapse:collapse;margin-top:10px;font-size:15px}
+table.ans th,table.ans td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+table.ans th{color:var(--mut);font-size:13px;text-transform:uppercase;letter-spacing:.5px}
+
+/* ---------- problem view ---------- */
+.problem[hidden]{display:none}
+.problem{scroll-margin-top:90px}
+.problem.locked .read .win,.problem.locked .spoil,.problem.locked .read .chip.ok{display:none}
+.mhead{display:flex;gap:14px;align-items:center;margin:26px 0 12px}
+.mhead .big-no{width:58px;height:58px;flex:none;border-radius:18px;background:var(--grape);color:#fff;display:grid;place-items:center;font:700 30px var(--head);box-shadow:0 4px 0 var(--grape-d);transform:rotate(-4deg)}
+.mhead .kicker{font-weight:800;font-size:14px;color:var(--mut);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.mhead h2{font-family:var(--head);font-size:clamp(24px,3.2vw,34px);line-height:1.15;margin:2px 0 0}
+.lvl{background:var(--coral-l);color:var(--coral-d);border-radius:999px;padding:1px 10px;font-size:13px}
+.lvl.med{background:var(--sun-l);color:var(--sun-d)}
+.src{font-weight:600;font-size:13px;color:var(--mut)}
+.case{display:flex;gap:14px;background:var(--card);border:2px solid var(--line);border-radius:var(--r);padding:16px 20px;box-shadow:var(--shadow);font-size:18px;margin-bottom:16px}
+.case .ic{font-size:28px;line-height:1}
+.case .lbl{font:600 13px var(--head);letter-spacing:1px;text-transform:uppercase;color:var(--coral-d)}
+.grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:16px;align-items:start}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.col{display:grid;gap:16px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--shadow)}
+.card-h{display:flex;align-items:center;gap:10px;font:600 18px var(--head);margin-bottom:10px}
+.card-h .n{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:15px;flex:none}
+.card-h .cnt{margin-left:auto;font:700 13px "Nunito";color:var(--mut)}
+.figwrap svg{width:100%;height:auto;display:block;background:var(--fig);border-radius:16px;border:1px solid var(--line)}
+.read{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 2px}
+.chip{display:inline-flex;gap:6px;align-items:baseline;background:var(--soft);border-radius:10px;padding:3px 10px;font-size:14px}
+.chip i{font-style:normal;color:var(--mut);font-weight:600}.chip b{font-family:var(--head);font-weight:600}
+.chip.ok{background:var(--mint-l)}.chip.ok b{color:var(--mint-d)}
+.chip.bad{background:var(--coral-l)}.chip.bad b{color:var(--coral-d)}
+.win{margin-top:8px;padding:9px 14px;border-radius:14px;background:var(--mint-l);color:var(--mint-d);font-weight:800;animation:pop .35s}
+.win.warn{background:var(--sun-l);color:var(--sun-d)}
+.ctls{margin-top:12px;display:grid;gap:10px}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;font-size:15px;font-weight:700;color:var(--mut)}
+.ctl output{font:600 15px var(--head);color:var(--grape-d);background:var(--grape-l);padding:0 10px;border-radius:8px}
+.ctl input[type=range]{grid-column:1/-1;width:100%;-webkit-appearance:none;appearance:none;height:30px;background:transparent}
+.ctl input[type=range]::-webkit-slider-runnable-track{height:10px;border-radius:99px;background:var(--grape-l)}
+.ctl input[type=range]::-moz-range-track{height:10px;border-radius:99px;background:var(--grape-l)}
+.ctl input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;margin-top:-8px;border-radius:50%;background:var(--grape);border:4px solid var(--card);box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.ctl input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--grape);border:4px solid var(--card);box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.ctl.chk{display:flex;gap:10px;align-items:center;color:var(--ink);cursor:pointer}
+.ctl.chk input{width:22px;height:22px;accent-color:var(--mint)}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.pre{background:var(--card);border:2px solid var(--line);border-radius:999px;padding:5px 12px;font-size:14px;font-weight:700;transition:.15s}
+.pre:hover{border-color:var(--grape);transform:translateY(-1px)}
+.pre[hidden]{display:none}
+
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:8px 16px;font:600 17px var(--head);box-shadow:0 3px 0 var(--line);transition:.12s}
+.opt:hover{border-color:var(--sun);transform:translateY(-2px)}
+.opt.right{background:var(--mint-l);border-color:var(--mint);box-shadow:0 3px 0 var(--mint)}
+.opt.wrong{background:var(--coral-l);border-color:var(--coral);box-shadow:0 3px 0 var(--coral);opacity:.75}
+.numin{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-weight:700}
+.numin input{border:2px solid var(--line);border-radius:14px;padding:9px 12px;font:600 18px var(--head);width:140px;background:var(--fig);color:var(--ink)}
+.numin input:focus{outline:none;border-color:var(--sun);box-shadow:0 0 0 4px var(--sun-l)}
+.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+
+.buddy{display:flex;gap:10px;align-items:flex-end;margin-top:14px}
+.buddy .fox{width:54px;height:54px;flex:none}
+.bubble{position:relative;background:var(--soft);border-radius:16px 16px 16px 4px;padding:10px 14px;font-weight:700;font-size:15px;flex:1}
+.bubble.good{background:var(--mint-l);color:var(--mint-d)}
+.bubble.no{background:var(--coral-l);color:var(--coral-d)}
+.bubble.hint{background:var(--sun-l);color:var(--hint-ink)}
+.bubble .gotstars{font-size:20px;letter-spacing:2px;display:block;margin-top:2px}
+
+.btn{background:var(--card);border:2px solid var(--line);border-radius:999px;padding:7px 14px;font-size:15px;font-weight:800;transition:.15s}
+.btn:hover{border-color:var(--grape)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.main{background:var(--sun);border-color:var(--sun);box-shadow:0 4px 0 var(--sun-d);color:#3a2600}
+.btn.main:hover{transform:translateY(-1px)}
+.btn.main:active{transform:translateY(2px);box-shadow:0 2px 0 var(--sun-d)}
+.btn.go{background:var(--mint);border-color:var(--mint);color:#fff;box-shadow:0 4px 0 var(--mint-d)}
+.hintbtn{margin-top:10px}
+
+.cluebar{display:flex;gap:5px;margin-bottom:10px}
+.cluebar span{flex:1;height:8px;border-radius:99px;background:var(--line);transition:.3s}
+.cluebar span.on{background:var(--mint)}
+.empty{color:var(--mut);font-weight:700;text-align:center;padding:14px;border:2px dashed var(--line);border-radius:16px}
+ol.steps{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ol.steps li{display:none;background:var(--fig);border:2px solid var(--line);border-radius:16px;padding:12px 14px 12px 54px;position:relative}
+ol.steps li.on{display:block;animation:pop .35s ease}
+ol.steps li.cur{border-color:var(--sun);box-shadow:0 0 0 4px var(--sun-l)}
+ol.steps li::before{content:attr(data-n);position:absolute;left:12px;top:12px;width:30px;height:30px;border-radius:50%;background:var(--mint);color:#fff;font:700 15px var(--head);display:grid;place-items:center}
+ol.steps li h4{margin:0 0 2px;font:600 17px var(--head)}
+ol.steps li p{margin:5px 0}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+.big{margin-top:12px;background:var(--grape-l);border-radius:16px;padding:12px 16px;display:none;color:var(--grape-ink)}
+.big.on{display:block;animation:pop .4s}
+.big b{color:var(--grape-d)}
+.stepbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center}
+details.pm{background:var(--card);border:2px dashed var(--line);border-radius:18px;padding:8px 14px}
+details.pm summary{cursor:pointer;font-weight:800;color:var(--mut);font-size:15px}
+details.pm pre{white-space:pre-wrap;word-break:break-word;margin:8px 0;font:14px/1.5 "Nunito",sans-serif;background:var(--soft);padding:10px;border-radius:12px}
+.pm select{border:2px solid var(--line);border-radius:10px;padding:5px 8px;font:inherit;font-size:14px;background:var(--card);color:var(--ink)}
+.mnav{display:flex;justify-content:space-between;gap:10px;margin-top:22px;flex-wrap:wrap}
+.mnav .btn{padding:10px 18px}
+
+/* ---------- dialogs & confetti ---------- */
+dialog{border:0;border-radius:26px;padding:24px;max-width:min(760px,92vw);box-shadow:0 30px 80px -20px rgba(0,0,0,.4);color:var(--ink);background:var(--paper)}
+dialog::backdrop{background:rgba(43,45,66,.45)}
+dialog h3{font-family:var(--head);font-size:26px;margin:0 0 12px}
+.dlg-x{float:right}
+.trophy{text-align:center}
+.trophy .fox{width:130px;height:130px}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:10000}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+footer{color:var(--mut);text-align:center;margin-top:30px;font-size:14px;font-weight:600}
+</style>
+<script>
+window.THEME={mode:'auto',night(){const h=new Date().getHours();return h>=19||h<7},
+  eff(){return this.mode==='auto'?((matchMedia('(prefers-color-scheme: dark)').matches||this.night())?'dark':'light'):this.mode}};
+document.documentElement.dataset.theme=THEME.eff();
+</script>
+</head>
+<body>
+<header class="topbar"><div class="in">
+  <a class="brand" href="#map" aria-label="Back to the mission map"><span class="foxslot"></span><span>Math Detective<small id="weeklbl"></small></span></a>
+  <div class="pdots" id="pdots" aria-label="Missions"></div>
+  <div class="starcount" title="Stars collected"><span class="st">★</span><span id="starnum">0</span><span style="color:var(--mut);font-size:14px">/ <span id="starmax"></span></span></div>
+  <button class="tbtn" id="themebtn" type="button" title="Day / night"></button>
+  <button class="tbtn" id="toolbtn" type="button">🧰 <span>Toolbox</span></button>
+</div></header>
+
+<div class="wrap">
+<!-- ================= MAP ================= -->
+<section class="view" id="mapview">
+  <div class="hero">
+    <div class="foxslot herofox"></div>
+    <div>
+      <h1 id="map">Hi <span data-learner></span>! <span data-count></span> mysteries <em>need a detective.</em></h1>
+      <p>Each mission is a puzzle about <span data-blurb></span>. Play with the picture, make your guess, then open the clues one by one.</p>
+      <div class="howto">
+        <span><i style="background:var(--sky)">1</i>Explore the picture</span>
+        <span><i style="background:var(--sun)">2</i>Try an answer</span>
+        <span><i style="background:var(--mint)">3</i>Open the clues</span>
+      </div>
+      <p style="font-size:14px;margin-top:10px">⭐⭐⭐ for solving it on your own. Hints and clues are always OK to use!</p>
+    </div>
+  </div>
+
+  <h2 class="sec-h" id="missions">🗺️ Mission map</h2>
+  <div class="missions" id="missiongrid"></div>
+
+  <h2 class="sec-h" id="toolbox">🧰 Detective toolbox</h2>
+  <div class="toolbox" id="toolboxgrid">
+<!--@@TOOLBOX-->
+    <div class="tool"><svg viewBox="0 0 56 44"><polygon points="4,40 52,40 20,6" fill="#ffe3ea" stroke="#f2557a" stroke-width="2.5" stroke-linejoin="round"/><line x1="20" y1="6" x2="20" y2="40" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="3 3"/></svg><b>Triangle area</b><span class="f">½ × base × height</span><p>Height = straight-down distance to the base.</p></div>
+    <div class="tool"><svg viewBox="0 0 56 44"><polygon points="6,40 46,40 6,8" fill="#e0f0fc" stroke="#3b9be0" stroke-width="2.5" stroke-linejoin="round"/><path d="M6 33h7v7" fill="none" stroke="#3b9be0" stroke-width="2"/></svg><b>Pythagoras</b><span class="f">leg² + leg² = long side²</span><p>Friends to know: 3-4-5, 5-12-13, 6-8-10.</p></div>
+    <div class="tool"><svg viewBox="0 0 56 44"><rect x="4" y="28" width="12" height="12" fill="#fff1c9" stroke="#ffb703" stroke-width="2"/><rect x="22" y="4" width="36" height="36" fill="#fff1c9" stroke="#ffb703" stroke-width="2" transform="scale(.9) translate(4 4)"/></svg><b>Area grows by the square</b><span class="f">lengths ×3 → area ×9</span><p>Every length gets multiplied twice.</p></div>
+    <div class="tool"><svg viewBox="0 0 56 44"><polygon points="6,40 50,40 28,6" fill="#d9f7f2" stroke="#14b8a6" stroke-width="2.5" stroke-linejoin="round"/><path d="M14.31 21.26L19.69 24.74M36.31 24.74L41.69 21.26" stroke="#14b8a6" stroke-width="2" stroke-linecap="round"/><path d="M15.0 40.0A9 9 0 0 0 10.89 32.44M41.0 40.0A9 9 0 0 1 45.11 32.44" fill="none" stroke="#f2557a" stroke-width="2.2" stroke-linecap="round"/></svg><b>Isosceles triangle</b><span class="f">2 equal sides ⇒ 2 equal angles</span><p>The two base angles (pink) match.</p></div>
+    <div class="tool"><svg viewBox="0 0 56 44"><polygon points="4,38 38,38 18,8" fill="#efe8ff" stroke="#8b5cf6" stroke-width="2.5" stroke-linejoin="round"/><line x1="38" y1="38" x2="54" y2="38" stroke="#8b5cf6" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="3 3"/><path d="M46.0 38.0A8 8 0 0 0 33.56 31.34" fill="none" stroke="#f2557a" stroke-width="2.4" stroke-linecap="round"/><path d="M11.0 38.0A7 7 0 0 0 6.96 31.66M15.46 13.44A6 6 0 0 0 21.33 12.99" fill="none" stroke="#3b9be0" stroke-width="2.2" stroke-linecap="round"/></svg><b>Exterior angle</b><span class="f">outside = far inside + far inside</span><p>Pink = blue + blue: the two inside angles not touching it.</p></div>
+    <div class="tool"><svg viewBox="0 0 56 44"><rect x="6" y="4" width="44" height="36" fill="#fff1c9" stroke="#ffb703" stroke-width="2.5"/><polygon points="6,4 22,4 6,18" fill="#ffe3ea"/><polygon points="50,40 34,40 50,26" fill="#ffe3ea"/></svg><b>Composite figure</b><span class="f">big shape − small pieces</span><p>Or add the pieces up.</p></div>
+<!--@@END-->
+  </div>
+
+  <details class="grown"><summary>👪 For grown-ups: answer key</summary>
+    <div class="tbl"><table class="ans" id="anstable"></table></div>
+    <p style="font-size:14px;color:var(--mut)">Every answer was also double-checked with a short computer calculation.</p>
+  </details>
+  <footer>Keep exploring, detective! 🚀</footer>
+</section>
+
+<!-- ================= MISSIONS ================= -->
+<section class="view" id="playview" hidden><main id="main"></main></section>
+</div>
+
+<dialog id="tooldlg"><button class="btn dlg-x" data-close>✕</button><h3>🧰 Detective toolbox</h3><div class="toolbox" id="toolclone"></div></dialog>
+<dialog id="windlg"><div class="trophy"><div class="foxslot herofox"></div><h3>🏆 Case closed, Detective <span data-learner></span>!</h3><p>You solved all <span data-count></span> mysteries and collected <b id="winstars">0</b> stars.</p><p style="color:var(--mut)">Want more stars? Replay a mission and solve it before opening the clues.</p><button class="btn main" data-close>Yay! 🎉</button></div></dialog>
+<canvas id="confetti"></canvas>
+
+<script>
+/* ---------- helpers (light theme) ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+function $$(s,r=document){return [...r.querySelectorAll(s)]}
+const r2=v=>+(+v).toFixed(2), r3=v=>+(+v).toFixed(3);
+let INK,GRID,CIRC,HALO;
+const GOLD='#ffb703',TEAL='#14b8a6',PINK='#f2557a',BLUE='#3b9be0',VIO='#8b5cf6',MUT='#8a8fa8';
+let TXT={};
+const FIG={light:{INK:'#2b2d42',GRID:'#e6eaf3',CIRC:'#e0f0fc',HALO:'#fffdf8',TXT:{[GOLD]:'#8a5700',[TEAL]:'#0b6e63',[PINK]:'#b81f45',[BLUE]:'#1f6fae',[VIO]:'#6d3fe0',[MUT]:'#5d6280'}},
+           dark:{INK:'#ecebf5',GRID:'#2f3352',CIRC:'#243a5c',HALO:'#202338',TXT:{[GOLD]:'#ffd166',[TEAL]:'#5eead4',[PINK]:'#ff8fab',[BLUE]:'#8cc8f5',[VIO]:'#c4b1ff',[MUT]:'#b3b6cf'}}};
+function figColors(){const f=FIG[document.documentElement.dataset.theme==='dark'?'dark':'light'];({INK,GRID,CIRC,HALO,TXT}=f);}
+figColors();
+const chips=l=>l.map(([a,b,ok])=>`<span class="chip${ok===true?' ok':ok===false?' bad':''}"><i>${a}</i><b>${b}</b></span>`).join('');
+const L=(x1,y1,x2,y2,c=MUT,w=2,d='')=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c}" stroke-width="${w}"${d?` stroke-dasharray="${d}"`:''} stroke-linecap="round"/>`;
+const T=(x,y,t,c=INK,sz=14,a='middle',wt=700)=>`<text x="${x}" y="${y}" fill="${TXT[c]||c}" font-size="${sz+1}" text-anchor="${a}" font-weight="${wt}" font-family="Fredoka,Nunito,system-ui,sans-serif" stroke="${HALO}" stroke-width="3.5" paint-order="stroke" stroke-linejoin="round">${t}</text>`;
+const Dt=(x,y,c=GOLD,r=4)=>`<circle cx="${x}" cy="${y}" r="${r+0.5}" fill="${c}" stroke="${HALO}" stroke-width="1.5"/>`;
+const POLY=(pts,f,s='none',w=2,fo=1,d='')=>`<polygon points="${pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')}" fill="${f}" fill-opacity="${fo}" stroke="${s}" stroke-width="${w}"${d?` stroke-dasharray="${d}"`:''} stroke-linejoin="round"/>`;
+/* ---- pictures for any topic (all theme-aware) ---- */
+/* number line: values a..b drawn from x0 to x1 at y; ticks every `step`, labels every o.lab; returns {svg, X} where X(value) gives the x position */
+const NL=(x0,x1,y,a,b,step=1,o={})=>{const lab=o.lab||step,fmt=o.fmt||(v=>r2(v)),X=v=>x0+(v-a)/(b-a)*(x1-x0);let g=L(x0-8,y,x1+8,y,INK,2.5);
+  const n=Math.round((b-a)/step);for(let i=0;i<=n;i++){const v=a+i*step,big=Math.abs((v-a)/lab-Math.round((v-a)/lab))<1e-6;g+=L(X(v),y-(big?8:5),X(v),y+(big?8:5),INK,big?2:1.5);if(big)g+=T(X(v),y+26,fmt(v),MUT,13);}
+  return{svg:g,X};};
+/* hop arc above a number line from xa to xb, with optional label */
+const ARC=(xa,xb,y,c=VIO,t='')=>{const hgt=Math.abs(xb-xa)*.45+12;return `<path d="M${xa} ${y} Q${(xa+xb)/2} ${y-hgt} ${xb} ${y}" fill="none" stroke="${c}" stroke-width="2.5" stroke-linecap="round"/>`+(t?T((xa+xb)/2,y-hgt/2-8,t,c,13):'');};
+/* bar / fraction model: n equal parts, first k filled; o.label text to the right */
+const BAR=(x,y,w,h,n,k,c=GOLD,o={})=>{let g='';const pw=w/n;for(let i=0;i<n;i++)g+=`<rect x="${(x+i*pw).toFixed(1)}" y="${y}" width="${pw.toFixed(1)}" height="${h}" fill="${i<k?c:'none'}" fill-opacity="${i<k?.55:0}" stroke="${INK}" stroke-width="2"/>`;if(o.label)g+=T(x+w+12,y+h/2+5,o.label,o.lc||INK,15,'start');return g;};
+/* block array: rows x cols squares of size sz; fill(i,j) true = coloured */
+const BLOCKS=(x,y,cols,rows,sz,fill=()=>false,c=BLUE)=>{let g='';for(let i=0;i<rows;i++)for(let j=0;j<cols;j++){const f=fill(i,j);g+=`<rect x="${x+j*sz+1}" y="${y+i*sz+1}" width="${sz-2}" height="${sz-2}" rx="3" fill="${f?c:GRID}" fill-opacity="${f?.75:1}"/>`;}return g;};
+const FOX=`<svg viewBox="0 0 100 100" class="fox" aria-hidden="true"><polygon points="18,40 28,6 46,32" fill="#ff8a3d"/><polygon points="82,40 72,6 54,32" fill="#ff8a3d"/><polygon points="24,34 29,16 38,30" fill="#ffd1b0"/><polygon points="76,34 71,16 62,30" fill="#ffd1b0"/><polygon points="10,36 90,36 50,92" fill="#ff8a3d"/><polygon points="10,36 50,36 32,62" fill="#ff9f5c"/><polygon points="28,60 72,60 50,92" fill="#fff"/><circle cx="35" cy="50" r="5.5" fill="#2b2d42"/><circle cx="65" cy="50" r="5.5" fill="#2b2d42"/><circle cx="37" cy="48" r="1.8" fill="#fff"/><circle cx="67" cy="48" r="1.8" fill="#fff"/><circle cx="50" cy="86" r="4.5" fill="#2b2d42"/><circle cx="80" cy="74" r="11" fill="none" style="stroke:var(--ink)" stroke-width="4"/><circle cx="80" cy="74" r="8" fill="#e0f0fc" fill-opacity=".7"/><line x1="72" y1="82" x2="62" y2="94" style="stroke:var(--ink)" stroke-width="5" stroke-linecap="round"/></svg>`;
+$$('.foxslot').forEach(e=>e.innerHTML=FOX);
+
+/*@@WEEK*/
+const WEEK={n:7,topic:'Area & Perimeter',blurb:'area, perimeter and composite figures',learner:'Grace',
+  finals:['(D) 2 : 3','(A) 8/9','k = 6','25 square units','4 isosceles triangles','32','4 cm','1000 square units']};
+/*@@END*/
+/*@@PROBLEMS*/
+/* ---------- problems ---------- */
+const P=[];
+
+/* ===== 1 ===== */
+P.push({
+ n:1,title:'Square, a cut-off corner, and a ratio',src:'CJMC (Gray Jay) 2020 Q14 · Worked example',lvl:['med','Medium-Hard'],
+ statement:`<b>ABCD</b> is a square and <b>EF ∥ AC</b> (E on AB, F on BC). If the areas of <b>AEFCD</b> and <b>ABCD</b> are in the ratio <b>8 : 9</b>, what is the ratio <b>EF : AB</b>?`,
+ type:'mc',opts:[['A','1 : 2'],['B','1 : 3'],['C','1 : 6'],['D','2 : 3'],['E','1 : 1'],['F','3 : 4']],correct:'D',
+ hint:'Follow the teacher’s red note: pretend the side is 3. The part that is missing from the square is the little triangle EBF.',
+ def:{f:0.3,side:3,sq:false},
+ controls:[
+  {k:'f',t:'range',label:'How far E is from B (EB = BF)',min:0.05,max:1,step:0.005,fmt:(v,s)=>r2(v*s.side)+' units'},
+  {k:'side',t:'range',label:'Side of the square ABCD',min:3,max:9,step:3,fmt:v=>v+' units'},
+  {k:'sq',t:'check',label:'Build the square on EF (Method 2)'}],
+ presets:[{n:'🎯 Make it 8 : 9',set:{f:Math.SQRT2/3}},{n:'Tiny corner',set:{f:0.15}},{n:'Half way',set:{f:0.5}},{n:'Side 6, still 8:9',set:{side:6,f:Math.SQRT2/3}},{n:'Side 9, still 8:9',set:{side:9,f:Math.SQRT2/3}}],
+ svg(s){
+  const U=150,ox=50,oy=190,X=v=>ox+v*U,Y=v=>oy-v*U,f=s.f;
+  const E=[1-f,0],F=[1,f],E2=[1,-f],F2=[1+f,0];
+  let b='';
+  b+=POLY([[0,0],E,F,[1,1],[0,1]].map(p=>[X(p[0]),Y(p[1])]),TEAL,'none',0,.28);
+  b+=POLY([E,[1,0],F].map(p=>[X(p[0]),Y(p[1])]),PINK,PINK,2,.55);
+  b+=POLY([[0,0],[1,0],[1,1],[0,1]].map(p=>[X(p[0]),Y(p[1])]),'none',INK,2.5);
+  b+=L(X(0),Y(0),X(1),Y(1),MUT,1.5,'3 4');
+  if(s.sq){
+    b+=POLY([E,[1,0],E2].map(p=>[X(p[0]),Y(p[1])]),PINK,'none',0,.28)+POLY([[1,0],E2,F2].map(p=>[X(p[0]),Y(p[1])]),PINK,'none',0,.18)+POLY([[1,0],F2,F].map(p=>[X(p[0]),Y(p[1])]),PINK,'none',0,.28);
+    b+=POLY([E,F,F2,E2].map(p=>[X(p[0]),Y(p[1])]),'none',GOLD,2.5,1,'6 4');
+    b+=L(X(1),Y(0),X(E2[0]),Y(E2[1]),GOLD,1.2,'3 3')+L(X(1),Y(0),X(F2[0]),Y(F2[1]),GOLD,1.2,'3 3');
+    b+=T(X(1)+f*U*.55+8,Y(-f)+16,'4 copies of the triangle',GOLD,12,'start');
+  }
+  b+=Dt(X(0),Y(0),INK)+Dt(X(1),Y(0),INK)+Dt(X(1),Y(1),INK)+Dt(X(0),Y(1),INK)+Dt(X(E[0]),Y(0),GOLD)+Dt(X(1),Y(f),GOLD);
+  b+=T(X(0)-12,Y(0)+16,'A')+T(X(1)+4,Y(0)-8,'B',INK,14,'start')+T(X(1)+12,Y(1)+4,'C',INK,14,'start')+T(X(0)-12,Y(1)+4,'D')+T(X(E[0])-2,Y(0)+18,'E',GOLD)+T(X(1)+12,Y(f)+4,'F',GOLD,14,'start');
+  b+=T(X(.5),Y(1)-8,'side = '+s.side,MUT,13);
+  const eb=f*s.side,rest=1-f*f/2,ef=f*Math.SQRT2;
+  const ok1=Math.abs(rest-8/9)<0.002,ok2=Math.abs(ef-2/3)<0.003;
+  return{w:400,h:s.sq?370:225,body:b,
+   read:chips([['EB = BF',r2(eb)],['triangle EBF',r2(eb*eb/2)],['AEFCD ÷ ABCD',r3(rest)+' (goal 0.889)',ok1],['EF ÷ AB',r3(ef),ok1]])+(ok1?'<div class="win">✔ Area ratio is exactly 8 : 9 — and look: EF ÷ AB = 2 ÷ 3 !</div>':'')};
+ },
+ steps:[
+  {t:'Pick a friendly side length',h:`<p>The teacher’s note says: <i>suppose the side is 3</i>. Any size works because we only want a <b>ratio</b>. So the square has area <span class="m">3 × 3 = 9</span>.</p>`,act:{side:3,f:0.3,sq:false}},
+  {t:'Decode “8 : 9”',h:`<p><b>AEFCD</b> is the whole square with the little corner triangle <b>EBF</b> chopped off. If AEFCD is 8 parts and the square is 9 parts, the missing triangle is <span class="k">1 part</span>.</p><p>So triangle EBF has area <span class="m">1</span> (one ninth of 9).</p>`,act:{f:0.4,sq:false}},
+  {t:'What kind of triangle is EBF?',h:`<p>The diagonal AC cuts the square’s corner A at <b>45°</b>. Since <b>EF ∥ AC</b>, line EF also makes a 45° angle with AB. So angles <span class="m">BEF = BFE = 45°</span>.</p><p>Two equal angles ⇒ two equal sides: <span class="m">EB = BF</span>. Triangle EBF is a <span class="k">right isosceles triangle</span> (right angle at B).</p>`,act:{f:0.4}},
+  {t:'Method 1 — find EB, then EF with Pythagoras',h:`<p>Let EB = BF = <i>x</i>. Area <span class="m">½ · x · x = 1</span> ⇒ <span class="m">x² = 2</span>.</p><p>Pythagoras: <span class="m">EF² = x² + x² = 2 + 2 = 4</span> ⇒ <span class="k">EF = 2</span>. (We never needed to know √2 itself!)</p><p>Ratio: <span class="m">EF : AB = 2 : 3</span>. Slide the slider to the glowing ✔ to see it.</p>`,act:{f:Math.SQRT2/3}},
+  {t:'Method 2 — complete the square around EF',h:`<p>Build a square <b>on</b> EF (the blue arrows in the teacher’s picture). Magic: point <b>B is exactly its centre</b>, and the diagonals through B cut that square into <span class="k">4 copies</span> of triangle EBF.</p><p>So the big square has area <span class="m">4 × 1 = 4</span> ⇒ its side is <span class="m">EF = √4 = 2</span>. Same answer, even faster!</p>`,act:{sq:true,f:Math.SQRT2/3}},
+  {t:'Does the side length matter?',h:`<p>Try the “Side 6” and “Side 9” presets: every length grows by the same factor, so <span class="m">EF : AB</span> stays <span class="k">2 : 3</span>. The answer is <b>(D) 2 : 3</b>.</p>`,act:{side:6,f:Math.SQRT2/3,sq:true}}],
+ big:'<b>Big idea:</b> a ratio problem doesn’t care about the real size — choose a nice number (like 3) and the problem gets easy. And “square the lengths ⇒ area” works both ways: area 4 ⇒ side 2.',
+ describe:(s,d)=>{const a=[];if(s.side!==d.side)a.push('the square’s side to '+s.side);if(s.f!==d.f)a.push('EB = '+r2(s.f*s.side)+' (so AEFCD ÷ ABCD ≈ '+r3(1-s.f*s.f/2)+')');if(s.sq)a.push('the square built on EF turned on');return a;}
+});
+
+/* ===== 2 ===== */
+P.push({
+ n:2,title:'Circle inside a circle',src:'Gauss 2021 Grade 8 Q18 · Practice',lvl:['med','Medium'],
+ statement:`The radius of the larger circle is <b>3 times</b> the radius of the smaller circle. What fraction of the area of the larger circle is <b>not shaded</b>?`,
+ type:'mc',opts:[['A','8/9'],['B','2/3'],['C','5/6'],['D','7/9'],['E','1/3']],correct:'A',
+ hint:'Call the small radius r. Then the big radius is 3r. Write both areas using π.',
+ def:{n:3},
+ controls:[{k:'n',t:'range',label:'Big radius is … × small radius',min:2,max:6,step:1,fmt:v=>'× '+v}],
+ presets:[{n:'× 2',set:{n:2}},{n:'× 3 (the problem)',set:{n:3}},{n:'× 4',set:{n:4}},{n:'× 5',set:{n:5}}],
+ svg(s){
+  const n=s.n,R=100,cx=110,cy=135,r=R/n,off=(R-r)*0.62;
+  let b=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="${CIRC}" stroke="${INK}" stroke-width="2.5"/><circle cx="${cx-off}" cy="${cy-off}" r="${r}" fill="${GOLD}" stroke="${INK}" stroke-width="2"/>`;
+  b+=L(cx,cy,cx+R,cy,PINK,2.5)+T(cx+R/2,cy-8,'R = '+n+'r',PINK,13)+L(cx-off,cy-off,cx-off+r,cy-off,'#0b0e20',2)+T(cx-off+r/2,cy-off-5,r>14?'r':'',  '#0b0e20',12);
+  const g=150,bx=235,by=45,bs=g/n;
+  b+=T(bx+g/2,by-14,'Area in “small-circle units”',MUT,12);
+  for(let i=0;i<n;i++)for(let j=0;j<n;j++){const sh=(i===0&&j===0);b+=`<rect x="${bx+j*bs+1}" y="${by+i*bs+1}" width="${bs-2}" height="${bs-2}" rx="3" fill="${sh?GOLD:'#2f5fd0'}" fill-opacity="${sh?1:.65}"/>`;}
+  b+=T(bx+g/2,by+g+22,n+' × '+n+' = '+n*n+' blocks, only 1 is shaded',TEAL,12);
+  const ok=n===3;
+  return{w:400,h:290,body:b,read:chips([['small area','π r²'],['big area','π ('+n+'r)² = '+n*n+' π r²'],['not shaded',(n*n-1)+'/'+(n*n),ok],['as decimal',r3((n*n-1)/(n*n))]])+(ok?'<div class="win">✔ This is the problem: 8 out of 9 blocks are NOT shaded → 8/9</div>':'')};
+ },
+ steps:[
+  {t:'Give the small radius a name',h:`<p>Let the small radius be <span class="m">r</span>. “3 times as long” means the big radius is <span class="m">3r</span>.</p>`,act:{n:3}},
+  {t:'Write both areas (circle area = π × radius × radius)',h:`<p>Small circle: <span class="m">π · r · r = π r²</span>.</p><p>Big circle: <span class="m">π · (3r) · (3r) = 9 π r²</span> — the 3 gets multiplied <b>twice</b>, once for each “radius” in the formula.</p>`,act:{n:3}},
+  {t:'Find the un-shaded area',h:`<p>Not shaded = big − small = <span class="m">9πr² − 1πr² = 8πr²</span>.</p>`},
+  {t:'Make the fraction',h:`<p><span class="m">(8πr²) ÷ (9πr²)</span> — the <span class="k">π r²</span> cancels top and bottom, leaving <span class="k">8/9</span>. Answer: <b>(A)</b>.</p>`},
+  {t:'See it as blocks',h:`<p>Look at the blocks: the big circle is worth <b>3 × 3 = 9</b> small circles of area. One is shaded, 8 are not. Try ×2, ×4, ×5 and spot the pattern: the un-shaded fraction is <span class="m">(n² − 1)/n²</span>.</p>`,act:{n:3}}],
+ big:'<b>Big idea:</b> if you multiply every <i>length</i> by n, the <i>area</i> is multiplied by <b>n × n</b>. That is why one 3× jump in radius means 9× the area.',
+ describe:(s,d)=>s.n!==d.n?['the radius ratio to '+s.n+' (so '+(s.n*s.n-1)+'/'+s.n*s.n+' is un-shaded)']:[]
+});
+
+/* ===== 3 ===== */
+P.push({
+ n:3,title:'Tangled Triangles',src:'CEMC Problem of the Week · Hard',lvl:['hard','Hard'],
+ statement:`Points <b>A(7,12), B(3,2), C(11,2), D(6,2), E(10,2)</b> are plotted. Point <b>F(8, k)</b> lies inside △ABC so that the area inside △ABC but <b>outside</b> △DEF is <b>32 units²</b>. Find <b>k</b>, the y-coordinate of F.`,
+ type:'num',correct:6,unit:'',
+ hint:'First find the area of the big triangle ABC. Then the little triangle DEF must be whatever is left over.',
+ def:{k:9},
+ controls:[{k:'k',t:'range',label:'Height of F (the number k)',min:2.2,max:11.8,step:0.1,fmt:v=>'k = '+r2(v)}],
+ presets:[{n:'🎯 k = 6',set:{k:6}},{n:'k = 4',set:{k:4}},{n:'k = 8',set:{k:8}},{n:'k = 9.4',set:{k:9.4}}],
+ svg(s){
+  const ox=34,oy=350,u=24,X=v=>ox+v*u,Y=v=>oy-v*u,k=s.k;
+  let b='';
+  for(let i=0;i<=13;i++)b+=L(X(i),Y(0),X(i),Y(14),GRID,1);
+  for(let j=0;j<=14;j++)b+=L(X(0),Y(j),X(13),Y(j),GRID,1);
+  b+=L(X(0),Y(0),X(13),Y(0),MUT,1.5)+L(X(0),Y(0),X(0),Y(14),MUT,1.5);
+  b+=`<path d="M${X(7)} ${Y(12)} L${X(3)} ${Y(2)} L${X(11)} ${Y(2)} Z M${X(6)} ${Y(2)} L${X(8)} ${Y(k)} L${X(10)} ${Y(2)} Z" fill="${GOLD}" fill-opacity=".45" fill-rule="evenodd" stroke="${INK}" stroke-width="2"/>`;
+  b+=L(X(8),Y(k),X(8),Y(2),PINK,2,'5 4')+T(X(8)+6,Y((k+2)/2)+4,'height = '+r2(k-2),PINK,12,'start');
+  [['A',7,12,'(7,12)'],['B',3,2,'(3,2)'],['C',11,2,'(11,2)'],['D',6,2,'D'],['E',10,2,'E']].forEach(p=>{b+=Dt(X(p[1]),Y(p[2]));});
+  b+=T(X(7),Y(12)-8,'A (7,12)')+T(X(3)-4,Y(2)+16,'B (3,2)',INK,13,'end')+T(X(11)+6,Y(2)+16,'C (11,2)',INK,13,'start')+T(X(6)-4,Y(2)+16,'D',INK,13,'end')+T(X(10)+2,Y(2)+16,'E',INK,13,'start');
+  b+=Dt(X(8),Y(k),PINK,5)+T(X(8)+8,Y(k)-6,'F (8, '+r2(k)+')',PINK,13,'start');
+  const def=0.5*4*(k-2),out=40-def,inside=(8>3+0.4*(k-2)&&8<11-0.4*(k-2)),ok=Math.abs(out-32)<0.05;
+  return{w:370,h:372,body:b,read:chips([['△ABC','½·8·10 = 40'],['△DEF',r2(def)],['shaded = ABC − DEF',r2(out)+' (goal 32)',ok],['F inside ABC?',inside?'yes':'NO – too high!',inside]])+(ok?'<div class="win">✔ k = 6 makes the shaded region exactly 32 units²</div>':'')};
+ },
+ steps:[
+  {t:'Area of the big triangle ABC',h:`<p>B(3,2) and C(11,2) are on the same horizontal line, so that’s the <b>base</b>: <span class="m">11 − 3 = 8</span>.</p><p>A is at height 12, the base is at height 2, so the <b>height</b> is <span class="m">12 − 2 = 10</span>.</p><p>Area = <span class="m">½ × 8 × 10 = 40</span>.</p>`,act:{k:9}},
+  {t:'What area must DEF have?',h:`<p>The gold region is “ABC <b>minus</b> DEF”. It’s <span class="m">32</span>, so <span class="m">40 − DEF = 32</span> ⇒ <span class="k">DEF = 8</span>.</p>`,act:{k:9}},
+  {t:'Use DEF’s base and unknown height',h:`<p>D(6,2) and E(10,2) are also on the line y = 2: base DE = <span class="m">10 − 6 = 4</span>.</p><p>F is at height k, so its distance above that line is <span class="m">k − 2</span> (the pink dashed line).</p><p>Area: <span class="m">½ × 4 × (k − 2) = 2(k − 2)</span>.</p>`,act:{k:7}},
+  {t:'Solve for k',h:`<p><span class="m">2(k − 2) = 8</span> ⇒ <span class="m">k − 2 = 4</span> ⇒ <span class="k">k = 6</span>.</p>`,act:{k:6}},
+  {t:'Check your answer (good detectives always do!)',h:`<p>F = (8, 6). Is it inside ABC? At height 6, the triangle ABC spans from x = 4.6 to x = 9.4, and 8 is between them ✔.</p><p>Shaded area = 40 − 8 = 32 ✔. Slide k past about 9.5 and the dot jumps out of the triangle — the problem says F must be inside!</p>`,act:{k:6}}],
+ big:'<b>Big idea:</b> the height of a triangle is how far the top point is from the <i>base line</i> — here that’s <b>k − 2</b>, not k. Subtracting the base line’s height is the key move on a coordinate grid.',
+ describe:(s,d)=>s.k!==d.k?['F at height k = '+r2(s.k)+' (shaded area then = '+r2(44-2*s.k)+')']:[]
+});
+
+/* ===== 4 ===== */
+P.push({
+ n:4,title:'Squared Up',src:'CEMC Problem of the Week · Hard',lvl:['hard','Hard'],
+ statement:`Square <b>ABCD</b> is drawn on graph paper with three vertices at <b>A(0,4), B(3,0), C(7,3)</b>. Determine the <b>area</b> of square ABCD.`,
+ type:'num',correct:25,unit:'square units',
+ hint:'Area of a square = side × side. How far is it from A to B? Count squares: right ?, down ?.',
+ def:{a:3,b:4,py:false,fr:false},
+ controls:[
+  {k:'a',t:'range',label:'Run of the slope  (a)',min:1,max:6,step:1,fmt:v=>v},
+  {k:'b',t:'range',label:'Rise of the slope  (b)',min:1,max:6,step:1,fmt:v=>v},
+  {k:'py',t:'check',label:'Show the Pythagoras triangle on AB'},
+  {k:'fr',t:'check',label:'Show the big frame + 4 corner triangles'}],
+ presets:[{n:'The problem (3, 4)',set:{a:3,b:4}},{n:'(1, 1)',set:{a:1,b:1}},{n:'(2, 5)',set:{a:2,b:5}},{n:'(5, 5)',set:{a:5,b:5}}],
+ svg(s){
+  const a=s.a,b=s.b,t=a+b,u=Math.min(32,290/t),ox=62,oy=30+t*u+2,X=v=>ox+v*u,Y=v=>oy-v*u;
+  const A=[0,b],B=[a,0],C=[a+b,a],D=[b,a+b];
+  let g='';
+  for(let i=0;i<=t;i++){g+=L(X(i),Y(0),X(i),Y(t),GRID,1)+L(X(0),Y(i),X(t),Y(i),GRID,1);}
+  g+=L(X(0),Y(0),X(t),Y(0),MUT,1.5)+L(X(0),Y(0),X(0),Y(t),MUT,1.5);
+  const q=p=>[X(p[0]),Y(p[1])];
+  let bd=g+POLY([A,B,C,D].map(q),TEAL,INK,2.5,.3);
+  if(s.fr){
+    bd+=POLY([[0,0],[t,0],[t,t],[0,t]].map(q),'none',GOLD,2,1,'6 4');
+    [[[0,0],B,A],[B,[t,0],C],[C,[t,t],D],[D,[0,t],A]].forEach((tr,i)=>{bd+=POLY(tr.map(q),['#ef476f','#4cc9f0','#ef476f','#4cc9f0'][i],'none',0,.35);});
+  }
+  if(s.py){
+    bd+=POLY([[0,0],B,A].map(q),PINK,PINK,2.5,.35)+T(X(a/2),Y(0)+16,'a = '+a,PINK,13)+T(X(0)-6,Y(b/2)+4,'b = '+b,PINK,13,'end');
+  }
+  bd+=[A,B,C,D].map(p=>Dt(X(p[0]),Y(p[1]))).join('');
+  bd+=T(X(A[0])-8,Y(A[1])-8,'A ('+A+')',INK,12,'end')+T(X(B[0]),Y(B[1])+30,'B ('+B+')',INK,12)+T(X(C[0])+8,Y(C[1])+4,'C ('+C+')',INK,12,'start')+T(X(D[0]),Y(D[1])-8,'D ('+D+')',INK,12);
+  const area=a*a+b*b,frame=t*t-2*a*b,ok=(a===3&&b===4);
+  return{w:440,h:Math.round(oy+34),body:bd,read:chips([['AB² = a² + b²',a+'² + '+b+'² = '+area,ok],['frame method',t+'² − 4·(½·'+a+'·'+b+') = '+frame],['area of ABCD',area,ok]])+(ok?'<div class="win">✔ a = 3, b = 4 → AB² = 25 = area of the square. Both methods agree!</div>':'')};
+ },
+ steps:[
+  {t:'Walk from A to B on the grid',h:`<p>From A(0,4) to B(3,0) you go <b>right 3</b> and <b>down 4</b>. Those two moves are the two legs of a right triangle, and the walk itself (AB) is the long slanted side.</p>`,act:{a:3,b:4,py:true,fr:false}},
+  {t:'Pythagoras gives AB² — and that’s all we need!',h:`<p><span class="m">AB² = 3² + 4² = 9 + 16 = 25</span> (so AB = 5, the famous 3-4-5 triangle).</p><p>The area of a square is <b>side × side = AB²</b>, so the area is already <span class="k">25</span>.</p>`,act:{py:true}},
+  {t:'Is BC really the same length?',h:`<p>From B(3,0) to C(7,3): right 4, up 3 ⇒ <span class="m">BC² = 4² + 3² = 25</span> ✔. The “3 and 4” swapped roles — that’s a 90° turn, exactly what a square corner does.</p>`,act:{py:true}},
+  {t:'Second method — wrap a frame around the square',h:`<p>Put a big <b>7 × 7</b> square frame around ABCD (area 49). Four identical corner triangles are left over; each has legs 3 and 4, so area <span class="m">½·3·4 = 6</span>.</p><p>Square = frame − 4 triangles = <span class="m">49 − 4×6 = 49 − 24 = 25</span> ✔ — same answer!</p>`,act:{py:false,fr:true}},
+  {t:'Experiment: a secret rule',h:`<p>Move the sliders. For any rise <b>a</b> and run <b>b</b>, the square’s area is always <span class="m">a² + b²</span> — and the frame method gives <span class="m">(a+b)² − 2ab</span>, which is exactly the same thing. Algebra and geometry agreeing!</p>`,act:{py:true,fr:true}}],
+ big:'<b>Big idea:</b> you don’t have to find the side itself. For a square, “side × side” is exactly what Pythagoras hands you (a² + b²), so the square root never even shows up.',
+ describe:(s,d)=>{const a=[];if(s.a!==d.a||s.b!==d.b)a.push('the slope run = '+s.a+' and rise = '+s.b+' (area '+(s.a*s.a+s.b*s.b)+')');if(s.py)a.push('the Pythagoras triangle on');if(s.fr)a.push('the big frame on');return a;}
+});
+
+/* ===== 5 ===== */
+function zig(th){
+  const t=th*Math.PI/180,dA=[1,0],dB=[Math.cos(t),Math.sin(t)],pts=[[0,0],dB.slice()];let onB=true;
+  const K=(60%th===0)?60/th:Math.floor(89.999/th);
+  for(let n=1;n<=K;n++){const c=pts[n],d=onB?dA:dB,pr=c[0]*d[0]+c[1]*d[1],disc=1-(c[0]*c[0]+c[1]*c[1]-pr*pr);if(disc<0)break;const tt=pr+Math.sqrt(disc);pts.push([d[0]*tt,d[1]*tt]);onB=!onB;}
+  return pts;
+}
+P.push({
+ n:5,title:'Back and Forth',src:'CEMC Problem of the Week · Hard',lvl:['hard','Hard'],
+ statement:`<b>∠BPA = 12°</b>. Points Q, R, S, T, … zig-zag from one arm of the angle to the other, each farther from P than the one before, with <b>PQ = QR = RS = ST = …</b>. This makes isosceles triangles PQR, QRS, RST, … Eventually one is also <b>equilateral</b>. How many isosceles triangles are created <b>before</b> the equilateral one?`,
+ type:'num',correct:4,unit:'triangles',
+ hint:'Find the base angle of the first triangle, then of the second. Do you see a pattern that grows by the same amount each time?',
+ def:{th:12},
+ controls:[{k:'th',t:'range',label:'Angle at P  (θ)',min:5,max:30,step:1,fmt:v=>v+'°'}],
+ presets:[{n:'12° (the problem)',set:{th:12}},{n:'10°',set:{th:10}},{n:'15°',set:{th:15}},{n:'6°',set:{th:6}},{n:'20°',set:{th:20}},{n:'30°',set:{th:30}}],
+ svg(s){
+  const th=s.th,pts=zig(th),K=pts.length-2,name=i=>i<11?'PQRSTUVWXYZ'[i]:'P'+i;
+  let mx=0,my=0,rm=0;pts.forEach(p=>{mx=Math.max(mx,p[0]);my=Math.max(my,p[1]);rm=Math.max(rm,Math.hypot(p[0],p[1]));});
+  const sc=Math.min(350/mx,190/my),ox=24,oy=226,X=v=>ox+v*sc,Y=v=>oy-v*sc,eq=(60%th===0);
+  const rad=th*Math.PI/180;
+  let b=L(X(0),Y(0),X(mx*1.04),Y(0),MUT,2)+L(X(0),Y(0),X(rm*1.04*Math.cos(rad)),Y(rm*1.04*Math.sin(rad)),MUT,2);
+  b+=T(X(mx*1.04)+4,Y(0)+4,'A',MUT,13,'start')+T(X(rm*1.04*Math.cos(rad))+4,Y(rm*1.04*Math.sin(rad))-4,'B',MUT,13,'start');
+  for(let k=1;k<=K;k++){const col=(eq&&k===K)?GOLD:`hsl(${200+k*(150/Math.max(K,4))},75%,60%)`;b+=POLY([pts[k-1],pts[k],pts[k+1]].map(p=>[X(p[0]),Y(p[1])]),col,col,1.5,(eq&&k===K)?.6:.28);}
+  b+=`<polyline points="${pts.map(p=>X(p[0]).toFixed(1)+','+Y(p[1]).toFixed(1)).join(' ')}" fill="none" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/>`;
+  pts.forEach((p,i)=>{b+=Dt(X(p[0]),Y(p[1]),i===0?PINK:GOLD,3.5);const up=i%2===1;b+=T(X(p[0])+(i===0?-4:0),Y(p[1])+(i===0?16:(up?-8:16)),name(i),INK,12,i===0?'end':'middle');});
+  b+=T(X(0)+34,Y(0)-6,th+'°',PINK,12,'start');
+  const list=[];for(let k=1;k<=K;k++){const last=eq&&k===K;list.push([name(k-1)+name(k)+name(k+1),'base '+k*th+'°'+(last?' → equilateral!':''),last?true:undefined]);}
+  const rd=chips(list)+'<div class="read spoil">'+chips([['isosceles BEFORE equilateral',eq?(60/th-1):'none',(eq&&th===12)?true:undefined]])+'</div>'+(eq?(th===12?'<div class="win">✔ Base angles go 12°, 24°, 36°, 48°, 60° — the 5th triangle is equilateral, so 4 come before it.</div>':'<div class="win">With θ = '+th+'°, base angles reach 60° at triangle '+60/th+', so '+(60/th-1)+' come before.</div>'):'<div class="win warn">θ = '+th+'° doesn’t divide 60, so base angles never hit exactly 60° — no equilateral triangle appears.</div>');
+  return{w:400,h:250,body:b,read:rd};
+ },
+ steps:[
+  {t:'First triangle PQR',h:`<p>PQ = QR, so triangle PQR is isosceles with apex Q. Its <b>base angles</b> (at P and at R) are equal. Angle at P is 12°, so <span class="m">∠QRP = 12°</span>. First base angle: <span class="k">12°</span>.</p>`,act:{th:12}},
+  {t:'Second triangle QRS — use the exterior angle',h:`<p>Look at point Q on line PB. The angle <b>∠BQR</b> sits outside triangle PQR, so it equals the two far-away inside angles added: <span class="m">12° + 12° = 24°</span>.</p><p>Triangle QRS has QR = RS, so its base angles (at Q and S) are equal: ∠RQS = ∠BQR = <span class="k">24°</span>.</p>`,act:{th:12}},
+  {t:'Third triangle RST',h:`<p>Same trick at R on line PA. The outside angle ∠SRA is the exterior angle of triangle PRS: <span class="m">∠RPS + ∠RSP = 12° + 24° = 36°</span>.</p><p>Triangle RST has RS = ST, so its base angles are <span class="k">36°</span>.</p>`,act:{th:12}},
+  {t:'Spot the pattern',h:`<p>Base angles: <span class="m">12°, 24°, 36°, 48°, 60°, …</span> — they grow by 12° each time, because each new base angle = 12° + the previous one. The k-th triangle has base angle <span class="m">12° × k</span>.</p>`,act:{th:12}},
+  {t:'When is it equilateral?',h:`<p>An isosceles triangle with base angles 60° has all three angles 60° — that’s <b>equilateral</b>. <span class="m">12° × 5 = 60°</span>, so the <b>5th</b> triangle is equilateral (the gold one).</p><p>Triangles 1, 2, 3, 4 come before it: base angles 12°, 24°, 36°, 48°. Answer: <span class="k">4</span>.</p>`,act:{th:12}},
+  {t:'Try other angles',h:`<p>Press 10°, 15°, 6°… The rule is <span class="m">60 ÷ θ − 1</span> triangles before the equilateral one. A pattern like this is exactly what contest problems love.</p>`,act:{th:12}}],
+ big:'<b>Big idea:</b> an exterior angle = sum of the two far inside angles, and an isosceles triangle has equal base angles. Chain those two facts and every new triangle’s angle is the previous one plus θ.',
+ describe:(s,d)=>s.th!==d.th?['the angle at P to '+s.th+'° ('+(60%s.th===0?(60/s.th-1)+' isosceles triangles come before the equilateral one':'no equilateral triangle appears')+')']:[]
+});
+
+/* ===== 6 ===== */
+P.push({
+ n:6,title:'Three Triangles',src:'CEMC Problem of the Week · Hard',lvl:['hard','Hard'],
+ statement:`Right triangle <b>ABC</b> has <b>∠ABC = 90°</b> and <b>AB = 12</b>. Point D is on side BC with <b>BD = 5</b>, and the area of △ADC is <b>80%</b> of the area of △ABD. Find the <b>perimeter of △ADC</b>.`,
+ type:'num',correct:32,unit:'',
+ hint:'Find the area of triangle ABD first. Then get the area of ADC and use it to find the length DC.',
+ def:{dc:7},
+ controls:[{k:'dc',t:'range',label:'Length of DC',min:0.5,max:10,step:0.5,fmt:v=>v}],
+ presets:[{n:'🎯 DC = 4',set:{dc:4}},{n:'DC = 2.5 (50%)',set:{dc:2.5}},{n:'DC = 5 (100%)',set:{dc:5}},{n:'DC = 10',set:{dc:10}}],
+ svg(s){
+  const u=16,Bx=50,By=272,dc=s.dc,Dx=Bx+5*u,Cx=Bx+(5+dc)*u,Ay=By-12*u;
+  let b=POLY([[Bx,Ay],[Bx,By],[Dx,By]],BLUE,'none',0,.35)+POLY([[Bx,Ay],[Dx,By],[Cx,By]],GOLD,'none',0,.35);
+  b+=POLY([[Bx,Ay],[Bx,By],[Cx,By]],'none',INK,2.5)+L(Bx,Ay,Dx,By,INK,2.5)+`<path d="M${Bx} ${By-12} H${Bx+12} V${By}" fill="none" stroke="${INK}" stroke-width="1.5"/>`;
+  b+=Dt(Bx,Ay)+Dt(Bx,By)+Dt(Dx,By)+Dt(Cx,By)+T(Bx-10,Ay+4,'A',INK,14,'end')+T(Bx-10,By+16,'B',INK,14,'end')+T(Dx,By+18,'D')+T(Cx,By+18,'C');
+  b+=T(Bx-14,(Ay+By)/2,'12',MUT,13,'end')+T((Bx+Dx)/2,By-6,'5',BLUE,13)+T((Dx+Cx)/2,By-6,r2(dc),GOLD,13);
+  const AC=Math.hypot(12,5+dc),pct=dc/5*100,ok=Math.abs(pct-80)<0.01;
+  return{w:350,h:300,body:b,read:chips([['△ABD','½·5·12 = 30'],['△ADC','½·'+r2(dc)+'·12 = '+r2(6*dc)],['ADC ÷ ABD',r2(pct)+'% (goal 80%)',ok],['AD',13],['AC',r2(AC)],['perimeter ADC',r2(13+dc+AC)]])+(ok?'<div class="win">✔ DC = 4 gives exactly 80%. Perimeter = 13 + 4 + 15 = 32</div>':'')};
+ },
+ steps:[
+  {t:'Area of △ABD',h:`<p>Right angle at B, so the legs are the base and height: <span class="m">½ × BD × AB = ½ × 5 × 12 = 30</span>.</p>`,act:{dc:7}},
+  {t:'Area of △ADC',h:`<p>80% of 30 is <span class="m">0.8 × 30 = 24</span>.</p>`,act:{dc:5}},
+  {t:'Find DC',h:`<p>Both △ABD and △ADC have the <b>same height</b> from A down to the line BC — that’s AB = 12. So <span class="m">½ × DC × 12 = 24</span> ⇒ <span class="m">6 × DC = 24</span> ⇒ <span class="k">DC = 4</span>.</p><p>(Neat shortcut: same height ⇒ area ratio = base ratio, so DC : BD = 80% ⇒ DC = 0.8 × 5 = 4.)</p>`,act:{dc:4}},
+  {t:'Find AD with Pythagoras',h:`<p>△ABD is a right triangle with legs 5 and 12: <span class="m">AD² = 5² + 12² = 25 + 144 = 169</span> ⇒ <span class="k">AD = 13</span> (the 5-12-13 triple!).</p>`,act:{dc:4}},
+  {t:'Find AC',h:`<p>BC = BD + DC = 5 + 4 = <b>9</b>. Right triangle ABC with legs 12 and 9: <span class="m">AC² = 12² + 9² = 144 + 81 = 225</span> ⇒ <span class="k">AC = 15</span> (a 3-4-5 triangle times 3).</p>`,act:{dc:4}},
+  {t:'Add up the perimeter of △ADC',h:`<p>△ADC has sides AD, DC and AC: <span class="m">13 + 4 + 15 = 32</span>.</p><p>Answer: <span class="k">32</span>.</p>`,act:{dc:4}}],
+ big:'<b>Big idea:</b> triangles that share the same height have areas in the same ratio as their bases. Spot that and the percentage turns straight into a length.',
+ describe:(s,d)=>s.dc!==d.dc?['DC = '+s.dc+' (△ADC is then '+r2(s.dc/5*100)+'% of △ABD)']:[]
+});
+
+/* ===== 7 ===== */
+P.push({
+ n:7,title:'A Rectangle in a Circle',src:'CEMC Problem of the Week · Hard',lvl:['hard','Hard'],
+ statement:`A circle has radius <b>10 cm</b>, centre <b>C</b>. Points A and B are on the circle with <b>AC ⊥ BC</b>. D is on BC with <b>BD = 2 cm</b>. E is on the circle (on the short arc AB) with <b>DE ⊥ BC</b>. F is on AC so that <b>CDEF is a rectangle</b>. Find the distance from <b>A to F</b>.`,
+ type:'num',correct:4,unit:'cm',
+ hint:'Draw the line CE. What is its length, and which line inside the rectangle CDEF is it?',
+ def:{bd:5,r:false},
+ controls:[{k:'bd',t:'range',label:'Length BD',min:0,max:9.5,step:0.5,fmt:v=>v+' cm'},{k:'r',t:'check',label:'Show the radius CE (a diagonal of the rectangle!)'}],
+ presets:[{n:'🎯 BD = 2',set:{bd:2,r:true}},{n:'BD = 5',set:{bd:5}},{n:'BD = 8',set:{bd:8}},{n:'BD = 0',set:{bd:0}}],
+ svg(s){
+  const cx=200,cy=190,u=15,X=v=>cx+v*u,Y=v=>cy-v*u,bd=s.bd,dx=-(10-bd),ey=Math.sqrt(Math.max(0,100-dx*dx));
+  let b=`<circle cx="${cx}" cy="${cy}" r="${10*u}" fill="${CIRC}" fill-opacity=".5" stroke="${INK}" stroke-width="2.5"/>`;
+  b+=L(X(-10),Y(0),X(0),Y(0),INK,2)+L(X(0),Y(0),X(0),Y(10),INK,2);
+  b+=POLY([[0,0],[dx,0],[dx,ey],[0,ey]].map(p=>[X(p[0]),Y(p[1])]),TEAL,TEAL,2.5,.3);
+  if(s.r)b+=L(X(0),Y(0),X(dx),Y(ey),GOLD,2.5,'6 4')+T(X(dx/2)+4,Y(ey/2)+14,'radius = 10',GOLD,12,'start');
+  b+=L(X(0),Y(ey),X(0),Y(10),PINK,5);
+  [[0,0],[-10,0],[0,10],[dx,0],[dx,ey],[0,ey]].forEach(p=>b+=Dt(X(p[0]),Y(p[1]),INK,4));
+  b+=T(X(0)+10,Y(0)+16,'C',INK,14,'start')+T(X(-10)-8,Y(0)+4,'B',INK,14,'end')+T(X(0)+8,Y(10)-4,'A',INK,14,'start')+T(X(dx),Y(0)+18,'D')+T(X(dx)-8,Y(ey)-6,'E',INK,14,'end')+T(X(0)+10,Y(ey)+4,'F',INK,14,'start');
+  const af=10-ey,ok=bd===2;
+  return{w:400,h:370,body:b,read:chips([['CD',r2(10-bd)],['DE = √(10² − CD²)',r2(ey)],['CF = DE',r2(ey)],['AF = 10 − CF',r2(af)+' cm'+(ok?' ✔':''),ok]])+(ok?'<div class="win">✔ BD = 2 → CD = 8, DE = 6, so AF = 10 − 6 = 4 cm</div>':'')};
+ },
+ steps:[
+  {t:'Put names on the lengths we know',h:`<p>C is the centre, so <span class="m">CA = CB = CE = 10</span> — all are radii. Since BD = 2: <span class="m">CD = CB − BD = 10 − 2 = 8</span>.</p>`,act:{bd:2,r:false}},
+  {t:'The magic diagonal',h:`<p>Draw the radius <b>CE</b> (gold dashed). In rectangle CDEF it joins opposite corners C and E, so it’s a <b>diagonal</b> of the rectangle — and its length is the radius, <span class="k">10</span>!</p>`,act:{bd:2,r:true}},
+  {t:'Right triangle CDE → find DE',h:`<p>Corner D of a rectangle is a right angle. In △CDE: <span class="m">CD² + DE² = CE²</span> ⇒ <span class="m">8² + DE² = 10²</span> ⇒ <span class="m">DE² = 100 − 64 = 36</span> ⇒ <span class="k">DE = 6</span> (a 6-8-10 triangle: 3-4-5 doubled).</p>`,act:{bd:2,r:true}},
+  {t:'Opposite sides of a rectangle are equal',h:`<p><span class="m">CF = DE = 6</span>.</p>`,act:{bd:2,r:true}},
+  {t:'Finally: the distance from A to F',h:`<p>A, F and C lie on one straight line with AC = 10 and CF = 6, so <span class="m">AF = AC − CF = 10 − 6 = 4</span> cm (the pink segment). Answer: <span class="k">4 cm</span>.</p><p>Slide BD to see how AF changes — at BD = 2 it’s exactly 4!</p>`,act:{bd:2,r:true}}],
+ big:'<b>Big idea:</b> the diagonals of a rectangle are equal — and one of them here is secretly a radius. “Hidden radius” is the classic trick for rectangles inside circles.',
+ describe:(s,d)=>{const a=[];if(s.bd!==d.bd)a.push('BD = '+s.bd+' cm (then AF ≈ '+r2(10-Math.sqrt(100-(10-s.bd)**2))+' cm)');if(s.r)a.push('the radius CE shown');return a;}
+});
+
+/* ===== 8 ===== */
+P.push({
+ n:8,title:'Square with four cut-off corners',src:'HMMT November 2012 · Problem 3 · Hard',lvl:['hard','Hard'],
+ statement:`Square <b>ABCD</b> has side length <b>45</b>. Points W, X, Y, Z lie on sides AB, BC, CD, DA respectively, with <b>AW = CY = 20</b> and <b>BX = DZ = 25</b>. Compute the <b>area of quadrilateral WXYZ</b>.`,
+ type:'num',correct:1000,unit:'square units',
+ hint:'The square is the quadrilateral plus four corner triangles. Find the four triangles’ areas and subtract.',
+ def:{a:10,b:10},
+ controls:[{k:'a',t:'range',label:'AW = CY',min:0,max:45,step:1,fmt:v=>v},{k:'b',t:'range',label:'BX = DZ',min:0,max:45,step:1,fmt:v=>v}],
+ presets:[{n:'🎯 20 and 25',set:{a:20,b:25}},{n:'10 and 10',set:{a:10,b:10}},{n:'15 and 30',set:{a:15,b:30}},{n:'30 and 30',set:{a:30,b:30}}],
+ svg(s){
+  const sc=6.4,ox=34,oy=332,X=v=>ox+v*sc,Y=v=>oy-v*sc,a=s.a,b=s.b,S=45;
+  const A=[0,0],B=[S,0],C=[S,S],D=[0,S],W=[a,0],Xp=[S,b],Yp=[S-a,S],Z=[0,S-b];
+  const q=p=>[X(p[0]),Y(p[1])];
+  let g=POLY([A,B,C,D].map(q),'none',INK,2.5);
+  g+=POLY([A,W,Z].map(q),PINK,'none',0,.4)+POLY([W,B,Xp].map(q),BLUE,'none',0,.4)+POLY([Xp,C,Yp].map(q),PINK,'none',0,.4)+POLY([Yp,D,Z].map(q),BLUE,'none',0,.4);
+  g+=POLY([W,Xp,Yp,Z].map(q),GOLD,GOLD,2.5,.3);
+  [A,B,C,D].forEach(p=>g+=Dt(X(p[0]),Y(p[1]),INK,3.5));[W,Xp,Yp,Z].forEach(p=>g+=Dt(X(p[0]),Y(p[1]),GOLD,4.5));
+  g+=T(X(0)-10,Y(0)+14,'A',INK,14,'end')+T(X(S)+8,Y(0)+14,'B',INK,14,'start')+T(X(S)+8,Y(S)-2,'C',INK,14,'start')+T(X(0)-10,Y(S)-2,'D',INK,14,'end');
+  g+=T(X(W[0]),Y(0)+16,'W',GOLD)+T(X(S)+10,Y(b)+4,'X',GOLD,14,'start')+T(X(Yp[0]),Y(S)-8,'Y',GOLD)+T(X(0)-10,Y(Z[1])+4,'Z',GOLD,14,'end');
+  const t1=a*(S-b)/2,t2=b*(S-a)/2,tot=2*t1+2*t2,area=S*S-tot,ok=(a===20&&b===25);
+  return{w:370,h:350,body:g,read:chips([['△AWZ = △CXY',r2(t1)],['△BWX = △DYZ',r2(t2)],['4 triangles',r2(tot)],['2025 − triangles',r2(area),ok]])+(ok?'<div class="win">✔ AW = 20, BX = 25 → WXYZ = 2025 − 1025 = 1000</div>':'')};
+ },
+ steps:[
+  {t:'Plan: big square minus four corners',h:`<p>The square’s area is <span class="m">45 × 45 = 2025</span>. Quadrilateral WXYZ is what’s left after we cut off the four corner triangles (pink and blue). So <span class="m">WXYZ = 2025 − (four triangles)</span>.</p>`,act:{a:10,b:10}},
+  {t:'Get every short side from “side = 45”',h:`<p>If AW = 20, the rest of that side is <span class="m">WB = 45 − 20 = 25</span>. Do the same on every side:</p><p><span class="m">WB = 25</span>, <span class="m">DY = 45 − 20 = 25</span>, <span class="m">AZ = 45 − 25 = 20</span>, <span class="m">CX = 45 − 25 = 20</span>.</p>`,act:{a:20,b:25}},
+  {t:'The blue-ish triangles BWX and DYZ',h:`<p>△BWX has legs <span class="m">BW = 25</span> and <span class="m">BX = 25</span>. Area <span class="m">½ × 25 × 25 = 312.5</span>.</p><p>△DYZ has legs DY = 25 and DZ = 25 — identical, <span class="m">312.5</span>.</p>`,act:{a:20,b:25}},
+  {t:'The pink triangles AWZ and CXY',h:`<p>△AWZ has legs <span class="m">AW = 20</span> and <span class="m">AZ = 20</span>: area <span class="m">½ × 20 × 20 = 200</span>.</p><p>△CXY has legs CX = 20 and CY = 20: also <span class="m">200</span>.</p>`,act:{a:20,b:25}},
+  {t:'Add and subtract',h:`<p>Four triangles: <span class="m">312.5 + 312.5 + 200 + 200 = 1025</span>.</p><p>WXYZ = <span class="m">2025 − 1025 = </span><span class="k">1000</span>.</p>`,act:{a:20,b:25}},
+  {t:'Bonus pattern',h:`<p>Whenever <b>AW + BX = 45</b> (like 20 + 25), the area is exactly <span class="m">2 × AW × BX</span> = 2 × 20 × 25 = 1000. Try 15 &amp; 30: 2 × 15 × 30 = 900. Check the readout!</p>`,act:{a:20,b:25}}],
+ big:'<b>Big idea:</b> when a shape is awkward, find the easy shape around it (here a square) and subtract the leftover pieces. This “big minus small” trick is the heart of composite figures.',
+ describe:(s,d)=>(s.a!==d.a||s.b!==d.b)?['AW = CY = '+s.a+' and BX = DZ = '+s.b+' (WXYZ area then '+r2(2025-(s.a*(45-s.b)+s.b*(45-s.a)))+')']:[]
+});
+
+/*@@END*/
+
+/* ---------- engine ---------- */
+const main=$('#main');
+const PRAISE=['Brilliant detective work!','You cracked it!','Nailed it — that’s exactly right!','Super sleuth! Case solved.','Wow, that’s correct!'];
+const OOPS=['Not quite — good detectives try again!','Close call! Look at the picture once more.','Hmm, not this one. A hint might help.','Mistakes are clues too — try again!'];
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const flames=l=>l[0]==='hard'?'🔥🔥🔥':'🔥🔥';
+const starStr=n=>[0,1,2].map(i=>`<span class="${i<n?'':'off'}">⭐</span>`).join('');
+let current=0;
+
+function totalStars(){return P.reduce((a,p)=>a+p.stars,0)}
+function renderProgress(){
+  $('#starnum').textContent=totalStars();
+  $('#pdots').innerHTML=P.map(p=>`<button type="button" class="${p.solved?'done':''}${current===p.n?' here':''}" data-go="${p.n}" title="Mission ${p.n}: ${p.title}">${p.solved?'✓':p.n}</button>`).join('');
+  $('#missiongrid').innerHTML=P.map(p=>{const fig=p.svg(p.def);return `<button type="button" class="mcard${p.solved?' done':''}" data-go="${p.n}">
+    <div class="thumb"><svg viewBox="0 0 ${fig.w} ${fig.h}" aria-hidden="true">${fig.body}</svg></div>
+    <div class="row"><span class="no">${p.solved?'✓':p.n}</span><span class="tt">${p.title}</span></div>
+    <div class="meta"><span class="stars3">${starStr(p.stars)}</span><span>${flames(p.lvl)} ${p.lvl[1]}</span></div></button>`}).join('');
+}
+document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){location.hash='#p'+g.dataset.go;}});
+
+function say(p,cls,html){const b=$('.bubble',p.sec);b.className='bubble'+(cls?' '+cls:'');b.innerHTML=html;}
+function unlock(p){p.unlocked=true;p.sec.classList.remove('locked');$$('.pre[data-spoil]',p.sec).forEach(b=>b.hidden=false);}
+
+function buildProblem(p){
+  p.s={...p.def};p.shown=0;p.guess=null;p.solved=false;p.ask=0;p.wrong=0;p.hintUsed=false;p.stars=0;p.unlocked=false;
+  const N=P.length,sec=document.createElement('section');sec.id='p'+p.n;sec.className='problem locked';sec.dataset.n=p.n;sec.hidden=true;
+  sec.innerHTML=`
+  <div class="mhead"><div class="big-no">${p.n}</div><div>
+    <div class="kicker">Mission ${p.n} of ${N}<span class="lvl ${p.lvl[0]}">${flames(p.lvl)} ${p.lvl[1]}</span><span class="src">${p.src}</span></div>
+    <h2 id="p${p.n}-title">${p.title}</h2></div></div>
+  <div class="case"><div class="ic">🔍</div><div><div class="lbl">The case</div>${p.statement}</div></div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-h"><span class="n" style="background:var(--sky)">1</span>Explore the picture</div>
+      <div class="figwrap"></div><div class="read"></div><div class="ctls"></div><div class="presets"></div>
+    </div>
+    <div class="col">
+      <div class="card">
+        <div class="card-h"><span class="n" style="background:var(--sun)">2</span>Your answer</div>
+        <div class="answer"></div>
+        <div class="buddy"><div class="foxslot"></div><div class="bubble">Play with the picture first, then make your best guess. You can do this!</div></div>
+        <button class="btn hintbtn" data-hint>💡 I’d like a hint</button>
+      </div>
+      <div class="card">
+        <div class="card-h"><span class="n" style="background:var(--mint)">3</span>Clues, one at a time<span class="cnt"></span></div>
+        <div class="cluebar">${p.steps.map(()=>'<span></span>').join('')}</div>
+        <div class="empty">No clues open yet. Try it yourself first — then tap “Next clue”. 🕵️</div>
+        <ol class="steps"></ol>
+        <div class="big">${p.big}</div>
+        <div class="stepbtns"><button class="btn main" data-next>🔍 Next clue</button><button class="btn" data-all>Show all</button><button class="btn" data-reset>↺ Start over</button></div>
+      </div>
+      <details class="pm"><summary>🤖 Stuck? Copy a question for Claude</summary>
+        <label style="font-size:14px;font-weight:700">I want Claude to: <select data-ask>
+          <option>explain the next step in simpler words</option>
+          <option>give me a similar practice problem</option>
+          <option>check my own working (I will paste it)</option>
+          <option>show me a different method</option></select></label>
+        <pre></pre><button class="btn" data-copy>📋 Copy message</button></details>
+    </div>
+  </div>
+  <div class="mnav">
+    <button class="btn" data-go="${p.n>1?p.n-1:N}">← Mission ${p.n>1?p.n-1:N}</button>
+    <button class="btn" data-map>🗺️ Mission map</button>
+    <button class="btn go" data-go="${p.n<N?p.n+1:1}">Mission ${p.n<N?p.n+1:1} →</button>
+  </div>`;
+  main.appendChild(sec);
+  $('.buddy .foxslot',sec).innerHTML=FOX;
+  p.sec=sec;p.fig=$('.figwrap',sec);p.read=$('.read',sec);
+  /* answer area */
+  const ans=$('.answer',sec);
+  if(p.type==='mc'){
+    ans.innerHTML='<div class="opts">'+p.opts.map(o=>`<button class="opt" data-v="${o[0]}">(${o[0]}) ${o[1]}</button>`).join('')+'</div>';
+    ans.addEventListener('click',e=>{const bt=e.target.closest('.opt');if(!bt)return;const v=bt.dataset.v;p.guess='('+v+') '+p.opts.find(o=>o[0]===v)[1];
+      if(v===p.correct){bt.classList.add('right');good(p,bt)}else{bt.classList.add('wrong');bad(p,bt)}});
+  } else {
+    ans.innerHTML=`<div class="numin"><input type="text" inputmode="decimal" placeholder="your answer" aria-label="answer"><span>${p.unit}</span><button class="btn main" data-check>Check ✓</button></div>`;
+    const inp=$('input',ans);
+    const chk=()=>{const raw=inp.value.trim().replace(',','.');if(!raw)return;const v=parseNum(raw);p.guess=raw+(p.unit?' '+p.unit:'');if(Math.abs(v-p.correct)<1e-6)good(p,inp);else bad(p,inp);};
+    $('[data-check]',ans).addEventListener('click',chk);inp.addEventListener('keydown',e=>{if(e.key==='Enter')chk();});
+  }
+  /* controls */
+  const cb=$('.ctls',sec);
+  p.controls.forEach(c=>{
+    const row=document.createElement('label');
+    if(c.t==='range'){row.className='ctl';row.innerHTML=`<span>${c.label}</span><output></output><input type="range" min="${c.min}" max="${c.max}" step="${c.step}">`;
+      c.el=$('input',row);c.out=$('output',row);c.el.addEventListener('input',()=>{p.s[c.k]=parseFloat(c.el.value);sync(p)});}
+    else{row.className='ctl chk';row.innerHTML=`<input type="checkbox"><span>${c.label}</span>`;c.el=$('input',row);c.el.addEventListener('change',()=>{p.s[c.k]=c.el.checked;sync(p)});}
+    cb.appendChild(row);});
+  const pb=$('.presets',sec);
+  p.presets.forEach(pr=>{const b=document.createElement('button');b.className='pre';b.type='button';
+    if(pr.n.includes('🎯')){b.dataset.spoil='1';b.hidden=true;b.title='Unlocks after your first try or first clue';}
+    b.textContent=pr.n;b.addEventListener('click',()=>{Object.assign(p.s,pr.set);sync(p)});pb.appendChild(b);});
+  /* steps */
+  const ol=$('.steps',sec);
+  p.steps.forEach((st,i)=>{const li=document.createElement('li');li.dataset.n=i+1;li.innerHTML=`<h4>${st.t}</h4>${st.h}`;ol.appendChild(li);});
+  $('[data-next]',sec).addEventListener('click',()=>reveal(p,1));
+  $('[data-all]',sec).addEventListener('click',()=>reveal(p,p.steps.length-p.shown));
+  $('[data-reset]',sec).addEventListener('click',()=>{p.shown=0;p.s={...p.def};$$('li',ol).forEach(l=>l.className='');$('.big',sec).classList.remove('on');sync(p);cnt(p)});
+  $('[data-hint]',sec).addEventListener('click',()=>{p.hintUsed=true;say(p,'hint','💡 '+p.hint);});
+  $('[data-map]',sec).addEventListener('click',()=>{location.hash='#missions'});
+  $('[data-ask]',sec).addEventListener('change',e=>{p.ask=e.target.selectedIndex;updPrompt(p)});
+  $('[data-copy]',sec).addEventListener('click',e=>{const t=$('pre',sec).textContent;const done=()=>{e.target.textContent='Copied! ✔';setTimeout(()=>e.target.textContent='📋 Copy message',1400)};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,()=>fallbackCopy(t,done))}else fallbackCopy(t,done);});
+  cnt(p);sync(p);
+}
+function parseNum(t){t=t.replace(/[^0-9./\s-]/g,' ').trim();const m=t.match(/^(-?\d+)\s+(\d+)\s*\/\s*(\d+)$/);if(m){const w=+m[1];return w+(w<0?-1:1)*(+m[2]/+m[3]);}
+  const f=t.match(/^(-?\d*\.?\d+)\s*\/\s*(\d*\.?\d+)$/);if(f)return +f[1]/+f[2];return parseFloat(t);}
+function fallbackCopy(t,done){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy')}catch(e){}ta.remove();done()}
+
+function good(p,el){
+  const first=!p.solved;
+  if(first){
+    let s=3;if(p.wrong>0||p.hintUsed)s--;if(p.shown>0)s--;if(p.shown>=p.steps.length)s=1;
+    p.stars=Math.max(1,s);p.solved=true;
+  }
+  unlock(p);
+  say(p,'good',`🎉 ${pick(PRAISE)} ${first?'<span class="gotstars">'+starStr(p.stars)+'</span>':''}${p.shown<p.steps.length?'Open the clues to see <i>why</i> it works.':''}`);
+  confetti(el);renderProgress();updPrompt(p);
+  if(first&&P.every(q=>q.solved))setTimeout(()=>{$('#winstars').textContent=totalStars();$('#windlg').showModal();confetti();},1400);
+}
+function bad(p,el){
+  p.wrong++;unlock(p);
+  el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');
+  say(p,'no',pick(OOPS)+(p.hintUsed?' Or open the first clue.':' Tap 💡 for a hint.'));
+  updPrompt(p);
+}
+function cnt(p){
+  $('.cnt',p.sec).textContent=p.shown+' / '+p.steps.length;
+  $('[data-next]',p.sec).disabled=p.shown>=p.steps.length;
+  $$('.cluebar span',p.sec).forEach((s,i)=>s.classList.toggle('on',i<p.shown));
+  $('.empty',p.sec).hidden=p.shown>0;
+}
+function reveal(p,n){
+  const lis=$$('ol.steps li',p.sec);
+  if(n>0)unlock(p);
+  for(let i=0;i<n&&p.shown<p.steps.length;i++){const st=p.steps[p.shown];lis[p.shown].classList.add('on');if(st.act)Object.assign(p.s,st.act);p.shown++;}
+  lis.forEach(l=>l.classList.remove('cur'));if(p.shown>0)lis[p.shown-1].classList.add('cur');
+  if(p.shown>=p.steps.length)$('.big',p.sec).classList.add('on');
+  cnt(p);sync(p);
+  if(n===1&&p.shown>0)lis[p.shown-1].scrollIntoView({block:'nearest',behavior:'smooth'});
+}
+function sync(p){
+  const r=p.svg(p.s);
+  p.fig.innerHTML=`<svg viewBox="0 0 ${r.w} ${r.h}" role="img" aria-label="Figure for mission ${p.n}">${r.body}</svg>`;
+  p.read.innerHTML=r.read;
+  p.controls.forEach(c=>{if(c.t==='range'){c.el.value=p.s[c.k];c.out.textContent=c.fmt?c.fmt(p.s[c.k],p.s):p.s[c.k];}else c.el.checked=!!p.s[c.k];});
+  updPrompt(p);
+}
+const ASKS=['explain the next step in simpler words','give me a similar practice problem to try','check my own working (I will paste it in)','show me a different way to solve it'];
+function updPrompt(p){
+  const parts=p.describe(p.s,p.def);
+  let t=`I'm working on Problem ${p.n}, "${p.title}" (${p.src}), from my Week ${WEEK.n} homework on ${WEEK.blurb}.`;
+  if(parts.length)t+=` In the interactive figure I set ${parts.join('; ')}.`;
+  t+=p.shown?` I have read ${p.shown} of ${p.steps.length} steps.`:` I haven't opened the steps yet.`;
+  if(p.guess!==null)t+=p.solved?` My answer, ${p.guess}, was correct.`:` My answer so far is ${p.guess}, which isn't right yet.`;
+  t+=` Please ${ASKS[p.ask]}.`;
+  $('pre',p.sec).textContent=t;
+}
+
+/* ---------- routing: one mission at a time ---------- */
+function route(){
+  const id=decodeURIComponent(location.hash.slice(1));
+  const el=id&&document.getElementById(id);
+  const sec=el&&el.closest('.problem');
+  if(sec){
+    current=+sec.dataset.n;
+    $('#mapview').hidden=true;$('#playview').hidden=false;
+    $$('.problem').forEach(s=>s.hidden=s!==sec);
+    window.scrollTo({top:0,behavior:'instant'});setTimeout(()=>window.scrollTo({top:0,behavior:'instant'}),0);
+  }else{
+    current=0;$('#playview').hidden=true;$('#mapview').hidden=false;
+    if(el&&el.id!=='map')requestAnimationFrame(()=>el.scrollIntoView({behavior:'smooth'}));else window.scrollTo({top:0});
+  }
+  renderProgress();
+  window.dispatchEvent(new Event('scroll'));
+}
+window.addEventListener('hashchange',route);
+document.addEventListener('keydown',e=>{
+  if(!current||/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)||e.altKey||e.metaKey||e.ctrlKey)return;
+  if(e.key==='ArrowRight')location.hash='#p'+(current<P.length?current+1:1);
+  if(e.key==='ArrowLeft')location.hash='#p'+(current>1?current-1:P.length);
+});
+
+/* ---------- toolbox dialog ---------- */
+$('#toolclone').innerHTML=$('#toolboxgrid').innerHTML;
+$('#toolbtn').addEventListener('click',()=>$('#tooldlg').showModal());
+$$('dialog').forEach(d=>{d.addEventListener('click',e=>{if(e.target===d||e.target.closest('[data-close]'))d.close();});});
+
+/* ---------- confetti ---------- */
+const cv=$('#confetti'),cx=cv.getContext('2d');let parts=[],raf=0;
+function confetti(el){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  cv.width=innerWidth;cv.height=innerHeight;
+  let ox=innerWidth/2,oy=innerHeight/3;
+  if(el){const r=el.getBoundingClientRect();ox=r.left+r.width/2;oy=r.top+r.height/2;}
+  const cols=[GOLD,TEAL,PINK,BLUE,VIO,'#ff8a3d'];
+  for(let i=0;i<90;i++){const a=Math.random()*Math.PI*2,v=4+Math.random()*7;
+    parts.push({x:ox,y:oy,vx:Math.cos(a)*v,vy:Math.sin(a)*v-5,r:4+Math.random()*5,c:cols[i%cols.length],rot:Math.random()*6,vr:(Math.random()-.5)*.4,life:90+Math.random()*40,sh:i%3});}
+  if(!raf)tick();
+}
+function tick(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  parts=parts.filter(q=>q.life-->0&&q.y<cv.height+20);
+  parts.forEach(q=>{q.vy+=.22;q.vx*=.99;q.x+=q.vx;q.y+=q.vy;q.rot+=q.vr;
+    cx.save();cx.translate(q.x,q.y);cx.rotate(q.rot);cx.fillStyle=q.c;cx.globalAlpha=Math.min(1,q.life/30);
+    if(q.sh===0){cx.fillRect(-q.r,-q.r/2,q.r*2,q.r);}else if(q.sh===1){cx.beginPath();cx.moveTo(0,-q.r);cx.lineTo(q.r,q.r);cx.lineTo(-q.r,q.r);cx.fill();}else{cx.beginPath();cx.arc(0,0,q.r/1.4,0,7);cx.fill();}
+    cx.restore();});
+  raf=parts.length?requestAnimationFrame(tick):0;
+  if(!raf)cx.clearRect(0,0,cv.width,cv.height);
+}
+
+/* ---------- day / night ---------- */
+const TLBL={auto:'🌗 <span>Auto</span>',dark:'🌙 <span>Night</span>',light:'☀️ <span>Day</span>'};
+function applyTheme(){
+  document.documentElement.dataset.theme=THEME.eff();figColors();
+  $('#themebtn').innerHTML=TLBL[THEME.mode];
+  $('#themebtn').title='Theme: '+THEME.mode+(THEME.mode==='auto'?' (night after 7 pm or when your device is dark)':'')+' — tap to change';
+  if(P[0].sec){P.forEach(sync);renderProgress();}
+}
+$('#themebtn').addEventListener('click',()=>{THEME.mode={auto:'dark',dark:'light',light:'auto'}[THEME.mode];applyTheme();});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(THEME.mode==='auto')applyTheme();});
+setInterval(()=>{if(THEME.mode==='auto'&&document.documentElement.dataset.theme!==THEME.eff())applyTheme();},60000);
+applyTheme();
+
+/* ---------- week labels ---------- */
+document.title='Math Detective · Week '+WEEK.n;
+$('#weeklbl').textContent='Week '+WEEK.n+' · '+WEEK.topic;
+$('#starmax').textContent=P.length*3;
+$$('[data-learner]').forEach(x=>x.textContent=WEEK.learner);
+$$('[data-count]').forEach(x=>x.textContent=P.length);
+$$('[data-blurb]').forEach(x=>x.textContent=WEEK.blurb);
+
+/* ---------- boot ---------- */
+P.forEach(buildProblem);
+$('#anstable').innerHTML='<tr><th>#</th><th>Mission</th><th>Answer</th><th>Key idea</th></tr>'+P.map((p,i)=>`<tr><td>${p.n}</td><td><a href="#p${p.n}">${p.title}</a></td><td><b>${WEEK.finals[i]}</b></td><td>${p.big.replace(/<b>Big idea:<\/b>\s*/,'').split('.')[0]}.</td></tr>`).join('');
+route();
+</script>
+
+<!-- NAV-WIDGET:START (floating hamburger TOC top-left + back-to-top bottom-right) -->
+<style>
+:root{--nav-bg:#fff;--nav-fg:#222;--nav-line:#d9d9d9;--nav-acc:#1f5c8a;--nav-shadow:0 2px 10px rgba(0,0,0,.18)}
+@media(prefers-color-scheme:dark){:root{--nav-bg:#22262a;--nav-fg:#e6e6e6;--nav-line:#3a3f45;--nav-acc:#7db7e8;--nav-shadow:0 2px 10px rgba(0,0,0,.6)}}
+html{scroll-behavior:smooth}
+#navw-btn,#navw-top{position:fixed;z-index:9999;width:44px;height:44px;border-radius:50%;border:1px solid var(--nav-line);background:var(--nav-bg);color:var(--nav-fg);box-shadow:var(--nav-shadow);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;font:inherit}
+#navw-btn{top:12px;left:12px}
+#navw-top{bottom:16px;right:16px;opacity:0;pointer-events:none;transition:opacity .2s}
+#navw-top.show{opacity:1;pointer-events:auto}
+#navw-btn svg,#navw-top svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#navw-panel{position:fixed;z-index:9998;top:0;left:0;bottom:0;width:min(320px,86vw);background:var(--nav-bg);color:var(--nav-fg);border-right:1px solid var(--nav-line);box-shadow:var(--nav-shadow);padding:68px 8px 24px;overflow-y:auto;transform:translateX(-105%);transition:transform .22s;font:14px/1.5 -apple-system,"PingFang SC","Noto Sans SC",sans-serif}
+#navw-panel.open{transform:none}
+#navw-panel a{display:block;padding:6px 10px;border-radius:6px;color:inherit;text-decoration:none;word-break:normal}
+#navw-panel a:hover{background:rgba(127,127,127,.15)}
+#navw-panel a.active{color:var(--nav-acc);font-weight:600;background:rgba(127,127,127,.12)}
+#navw-panel a.l1{font-weight:600}
+#navw-panel a.l3{padding-left:26px;font-size:13px;opacity:.9}
+#navw-panel a.l2{padding-left:16px}
+@media print{#navw-btn,#navw-top,#navw-panel{display:none!important}}
+/* page is light: keep the widget light regardless of OS setting */
+:root{--nav-bg:#fff;--nav-fg:#2b2d42;--nav-line:#efe4d0;--nav-acc:#6d3fe0;--nav-shadow:0 4px 14px rgba(43,45,66,.18)}
+#navw-btn{top:10px}
+html[data-theme="dark"]{--nav-bg:#26293f;--nav-fg:#ecebf5;--nav-line:#3a3e5e;--nav-acc:#c4b1ff;--nav-shadow:0 4px 14px rgba(0,0,0,.5)}
+#navw-panel{font-family:Nunito,system-ui,sans-serif;font-weight:600}
+</style>
+<button id="navw-btn" type="button" aria-label="目录 / Table of contents" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+<nav id="navw-panel" aria-label="目录" hidden></nav>
+<button id="navw-top" type="button" aria-label="回到顶部 / Back to top"><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></button>
+<script>
+(function(){
+  var btn=document.getElementById('navw-btn'),panel=document.getElementById('navw-panel'),top=document.getElementById('navw-top');
+  var hs=[].slice.call(document.querySelectorAll('h1,h2,h3')).filter(function(h){return !h.closest('#navw-panel,dialog')&&h.textContent.trim()});
+  hs.forEach(function(h,i){
+    if(!h.id){h.id='sec-'+(i+1)}
+    var a=document.createElement('a');a.href='#'+h.id;a.textContent=h.textContent.trim();
+    a.className='l'+h.tagName.charAt(1);a.dataset.t=h.id;panel.appendChild(a);
+  });
+  function setOpen(o){panel.classList.toggle('open',o);btn.setAttribute('aria-expanded',o);if(o)panel.hidden=false}
+  btn.addEventListener('click',function(e){e.stopPropagation();setOpen(!panel.classList.contains('open'))});
+  panel.addEventListener('click',function(e){if(e.target.tagName==='A')setOpen(false)});
+  document.addEventListener('click',function(e){if(!panel.contains(e.target)&&e.target!==btn)setOpen(false)});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')setOpen(false)});
+  top.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+  var links=[].slice.call(panel.querySelectorAll('a'));
+  function onScroll(){
+    top.classList.toggle('show',window.scrollY>400);
+    var cur=null;for(var i=0;i<hs.length;i++){if(!hs[i].offsetParent)continue;if(hs[i].getBoundingClientRect().top<=120)cur=hs[i].id;else break}
+    links.forEach(function(a){a.classList.toggle('active',a.dataset.t===cur)});
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+  if(hs.length<2){btn.style.display='none'}
+})();
+</script>
+<!-- NAV-WIDGET:END -->
+</body>
+</html>

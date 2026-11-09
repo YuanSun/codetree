@@ -49,6 +49,16 @@ class ServerTests(unittest.TestCase):
             with self.subTest(path=path):
                 self.assertEqual(self.get(path)[0], 200)
 
+    def test_standalone_page_gets_back_links(self):
+        status, body, _ = self.get("/week/week07/detective")
+        self.assertEqual(status, 200)
+        self.assertIn("<title>Math Detective", body)
+        self.assertIn('class="mc-back"', body)
+        self.assertIn('href="/week/week07/"', body)
+        self.assertEqual(body.count("</body>"), 1)
+        # regular html pages are untouched
+        self.assertNotIn("mc-back", self.get("/week/week08/lesson")[1])
+
     def test_week_without_trailing_slash_redirects(self):
         status, _, headers = self.get("/week/week08")
         self.assertEqual(status, 301)

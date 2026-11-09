@@ -54,6 +54,18 @@ def rebase(text: str) -> str:
     return ABS_LINK_RE.sub(lambda m: f"{m.group(1)}{BASE_PATH}/", text) if BASE_PATH else text
 
 
+# Floating links added to standalone pages (bottom-left: the top-left and bottom-right corners are
+# usually taken by a page's own menu / back-to-top buttons). Uses root-relative hrefs so --base-path works.
+BACK_PILL = """<style>
+.mc-back{position:fixed;left:12px;bottom:14px;z-index:9997;display:flex;gap:2px;font:700 13px/1 Nunito,system-ui,sans-serif;
+  background:#fff;color:#2b2d42;border:1px solid #d9d9d9;border-radius:999px;box-shadow:0 4px 14px rgba(43,45,66,.2);overflow:hidden}
+.mc-back a{color:inherit;text-decoration:none;padding:10px 12px;white-space:nowrap}
+.mc-back a:hover{background:rgba(127,127,127,.15)}
+html[data-theme="dark"] .mc-back{background:#26293f;color:#ecebf5;border-color:#3a3e5e}
+@media print{.mc-back{display:none}}
+</style>
+<nav class="mc-back" aria-label="Math Lab"><a href="/">🧪 Math Lab</a><a href="/week/{{week}}/">‹ {{label}}</a></nav>"""
+
 ID_RE = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
 # Files a week folder may serve directly. Anything else (e.g. .py) is never exposed.
 SERVABLE = {
@@ -279,6 +291,17 @@ class Handler(BaseHTTPRequestHandler):
             body = rebase(body.decode("utf-8")).encode("utf-8")
         self._send(200, body, ctype, self.command == "HEAD")
 
+    def _standalone(self, week: dict, page: dict) -> None:
+        """A self-contained page (its own <html>, styles and scripts): serve it as-is, plus a small
+        "back to the lab" pill so the child can always get home. Set ``"standalone": true`` in week.json."""
+        target = (WEEKS_DIR / week["id"] / page["file"]).resolve()
+        if not target.is_relative_to((WEEKS_DIR / week["id"]).resolve()) or not target.is_file():
+            return self._not_found()
+        pill = BACK_PILL.replace("{{week}}", esc(week["id"])).replace("{{label}}", esc(f"Week {week['number']}"))
+        text = target.read_text(encoding="utf-8")
+        text = text.replace("</body>", pill + "\n</body>", 1) if "</body>" in text else text + pill
+        self._html(text)
+
     # -- routing
     def do_HEAD(self) -> None:  # noqa: N802
         self.do_GET()
@@ -311,6 +334,8 @@ class Handler(BaseHTTPRequestHandler):
                 if page is not None:
                     if page["type"] == "quiz":
                         return self._html(quiz_page(week, page))
+                    if page.get("standalone"):
+                        return self._standalone(week, page)
                     return self._file(WEEKS_DIR / week["id"], page["file"])
                 return self._file(WEEKS_DIR / week["id"], parts[2])
             return self._file(WEEKS_DIR / week["id"], "/".join(parts[2:]))
