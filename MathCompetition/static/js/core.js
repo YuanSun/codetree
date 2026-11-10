@@ -147,13 +147,16 @@
     if (!host) return;
     const d = document.body.dataset;
     const [, name, icon] = MC.level();
+    // two tracks share this engine: the contest lab (/week/…) and normal school study (/study/…)
+    const study = d.track === 'study';
     host.replaceChildren(
       h('div', { class: 'nav' },
-        h('a', { href: BASE + '/' }, '🧪 Math Lab'),
-        d.week ? h('span', { class: 'crumb' }, '› ', h('a', { href: `${BASE}/week/${d.week}/` }, d.weekTitle || d.week)) : null,
+        h('a', { href: BASE + (study ? '/study/' : '/') }, study ? '📚 Study' : '🧪 Math Lab'),
+        d.week ? h('span', { class: 'crumb' }, '› ', h('a', { href: `${BASE}/${study ? 'study' : 'week'}/${d.week}/` }, d.weekTitle || d.week)) : null,
         h('span', { class: 'spacer' }),
         skillList ? h('div', { class: 'skillbar', title: 'Skill badges' }, skillList.map((s) => h('span', { class: s.done ? 'done' : '', style: { '--c': s.color }, title: s.label }, s.emoji))) : null,
-        h('span', { class: 'xp', title: 'Your level' }, `${icon} ${name} · `, h('b', {}, `${state.xp} XP`)),
+        // contest level names (Gauss Hero…) make no sense for school study: show just the points there
+        h('span', { class: 'xp', title: study ? 'Your points' : 'Your level' }, study ? '⭐ ' : `${icon} ${name} · `, h('b', {}, `${state.xp} XP`)),
         h('div', { class: 'nav-progress', style: { width: navPct + '%' } })));
   }
   MC.renderNav = renderNav;

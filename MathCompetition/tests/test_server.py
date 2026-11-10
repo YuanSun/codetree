@@ -59,6 +59,39 @@ class ServerTests(unittest.TestCase):
         # regular html pages are untouched
         self.assertNotIn("mc-back", self.get("/week/week08/lesson")[1])
 
+    def test_study_track_is_separate_from_the_contest_lab(self):
+        status, home, _ = self.get("/")
+        self.assertEqual(status, 200)
+        self.assertNotIn("/study/sem0", home)           # study units never show up in the contest list
+        self.assertIn('href="/study/"', home)           # ...but the switcher links to them
+        status, study, _ = self.get("/study/")
+        self.assertEqual(status, 200)
+        self.assertIn('data-track="study"', study)
+        for unit in ("sem0506", "sem06", "sem05"):
+            self.assertIn(f'href="/study/{unit}/"', study)
+        self.assertNotIn("/week/week0", study)
+        self.assertEqual([w["id"] for w in json.loads(self.get("/api/study")[1])], ["sem0506", "sem06", "sem05"])
+
+    def test_study_pages(self):
+        for path in ("/study/sem05/", "/study/sem05/lesson", "/study/sem05/practice", "/study/sem06/lesson", "/study/sem06/practice",
+                     "/study/sem0506/", "/study/sem0506/parcours", "/study/sem05/lesson.js"):
+            with self.subTest(path=path):
+                self.assertEqual(self.get(path)[0], 200)
+        status, body, _ = self.get("/study/sem05/practice")
+        self.assertIn('data-track="study"', body)
+        self.assertIn('data-week="sem05"', body)
+        _, page, _ = self.get("/study/sem0506/parcours")
+        self.assertIn('href="/study/"', page)
+        self.assertIn('href="/study/sem0506/"', page)
+        self.assertIn("Parcours d'étude", page)
+        self.assertEqual(self.get("/study/sem99/")[0], 404)
+
+    def test_study_redirects(self):
+        status, _, headers = self.get("/study")
+        self.assertEqual((status, headers["Location"]), (301, "/study/"))
+        status, _, headers = self.get("/study/sem05")
+        self.assertEqual((status, headers["Location"]), (301, "/study/sem05/"))
+
     def test_week_without_trailing_slash_redirects(self):
         status, _, headers = self.get("/week/week08")
         self.assertEqual(status, 301)
@@ -95,7 +128,7 @@ class ServerTests(unittest.TestCase):
 
 class ContentTests(unittest.TestCase):
     def test_every_week_passes_weekctl_check(self):
-        for folder in sorted(p for p in (ROOT / "weeks").iterdir() if p.is_dir()):
+        for folder in sorted(p for root in ("weeks", "study") for p in (ROOT / root).iterdir() if p.is_dir()):
             with self.subTest(week=folder.name):
                 self.assertEqual(weekctl.check_week(folder), [])
 
@@ -147,6 +180,15 @@ class BasePathTests(unittest.TestCase):
                 self.assertNotRegex(body, r'(?:href|src)="/(?!math/|/)', "unprefixed absolute link")
         self.assertIn('href="/math/static/css/base.css"', self.get("/")[1])
         self.assertIn('href="/math/week/week08/"', self.get("/")[1])
+
+    def test_study_links_are_prefixed(self):
+        for path in ("/study/", "/study/sem05/", "/study/sem0506/parcours"):
+            with self.subTest(path=path):
+                status, body, _ = self.get(path)
+                self.assertEqual(status, 200)
+                self.assertNotRegex(body, r'(?:href|src)="/(?!math/|/)')
+        self.assertIn('href="/math/study/sem05/"', self.get("/study/")[1])
+        self.assertIn('href="/math/study/"', self.get("/study/sem0506/parcours")[1])
 
     def test_redirect_is_prefixed(self):
         self.assertEqual(self.get("/week/week08")[2]["Location"], "/math/week/week08/")

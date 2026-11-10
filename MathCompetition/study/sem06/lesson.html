@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sem 6 · The Quest</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/lesson-common.css">
+  <link rel="stylesheet" href="lesson.css">
+</head>
+<body data-page="lesson" data-track="study" data-week="sem06" data-page-slug="lesson" data-week-title="Sem 6">
+<div id="mc-nav"></div>
+<main class="wrap">
+
+  <section class="hero-quest">
+    <div class="floaters" aria-hidden="true">
+      <span style="left:5%;top:14%;font-size:54px">2</span><span style="left:90%;top:18%;font-size:46px;animation-delay:-2s">3</span>
+      <span style="left:18%;top:70%;font-size:60px;animation-delay:-4s">5</span><span style="left:78%;top:62%;font-size:52px;animation-delay:-1s">7</span>
+      <span style="left:50%;top:6%;font-size:40px;animation-delay:-3s">×</span><span style="left:93%;top:80%;font-size:44px;animation-delay:-5s">=</span>
+    </div>
+    <div class="eyebrow">Sem 6 · The Quest</div>
+    <h1>PPCM &amp; PGCD: <span class="one">meet</span> or <span class="one">share</span>?</h1>
+    <p>Two ideas, one tool: <b>prime factors</b>. Play with clocks, bags and number bubbles — then the sheet's questions are quick.</p>
+    <div class="four">
+      <a class="skill sk-mean"    href="#ppcm"><i>🔔</i><b>PPCM</b><span>When do they <u>meet again</u>? Smallest shared multiple.</span></a>
+      <a class="skill sk-ratio"   href="#primes"><i>🧬</i><b>Prime factors</b><span>Break numbers into <u>prime</u> bricks.</span></a>
+      <a class="skill sk-rates"   href="#pgcd"><i>🎒</i><b>PGCD</b><span>Biggest <u>equal sharing</u>. Biggest shared divisor.</span></a>
+      <a class="skill sk-percent" href="#review"><i>💰</i><b>Review</b><span>The PPCM finds your <u>common denominator</u>.</span></a>
+    </div>
+    <a class="btn warm start" href="#ppcm">▶ Start the quest</a>
+  </section>
+
+  <!-- ===================================================================== PPCM -->
+  <section class="level sk-mean" id="ppcm">
+    <div class="world-banner" data-bg="🔔"><div class="big">🔔</div><div><div class="eyebrow">World 1</div><h2>Multiples &amp; the PPCM</h2><p>PPCM = <b>P</b>lus <b>P</b>etit <b>C</b>ommun <b>M</b>ultiple — the <b>first</b> time two lists of multiples meet.</p></div></div>
+    <div class="big-idea"><span>⚡</span><div>PPCM = “meet again”.<small>Same time? At once? Together again? Think PPCM.</small></div></div>
+
+    <div class="lab">
+      <div class="lab-title">🔔 Explore · The beep race</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Each clock beeps every so many minutes. They all start together at <b>0</b>. <b>Change the intervals</b> and watch for the <b>gold</b> line — the first time <b>all</b> clocks beep together!</div></div>
+      <div id="race-lab"></div>
+      <div id="race-steps"></div>
+    </div>
+
+    <div class="mission" style="--c:var(--mean)">
+      <div class="mission-top"><span class="src">📜 Sem-6 · Exercice 2 (1)</span><span class="tag medium">Medium</span></div>
+      <p class="ask">⏰ Three broken clocks just rang <b>together</b>. One rings every <b>20 min</b>, one every <b>15 min</b>, one every <b>24 min</b>. When will they ring together <b>again</b>? <small>(Try it in the beep race above: set 3 clocks.)</small></p>
+      <details><summary>Show the exact wording</summary><div class="orig">Trois horloges sont déréglées. Elles viennent de sonner ensemble. L'une sonne à toutes les 20 minutes, l'autre à toutes les 15 minutes et la dernière à toutes les 24 minutes. Dans combien de minutes sonneront-elles de nouveau ensemble ?</div></details>
+      <div id="clock-steps"></div>
+    </div>
+  </section>
+
+  <!-- ================================================================== PRIMES -->
+  <section class="level sk-ratio" id="primes">
+    <div class="world-banner" data-bg="2·3·5"><div class="big">🧬</div><div><div class="eyebrow">World 2</div><h2>Prime factors: one tool for both</h2><p>Break each number into <b>prime bricks</b> (2, 3, 5, 7, …). Then the bricks tell you everything.</p></div></div>
+    <div class="big-idea"><span>⚡</span><div>PGCD = the bricks they <u>share</u>. PPCM = <u>all</u> the bricks.<small>Shared bricks go in the middle of the picture.</small></div></div>
+
+    <div class="lab">
+      <div class="lab-title">🫧 Lab 1 · The prime bubbles</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Pick two numbers. Their <b>prime bricks</b> fly into two bubbles. Bricks <b>both</b> numbers have sit in the <b>middle</b>.</div></div>
+      <div id="venn-lab"></div>
+      <div id="venn-steps"></div>
+    </div>
+
+    <div class="lab">
+      <div class="lab-title">🪜 Lab 2 · The divide-down ladder (works for 3 numbers too)</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">This is the method from your sheet: <b>divide by a prime</b>, again and again. <b>PPCM:</b> divide the numbers it fits, until everything is <b>1</b>. <b>PGCD:</b> only divide when the prime fits <b>ALL</b> the numbers, until none fits.</div></div>
+      <div id="ladder-lab"></div>
+      <div id="ladder-steps"></div>
+    </div>
+  </section>
+
+  <!-- ===================================================================== PGCD -->
+  <section class="level sk-ratio" id="pgcd">
+    <div class="world-banner" data-bg="🎒"><div class="big">🎒</div><div><div class="eyebrow">World 3</div><h2>Sharing equally &amp; the PGCD</h2><p>PGCD = <b>P</b>lus <b>G</b>rand <b>C</b>ommun <b>D</b>iviseur — the <b>biggest</b> number that divides them all.</p></div></div>
+    <div class="big-idea" style="--c:var(--ratio);--c2:var(--ratio-2)"><span>⚡</span><div>PGCD = “share equally, as many groups as possible”.<small>Nothing left over? The number of groups divides every amount.</small></div></div>
+
+    <div class="mission" style="--c:var(--ratio)">
+      <div class="mission-top"><span class="src">📜 Sem-6 · Exercice 2 (2)</span><span class="tag hard">Hard</span></div>
+      <p class="ask">🎒 Julien has <b>48 red</b>, <b>64 blue</b> and <b>112 green</b> marbles. He wants the <b>most bags possible</b>, each with the <b>same number of each colour</b>, and <b>no marble left over</b>.</p>
+      <details><summary>Show the exact wording</summary><div class="orig">Julien veut mettre des billes dans de petits sacs. Il possède 48 billes rouges, 64 billes bleues et 112 billes vertes. Il veut faire le plus grand nombre possible de sacs contenant chacun le même nombre de billes de chaque couleur. Combien remplit-il de sacs s'il ne reste aucune bille ? Combien de billes retrouvera-t-on dans chaque sac ?</div></details>
+      <div id="bags-lab"></div>
+      <div id="bags-steps"></div>
+    </div>
+
+    <div class="lab">
+      <div class="lab-title">🃏 Game · PPCM or PGCD?</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Read the clue. Is it a <b>“meet again”</b> story (PPCM) or a <b>“share equally”</b> story (PGCD)? Get all of them right!</div></div>
+      <div id="sorter-lab"></div>
+    </div>
+  </section>
+
+  <!-- ==================================================================== REVIEW -->
+  <section class="level sk-percent" id="review">
+    <div class="world-banner" data-bg="💰"><div class="big">💰</div><div><div class="eyebrow">World 4</div><h2>Fractions review</h2><p>Sem 5's fractions + this sheet's PPCM = a common denominator in one step.</p></div></div>
+    <div class="mission" style="--c:var(--percent)">
+      <div class="mission-top"><span class="src">📜 Sem-6 · Révision</span><span class="tag hard">Hard</span></div>
+      <p class="ask">💵 A worker earns <b>$1200 a week</b>. [[3/10]] goes to taxes, [[3/20]] to the pension and [[1/50]] to unemployment insurance. How much does the worker keep from <b>two weeks</b> of pay?</p>
+      <details><summary>Show the exact wording</summary><div class="orig">Un travailleur gagne 1200 $ par semaine. Les [[3/10]] de cette somme sont retenus pour les impôts, les [[3/20]] pour la caisse de retraite et le [[1/50]] pour l'assurance-chômage. Combien reste-t-il à ce travailleur sur une paye de deux semaines ?</div></details>
+      <div id="pay-steps"></div>
+    </div>
+  </section>
+
+  <section class="level" id="finale">
+    <div class="finale">
+      <div class="eyebrow" style="color:var(--gold)">The point to land</div>
+      <h2>Break numbers into <u>prime bricks</u>. Then the two big ideas are just two ways of picking bricks.</h2>
+      <ul class="finale-list">
+        <li style="--c:#c9b5ff"><b>PPCM</b> → all the bricks, highest power</li>
+        <li style="--c:#7ee8c0"><b>PGCD</b> → only shared bricks, lowest power</li>
+        <li style="--c:#ffd08a"><b>Check</b> → PPCM × PGCD = a × b (two numbers)</li>
+        <li style="--c:#8fbaff"><b>Story</b> → “again” = PPCM · “share equally” = PGCD</li>
+      </ul>
+      <div class="row"><a class="btn warm" href="practice">🏋️ Go to the Class Sheet questions</a></div>
+    </div>
+  </section>
+</main>
+
+<script src="/static/js/core.js"></script>
+<script src="lesson.js"></script>
+</body>
+</html>

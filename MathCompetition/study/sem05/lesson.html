@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sem 5 · The Quest</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/lesson-common.css">
+  <link rel="stylesheet" href="lesson.css">
+</head>
+<body data-page="lesson" data-track="study" data-week="sem05" data-page-slug="lesson" data-week-title="Sem 5">
+<div id="mc-nav"></div>
+<main class="wrap">
+
+  <section class="hero-quest">
+    <div class="floaters" aria-hidden="true">
+      <span style="left:5%;top:14%;font-size:54px">½</span><span style="left:90%;top:18%;font-size:46px;animation-delay:-2s">¾</span>
+      <span style="left:18%;top:70%;font-size:60px;animation-delay:-4s">×</span><span style="left:78%;top:62%;font-size:52px;animation-delay:-1s">÷</span>
+      <span style="left:50%;top:6%;font-size:40px;animation-delay:-3s">⅓</span><span style="left:93%;top:80%;font-size:44px;animation-delay:-5s">=</span>
+    </div>
+    <div class="eyebrow">Sem 5 · The Quest</div>
+    <h1>Fractions of <span class="one">WHAT?</span></h1>
+    <p>Goats, cows, brackets and a very big farm. Play with each idea first — then the questions on your sheet turn into easy points.</p>
+    <div class="four">
+      <a class="skill sk-ratio"   href="#of"><i>🍰</i><b>Fraction of a fraction</b><span>“<u>of</u>” means <u>×</u>.</span></a>
+      <a class="skill sk-rates"   href="#brackets"><i>🧮</i><b>Brackets</b><span>Inside first. <u>Flip</u> to divide.</span></a>
+      <a class="skill sk-percent" href="#farm"><i>🐄</i><b>The farm</b><span>A fraction of <u>WHAT</u>? The group or the farm?</span></a>
+    </div>
+    <a class="btn warm start" href="#of">▶ Start the quest</a>
+  </section>
+
+  <!-- ===================================================================== OF -->
+  <section class="level sk-ratio" id="of">
+    <div class="world-banner" data-bg="×"><div class="big">🍰</div><div><div class="eyebrow">World 1</div><h2>A fraction <u>of</u> a fraction</h2><p>Take a piece. Then take a piece <b>of that piece</b>.</p></div></div>
+    <div class="big-idea"><span>⚡</span><div>“Of” means multiply.<small>[[1/2]] of [[1/2]] is [[1/4]] — the piece gets smaller, so it can't be bigger than where you started.</small></div></div>
+
+    <div class="lab">
+      <div class="lab-title">🟦 Explore · The fraction grid</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Cut a square into pieces and <b>colour a fraction</b> (blue). Then cut the other way and take a fraction <b>of the blue part</b>. The <b>gold</b> cells are your answer — count them out of <b>all</b> the cells!</div></div>
+      <div id="grid-lab"></div>
+      <div id="grid-steps"></div>
+    </div>
+
+    <div class="mission" style="--c:var(--ratio)">
+      <div class="mission-top"><span class="src">📜 Sem-5 · Exercice 2</span><span class="tag easy">Easy</span></div>
+      <p class="ask">🐐 A shepherd has <b>56 goats</b>. Last year he lost [[1/7]] of them. This year he loses [[1/6]] of <b>the rest</b>. How many goats are left?</p>
+      <details><summary>Show the exact wording</summary><div class="orig">Un berger a perdu le [[1/7]] de ses 56 chèvres l'an dernier et le [[1/6]] du reste cette année.<br>a) Quelle fraction de ses chèvres lui reste-t-il ? &nbsp; b) Combien de chèvres lui reste-t-il ?</div></details>
+      <div class="stage"><div id="goat-stage"></div></div>
+      <div id="goat-steps"></div>
+    </div>
+  </section>
+
+  <!-- ================================================================ BRACKETS -->
+  <section class="level sk-rates" id="brackets">
+    <div class="world-banner" data-bg="( )"><div class="big">🧮</div><div><div class="eyebrow">World 2</div><h2>Brackets &amp; fractions</h2><p>Three skills in one big expression: common denominators, dividing, and order.</p></div></div>
+    <div class="big-idea"><span>⚡</span><div>Inside the brackets first.<small>Then × and ÷, last + and −. To add or subtract, make the pieces the <u>same size</u>.</small></div></div>
+
+    <div class="lab">
+      <div class="lab-title">🧩 Lab 1 · Same-size pieces (common denominator)</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">You can't add <b>fourths</b> and <b>thirds</b> — they are different sizes! Cut <b>both</b> bars into the <b>same</b> small pieces. The new piece size comes from the <b>PPCM</b> of the two denominators.</div></div>
+      <div id="lcd-lab"></div>
+      <div id="lcd-steps"></div>
+    </div>
+
+    <div class="lab">
+      <div class="lab-title">➗ Lab 2 · Dividing by a fraction: how many fit?</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">[[3/4]] ÷ [[1/8]] asks: <b>how many</b> pieces of size [[1/8]] fit into [[3/4]]? Pick an example and watch the pieces line up.</div></div>
+      <div id="flip-lab"></div>
+      <div id="flip-steps"></div>
+    </div>
+
+    <div class="mission" style="--c:var(--rates)">
+      <div class="mission-top"><span class="src">📜 Sem-5 · Exercice 1</span><span class="tag hard">Medium–Hard</span></div>
+      <p class="ask">🧮 Crack the big one — <b>one step at a time</b>:</p>
+      <div class="bigexpr" id="bigexpr"></div>
+      <div id="expr-steps"></div>
+    </div>
+  </section>
+
+  <!-- ====================================================================== FARM -->
+  <section class="level sk-percent" id="farm">
+    <div class="world-banner" data-bg="🐄"><div class="big">🐄</div><div><div class="eyebrow">World 3</div><h2>Monsieur Matheux's farm</h2><p>450 animals. Every fraction is a fraction of <b>something</b> — find out what.</p></div></div>
+    <div class="big-idea"><span>⚡</span><div>Fraction of WHAT?<small>[[1/10]] of the cows is <u>not</u> [[1/10]] of the farm.</small></div></div>
+
+    <div class="lab">
+      <div class="lab-title">🐖 Explore · The farm bar</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">The whole bar is the <b>450 animals</b>. <b>Tap a piece</b> to open it — the story's “second fractions” live <b>inside</b> each group.</div></div>
+      <div id="farm-lab"></div>
+      <div id="farm-steps"></div>
+    </div>
+
+    <div class="mission" style="--c:var(--percent)">
+      <div class="mission-top"><span class="src">📜 Sem-5 · Exercice 3 (a–f)</span><span class="tag medium">Medium</span></div>
+      <p class="ask">🌾 Six questions about the same farm. Keep the bar above in mind.</p>
+      <details open><summary>The farm story (original wording)</summary><div class="orig">
+        Monsieur Matheux possède une ferme sur laquelle on retrouve <b>450 animaux</b>.<br>
+        Les [[2/15]] animaux sont des <b>cochons</b> dont les [[7/12]] iront à l'abattoir cette semaine.<br>
+        Les [[3/10]] des animaux sont des <b>lapins</b> et les [[2/9]] des ceux-ci sont noirs.<br>
+        Les [[2/5]] des animaux sont des <b>vaches</b>. Malheureusement le [[1/10]] de ces vaches sont malades.<br>
+        Le reste de ses animaux sont des <b>poules</b>. Monsieur Matheux considère que les [[2/15]] de ses poules sont de très bonnes pondeuses.</div></details>
+      <div id="mission-steps"></div>
+    </div>
+  </section>
+
+  <section class="level" id="finale">
+    <div class="finale">
+      <div class="eyebrow" style="color:var(--gold)">The point to land</div>
+      <h2>Fractions get easy when you ask <u>“of what?”</u> and keep the pieces the same size.</h2>
+      <ul class="finale-list">
+        <li style="--c:#7ee8c0"><b>of</b> → multiply</li>
+        <li style="--c:#8fbaff"><b>÷ fraction</b> → × the flip</li>
+        <li style="--c:#8fbaff"><b>+ and −</b> → same-size pieces first</li>
+        <li style="--c:#ffd08a"><b>the rest</b> → 1 minus the parts</li>
+      </ul>
+      <div class="row"><a class="btn warm" href="practice">🏋️ Go to the Class Sheet questions</a></div>
+    </div>
+  </section>
+</main>
+
+<script src="/static/js/core.js"></script>
+<script src="lesson.js"></script>
+</body>
+</html>
