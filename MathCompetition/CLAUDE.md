@@ -18,6 +18,16 @@ for an **11-year-old**. Goal: the child *understands the concept by interacting*
    and drive the pages in headless Chromium (Playwright is preinstalled: `require('playwright')`) — solve every lab through the UI, assert
    no console/page errors, and **look at screenshots** (they caught real bugs the DOM assertions missed).
 
+## Two tracks: contest vs school study
+
+`weeks/` = **Math Contest Lab** (CJMC / Gauss, "Week N", contest voice: sources like "Gauss 2017 Q9", contest-pace timers, "Gauss Hero" levels).
+`study/` = **School Study** (normal class sheets, "Sem N"): same recipe and same engine, but never label it as contest prep.
+- Create with `python3 weekctl.py new <n> "<title>" --study` → `study/semNN/` (adds `data-track="study"` to the lesson `<body>` — copy that
+  attribute onto any lesson you hand-build, and use the unit id (`sem05`) in `data-week`, in `lesson.js`'s `WEEK` and in `MC.guided` ids).
+- Cite the class sheet (`Hu Education 190-Grace · Sem-5 · Exercice 3a`), not a contest. Pages are usually `lesson` (Quest) + `practice` (Class Sheet).
+- A ready-made single-file HTML (e.g. a `kid-study-playground` page) is dropped in as `study/<id>/page.html` with `"standalone": true` in `week.json`.
+- Progress keys are per unit id, so `sem05` and `week05` would never collide; `week.json` may set `"label"` (e.g. "Sem 5 + 6").
+
 ## Question schema (`exercises.json` / `homework.json`)
 
 ```jsonc

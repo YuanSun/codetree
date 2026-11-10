@@ -1,0 +1,26 @@
+{
+  "number": 6,
+  "label": "Sem 5 + 6",
+  "title": "Parcours d'étude",
+  "tagline": "Fractions, PPCM et PGCD, pronoms relatifs et subordonnées : 14 exercices avec indices, étapes animées et progression sauvegardée.",
+  "level": "Étude · Français",
+  "emoji": "🧭",
+  "skills": [
+    "Fractions",
+    "PPCM / PGCD",
+    "Pronoms relatifs",
+    "Subordonnées"
+  ],
+  "credit": "Based on Hu Education · 190-Grace · Sem-5 and Sem-6 sheets (retyped for personal study).",
+  "pages": [
+    {
+      "slug": "parcours",
+      "type": "html",
+      "standalone": true,
+      "file": "parcours.html",
+      "title": "Parcours d'étude",
+      "emoji": "🧭",
+      "desc": "14 exercices (maths + grammaire) avec indices, étapes animées, lecture à voix haute et sauvegarde automatique."
+    }
+  ]
+}

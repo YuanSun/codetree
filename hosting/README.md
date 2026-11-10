@@ -7,7 +7,8 @@ address and one port. Reach it by whatever name the machine has (`mac-studio.loc
 |---|---|---|
 | `http://<machine>:12999/` | Portal page linking to everything | static (`portal/`) |
 | `/fund/` | [Fund Accounting Academy](../fund-accounting-academy) | static files |
-| `/math/` | [MathCompetition](../MathCompetition) | reverse proxy to its Python server on `127.0.0.1:12998`, started with `--base-path /math` |
+| `/math/` | [MathCompetition](../MathCompetition) — the **Math Contest Lab** (CJMC / Gauss prep) | reverse proxy to its Python server on `127.0.0.1:12998`, started with `--base-path /math` |
+| `/math/study/` | the same project's **School Study** track (normal class sheets, not contest prep) | same server and proxy rule as `/math/`; it has its own portal card, colours and navigation |
 | `/notes/` | Family Obsidian vault | static site built by [Quartz](https://quartz.jzhao.xyz); **password-protected** |
 | `/budget/` | [Family budget dashboard](../budget-advisor/budget-dashboard) | reverse proxy to its Streamlit app on `127.0.0.1:12997` (`--server.baseUrlPath budget`); **same login as the notes** |
 

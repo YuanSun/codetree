@@ -1,4 +1,4 @@
-/* Week 6 lesson — beep race, prime bubbles, ladder, bags, sorter */
+/* Sem 6 lesson — beep race, prime bubbles, ladder, bags, sorter */
 .race svg, .venn svg { width: 100%; display: block; background: #fff; border: 3px solid var(--line); border-radius: 14px; }
 .venn svg text { font-family: var(--head); font-weight: 600; }
 .chips2 { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }

@@ -2,7 +2,7 @@
   "number": 6,
   "title": "PPCM, PGCD & Fractions Review",
   "tagline": "PPCM = when do they meet again? PGCD = how many equal groups? Prime factors answer both — and the PPCM finds your common denominator too.",
-  "level": "G5–G6 · Class sheet",
+  "level": "School study · Hu Education",
   "emoji": "🔔",
   "skills": [
     "PPCM",
@@ -28,5 +28,6 @@
       "emoji": "🏋️",
       "desc": "11 questions from the sheet + the fractions review. Hints, trap-spotting and full solutions."
     }
-  ]
+  ],
+  "label": "Sem 6"
 }

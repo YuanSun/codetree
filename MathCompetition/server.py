@@ -9,13 +9,19 @@ Weeks are auto-discovered: every folder in ``weeks/`` that contains a ``week.jso
 shows up on the home page. Nothing is cached, so dropping in a new week (or editing
 one) only needs a browser refresh — no restart.
 
+Two tracks share one server and one engine:
+    contest   weeks/<id>/   Math Contest Lab (CJMC / Gauss prep)      URLs under /week/
+    study     study/<id>/   School Study (normal class sheets)        URLs under /study/
+
 Routes
-    /                          home: all weeks, newest first
+    /                          contest home: all weeks, newest first
     /week/<id>/                week hub: the pages (lesson, practice, homework, ...)
     /week/<id>/<slug>          one page of the week (see "pages" in week.json)
     /week/<id>/<file>          static files that belong to the week (js, images, ...)
+    /study/                    study home (same layout, its own colours and wording)
+    /study/<id>/...            same three routes as /week/<id>/ for a study unit
     /static/<file>             shared css/js
-    /api/weeks                 JSON list of weeks (handy for scripts)
+    /api/weeks, /api/study     JSON list of units (handy for scripts)
 """
 
 from __future__ import annotations
@@ -34,6 +40,7 @@ from urllib.parse import unquote, urlparse
 
 ROOT = Path(__file__).resolve().parent
 WEEKS_DIR = ROOT / "weeks"
+STUDY_DIR = ROOT / "study"
 STATIC_DIR = ROOT / "static"
 TEMPLATES_DIR = ROOT / "templates"
 
@@ -61,10 +68,16 @@ BACK_PILL = """<style>
   background:#fff;color:#2b2d42;border:1px solid #d9d9d9;border-radius:999px;box-shadow:0 4px 14px rgba(43,45,66,.2);overflow:hidden}
 .mc-back a{color:inherit;text-decoration:none;padding:10px 12px;white-space:nowrap}
 .mc-back a:hover{background:rgba(127,127,127,.15)}
-html[data-theme="dark"] .mc-back{background:#26293f;color:#ecebf5;border-color:#3a3e5e}
+html[data-theme="dark"] .mc-back,html[data-theme="night"] .mc-back{background:#26293f;color:#ecebf5;border-color:#3a3e5e}
 @media print{.mc-back{display:none}}
 </style>
-<nav class="mc-back" aria-label="Math Lab"><a href="/">🧪 Math Lab</a><a href="/week/{{week}}/">‹ {{label}}</a></nav>"""
+<nav class="mc-back" aria-label="{{short}}"><a href="{{home}}">{{emoji}} {{short}}</a><a href="{{prefix}}/{{week}}/">‹ {{label}}</a></nav>"""
+
+# The two tracks. "item" prefixes a unit's number ("Week 8" / "Sem 5") unless its week.json has a "label".
+TRACKS = {
+    "week": {"dir": WEEKS_DIR, "prefix": "/week", "home": "/", "name": "Math Contest Lab", "short": "Math Lab", "emoji": "🧪", "item": "Week"},
+    "study": {"dir": STUDY_DIR, "prefix": "/study", "home": "/study/", "name": "School Study", "short": "Study", "emoji": "📚", "item": "Sem"},
+}
 
 ID_RE = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
 # Files a week folder may serve directly. Anything else (e.g. .py) is never exposed.
@@ -77,12 +90,13 @@ SERVABLE = {
 # --------------------------------------------------------------------------- data
 
 
-def load_weeks() -> list[dict]:
-    """Read every ``weeks/*/week.json``. Newest (highest number) first. Bad weeks are skipped."""
+def load_weeks(track: str = "week") -> list[dict]:
+    """Read every ``<track dir>/*/week.json``. Newest (highest number) first. Bad units are skipped."""
     weeks = []
-    if not WEEKS_DIR.is_dir():
+    root = TRACKS[track]["dir"]
+    if not root.is_dir():
         return weeks
-    for folder in sorted(WEEKS_DIR.iterdir()):
+    for folder in sorted(root.iterdir()):
         meta_file = folder / "week.json"
         if not (folder.is_dir() and ID_RE.match(folder.name) and meta_file.is_file()):
             continue
@@ -92,7 +106,9 @@ def load_weeks() -> list[dict]:
             print(f"warning: skipping {folder.name}: {exc}", file=sys.stderr)
             continue
         meta["id"] = folder.name
+        meta["track"] = track
         meta.setdefault("number", 0)
+        meta.setdefault("label", f"{TRACKS[track]['item']} {meta['number']}")
         meta.setdefault("title", folder.name)
         meta.setdefault("emoji", "📘")
         meta.setdefault("pages", [])
@@ -116,8 +132,8 @@ def page_total(folder: Path, page: dict) -> int:
     return int(page.get("tasks", 0))
 
 
-def find_week(week_id: str) -> dict | None:
-    return next((w for w in load_weeks() if w["id"] == week_id), None)
+def find_week(week_id: str, track: str = "week") -> dict | None:
+    return next((w for w in load_weeks(track) if w["id"] == week_id), None)
 
 
 # ------------------------------------------------------------------------ rendering
@@ -149,16 +165,32 @@ def floaters() -> str:
     return f'<div class="floaters" aria-hidden="true">{spans}</div>'
 
 
-def home_page() -> str:
+def track_tabs(current: str) -> str:
+    """Little switcher between the two tracks, shown under the hero on both home pages."""
+    links = "".join(
+        f'<a href="{esc(t["home"])}"{" class=on" if key == current else ""}>{t["emoji"]} {esc(t["name"])}</a>'
+        for key, t in TRACKS.items()
+    )
+    return f'<nav class="track-switch" aria-label="Sections">{links}</nav>'
+
+
+HOME_COPY = {
+    "week": ("Math Contest Lab", "🧪", "Every week a new mission. Play with the ideas first — the contest questions get easy after that."),
+    "study": ("School Study", "📚", "Your normal class sheets, made playable: fractions, PPCM &amp; PGCD, French grammar… Not contest prep — take your time and check your answers."),
+}
+
+
+def home_page(track: str = "week") -> str:
+    t = TRACKS[track]
     cards = []
-    for w in load_weeks():
+    for w in load_weeks(track):
         total = sum(p["total"] for p in w["pages"])
         skills = "".join(f'<span class="chip">{esc(s)}</span>' for s in w.get("skills", []))
         cards.append(
             f"""
-        <a class="week-card" href="/week/{esc(w['id'])}/" data-week="{esc(w['id'])}" data-total="{total}">
+        <a class="week-card" href="{t['prefix']}/{esc(w['id'])}/" data-week="{esc(w['id'])}" data-total="{total}">
           <div class="week-emoji">{esc(w['emoji'])}</div>
-          <div class="week-num">Week {esc(w['number'])}</div>
+          <div class="week-num">{esc(w['label'])}</div>
           <h2>{esc(w['title'])}</h2>
           <p>{esc(w.get('tagline', ''))}</p>
           <div class="chips">{skills}</div>
@@ -169,31 +201,34 @@ def home_page() -> str:
     body = (
         "".join(cards)
         if cards
-        else "<p>No weeks yet. Add a folder to <code>weeks/</code> with a <code>week.json</code>.</p>"
+        else f"<p>Nothing here yet. Add a folder to <code>{esc(t['dir'].name)}/</code> with a <code>week.json</code>.</p>"
     )
+    name, emoji, blurb = HOME_COPY[track]
     return render(
         "layout.html",
-        title="Math Contest Lab",
-        body_attrs='data-page="home"',
+        title=name,
+        body_attrs=f'data-page="home" data-track="{track}"',
         head="",
         body=f"""
       <section class="hero hero-home">
         {floaters()}
-        <h1>Math Contest Lab <span class="wiggle">🧪</span></h1>
-        <p>Every week a new mission. Play with the ideas first — the contest questions get easy after that.</p>
+        <h1>{name} <span class="wiggle">{emoji}</span></h1>
+        <p>{blurb}</p>
       </section>
+      {track_tabs(track)}
       <section class="week-grid">{body}</section>""",
         scripts="",
     )
 
 
 def hub_page(week: dict) -> str:
+    t = TRACKS[week["track"]]
     cards = []
     for p in week["pages"]:
         done_attr = f'data-week="{esc(week["id"])}" data-page-slug="{esc(p["slug"])}" data-total="{p["total"]}"'
         cards.append(
             f"""
-        <a class="page-card" href="/week/{esc(week['id'])}/{esc(p['slug'])}" {done_attr}>
+        <a class="page-card" href="{t['prefix']}/{esc(week['id'])}/{esc(p['slug'])}" {done_attr}>
           <div class="page-emoji">{esc(p.get('emoji', '📄'))}</div>
           <div>
             <h3>{esc(p['title'])}</h3>
@@ -206,13 +241,13 @@ def hub_page(week: dict) -> str:
     credit = f'<p class="credit">{esc(week["credit"])}</p>' if week.get("credit") else ""
     return render(
         "layout.html",
-        title=f"Week {week['number']} · {week['title']}",
-        body_attrs=f'data-page="hub" data-week="{esc(week["id"])}" data-week-title="Week {esc(week["number"])}"',
+        title=f"{week['label']} · {week['title']}",
+        body_attrs=f'data-page="hub" data-track="{week["track"]}" data-week="{esc(week["id"])}" data-week-title="{esc(week["label"])}"',
         head="",
         body=f"""
       <section class="hero hero-home">
         {floaters()}
-        <div class="eyebrow">Week {esc(week['number'])} · {esc(week.get('level', ''))}</div>
+        <div class="eyebrow">{esc(week['label'])} · {esc(week.get('level', ''))}</div>
         <h1>{esc(week['title'])}</h1>
         <p>{esc(week.get('tagline', ''))}</p>
       </section>
@@ -223,16 +258,17 @@ def hub_page(week: dict) -> str:
 
 
 def quiz_page(week: dict, page: dict) -> str:
-    data = json.loads((WEEKS_DIR / week["id"] / page["file"]).read_text(encoding="utf-8"))
+    t = TRACKS[week["track"]]
+    data = json.loads((t["dir"] / week["id"] / page["file"]).read_text(encoding="utf-8"))
     extra = "".join(
-        f'<script src="/week/{esc(week["id"])}/{esc(s)}"></script>' for s in page.get("scripts", [])
+        f'<script src="{t["prefix"]}/{esc(week["id"])}/{esc(s)}"></script>' for s in page.get("scripts", [])
     )
     return render(
         "layout.html",
-        title=f"{page['title']} · Week {week['number']}",
+        title=f"{page['title']} · {week['label']}",
         body_attrs=(
-            f'data-page="quiz" data-week="{esc(week["id"])}" data-page-slug="{esc(page["slug"])}" '
-            f'data-week-title="Week {esc(week["number"])}"'
+            f'data-page="quiz" data-track="{week["track"]}" data-week="{esc(week["id"])}" data-page-slug="{esc(page["slug"])}" '
+            f'data-week-title="{esc(week["label"])}"'
         ),
         head="",
         body='<div id="quiz-root"></div>',
@@ -264,6 +300,11 @@ class Handler(BaseHTTPRequestHandler):
     def _html(self, text: str, status: int = 200) -> None:
         self._send(status, rebase(text).encode("utf-8"), "text/html; charset=utf-8", self.command == "HEAD")
 
+    def _redirect(self, location: str) -> None:
+        self.send_response(301)
+        self.send_header("Location", location)
+        self.end_headers()
+
     def _not_found(self) -> None:
         self._html(
             render(
@@ -294,10 +335,14 @@ class Handler(BaseHTTPRequestHandler):
     def _standalone(self, week: dict, page: dict) -> None:
         """A self-contained page (its own <html>, styles and scripts): serve it as-is, plus a small
         "back to the lab" pill so the child can always get home. Set ``"standalone": true`` in week.json."""
-        target = (WEEKS_DIR / week["id"] / page["file"]).resolve()
-        if not target.is_relative_to((WEEKS_DIR / week["id"]).resolve()) or not target.is_file():
+        t = TRACKS[week["track"]]
+        base = (t["dir"] / week["id"]).resolve()
+        target = (base / page["file"]).resolve()
+        if not target.is_relative_to(base) or not target.is_file():
             return self._not_found()
-        pill = BACK_PILL.replace("{{week}}", esc(week["id"])).replace("{{label}}", esc(f"Week {week['number']}"))
+        pill = (BACK_PILL.replace("{{week}}", esc(week["id"])).replace("{{label}}", esc(week["label"]))
+                .replace("{{short}}", esc(t["short"])).replace("{{emoji}}", t["emoji"])
+                .replace("{{home}}", t["home"]).replace("{{prefix}}", t["prefix"]))
         text = target.read_text(encoding="utf-8")
         text = text.replace("</body>", pill + "\n</body>", 1) if "</body>" in text else text + pill
         self._html(text)
@@ -310,24 +355,28 @@ class Handler(BaseHTTPRequestHandler):
         path = unquote(urlparse(self.path).path)
 
         if path == "/":
-            return self._html(home_page())
-        if path == "/api/weeks":
-            body = json.dumps(load_weeks(), ensure_ascii=False).encode("utf-8")
-            return self._send(200, body, "application/json; charset=utf-8", self.command == "HEAD")
+            return self._html(home_page("week"))
+        if path == "/study":
+            return self._redirect(f"{BASE_PATH}/study/")
+        if path == "/study/":
+            return self._html(home_page("study"))
+        for track, api in (("week", "/api/weeks"), ("study", "/api/study")):
+            if path == api:
+                body = json.dumps(load_weeks(track), ensure_ascii=False, default=str).encode("utf-8")
+                return self._send(200, body, "application/json; charset=utf-8", self.command == "HEAD")
         if path.startswith("/static/"):
             return self._file(STATIC_DIR, path[len("/static/"):])
 
         parts = [p for p in path.split("/") if p]
-        if len(parts) >= 2 and parts[0] == "week" and ID_RE.match(parts[1]):
-            week = find_week(parts[1])
+        track = next((k for k, t in TRACKS.items() if len(parts) >= 2 and parts[0] == t["prefix"].strip("/")), None)
+        if track and ID_RE.match(parts[1]):
+            t = TRACKS[track]
+            week = find_week(parts[1], track)
             if week is None:
                 return self._not_found()
             if len(parts) == 2:
                 if not path.endswith("/"):  # keep relative links working
-                    self.send_response(301)
-                    self.send_header("Location", f"{BASE_PATH}/week/{week['id']}/")
-                    self.end_headers()
-                    return
+                    return self._redirect(f"{BASE_PATH}{t['prefix']}/{week['id']}/")
                 return self._html(hub_page(week))
             if len(parts) == 3:
                 page = next((p for p in week["pages"] if p["slug"] == parts[2]), None)
@@ -336,9 +385,9 @@ class Handler(BaseHTTPRequestHandler):
                         return self._html(quiz_page(week, page))
                     if page.get("standalone"):
                         return self._standalone(week, page)
-                    return self._file(WEEKS_DIR / week["id"], page["file"])
-                return self._file(WEEKS_DIR / week["id"], parts[2])
-            return self._file(WEEKS_DIR / week["id"], "/".join(parts[2:]))
+                    return self._file(t["dir"] / week["id"], page["file"])
+                return self._file(t["dir"] / week["id"], parts[2])
+            return self._file(t["dir"] / week["id"], "/".join(parts[2:]))
         return self._not_found()
 
     def log_message(self, fmt: str, *args: object) -> None:
@@ -354,10 +403,11 @@ def main() -> None:
     args = ap.parse_args()
     set_base_path(args.base_path)
     httpd = ThreadingHTTPServer((args.host, args.port), Handler)
-    weeks = load_weeks()
-    print(f"Math Contest Lab — {len(weeks)} week(s) found")
-    for w in weeks:
-        print(f"  • Week {w['number']}: {w['title']}")
+    for track, t in TRACKS.items():
+        units = load_weeks(track)
+        print(f"{t['name']} — {len(units)} unit(s) found" + ("" if track == "week" else "  (under /study/)"))
+        for w in units:
+            print(f"  • {w['label']}: {w['title']}")
     print(f"\nOpen  http://{'localhost' if args.host in ('127.0.0.1', '0.0.0.0') else args.host}:{args.port}   (Ctrl+C to stop)")
     try:
         httpd.serve_forever()

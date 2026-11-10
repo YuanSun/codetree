@@ -1,8 +1,8 @@
-/* Week 5 lesson — fractions. Each lab = something to play with + a "guided" worked example where YOU do each step. */
+/* Sem 5 lesson — fractions. Each lab = something to play with + a "guided" worked example where YOU do each step. */
 (function () {
   'use strict';
   const { h, $, $$, gcd } = MC;
-  const WEEK = 'week05', PAGE = 'lesson';
+  const WEEK = 'sem05', PAGE = 'lesson';
   const lcm = (a, b) => (a / gcd(a, b)) * b;
   const fr = (a, b) => `[[${a}/${b}]]`;
   const frs = (a, b) => { const g = gcd(a, b) || 1; return fr(a / g, b / g); };      // simplified fraction
@@ -131,7 +131,7 @@
     }
     draw();
     guided('#lcd-steps', 'brackets.lcd', {
-      finale: '🎉 **Same size first, then add or subtract the tops.** The new piece size is the PPCM of the denominators — you will meet the PPCM again next week!',
+      finale: '🎉 **Same size first, then add or subtract the tops.** The new piece size is the PPCM of the denominators — you will meet the PPCM again in Sem 6!',
       steps: [
         { q: `Set the lab to ${fr(3, 4)} − ${fr(1, 3)}. What is the **PPCM of 4 and 3**? (the smallest number in both times tables)`, type: 'number', answer: 12, nudge: 'Count: 4, 8, 12 … and 3, 6, 9, 12 …', ok: 'Twelfths!' },
         { q: `${fr(3, 4)} = ?/12 — how many twelfths?`, type: 'number', answer: 9, nudge: '12 ÷ 4 = 3, so each quarter is 3 twelfths. You take 3 quarters.', ok: `${fr(3, 4)} = ${fr(9, 12)}` },

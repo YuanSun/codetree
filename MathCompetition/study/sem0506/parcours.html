@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Semaines 5 et 6 · Fractions, PPCM/PGCD et subordonnées — Parcours d'étude</title>
+<style>
+:root{--bg:#0e1124;--card:#171c3a;--card2:#1e2448;--line:#2b3263;--tx:#e6ebff;--mut:#9aa6d6;--gold:#ffd166;--teal:#06d6a0;--pink:#ef476f;--blue:#4cc9f0;--vio:#b794f6;--ink:#0b0e20}
+[data-theme=light]{--bg:#f3f5ff;--card:#ffffff;--card2:#eceffd;--line:#c9d1f3;--tx:#1b2150;--mut:#56608f;--gold:#a86e00;--teal:#00775a;--pink:#c4244f;--blue:#0a76a3;--vio:#6a45c9;--ink:#ffffff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+[data-theme=night] body{background:radial-gradient(1200px 600px at 70% -10%,#1b2160 0%,var(--bg) 60%)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 18px 70px}
+.hero{padding:60px 0 14px;text-align:center}
+.hero h1{margin:0 0 6px;font-size:clamp(26px,4.2vw,42px)}
+.hero p{color:var(--mut);max-width:780px;margin:6px auto}
+.topbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+.stars{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center;justify-content:center;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:8px 16px;font-weight:600;max-width:100%}
+.stars .s{font-size:19px;filter:grayscale(1) opacity(.35);transition:.3s}.stars .s.on{filter:none;transform:scale(1.15)}
+.welcome{display:none;margin:14px auto 0;max-width:720px;background:linear-gradient(135deg,#2a2060,#143a5a);border:1px solid var(--vio);border-radius:14px;padding:12px 16px;color:#fff}
+.welcome.on{display:block;animation:pop .4s}
+.welcome .btn{margin-top:6px}
+.toolbox{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin:12px 0 8px}
+.tool{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}.tool b{color:var(--gold)}.tool code{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--teal)}
+h2.part{font-size:clamp(21px,2.8vw,30px);margin:54px 0 4px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+h3.sec{font-size:clamp(18px,2.3vw,24px);margin:34px 0 4px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+h3.sec .num{background:linear-gradient(135deg,var(--vio),var(--blue));color:var(--ink);border-radius:12px;padding:2px 12px}
+.tag{font-size:12px;font-weight:600;border-radius:999px;padding:3px 10px;border:1px solid var(--line);color:var(--mut)}
+.tag.done{color:var(--teal);border-color:var(--teal)}
+.statement{background:var(--card);border-left:4px solid var(--gold);border-radius:10px;padding:12px 16px;margin:10px 0 14px}
+.grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:16px;align-items:start}
+@media(max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.pbar{flex-wrap:wrap}.pbar .scrub{min-width:120px}
+.card{min-width:0}
+@media(min-width:901px){.grid>.card:first-child{position:sticky;top:10px}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+.figwrap svg{width:100%;height:auto;display:block;background:var(--bg);border-radius:12px;border:1px solid var(--line)}
+.figwrap.live svg,.figwrap.live .htmlstage{box-shadow:0 0 0 2px #b794f655,0 0 26px #b794f633}
+.htmlstage{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-height:150px;line-height:1.7}
+.htmlstage .ln{margin:6px 0}.htmlstage .hl{background:#ffd16633;border-radius:6px;padding:0 4px;color:var(--gold);font-weight:700}
+.htmlstage u{text-decoration-color:var(--pink);text-underline-offset:3px}
+.htmlstage .pr{color:var(--teal);font-weight:800}
+.htmlstage .old{color:var(--mut);text-decoration:line-through}
+.node{display:flex;gap:8px;align-items:stretch;margin:6px 0}
+.node .qn{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:14px}
+.node .rs{min-width:84px;display:grid;place-items:center;border-radius:10px;border:1px solid var(--line);font-weight:800;font-size:18px;color:var(--mut);background:var(--card2)}
+.node.on .qn{border-color:var(--gold);box-shadow:0 0 0 2px #ffd16644}.node.on .rs{background:var(--gold);color:var(--ink);border-color:var(--gold)}
+.node.dim{opacity:.5}
+.circ h4{margin:0 0 6px;color:var(--gold)}.circ li{margin:3px 0}.circ .ex{color:var(--teal);font-style:italic}
+.read{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 2px}
+.chip{display:inline-flex;gap:6px;align-items:baseline;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:3px 9px;font-size:13px}
+.chip i{font-style:normal;color:var(--mut)}.chip b{font-family:ui-monospace,Menlo,Consolas,monospace}
+.chip.ok{border-color:var(--teal)}.chip.ok b{color:var(--teal)}
+.win{margin-top:8px;padding:8px 12px;border-radius:10px;background:#0c3a33;border:1px solid var(--teal);color:#b5ffe9;font-weight:600}
+[data-theme=light] .win{background:#dcfbef;color:#00513c}
+.ctls{margin-top:10px;display:grid;gap:8px}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;font-size:14px;color:var(--mut)}
+.ctl input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--vio);height:26px}
+.ctl output{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--gold)}
+.ctl.chk{display:flex;gap:8px;align-items:center;color:var(--tx)}.ctl.chk input{width:20px;height:20px;accent-color:var(--teal)}
+.seg{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:14px;color:var(--mut)}
+.seg button{background:var(--card2);color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:6px 12px;min-height:36px}
+.seg button.on{background:var(--vio);color:var(--ink);border-color:var(--vio);font-weight:700}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+button{font:inherit;cursor:pointer;color:inherit}
+.pre,.btn{background:var(--card2);color:var(--tx);border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:13px;transition:.15s;min-height:36px}
+.pre:hover,.btn:hover{border-color:var(--vio);transform:translateY(-1px)}
+.btn.main{background:linear-gradient(135deg,var(--vio),var(--blue));color:var(--ink);border:0;font-weight:700;font-size:14px;padding:8px 16px}
+.btn.gold{border-color:var(--gold);color:var(--gold)}
+.btn:disabled{opacity:.45;cursor:default;transform:none}
+.player{margin-top:10px;background:var(--card2);border:1px solid var(--vio);border-radius:14px;padding:10px 12px}
+.pbar{display:flex;gap:10px;align-items:center}.pbar .scrub{flex:1;accent-color:var(--gold);height:24px}
+.pbar .tm{font:12px ui-monospace,Menlo,Consolas,monospace;color:var(--mut);min-width:78px;text-align:right}
+.pbar2{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:6px;font-size:13px;color:var(--mut)}
+.pbar2 select{background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:8px;padding:3px 6px;font:inherit}
+.caption{margin-top:8px;min-height:70px;background:var(--bg);border-radius:10px;padding:10px 14px;border-left:4px solid var(--gold)}
+.caption .scn{font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--gold)}.caption .say{font-size:17px;line-height:1.45}
+.caption .say.fade{animation:pop .45s ease}
+.try{background:var(--card2);border-radius:12px;padding:10px 12px;margin-bottom:12px}.try h4{margin:0 0 8px;color:var(--gold)}
+.q{padding:8px 0;border-top:1px dashed var(--line)}.q:first-of-type{border-top:0}
+.q .lab{margin-bottom:6px}.q .lab .qn0{display:inline-block;min-width:26px;color:var(--gold);font-weight:800}
+.q.done .lab .qn0::after{content:" ✔";color:var(--teal)}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 14px;font-size:15px;min-height:40px}
+.opt:hover:not(:disabled){border-color:var(--gold)}
+.opt.right{background:#0c3a33;border-color:var(--teal);color:#b5ffe9}[data-theme=light] .opt.right{background:#dcfbef;color:#00513c}
+.opt.wrong{background:#3b2f12;border-color:#a6832d;color:var(--gold);opacity:.8}[data-theme=light] .opt.wrong{background:#fff3d1}
+.numin{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.numin input{background:var(--bg);color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;width:150px;min-height:40px}
+.fb{margin-top:6px;font-weight:600;min-height:1.2em}.fb.good{color:var(--teal)}.fb.no{color:var(--gold)}
+.why{display:none;margin-top:6px;padding:8px 10px;border-radius:10px;background:var(--bg);border-left:3px solid var(--teal);font-size:15px}
+.why.on{display:block;animation:pop .35s}
+.hint{display:none;margin-top:6px;color:var(--mut);font-size:14px}.hint.on{display:block}
+.built{min-height:44px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px;border:2px dashed var(--line);border-radius:10px;margin-bottom:8px}
+.tok{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:15px;min-height:36px}
+.tok.used{opacity:.25;pointer-events:none}.built .tok{border-color:var(--vio);background:var(--card2)}
+.bank{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+ol.steps{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ol.steps li{display:none;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px 12px 10px 48px;position:relative}
+ol.steps li.on{display:block;animation:pop .35s ease}ol.steps li.cur{border-color:var(--gold);box-shadow:0 0 0 2px #ffd16640}
+ol.steps li::before{content:attr(data-n);position:absolute;left:10px;top:10px;width:28px;height:28px;border-radius:50%;background:var(--vio);color:var(--ink);font-weight:800;display:grid;place-items:center}
+ol.steps li h4{margin:0 0 2px;color:var(--gold);font-size:16px}ol.steps li p{margin:4px 0}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.k{color:var(--teal);font-weight:700}.m{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--blue)}
+.big{margin-top:10px;background:linear-gradient(135deg,#2a2060,#143a5a);border:1px solid var(--vio);border-radius:12px;padding:10px 14px;display:none;color:#fff}.big.on{display:block;animation:pop .4s}.big b{color:var(--gold)}
+.stepbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}.stepbtns .cnt{color:var(--mut);font-size:13px}
+details.pm,details.sv{margin-top:12px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+details summary{cursor:pointer;color:var(--mut);font-size:14px}
+details pre{white-space:pre-wrap;word-break:break-word;margin:8px 0;font:13px/1.5 ui-monospace,Menlo,Consolas,monospace}
+details select,details textarea{background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit;font-size:13px;width:100%}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0}
+table.ans{width:100%;border-collapse:collapse;background:var(--card);border-radius:14px;overflow:hidden}
+table.ans th,table.ans td{padding:8px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}table.ans th{background:var(--card2);color:var(--gold)}
+.tbl{overflow-x:auto}
+footer{color:var(--mut);text-align:center;margin-top:30px;font-size:13px}
+.conf{position:fixed;top:0;width:10px;height:14px;z-index:9997;pointer-events:none;animation:fall 1.6s ease-in forwards}
+@keyframes fall{to{transform:translate(var(--dx),105vh) rotate(540deg);opacity:.2}}
+@media(prefers-reduced-motion:reduce){.conf{display:none}*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hero">
+  <h1>🧭 Semaines 5 et 6 · Parcours d'étude</h1>
+  <p>Fractions, PPCM et PGCD, pronoms relatifs et subordonnées circonstancielles. Essaie d'abord, ouvre les indices, puis regarde les étapes. Ton avancement est sauvegardé automatiquement.</p>
+  <div class="topbar">
+    <div class="stars" id="stars" aria-label="progression"></div>
+  </div>
+  <div class="topbar">
+    <button class="btn main" id="playall">🎬 Lancer toutes les vidéos de maths</button>
+    <button class="btn" id="themebtn">🌙 / ☀️ Thème</button>
+  </div>
+  <div class="welcome" id="welcome"></div>
+</header>
+<h2 class="part" id="outils">🧰 Ta boîte à outils</h2>
+<div class="toolbox" id="toolbox"></div>
+<main id="main"></main>
+<h2 class="part" id="reponses">🏁 Récapitulatif des réponses</h2>
+<div class="tbl"><table class="ans" id="anstable"></table></div>
+<h2 class="part" id="sauvegarde">💾 Sauvegarde de ma progression</h2>
+<details class="sv" open><summary>Copier ou restaurer mon code de progression</summary>
+  <p style="font-size:14px;color:var(--mut)">Ta progression est gardée dans ce navigateur. Si tu changes d'appareil, copie ce code et colle-le sur l'autre appareil.</p>
+  <div class="row"><button class="btn gold" id="codecopy">Copier mon code</button><button class="btn" id="coderestore">Restaurer ce code</button></div>
+  <textarea id="codebox" rows="3" placeholder="Colle ici un code de progression…" aria-label="code de progression"></textarea>
+  <div class="fb" id="codefb"></div>
+  <div class="row"><button class="btn" id="resetbtn">Effacer ma progression</button><span id="resetask" style="display:none">Es-tu sûr(e) ? <button class="btn gold" id="resetyes">Oui, effacer</button> <button class="btn" id="resetno">Non</button></span></div>
+</details>
+<footer>Toutes les réponses ont été vérifiées. Continue comme ça ! 🚀</footer>
+</div>
+
+<script>
+/* ================= UTILITIES ================= */
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a),lcm=(a,b)=>a/gcd(a,b)*b;
+const gcdN=a=>a.reduce(gcd),lcmN=a=>a.reduce(lcm);
+const sup=n=>String(n).split('').map(c=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[+c]).join('');
+function factors(n){const o={};let m=n,p=2;while(m>1&&p*p<=m){while(m%p===0){o[p]=(o[p]||0)+1;m/=p;}p++;}if(m>1)o[m]=(o[m]||0)+1;return o;}
+const fstr=n=>{const f=factors(n),k=Object.keys(f).map(Number).sort((a,b)=>a-b);return k.length?k.map(p=>p+(f[p]>1?sup(f[p]):'')).join('×'):'1';};
+const fx=(n,d)=>{const g=gcd(n,d)||1;n/=g;d/=g;return d===1?String(n):n+'/'+d;};
+const norm=s=>String(s).toLowerCase().replace(/[’']/g,"'").replace(/\s+/g,' ').trim();
+const chips=l=>l.map(([a,b,ok])=>`<span class="chip${ok===true?' ok':''}"><i>${a}</i><b>${b}</b></span>`).join('');
+let COL={};
+function readCols(){const cs=getComputedStyle(document.documentElement);['tx','mut','gold','teal','pink','blue','vio','card','card2','line','bg'].forEach(k=>COL[k]=cs.getPropertyValue('--'+k).trim());}
+const L=(x1,y1,x2,y2,c,w,d)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c}" stroke-width="${w||2}"${d?` stroke-dasharray="${d}"`:''} stroke-linecap="round"/>`;
+const T=(x,y,t,c,sz,a,wt)=>`<text x="${x}" y="${y}" fill="${c}" font-size="${sz||14}" text-anchor="${a||'middle'}" font-weight="${wt||600}" font-family="Georgia,serif">${t}</text>`;
+const RECT=(x,y,w,h,f,s,sw,rx,op)=>`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${Math.max(0,w).toFixed(1)}" height="${h.toFixed(1)}" rx="${rx||0}" fill="${f}" fill-opacity="${op==null?1:op}" stroke="${s||'none'}" stroke-width="${sw||0}"/>`;
+const CIR=(x,y,r,f,s,sw)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${f}" stroke="${s||'none'}" stroke-width="${sw||1.5}"/>`;
+const SV=(w,h,body)=>({w:w,h:h,body:body});
+
+/* ================= PROGRESS MEMORY ================= */
+const KEY='study:sem5-sem6-190-grace';
+let ST={v:1,items:{},sec:{},last:'',theme:'night',narr:true,voice:false,vname:'',speed:1,ts:0},memOnly=false;
+function loadST(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&o.v===1)ST=Object.assign(ST,o);}}catch(e){memOnly=true;}}
+let saveTimer=null;
+function saveST(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{ST.ts=Date.now();try{localStorage.setItem(KEY,JSON.stringify(ST));}catch(e){memOnly=true;}},150);}
+const encodeST=()=>btoa(unescape(encodeURIComponent(JSON.stringify(ST))));
+function decodeST(code){const o=JSON.parse(decodeURIComponent(escape(atob(code.trim()))));if(!o||o.v!==1||typeof o.items!=='object')throw new Error('bad');return o;}
+
+const S=(say,to,step,o)=>Object.assign({say:say,to:to||{},step:step},o||{});
+/* ================= STAGES ================= */
+const STAGES={};
+
+/* ---- fraclab : operations on two fractions ---- */
+STAGES.fraclab={render(s){
+  const a=s.a,b=s.b,c=s.c,d=s.d,op=s.op;let body='',ch=[];
+  const x0=10,W=360,H=34;
+  if(op==='+'||op==='−'){
+    const Ls=lcm(b,d),A=a*Ls/b,Cc=c*Ls/d,res=op==='+'?A+Cc:A-Cc;
+    const M=Math.max(Ls,A,Cc,res,1),cw=W/M,sep=cw>3?1:0;
+    const cells=(y,n,col,from)=>{let o='';for(let i=0;i<n;i++)o+=RECT(x0+((from||0)+i)*cw,y,cw,H,col,COL.bg,sep,0,.9);return o;};
+    const outline=y=>RECT(x0,y,Ls*cw,H,'none',COL.tx,2);
+    body+=T(x0,42,`${a}/${b} = ${A}/${Ls}`,COL.pink,15,'start')+cells(50,A,COL.pink)+outline(50);
+    body+=T(x0,112,`${c}/${d} = ${Cc}/${Ls}`,COL.teal,15,'start')+cells(120,Cc,COL.teal)+outline(120);
+    if(op==='+'){
+      body+=T(x0,182,`Ensemble : ${A} + ${Cc} = ${res} parts de ${Ls}`,COL.gold,15,'start')+cells(190,A,COL.pink)+cells(190,Cc,COL.teal,A)+outline(190);
+    }else{
+      const keep=Math.max(0,A-Cc),gone=Math.min(A,Cc);
+      body+=T(x0,182,res>=0?`On enlève ${Cc} parts : il reste ${keep} parts de ${Ls}`:'Résultat négatif !',COL.gold,15,'start')+cells(190,keep,COL.gold)+cells(190,gone,COL.line,keep)+outline(190);
+    }
+    body+=T(190,262,'Chaque case = 1/'+Ls+' (même dénominateur !)',COL.mut,13);
+    ch=[['dénominateur commun',Ls],['résultat',res>=0?`${res}/${Ls}`:'négatif'],['simplifié',res>=0?fx(res,Ls):'—']];
+    return{svg:SV(380,275,body),read:chips(ch)};
+  }
+  if(op==='×'){
+    const cols=Math.max(a,b),rows=Math.max(c,d),gx=50,gy=30,gw=300,gh=210,cw=gw/cols,chh=gh/rows;
+    for(let i=0;i<cols;i++)for(let j=0;j<rows;j++){
+      const inA=i<a,inC=j<c,f=inA&&inC?COL.gold:(inA?COL.pink:(inC?COL.teal:COL.card2));
+      body+=RECT(gx+i*cw,gy+j*chh,cw,chh,f,COL.bg,cw>5?1:0,0,inA&&inC?.95:(inA||inC?.55:1));}
+    body+=RECT(gx,gy,b*cw,d*chh,'none',COL.tx,2);
+    body+=T(gx+gw/2,gy-8,`${a}/${b} de la largeur`,COL.pink,13)+T(gx-6,gy+gh/2,`${c}/${d}`,COL.teal,13,'end');
+    body+=T(190,gy+gh+24,`Zone dorée : ${a*c} cases sur ${b*d}`,COL.gold,15);
+    return{svg:SV(380,290,body),read:chips([['produit',`${a*c}/${b*d}`],['simplifié',fx(a*c,b*d)]])};
+  }
+  /* division */
+  const v1=a/b,v2=c/d,r=(a*d)/(b*c),Mx=Math.max(1,v1,v2),sc=W/Mx;
+  body+=T(x0,42,`${a}/${b}`,COL.pink,15,'start')+RECT(x0,50,v1*sc,H,COL.pink,COL.bg,1,0,.85)+RECT(x0,50,sc,H,'none',COL.tx,2);
+  body+=T(x0,112,`${c}/${d}`,COL.teal,15,'start')+RECT(x0,120,v2*sc,H,COL.teal,COL.bg,1,0,.85)+RECT(x0,120,sc,H,'none',COL.tx,2);
+  body+=T(x0,182,'Combien de fois '+c+'/'+d+' entre dans '+a+'/'+b+' ?',COL.gold,15,'start');
+  let k=0,pos=0;
+  while(pos<v1-1e-9&&k<40){const len=Math.min(v2,v1-pos);body+=RECT(x0+pos*sc,190,len*sc,H,len<v2-1e-9?COL.pink:COL.teal,COL.bg,2,0,.85);pos+=v2;k++;}
+  body+=T(190,258,`${a}/${b} ÷ ${c}/${d} = ${a}/${b} × ${d}/${c} = ${a*d}/${b*c}`,COL.tx,14);
+  return{svg:SV(380,275,body),read:chips([['÷ devient ×','inverse '+d+'/'+c],['résultat',`${a*d}/${b*c}`],['simplifié',fx(a*d,b*c)],['décimal',Math.round(r*1000)/1000]])};
+}};
+
+/* ---- goats ---- */
+STAGES.goats={render(s){
+  const cols=8,rows=7,x0=44,y0=30,gx=29,gy=34;let body='';
+  for(let j=0;j<rows;j++){
+    const lost=(s.l1&&j===0)||(s.l1&&s.l2&&j===1);
+    for(let i=0;i<cols;i++)body+=CIR(x0+i*gx,y0+j*gy,11,lost?COL.line:COL.teal,lost?COL.mut:'none')+(lost?T(x0+i*gx,y0+j*gy+5,'✕',COL.mut,13):'');
+    body+=T(8,y0+j*gy+5,String(j+1),COL.mut,12,'start');
+  }
+  body+=T(x0+3.5*gx,y0+rows*gy+8,'1 rangée = 8 chèvres = 1/7 de 56',COL.gold,13);
+  if(s.l1)body+=T(290,y0+5,'← perdu l’an dernier',COL.pink,13,'start');
+  if(s.l1&&s.l2)body+=T(290,y0+gy+5,'← 1/6 du reste',COL.pink,13,'start');
+  if(s.l1)body+=T(290,y0+3*gy+5,'reste : 6 rangées',COL.tx,13,'start')+L(284,y0+gy-14,284,y0+6*gy+14,COL.mut,2);
+  const left=56-(s.l1?8:0)-(s.l1&&s.l2?8:0);
+  return{svg:SV(400,290,body),read:chips([['chèvres restantes',left],['fraction restante',s.l1&&s.l2?'5/7':(s.l1?'6/7':'7/7')+'']])};
+}};
+
+/* ---- farm ---- */
+STAGES.farm={render(s){
+  const N=450,x0=10,W=360,y=70,H=56,u=W/N;
+  const segs=[['porcs',60,COL.pink,'2/15'],['lapins',135,COL.blue,'3/10'],['vaches',180,COL.teal,'2/5'],['poules',75,COL.gold,'1/6']];
+  let body=`<defs><pattern id="hf" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3" height="6" fill="#000" fill-opacity=".55"/></pattern></defs>`;
+  let x=x0,pos=[];
+  segs.forEach(sg=>{const w=sg[1]*u;pos.push(x);body+=RECT(x,y,w,H,sg[2],COL.bg,1,0,s.hens===false&&sg[0]==='poules'?.18:.9);x+=w;});
+  if(s.cells){for(let i=1;i<30;i++)body+=L(x0+i*12,y,x0+i*12,y+H,COL.bg,1);body+=T(190,y-38,'30 parts égales : 1 part = 15 animaux',COL.mut,13);}
+  body+=RECT(x0,y,W,H,'none',COL.tx,2);
+  segs.forEach((sg,i)=>{const w=sg[1]*u;body+=T(pos[i]+w/2,y+H/2+5,sg[0],COL.bg,12,'middle',700)+T(pos[i]+w/2,y+H+16,sg[3],COL.tx,12);});
+  if(s.det){
+    body+=RECT(pos[0],y,35*u,H,'url(#hf)')+RECT(pos[1],y,30*u,H,'url(#hf)')+RECT(pos[3],y,10*u,H,'url(#hf)');
+    body+=T(190,y+H+40,'Hachures = infos pièges (abattoir, lapins noirs, pondeuses) → inutiles ici !',COL.pink,12);
+  }
+  if(s.sick){body+=RECT(pos[2],y,18*u,H,COL.pink,COL.tx,2,0,.95);body+=T(x0+W,y+H+58,'vaches malades : 1/10 de 2/5 = 1/25 → 18',COL.pink,12,'end');}
+  if(s.quad){const xe=pos[2]+180*u;body+=L(x0,y-12,xe,y-12,COL.tx,3)+T((x0+xe)/2,y-18,'quadrupèdes : 5/6',COL.tx,13);}
+  if(s.hens!==false&&s.showHens){body+=L(pos[3],y+H+78,pos[3]+75*u,y+H+78,COL.gold,3);}
+  return{svg:SV(380,255,body),read:chips([['porcs',60],['lapins',135],['vaches',180],['poules',75],['malades',s.sick?18:'?']])};
+}};
+
+/* ---- paye ---- */
+STAGES.paye={render(s){
+  const x0=10,W=360,y=60,H=50,w=s.w;let body='';
+  const segs=[['impôts',.30,COL.pink,'3/10','30/100'],['retraite',.15,COL.blue,'3/20','15/100'],['chômage',.02,COL.vio,'1/50','2/100'],['reste',.53,COL.teal,'53/100','53/100']];
+  let x=x0;const pos=[];
+  segs.forEach(sg=>{const sw=W*sg[1];pos.push(x);body+=RECT(x,y,sw,H,sg[2],COL.bg,1,0,.9);x+=sw;});
+  body+=RECT(x0,y,W,H,'none',COL.tx,2)+T(190,y-18,`Salaire : 1200 $ × ${w} semaine${w>1?'s':''} = ${1200*w} $`,COL.gold,15);
+  const amt=[360,180,24,636];
+  segs.forEach((sg,i)=>{const cx=pos[i]+W*sg[1]/2;
+    if(i===2){body+=L(cx,y+H,cx,y+H+16,COL.mut,1.5)+T(cx-6,y+H+30,sg[3]+(s.pct?' = '+sg[4]:''),COL.vio,12,'end')+T(cx-6,y+H+46,(amt[i]*w)+' $',COL.tx,12,'end');}
+    else{body+=T(cx,y+H/2+5,sg[0],COL.bg,12,'middle',700)+T(cx,y+H+18,sg[3]+(s.pct&&i<3?' = '+sg[4]:''),COL.tx,12)+T(cx,y+H+34,(amt[i]*w)+' $',COL.tx,12);}
+  });
+  if(s.pct)body+=T(190,y+H+84,'30/100 + 15/100 + 2/100 = 47/100 retenus',COL.gold,14);
+  return{svg:SV(380,215,body),read:chips([['retenu','47/100'],['il reste','53/100'],['montant net',(636*w)+' $']])};
+}};
+
+/* ---- numlab : PPCM / PGCD ---- */
+STAGES.numlab=
+{render(s,sec){
+  const cfg=sec.cfg||{},names=cfg.names||['nombre A','nombre B','nombre C'],items=cfg.items||['rouges','bleues','vertes'];
+  const nums=s.use3?[s.n1,s.n2,s.n3]:[s.n1,s.n2];
+  const M=lcmN(nums),G=gcdN(nums);let body='';const cols=[COL.pink,COL.blue,COL.teal];
+  if(s.view==='mult'){
+    const x0=112,W=250;
+    nums.forEach((n,i)=>{const y=40+i*52;
+      body+=T(6,y+4,`${names[i]} : ${n}`,cols[i],12,'start')+L(x0,y,x0+W,y,COL.line,2);
+      if(M/n<=160)for(let m=n;m<=M;m+=n){const px=x0+W*m/M;body+=L(px,y-12,px,y+12,cols[i],2.5);}
+      else body+=T(x0+W/2,y+4,'(trop de multiples…)',COL.mut,11);
+    });
+    const yb=40+nums.length*52;
+    body+=L(x0+W,22,x0+W,yb-14,COL.gold,3,'5 4')+T(x0+W,16,'PPCM = '+M,COL.gold,14,'end')+L(x0,22,x0,yb-14,COL.mut,1.5)+T(x0,16,'0',COL.mut,12);
+    body+=T(190,yb+10,'Chaque trait = un multiple. Le premier moment où ils tombent ensemble = PPCM.',COL.mut,12);
+    return{svg:SV(380,yb+24,body),read:nums.map((n,i)=>chips([[n+' =',fstr(n)]])).join('')+chips([['PPCM',M,true],['PGCD',G,true]].concat(nums.length===2?[['PPCM × PGCD',M*G+' = '+nums[0]*nums[1]]]:[]))};
+  }
+  /* bags view */
+  const bags=G,per=nums.map(n=>n/G),tot=per.reduce((a,b)=>a+b,0),show=Math.min(bags,24),bw=56,bh=58,perRow=6;
+  for(let b=0;b<show;b++){const bx=10+(b%perRow)*61,by=10+Math.floor(b/perRow)*66;
+    body+=RECT(bx,by,bw,bh,COL.card2,COL.mut,1.5,8,1);
+    let k=0;per.forEach((p,i)=>{for(let q=0;q<p;q++){const dn=tot>30,cx=bx+(dn?8:9)+(k%(dn?8:5))*(dn?5.8:9.5),cy=by+(dn?8:9)+Math.floor(k/(dn?8:5))*(dn?5.8:9.5);if(tot<=60)body+=CIR(cx,cy,dn?2.4:3.8,cols[i]);k++;}});
+  }
+  const rowsN=Math.ceil(show/perRow);
+  body+=T(190,10+rowsN*66+8,G+' sac'+(G>1?'s':'')+(bags>show?' (24 montrés)':'')+' identiques',COL.gold,14);
+  body+=T(190,10+rowsN*66+28,per.map((p,i)=>p+' '+items[i]).join(' + ')+' = '+tot+' par sac',COL.tx,13);
+  return{svg:SV(380,10+rowsN*66+40,body),read:nums.map((n,i)=>chips([[n+' =',fstr(n)]])).join('')+chips([['PGCD = nombre de sacs',G,true],['par sac',per.join(' + ')+' = '+tot]])};
+}};
+
+/* ---- dtree : decision tree for relative pronouns ---- */
+STAGES.dtree={render(s){
+  const rows=[
+    ['sujet','Le mot remplace-t-il le <b>sujet</b> du verbe ? (celui qui fait l’action)','qui','Ma sœur <u>qui</u> étudie…'],
+    ['cod','Sinon : est-ce un <b>complément direct</b> (on dit « j’écoute <i>quelqu’un</i> », sans préposition) ?','que','Le monument <u>que</u> je photographie'],
+    ['de','Sinon : le verbe ou le nom demande-t-il <b>DE</b> ? (parler <b>de</b>, avoir besoin <b>de</b>, rêver <b>de</b>, la voiture <b>de</b>…)','dont','Les documents <u>dont</u> tu as besoin'],
+    ['lieu','Sinon : c’est un <b>lieu ou un moment</b> ?','où','La ville <u>où</u> j’habite'],
+    ['prep','Sinon : <b>à</b> + une personne (écrire <b>à</b> quelqu’un) ?','à qui','La personne <u>à qui</u> j’écrivais']];
+  let html='<div class="htmlstage"><div style="color:var(--mut);font-size:13px">Arbre de décision : pose les questions dans l’ordre.</div>';
+  rows.forEach(r=>{const on=s.hl===r[0];html+=`<div class="node${on?' on':(s.hl?' dim':'')}"><div class="qn">${r[1]}<div style="color:var(--teal);font-style:italic;margin-top:3px">${r[3]}</div></div><div class="rs">${on?'→ ':''}${r[2]}</div></div>`;});
+  html+='</div>';
+  return{html:html,read:''};
+}};
+
+/* ---- merge : joining two sentences ---- */
+const MERGE={
+ a:{s1:'La fille a été reçue avocate.',s2:'Je te parle de <u>cette fille</u>.',pr:'dont',why:'« parler <b>de</b> quelqu’un » → on utilise <b>dont</b>',mid:'Je te parle <span class="pr">dont</span>… → <span class="pr">dont</span> je te parle',fin:'La fille <span class="pr">dont</span> je te parle a été reçue avocate.',ante:'fille'},
+ b:{s1:'L’homme s’est blessé.',s2:'J’ai confié les rénovations <u>à cet homme</u>.',pr:'à qui',why:'« confier <b>à</b> quelqu’un » → <b>à qui</b> (ou <b>auquel</b>)',mid:'à cet homme → <span class="pr">à qui</span> j’ai confié les rénovations',fin:'L’homme <span class="pr">à qui</span> j’ai confié les rénovations s’est blessé.',ante:'homme'},
+ c:{s1:'La voiture a déjà connu sa première panne de moteur.',s2:'J’ai acheté <u>cette voiture</u>.',pr:'que',why:'« j’ai acheté <b>quelque chose</b> » → complément direct → <b>que</b>',mid:'cette voiture → <span class="pr">que</span> j’ai acheté',fin:'La voiture <span class="pr">que</span> j’ai achetée a déjà connu sa première panne de moteur. <br><small>(achetée : le COD « que » est placé avant → on accorde)</small>',ante:'voiture'},
+ d:{s1:'On m’a demandé mon passeport dans ce pays.',s2:'Je suis allé <u>dans ce pays</u>.',pr:'où',why:'« je suis allé <b>quelque part</b> » → lieu → <b>où</b>',mid:'dans ce pays → <span class="pr">où</span> je suis allé',fin:'On m’a demandé mon passeport dans le pays <span class="pr">où</span> je suis allé.',ante:'pays'}};
+STAGES.merge={render(s){
+  const m=MERGE[s.i],k=s.k;let html='<div class="htmlstage">';
+  html+=`<div class="ln"><b>Phrase 1 :</b> ${m.s1}</div><div class="ln"><b>Phrase 2 :</b> ${m.s2}</div>`;
+  if(k>=1)html+=`<div class="ln">① Le groupe souligné parle de la même chose que la phrase 1. On choisit le pronom : <span class="pr">${m.pr}</span><br><small>${m.why}</small></div>`;
+  if(k>=2)html+=`<div class="ln">② Dans la phrase 2, on remplace le groupe souligné par le pronom et on le place au début : ${m.mid}</div>`;
+  if(k>=3)html+=`<div class="ln">③ On glisse cette nouvelle phrase juste après « ${m.ante} » :<br><b>${m.fin}</b></div>`;
+  html+='</div>';
+  return{html:html,read:''};
+}};
+
+/* ---- circ : circumstance categories ---- */
+const CATS={
+ 'Temps':{c:['<b>Simultanéité :</b> quand, lorsque, pendant que, tandis que, alors que…','<b>Antériorité :</b> jusqu’à ce que, en attendant que, étant donné que…','<b>Postériorité :</b> après que, dès que…'],e:['Viens quand tu peux.','Pars avant qu’il arrive.','Viens après que tu as terminé.']},
+ 'Cause':{c:['comme, parce que, puisque, vu que, étant donné que…'],e:['Comme elle voulait te voir, elle est venue.']},
+ 'But':{c:['afin que, pour que (+ subjonctif)…','<b>But négatif :</b> de peur que, de crainte que (+ subjonctif)…'],e:['Viens pour qu’elle puisse te voir.','Pars, de peur qu’il ne nous surprenne.']},
+ 'Conséquence':{c:['de sorte que, si bien que, au point que','tellement… que, tant… que, si… que','assez… pour que, trop… pour que (+ subjonctif)'],e:['Elle chantait si bien que j’en ai pleuré.','Il fait tellement froid que la route est gelée.','Le gâteau est trop chaud pour qu’on mange.']},
+ 'Hypothèse ou condition':{c:['si','à condition que, à moins que (+ subjonctif)'],e:['Si tu viens ce soir, tu la verras.','Viens, à moins que tu ne veuilles pas la voir.']},
+ 'Opposition ou concession':{c:['alors que, même si…','bien que (+ subjonctif)','quand bien même (+ conditionnel)'],e:['Viens, même s’il est tard.','Quand bien même tu aurais raison, je ne t’écouterais pas.']},
+ 'Comparaison':{c:['comme, ainsi que, de même que, comme si'],e:['Il a agi comme je l’aurais fait moi-même.']}};
+STAGES.circ={render(s){
+  const c=CATS[s.cat];
+  const html=`<div class="htmlstage circ"><h4>${s.cat}</h4><div style="color:var(--mut);font-size:13px">Conjonctions de subordination</div><ul>${c.c.map(x=>'<li>'+x+'</li>').join('')}</ul><div style="color:var(--mut);font-size:13px">Exemples</div><ul>${c.e.map(x=>'<li class="ex">'+x+'</li>').join('')}</ul></div>`;
+  return{html:html,read:''};
+}};
+
+/* ================= CONTENT ================= */
+const PARTS=['Semaine 5 · Maths — Les fractions','Semaine 5 · Français — Le pronom relatif','Semaine 6 · Maths — PPCM, PGCD et révision','Semaine 6 · Français — La subordonnée circonstancielle'];
+const TOOLBOX=[
+ ['➗ Fractions','Même dénominateur pour <b>+</b> et <b>−</b>. Pour <b>×</b> : haut × haut, bas × bas. Pour <b>÷</b> : on multiplie par l’<b>inverse</b>. Ordre : ( ) [ ] puis × ÷ puis + −. N’oublie pas de simplifier !'],
+ ['🔢 PPCM et PGCD','Décompose en facteurs premiers. <b>PPCM</b> : tous les facteurs, avec la <b>plus grande</b> puissance. <b>PGCD</b> : seulement les facteurs communs, avec la <b>plus petite</b> puissance.'],
+ ['🧩 Pronoms relatifs','<b>qui</b> = sujet · <b>que</b> = complément direct · <b>dont</b> = complément introduit par <b>de</b> · <b>où</b> = lieu ou temps · <b>à qui / auquel</b> = à + une personne.'],
+ ['🧭 Subordonnées circonstancielles','Elles répondent à : <b>quand ?</b> (temps) · <b>pourquoi ?</b> (cause) · <b>pour quoi faire ?</b> (but) · <b>avec quel résultat ?</b> (conséquence) · <b>à quelle condition ?</b> · <b>malgré quoi ?</b> (opposition) · <b>comme quoi ?</b> (comparaison).']];
+
+const FR_OP=[['+','+'],['−','−'],['×','×'],['÷','÷']];
+const OPCTL=[{k:'a',t:'range',label:'Numérateur de la 1re fraction',min:1,max:20,step:1,fmt:v=>v},{k:'b',t:'range',label:'Dénominateur de la 1re fraction',min:2,max:20,step:1,fmt:v=>v},
+ {k:'c',t:'range',label:'Numérateur de la 2e fraction',min:1,max:20,step:1,fmt:v=>v},{k:'d',t:'range',label:'Dénominateur de la 2e fraction',min:2,max:20,step:1,fmt:v=>v},
+ {k:'op',t:'seg',label:'Opération',opts:FR_OP}];
+const NUMCTL=[{k:'n1',t:'range',label:'Premier nombre',min:2,max:200,step:1,fmt:v=>v},{k:'n2',t:'range',label:'Deuxième nombre',min:2,max:200,step:1,fmt:v=>v},
+ {k:'n3',t:'range',label:'Troisième nombre',min:2,max:200,step:1,fmt:v=>v},{k:'use3',t:'check',label:'Utiliser un troisième nombre'},
+ {k:'view',t:'seg',label:'Vue',opts:[['mult','Multiples (PPCM)'],['bags','Sacs (PGCD)']]}];
+const CATOPT=[['Temps','Temps'],['Cause','Cause'],['But','But'],['Conséquence','Conséquence'],['Condition','Hypothèse ou condition'],['Opposition','Opposition ou concession'],['Comparaison','Comparaison']];
+const Q=(id,lab,opts,c,why,hint,set)=>({id:id,t:'mc',lab:lab,opts:opts,c:c,why:why,hint:hint,set:set});
+const QUI4=['que','qui','dont','où'];
+
+const SECTIONS=[
+/* ---------------- 1 ---------------- */
+{id:'m1',part:0,title:'Une expression avec crochets',src:'Sem-5 · Fractions · Exercice 1',stage:'fraclab',
+ statement:`Calcule et donne la réponse en fraction simplifiée :<br><b>1/5 ÷ [ (7/10 + 1/5) × (3/4 − 1/3) ] − 2/5</b>`,
+ def:{a:7,b:10,c:1,d:5,op:'+'},controls:OPCTL,
+ presets:[['① 7/10 + 1/5',{a:7,b:10,c:1,d:5,op:'+'}],['② 3/4 − 1/3',{a:3,b:4,c:1,d:3,op:'−'}],['③ 9/10 × 5/12',{a:9,b:10,c:5,d:12,op:'×'}],['④ 1/5 ÷ 3/8',{a:1,b:5,c:3,d:8,op:'÷'}],['⑤ 8/15 − 2/5',{a:8,b:15,c:2,d:5,op:'−'}],['À moi : 1/2 + 1/3',{a:1,b:2,c:1,d:3,op:'+'}]],
+ goal:s=>(s.op==='−'&&fx(s.a,s.b)==='8/15'&&fx(s.c,s.d)==='2/5')?'✔ 8/15 − 2/5 = 2/15 : c’est la réponse de l’exercice !':'',
+ qs:[{id:'a',t:'num',lab:'Résultat de l’expression :',ans:[2,15],hint:'Commence par les deux parenthèses, puis multiplie, puis divise, et soustrais à la fin.',why:'La réponse est <b>2/15</b>.'}],
+ steps:[
+  {t:'Lis l’expression et choisis l’ordre',h:`<p>Ordre des calculs : <b>les parenthèses</b> d’abord, puis les <b>crochets</b>, puis × et ÷, et enfin le <b>−</b>.</p><p>On a donc 4 mini-calculs à faire à la suite.</p>`,act:{a:7,b:10,c:1,d:5,op:'+'}},
+  {t:'Première parenthèse : 7/10 + 1/5',h:`<p>Dénominateur commun : <span class="m">10</span>. Comme <span class="m">1/5 = 2/10</span> :</p><p><span class="m">7/10 + 2/10 = 9/10</span></p>`,act:{a:7,b:10,c:1,d:5,op:'+'}},
+  {t:'Deuxième parenthèse : 3/4 − 1/3',h:`<p>Dénominateur commun : <span class="m">12</span>. <span class="m">3/4 = 9/12</span> et <span class="m">1/3 = 4/12</span>.</p><p><span class="m">9/12 − 4/12 = 5/12</span></p>`,act:{a:3,b:4,c:1,d:3,op:'−'}},
+  {t:'Dans les crochets : on multiplie',h:`<p><span class="m">9/10 × 5/12 = 45/120</span>. On simplifie par 15 : <span class="k">3/8</span>.</p><p>Astuce : simplifie avant de multiplier (9 et 12 par 3 ; 5 et 10 par 5).</p>`,act:{a:9,b:10,c:5,d:12,op:'×'}},
+  {t:'On divise : 1/5 ÷ 3/8',h:`<p>Diviser, c’est <b>multiplier par l’inverse</b> : <span class="m">1/5 × 8/3 = 8/15</span>.</p>`,act:{a:1,b:5,c:3,d:8,op:'÷'}},
+  {t:'Dernière étape : 8/15 − 2/5',h:`<p><span class="m">2/5 = 6/15</span>, donc <span class="m">8/15 − 6/15 = 2/15</span>.</p><p>Vérifie : 2/15 est déjà simplifiée (2 et 15 n’ont aucun diviseur commun). Réponse : <span class="k">2/15</span>.</p>`,act:{a:8,b:15,c:2,d:5,op:'−'}}],
+ big:'<b>Idée clé :</b> une grosse expression, c’est une suite de petits calculs. On les fait dans l’ordre : parenthèses → crochets → × ÷ → + −.',
+ movie:[
+  S('Voici l’exercice. Il est long, mais on le coupe en petits calculs. On commence toujours par les parenthèses.',{a:7,b:10,c:1,d:5,op:'+'},1,{snap:['a','b','c','d']}),
+  S('Première parenthèse : sept dixièmes plus un cinquième. Le dénominateur commun est dix. Un cinquième, c’est deux dixièmes. Donc sept dixièmes plus deux dixièmes égalent neuf dixièmes.',{},2),
+  S('Deuxième parenthèse : trois quarts moins un tiers. Le dénominateur commun est douze. Neuf douzièmes moins quatre douzièmes égalent cinq douzièmes.',{a:3,b:4,c:1,d:3,op:'−'},3,{snap:['a','b','c','d']}),
+  S('Dans les crochets, on multiplie : neuf dixièmes fois cinq douzièmes, cela fait quarante-cinq cent vingtièmes, qu’on simplifie en trois huitièmes.',{a:9,b:10,c:5,d:12,op:'×'},4,{snap:['a','b','c','d']}),
+  S('Ensuite, diviser par trois huitièmes, c’est multiplier par huit tiers. Un cinquième fois huit tiers égale huit quinzièmes.',{a:1,b:5,c:3,d:8,op:'÷'},5,{snap:['a','b','c','d']}),
+  S('Pour finir, huit quinzièmes moins deux cinquièmes. Deux cinquièmes valent six quinzièmes. Il reste donc deux quinzièmes. C’est la réponse !',{a:8,b:15,c:2,d:5,op:'−'},6,{snap:['a','b','c','d']})]},
+
+/* ---------------- 2 ---------------- */
+{id:'m2',part:0,title:'Les chèvres du berger',src:'Sem-5 · Fractions · Exercice 2',stage:'goats',
+ statement:`Un berger a perdu le 1/7 de ses 56 chèvres l’an dernier et le 1/6 <b>du reste</b> cette année.<br>a) Quelle fraction de ses chèvres lui reste-t-il ? &nbsp; b) Combien de chèvres lui reste-t-il ?`,
+ def:{l1:false,l2:false},controls:[{k:'l1',t:'check',label:'Perdre 1/7 (l’an dernier)'},{k:'l2',t:'check',label:'Perdre 1/6 du reste (cette année)'}],
+ presets:[['Au début',{l1:false,l2:false}],['Après l’an dernier',{l1:true,l2:false}],['Après cette année',{l1:true,l2:true}]],
+ goal:s=>s.l1&&s.l2?'✔ Il reste 5 rangées sur 7 → 5/7 de 56 = 40 chèvres':'',
+ qs:[{id:'a',t:'num',lab:'a) Fraction restante :',ans:[5,7],hint:'Après la 1re perte il reste 6/7. Puis on perd 1/6 de ces 6/7.',why:'<b>5/7</b> : 6/7 × 5/6 = 30/42 = 5/7.'},
+     {id:'b',t:'num',lab:'b) Nombre de chèvres restantes :',ans:40,unit:'chèvres',hint:'Prends 5/7 de 56 : divise par 7, puis multiplie par 5.',why:'56 ÷ 7 = 8, puis 8 × 5 = <b>40</b> chèvres.'}],
+ steps:[
+  {t:'Range les 56 chèvres en 7 rangées',h:`<p><span class="m">56 ÷ 7 = 8</span> chèvres par rangée. Une rangée = <span class="k">1/7</span> du troupeau.</p>`,act:{l1:false,l2:false}},
+  {t:'L’an dernier : on perd 1/7',h:`<p>1/7 = <b>1 rangée</b> = 8 chèvres. Il reste <span class="m">6/7</span> du troupeau, c’est 6 rangées (48 chèvres).</p>`,act:{l1:true,l2:false}},
+  {t:'Cette année : 1/6 DU RESTE',h:`<p>Attention : pas 1/6 de 56 ! Le reste, ce sont <b>6 rangées</b>. Le 1/6 de 6 rangées, c’est <b>1 rangée</b> (8 chèvres).</p>`,act:{l1:true,l2:true}},
+  {t:'a) Compte les rangées qui restent',h:`<p>Il reste <b>5 rangées sur 7</b> → <span class="k">5/7</span>.</p><p>Avec le calcul : <span class="m">6/7 × 5/6 = 30/42 = 5/7</span> (on enlève 1/6, il reste 5/6).</p>`,act:{l1:true,l2:true}},
+  {t:'b) Combien de chèvres ?',h:`<p><span class="m">5/7 de 56 = 56 ÷ 7 × 5 = 8 × 5 = 40</span>.</p><p>Vérifie : <span class="m">56 − 8 − 8 = 40</span> ✔ Réponse : <span class="k">40 chèvres</span>.</p>`,act:{l1:true,l2:true}}],
+ big:'<b>Idée clé :</b> « du reste » veut dire qu’on prend une fraction de ce qui <i>reste</i>, pas du total. Dessiner des rangées rend la fraction visible.',
+ movie:[
+  S('Un berger a cinquante-six chèvres. On les range en sept rangées de huit. Chaque rangée vaut un septième du troupeau.',{l1:false,l2:false},1),
+  S('L’an dernier, il perd un septième : c’est une rangée de huit chèvres. Il reste six rangées.',{l1:true},2),
+  S('Cette année, il perd un sixième du reste. Le reste, c’est six rangées. Un sixième de six rangées, c’est une seule rangée.',{l2:true},3),
+  S('Il reste donc cinq rangées sur sept. La fraction restante est cinq septièmes.',{},4),
+  S('Cinq septièmes de cinquante-six : cinquante-six divisé par sept fait huit, et huit fois cinq font quarante. Il lui reste quarante chèvres.',{},5)]},
+
+/* ---------------- 3 ---------------- */
+{id:'m3',part:0,title:'La ferme de Monsieur Matheux',src:'Sem-5 · Fractions · Exercice 3',stage:'farm',
+ statement:`Monsieur Matheux possède une ferme avec <b>450 animaux</b>. Les 2/15 sont des cochons (dont les 7/12 iront à l’abattoir). Les 3/10 sont des lapins (dont les 2/9 sont noirs). Les 2/5 sont des vaches, dont le 1/10 est malade. Le reste, ce sont des poules (dont les 2/15 sont de bonnes pondeuses).<br>a) Quelle fraction sont des poules ? b) Quelle fraction sont des quadrupèdes ? c) Quelle fraction sont des vaches malades ? d) Combien de vaches malades ? e) Combien de quadrupèdes ? f) Les cochons et les poules représentent quelle fraction ?`,
+ def:{cells:false,det:false,sick:false,quad:false},controls:[{k:'cells',t:'check',label:'Découper en 30 parts égales'},{k:'quad',t:'check',label:'Entourer les quadrupèdes'},{k:'sick',t:'check',label:'Montrer les vaches malades'},{k:'det',t:'check',label:'Montrer les infos pièges (hachures)'}],
+ presets:[['Voir les 30 parts',{cells:true}],['Quadrupèdes',{cells:true,quad:true}],['Vaches malades',{cells:true,sick:true}],['Tout montrer',{cells:true,quad:true,sick:true,det:true}]],
+ goal:s=>(s.cells&&s.quad&&s.sick)?'✔ Poules 1/6 · quadrupèdes 5/6 · vaches malades 1/25 = 18':'',
+ qs:[{id:'a',t:'num',lab:'a) Fraction de poules :',ans:[1,6],hint:'Poules = tout (1) moins cochons, lapins et vaches. Mets tout sur 30.',why:'1 − 4/30 − 9/30 − 12/30 = 5/30 = <b>1/6</b>.'},
+     {id:'b',t:'num',lab:'b) Fraction de quadrupèdes :',ans:[5,6],hint:'Les quadrupèdes ont 4 pattes : cochons, lapins, vaches.',why:'4/30 + 9/30 + 12/30 = 25/30 = <b>5/6</b>.'},
+     {id:'c',t:'num',lab:'c) Fraction de vaches malades :',ans:[1,25],hint:'Le 1/10 DES vaches : 1/10 × 2/5.',why:'1/10 × 2/5 = 2/50 = <b>1/25</b>.'},
+     {id:'d',t:'num',lab:'d) Nombre de vaches malades :',ans:18,unit:'vaches',hint:'Prends 1/25 de 450.',why:'450 ÷ 25 = <b>18</b>. (Vérifie : 1/10 de 180 vaches = 18.)'},
+     {id:'e',t:'num',lab:'e) Nombre de quadrupèdes :',ans:375,unit:'animaux',hint:'Prends 5/6 de 450.',why:'450 ÷ 6 = 75, puis 75 × 5 = <b>375</b>. (Ou 450 − 75 poules.)'},
+     {id:'f',t:'num',lab:'f) Cochons + poules (fraction) :',ans:[3,10],hint:'2/15 + 1/6 : dénominateur commun 30.',why:'4/30 + 5/30 = 9/30 = <b>3/10</b>.'}],
+ steps:[
+  {t:'Découpe la ferme en 30 parts égales',h:`<p>Les dénominateurs 15, 10 et 5 entrent tous dans <span class="m">30</span>. Une part = <span class="m">450 ÷ 30 = 15</span> animaux.</p>`,act:{cells:true}},
+  {t:'Traduis chaque fraction en trentièmes',h:`<p>Cochons <span class="m">2/15 = 4/30</span> · lapins <span class="m">3/10 = 9/30</span> · vaches <span class="m">2/5 = 12/30</span>.</p><p>Ensemble : <span class="m">4 + 9 + 12 = 25</span> parts sur 30.</p>`,act:{cells:true}},
+  {t:'a) Les poules : ce qui reste',h:`<p><span class="m">30/30 − 25/30 = 5/30 = 1/6</span>. Les poules sont <span class="k">1/6</span> (75 animaux).</p>`,act:{cells:true}},
+  {t:'b) Les quadrupèdes',h:`<p>Cochons, lapins et vaches ont 4 pattes ; les poules non. <span class="m">25/30 = 5/6</span> → <span class="k">5/6</span>.</p>`,act:{cells:true,quad:true}},
+  {t:'Attention aux infos pièges !',h:`<p>Les 7/12 des porcs à l’abattoir, les 2/9 des lapins noirs et les 2/15 des poules pondeuses (<b>hachures</b>) ne servent à répondre à aucune question. Seules les <b>vaches malades</b> comptent.</p>`,act:{cells:true,quad:true,det:true}},
+  {t:'c) et d) Les vaches malades',h:`<p>Le 1/10 <b>des vaches</b> : <span class="m">1/10 × 2/5 = 2/50 = 1/25</span>.</p><p>Nombre : <span class="m">450 ÷ 25 = 18</span> vaches. Réponses : <span class="k">1/25</span> et <span class="k">18</span>.</p>`,act:{cells:true,quad:true,det:true,sick:true}},
+  {t:'e) et f) Les derniers calculs',h:`<p>e) <span class="m">5/6 × 450 = 375</span> quadrupèdes.</p><p>f) <span class="m">2/15 + 1/6 = 4/30 + 5/30 = 9/30 = 3/10</span>. Réponses : <span class="k">375</span> et <span class="k">3/10</span>.</p>`,act:{cells:true,quad:true,det:false,sick:true}}],
+ big:'<b>Idée clé :</b> quand il y a plusieurs fractions, cherche un dénominateur commun (ici 30) et découpe en parts égales. Et trie les informations : certaines sont des pièges.',
+ movie:[
+  S('Il y a quatre cent cinquante animaux. On les découpe en trente parts égales : chaque part contient quinze animaux.',{cells:true},1),
+  S('Les cochons valent quatre trentièmes, les lapins neuf trentièmes, les vaches douze trentièmes. Il reste cinq trentièmes pour les poules, soit un sixième.',{},3),
+  S('Les quadrupèdes sont les cochons, les lapins et les vaches : vingt-cinq trentièmes, soit cinq sixièmes.',{quad:true},4),
+  S('Attention ! Les hachures montrent des informations pièges. Elles ne servent pas pour les questions.',{det:true},5),
+  S('Seules les vaches malades comptent : un dixième de deux cinquièmes égale un vingt-cinquième. Quatre cent cinquante divisé par vingt-cinq font dix-huit vaches malades.',{det:false,sick:true},6),
+  S('Cinq sixièmes de quatre cent cinquante font trois cent soixante-quinze quadrupèdes. Et les cochons plus les poules représentent trois dixièmes.',{},7)]},
+
+/* ---------------- 4 ---------------- */
+{id:'f1',part:1,title:'qui ou que ?',src:'Sem-5 · Pronom relatif · Exercice 1',stage:'dtree',
+ statement:`Complète les phrases avec <b>qui</b> ou <b>que</b>.`,
+ def:{hl:''},controls:[{k:'hl',t:'seg',label:'Je teste le test…',opts:[['sujet','qui ?'],['cod','que ?'],['','Effacer']]}],
+ presets:[],goal:()=>'',
+ qs:[Q('1','1. J’ai une sœur ___ étudie en Angleterre.',['qui','que'],0,'« ma sœur <b>étudie</b> » : le mot remplace le <b>sujet</b> → <b>qui</b>.','Qui étudie ? Ma sœur : c’est le sujet.',{hl:'sujet'}),
+     Q('2','2. Nous connaissons bien l’homme ___ vient d’entrer.',['qui','que'],0,'« l’homme <b>vient</b> d’entrer » : sujet → <b>qui</b>.','Qui vient d’entrer ?',{hl:'sujet'}),
+     Q('3','3. Les exercices ___ je fais sont très difficiles.',['qui','que'],1,'« je fais <b>les exercices</b> » : complément direct → <b>que</b>.','Je fais quoi ? Les exercices : c’est le COD.',{hl:'cod'}),
+     Q('4','4. Le monument ___ je photographie est ancien.',['qui','que'],1,'« je photographie <b>le monument</b> » : COD → <b>que</b>.','Je photographie quoi ?',{hl:'cod'}),
+     Q('5','5. Le professeur ___ j’écoute est un bon communicateur.',['qui','que'],1,'« j’écoute <b>le professeur</b> » : COD (sans préposition) → <b>que</b>.','J’écoute qui ? Le professeur.',{hl:'cod'})],
+ steps:[
+  {t:'Trouve le verbe de la subordonnée',h:`<p>Dans « J’ai une sœur <u>qui</u> étudie… », le verbe est <b>étudie</b>.</p>`,act:{hl:''}},
+  {t:'Test du sujet',h:`<p>Demande : « <b>Qui</b> étudie ? » Réponse : ma sœur. Le mot remplace le sujet → <span class="k">qui</span>.</p>`,act:{hl:'sujet'}},
+  {t:'Test du complément direct',h:`<p>« Je fais <b>quoi</b> ? » Les exercices : on répond sans préposition → <span class="k">que</span> (devient <i>qu’</i> devant une voyelle).</p>`,act:{hl:'cod'}}],
+ big:'<b>Idée clé :</b> <b>qui</b> = celui qui fait l’action (sujet). <b>que</b> = celui qui subit l’action (complément direct).'},
+
+/* ---------------- 5 ---------------- */
+{id:'f2',part:1,title:'qui, que, dont, où… lequel est le bon ?',src:'Sem-5 · Pronom relatif · Exercice 2',stage:'dtree',
+ statement:`Choisis le bon pronom relatif. Après chaque réponse, l’arbre de décision s’allume pour te montrer le raisonnement.`,
+ def:{hl:''},controls:[{k:'hl',t:'seg',label:'Je teste…',opts:[['sujet','qui'],['cod','que'],['de','dont'],['lieu','où'],['prep','à qui'],['','Effacer']]}],
+ presets:[],goal:()=>'',
+ qs:[Q('1','1) J’ai trouvé les documents ___ tu as besoin.',QUI4,2,'« avoir besoin <b>de</b> » → <b>dont</b>.','Quelle préposition suit « avoir besoin » ?',{hl:'de'}),
+     Q('2','2) Voici le jus ___ vous avez commandé.',QUI4,0,'« vous avez commandé <b>le jus</b> » : COD → <b>que</b>.','Vous avez commandé quoi ?',{hl:'cod'}),
+     Q('3','3) Où est l’homme ___ tu as acheté la voiture ?',QUI4,2,'« la voiture <b>de</b> l’homme » : complément du nom → <b>dont</b>.','Remplace : tu as acheté la voiture de cet homme.',{hl:'de'}),
+     Q('4','4) Elle aime la maison ___ je t’ai parlé.',QUI4,2,'« parler <b>de</b> la maison » → <b>dont</b>.','Parler… à ou de ?',{hl:'de'}),
+     Q('5','5) C’est l’homme ___ j’ai rêvé.',QUI4,2,'« rêver <b>de</b> quelqu’un » → <b>dont</b>.','Rêver de ou rêver à ?',{hl:'de'}),
+     Q('6','6) J’entends le poème ___ il a écrit.',['qu’','qui','dont','où'],0,'« il a écrit <b>le poème</b> » : COD → <b>que</b>, qui devient <b>qu’</b> devant « il ».','Il a écrit quoi ?',{hl:'cod'}),
+     Q('7','7) Je connais un homme ___ parle le russe couramment.',QUI4,1,'« un homme <b>parle</b> » : sujet → <b>qui</b>.','Qui parle le russe ?',{hl:'sujet'}),
+     Q('8','8) Où est le livre ___ tu as mentionné ?',QUI4,0,'« tu as mentionné <b>le livre</b> » : COD → <b>que</b>.','Tu as mentionné quoi ?',{hl:'cod'}),
+     Q('9','9) Le guichet ___ vous changez votre argent est là-bas.',QUI4,3,'On change l’argent <b>au guichet</b> : un lieu → <b>où</b>.','C’est un endroit.',{hl:'lieu'}),
+     Q('10','10) La personne ___ j’écrivais a déménagé.',['que','qui','dont','à qui','à quoi'],3,'« écrire <b>à</b> quelqu’un » : à + personne → <b>à qui</b>.','Écrire à… une personne.',{hl:'prep'}),
+     Q('11','11) Elle est la chanteuse ___ nous avons trouvé le chien.',QUI4,2,'« le chien <b>de</b> la chanteuse » : complément du nom → <b>dont</b>.','Le chien de qui ?',{hl:'de'}),
+     Q('12','12) Le pays ___ j’habite est beau.',QUI4,3,'Comme dans ton cahier (« La ville <b>où</b> j’habitais ») : un lieu → <b>où</b>.','Habiter où ? C’est un lieu.',{hl:'lieu'})],
+ steps:[
+  {t:'Question 1 : le sujet ?',h:`<p>Le pronom remplace-t-il celui qui <b>fait l’action</b> ? Si oui : <span class="k">qui</span>.</p>`,act:{hl:'sujet'}},
+  {t:'Question 2 : un complément direct ?',h:`<p>Sinon, y a-t-il un complément direct, <b>sans préposition</b> ? Si oui : <span class="k">que</span>.</p>`,act:{hl:'cod'}},
+  {t:'Question 3 : « de » ?',h:`<p>Sinon, le verbe ou le nom demande-t-il <b>de</b> (parler de, avoir besoin de, rêver de, la voiture <b>de</b>…) ? Si oui : <span class="k">dont</span>.</p>`,act:{hl:'de'}},
+  {t:'Question 4 : lieu ou temps ?',h:`<p>Sinon, est-ce un <b>lieu</b> (ou un moment) ? Si oui : <span class="k">où</span>.</p>`,act:{hl:'lieu'}},
+  {t:'Dernier cas : à + personne',h:`<p>Avec <b>à</b> + une personne (écrire <b>à</b> quelqu’un) : <span class="k">à qui</span> (ou <b>auquel</b> pour un animal ou une chose).</p>`,act:{hl:'prep'}}],
+ big:'<b>Idée clé :</b> pour choisir un pronom relatif, regarde ce que demande le verbe : sujet → qui, complément direct → que, « de » → dont, lieu → où.'},
+
+/* ---------------- 6 ---------------- */
+{id:'f3',part:1,title:'Relier deux phrases',src:'Sem-5 · Pronom relatif · Exercice 3',stage:'merge',
+ statement:`Relie les deux phrases avec un pronom relatif. Construis la phrase en touchant les mots dans le bon ordre.`,
+ def:{i:'a',k:0},controls:[{k:'i',t:'seg',label:'Phrase',opts:[['a','a)'],['b','b)'],['c','c)'],['d','d)']]},{k:'k',t:'range',label:'Étape de la fusion',min:0,max:3,step:1,fmt:v=>['0 · deux phrases','1 · choisir le pronom','2 · transformer la phrase 2','3 · fusionner'][v]}],
+ presets:[],goal:()=>'',
+ qs:[{id:'a',t:'build',lab:'a) La fille a été reçue avocate. Je te parle de <u>cette fille</u>.',tokens:['La','fille','dont','je','te','parle','a','été','reçue','avocate.','que','où'],ok:['la fille dont je te parle a été reçue avocate.'],hint:'« Parler de quelqu’un » → dont. Le pronom se place juste après « fille ».',why:'<b>La fille dont je te parle a été reçue avocate.</b>',set:{i:'a',k:3}},
+     {id:'b',t:'build',lab:'b) L’homme s’est blessé. J’ai confié les rénovations <u>à cet homme</u>.',tokens:['L’homme','à','qui','j’ai','confié','les','rénovations','s’est','blessé.','auquel','dont','que'],ok:['l\'homme à qui j\'ai confié les rénovations s\'est blessé.','l\'homme auquel j\'ai confié les rénovations s\'est blessé.'],hint:'Confier à quelqu’un → à qui (ou auquel).',why:'<b>L’homme à qui j’ai confié les rénovations s’est blessé.</b> (« auquel » est aussi correct.)',set:{i:'b',k:3}},
+     {id:'c',t:'build',lab:'c) La voiture a déjà connu sa première panne de moteur. J’ai acheté <u>cette voiture</u>.',tokens:['La','voiture','que','j’ai','achetée','a','déjà','connu','sa','première','panne','de','moteur.','dont','acheté'],ok:['la voiture que j\'ai achetée a déjà connu sa première panne de moteur.'],hint:'J’ai acheté quoi ? un complément direct → que. Pense à l’accord du participe passé !',why:'<b>La voiture que j’ai achetée a déjà connu sa première panne de moteur.</b> « achetée » s’accorde car le COD « que » (= la voiture) est placé avant le verbe.',set:{i:'c',k:3}},
+     {id:'d',t:'build',lab:'d) On m’a demandé mon passeport dans ce pays. Je suis allé <u>dans ce pays</u>.',tokens:['On','m’a','demandé','mon','passeport','dans','le','pays','où','je','suis','allé.','que','dont'],ok:['on m\'a demandé mon passeport dans le pays où je suis allé.','on m\'a demandé mon passeport dans le pays où je suis allée.'],hint:'Je suis allé quelque part : un lieu → où.',why:'<b>On m’a demandé mon passeport dans le pays où je suis allé.</b>',set:{i:'d',k:3}}],
+ steps:[
+  {t:'Repère le groupe souligné',h:`<p>Dans la phrase 2, le groupe souligné parle de la <b>même chose</b> que la phrase 1. C’est lui qu’on va remplacer.</p>`,act:{i:'a',k:0}},
+  {t:'Choisis le pronom avec l’arbre',h:`<p>Cherche ce que demande le verbe : <i>parler <b>de</b></i> → <span class="k">dont</span>. Pour chaque phrase a, b, c, d, le pronom est différent !</p>`,act:{i:'a',k:1}},
+  {t:'Transforme la phrase 2',h:`<p>Le pronom remplace le groupe et se place <b>en tête</b> de la nouvelle phrase : « <span class="k">dont</span> je te parle ».</p>`,act:{i:'a',k:2}},
+  {t:'Fusionne',h:`<p>On glisse la subordonnée juste après le mot qu’elle complète : « La fille <b>dont je te parle</b> a été reçue avocate. »</p>`,act:{i:'a',k:3}},
+  {t:'Essaie les trois autres',h:`<p>Utilise les boutons b), c), d) et fais glisser « Étape de la fusion » pour voir comment chaque phrase se construit.</p>`,act:{i:'c',k:3}}],
+ big:'<b>Idée clé :</b> relier deux phrases = choisir le bon pronom, le mettre en tête de la phrase 2, puis insérer cette phrase après le mot qu’elle précise.'},
+
+/* ---------------- 7 ---------------- */
+{id:'m4',part:2,title:'PPCM et PGCD de deux nombres',src:'Sem-6 · PPCM / PGCD (page 9)',stage:'numlab',cfg:{names:['n₁','n₂','n₃']},
+ statement:`Calcule en décomposant en facteurs premiers : 1) <b>PPCM (36 ; 48)</b> · 2) <b>PGCD (36 ; 48)</b> · 3) <b>PPCM × PGCD</b> · 4) PPCM et PGCD de 11 et 12 (nombres consécutifs) · 5) PPCM et PGCD de 7 et 11 (nombres premiers).`,
+ def:{n1:36,n2:48,n3:20,use3:false,view:'mult'},controls:NUMCTL,
+ presets:[['36 et 48',{n1:36,n2:48,use3:false,view:'mult'}],['PGCD de 36 et 48 (sacs)',{n1:36,n2:48,use3:false,view:'bags'}],['11 et 12',{n1:11,n2:12,use3:false,view:'mult'}],['7 et 11',{n1:7,n2:11,use3:false,view:'mult'}],['Essaie : 12 et 18',{n1:12,n2:18,use3:false,view:'mult'}]],
+ goal:s=>(!s.use3&&s.n1===36&&s.n2===48)?'✔ 144 × 12 = 1728 = 36 × 48':'',
+ qs:[{id:'1',t:'num',lab:'1) PPCM (36 ; 48) =',ans:144,hint:'36 = 2²×3² et 48 = 2⁴×3. Prends les plus grandes puissances.',why:'2⁴ × 3² = 16 × 9 = <b>144</b>.'},
+     {id:'2',t:'num',lab:'2) PGCD (36 ; 48) =',ans:12,hint:'Garde seulement les facteurs communs, avec la plus petite puissance.',why:'2² × 3 = 4 × 3 = <b>12</b>.'},
+     {id:'3',t:'num',lab:'3) PPCM × PGCD =',ans:1728,hint:'Multiplie les deux résultats. Compare avec 36 × 48 !',why:'144 × 12 = <b>1728</b> = 36 × 48.'},
+     {id:'4a',t:'num',lab:'4) PPCM (11 ; 12) =',ans:132,hint:'11 est premier et n’a rien en commun avec 12.',why:'Pas de facteur commun : 11 × 12 = <b>132</b>.'},
+     {id:'4b',t:'num',lab:'4) PGCD (11 ; 12) =',ans:1,hint:'Quel est le seul diviseur commun de 11 et 12 ?',why:'Deux nombres consécutifs : <b>1</b>.'},
+     {id:'5a',t:'num',lab:'5) PPCM (7 ; 11) =',ans:77,hint:'7 et 11 sont premiers tous les deux.',why:'7 × 11 = <b>77</b>.'},
+     {id:'5b',t:'num',lab:'5) PGCD (7 ; 11) =',ans:1,hint:'Deux nombres premiers différents ont-ils un diviseur commun ?',why:'Seulement <b>1</b>.'}],
+ steps:[
+  {t:'Décompose en facteurs premiers',h:`<p><span class="m">36 = 2² × 3²</span> et <span class="m">48 = 2⁴ × 3</span>.</p>`,act:{n1:36,n2:48,use3:false,view:'mult'}},
+  {t:'1) PPCM : toutes les « briques », les plus grandes',h:`<p>On prend chaque facteur avec sa <b>plus grande</b> puissance : <span class="m">2⁴ × 3² = 16 × 9 = 144</span>. Sur le dessin, c’est le premier moment où les traits tombent ensemble.</p>`,act:{n1:36,n2:48,use3:false,view:'mult'}},
+  {t:'2) PGCD : seulement les briques communes',h:`<p>Facteurs communs, plus <b>petite</b> puissance : <span class="m">2² × 3 = 12</span>. Passe à la vue « sacs » : 12 sacs identiques.</p>`,act:{n1:36,n2:48,use3:false,view:'bags'}},
+  {t:'3) Le produit',h:`<p><span class="m">144 × 12 = 1728</span>, et <span class="m">36 × 48 = 1728</span>. Pour <b>deux</b> nombres, PPCM × PGCD = produit des deux nombres !</p>`,act:{n1:36,n2:48,use3:false,view:'mult'}},
+  {t:'4) Nombres consécutifs',h:`<p>11 et 12 n’ont aucun facteur commun : <span class="k">PGCD = 1</span> et <span class="k">PPCM = 11 × 12 = 132</span>.</p>`,act:{n1:11,n2:12,use3:false,view:'mult'}},
+  {t:'5) Nombres premiers',h:`<p>7 et 11 sont premiers : <span class="k">PGCD = 1</span>, <span class="k">PPCM = 7 × 11 = 77</span>.</p>`,act:{n1:7,n2:11,use3:false,view:'mult'}}],
+ big:'<b>Idée clé :</b> PPCM = les plus grandes puissances de tous les facteurs. PGCD = les plus petites puissances des facteurs communs. Et PPCM × PGCD = produit (pour deux nombres).',
+ movie:[
+  S('On décompose trente-six et quarante-huit en facteurs premiers. Trente-six égale deux au carré fois trois au carré. Quarante-huit égale deux puissance quatre fois trois.',{n1:36,n2:48,use3:false,view:'mult'},1,{snap:['n1','n2']}),
+  S('Pour le PPCM, on prend chaque facteur avec sa plus grande puissance : deux puissance quatre fois trois au carré, c’est seize fois neuf, soit cent quarante-quatre. C’est la ligne dorée sur le dessin.',{},2),
+  S('Pour le PGCD, on garde les facteurs communs avec la plus petite puissance : deux au carré fois trois, soit douze. On peut former douze sacs identiques.',{view:'bags'},3),
+  S('Cent quarante-quatre fois douze égale mille sept cent vingt-huit, et trente-six fois quarante-huit aussi. Pour deux nombres, le PPCM fois le PGCD égale le produit.',{view:'mult'},4),
+  S('Avec onze et douze, des nombres consécutifs, le PGCD est un et le PPCM est cent trente-deux.',{n1:11,n2:12},5,{snap:['n1','n2']}),
+  S('Avec sept et onze, deux nombres premiers, le PGCD est un et le PPCM est soixante-dix-sept.',{n1:7,n2:11},6,{snap:['n1','n2']})]},
+
+/* ---------------- 8 ---------------- */
+{id:'m5',part:2,title:'PPCM et PGCD de trois nombres',src:'Sem-6 · PPCM / PGCD · Exercice 1',stage:'numlab',cfg:{names:['n₁','n₂','n₃']},
+ statement:`1) <b>PPCM (72 ; 80 ; 180)</b> = ? &nbsp; 2) <b>PGCD (48 ; 60 ; 90)</b> = ?`,
+ def:{n1:72,n2:80,n3:180,use3:true,view:'mult'},controls:NUMCTL,
+ presets:[['PPCM (72, 80, 180)',{n1:72,n2:80,n3:180,use3:true,view:'mult'}],['PGCD (48, 60, 90)',{n1:48,n2:60,n3:90,use3:true,view:'bags'}],['Essaie : 12, 18, 30',{n1:12,n2:18,n3:30,use3:true,view:'mult'}]],
+ goal:s=>(s.use3&&s.n1===72&&s.n2===80&&s.n3===180)?'✔ Les trois lignes se rejoignent en 720':((s.use3&&s.n1===48&&s.n2===60&&s.n3===90)?'✔ 6 sacs identiques : PGCD = 6':''),
+ qs:[{id:'1',t:'num',lab:'1) PPCM (72 ; 80 ; 180) =',ans:720,hint:'72 = 2³×3² · 80 = 2⁴×5 · 180 = 2²×3²×5. Plus grandes puissances de 2, 3 et 5.',why:'2⁴ × 3² × 5 = 16 × 9 × 5 = <b>720</b>.'},
+     {id:'2',t:'num',lab:'2) PGCD (48 ; 60 ; 90) =',ans:6,hint:'48 = 2⁴×3 · 60 = 2²×3×5 · 90 = 2×3²×5. Garde les facteurs présents dans les trois.',why:'Facteurs communs : 2 et 3, puissance 1 → 2 × 3 = <b>6</b>.'}],
+ steps:[
+  {t:'Décompose les trois nombres du PPCM',h:`<p><span class="m">72 = 2³ × 3²</span> · <span class="m">80 = 2⁴ × 5</span> · <span class="m">180 = 2² × 3² × 5</span></p>`,act:{n1:72,n2:80,n3:180,use3:true,view:'mult'}},
+  {t:'PPCM : les plus grandes puissances',h:`<p>2 : la plus grande puissance est 2⁴ · 3 : 3² · 5 : 5¹. <span class="m">2⁴ × 3² × 5 = 16 × 9 × 5 = 720</span> → <span class="k">720</span>.</p>`,act:{n1:72,n2:80,n3:180,use3:true,view:'mult'}},
+  {t:'Passe aux nombres du PGCD',h:`<p><span class="m">48 = 2⁴ × 3</span> · <span class="m">60 = 2² × 3 × 5</span> · <span class="m">90 = 2 × 3² × 5</span></p>`,act:{n1:48,n2:60,n3:90,use3:true,view:'bags'}},
+  {t:'PGCD : seulement ce qui est dans les trois',h:`<p>Le 5 n’est pas dans 48. Les facteurs communs sont 2 et 3, avec la plus petite puissance (1 chacun) : <span class="m">2 × 3 = 6</span> → <span class="k">6</span> sacs identiques.</p>`,act:{n1:48,n2:60,n3:90,use3:true,view:'bags'}}],
+ big:'<b>Idée clé :</b> la méthode ne change pas avec trois nombres : PPCM → tout prendre, plus grande puissance ; PGCD → seulement ce qui est dans tous, plus petite puissance.',
+ movie:[
+  S('Pour le PPCM de soixante-douze, quatre-vingts et cent quatre-vingts, on décompose : soixante-douze égale deux au cube fois trois au carré. Quatre-vingts égale deux puissance quatre fois cinq. Cent quatre-vingts égale deux au carré fois trois au carré fois cinq.',{n1:72,n2:80,n3:180,use3:true,view:'mult'},1,{snap:['n1','n2','n3']}),
+  S('On prend les plus grandes puissances : deux puissance quatre, trois au carré, et cinq. Seize fois neuf fois cinq égale sept cent vingt. Les trois lignes se rejoignent à sept cent vingt.',{},2),
+  S('Pour le PGCD de quarante-huit, soixante et quatre-vingt-dix, on décompose aussi.',{n1:48,n2:60,n3:90,view:'bags'},3,{snap:['n1','n2','n3']}),
+  S('On garde seulement les facteurs présents dans les trois nombres : deux et trois, à la puissance un. Deux fois trois égale six. On peut faire six sacs identiques.',{},4)]},
+
+/* ---------------- 9 ---------------- */
+{id:'m6',part:2,title:'Les trois horloges déréglées',src:'Sem-6 · PPCM / PGCD · Exercice 2.1',stage:'numlab',cfg:{names:['Horloge A','Horloge B','Horloge C']},
+ statement:`Trois horloges sont déréglées. Elles viennent de sonner ensemble. L’une sonne toutes les <b>20 minutes</b>, l’autre toutes les <b>15 minutes</b> et la dernière toutes les <b>24 minutes</b>. Dans combien de minutes sonneront-elles de nouveau ensemble ?`,
+ def:{n1:20,n2:15,n3:24,use3:true,view:'mult'},controls:NUMCTL,
+ presets:[['Le problème (20, 15, 24)',{n1:20,n2:15,n3:24,use3:true,view:'mult'}],['Seulement A et B',{n1:20,n2:15,use3:false}],['Essaie : 10, 12, 15',{n1:10,n2:12,n3:15,use3:true,view:'mult'}]],
+ goal:s=>(s.use3&&s.n1===20&&s.n2===15&&s.n3===24)?'✔ Les trois horloges sonnent ensemble après 120 minutes (2 heures)':'',
+ qs:[{id:'a',t:'num',lab:'Dans combien de minutes sonneront-elles ensemble ?',ans:120,unit:'minutes',hint:'« Ensemble de nouveau » : cherche un multiple commun de 20, 15 et 24, le plus petit.',why:'PPCM (20, 15, 24) = 2³ × 3 × 5 = <b>120 minutes</b>.'}],
+ steps:[
+  {t:'Quel outil choisir ?',h:`<p>Elles sonnent ensemble à un moment qui est un <b>multiple</b> de 20, de 15 et de 24. On veut le <b>premier</b> : c’est le <span class="k">PPCM</span>.</p>`,act:{n1:20,n2:15,n3:24,use3:true,view:'mult'}},
+  {t:'Décompose',h:`<p><span class="m">20 = 2² × 5</span> · <span class="m">15 = 3 × 5</span> · <span class="m">24 = 2³ × 3</span></p>`,act:{n1:20,n2:15,n3:24,use3:true,view:'mult'}},
+  {t:'Calcule le PPCM',h:`<p>Plus grandes puissances : 2³, 3, 5 → <span class="m">8 × 3 × 5 = 120</span>.</p>`,act:{n1:20,n2:15,n3:24,use3:true,view:'mult'}},
+  {t:'Vérifie',h:`<p><span class="m">120 ÷ 20 = 6</span> · <span class="m">120 ÷ 15 = 8</span> · <span class="m">120 ÷ 24 = 5</span> : tous exacts ✔ Réponse : <span class="k">120 minutes</span>, c’est 2 heures.</p>`,act:{n1:20,n2:15,n3:24,use3:true,view:'mult'}}],
+ big:'<b>Idée clé :</b> « de nouveau ensemble », « en même temps », « tous les… » → pense au <b>PPCM</b>.',
+ movie:[
+  S('Trois horloges sonnent ensemble maintenant. L’une sonne toutes les vingt minutes, la deuxième toutes les quinze minutes, la troisième toutes les vingt-quatre minutes.',{n1:20,n2:15,n3:24,use3:true,view:'mult'},1,{snap:['n1','n2','n3']}),
+  S('Chaque trait est un moment où une horloge sonne. On cherche le premier moment où les trois traits tombent au même endroit : c’est le PPCM.',{},1),
+  S('Vingt égale deux au carré fois cinq. Quinze égale trois fois cinq. Vingt-quatre égale deux au cube fois trois.',{},2),
+  S('On prend les plus grandes puissances : huit fois trois fois cinq, cela fait cent vingt.',{},3),
+  S('Cent vingt divisé par vingt fait six, divisé par quinze fait huit, divisé par vingt-quatre fait cinq. Les trois horloges sonnent ensemble dans cent vingt minutes, soit deux heures.',{},4)]},
+
+/* ---------------- 10 ---------------- */
+{id:'m7',part:2,title:'Les billes de Julien',src:'Sem-6 · PPCM / PGCD · Exercice 2.2',stage:'numlab',cfg:{names:['rouges','bleues','vertes'],items:['rouges','bleues','vertes']},
+ statement:`Julien veut mettre des billes dans de petits sacs. Il possède <b>48 billes rouges, 64 billes bleues et 112 billes vertes</b>. Il veut faire <b>le plus grand nombre possible de sacs</b> contenant chacun le même nombre de billes de chaque couleur. Combien remplira-t-il de sacs s’il ne reste aucune bille ? Combien de billes retrouvera-t-on dans chaque sac ?`,
+ def:{n1:48,n2:64,n3:112,use3:true,view:'bags'},controls:NUMCTL,
+ presets:[['Le problème (48, 64, 112)',{n1:48,n2:64,n3:112,use3:true,view:'bags'}],['Voir les multiples',{n1:48,n2:64,n3:112,use3:true,view:'mult'}],['Essaie : 24, 36, 60',{n1:24,n2:36,n3:60,use3:true,view:'bags'}]],
+ goal:s=>(s.use3&&s.n1===48&&s.n2===64&&s.n3===112&&s.view==='bags')?'✔ 16 sacs identiques : 3 rouges + 4 bleues + 7 vertes = 14 billes':'',
+ qs:[{id:'a',t:'num',lab:'Nombre de sacs :',ans:16,unit:'sacs',hint:'« Le plus grand nombre possible » de sacs identiques → PGCD (48, 64, 112).',why:'PGCD = 2⁴ = <b>16</b> sacs.'},
+     {id:'b',t:'num',lab:'Nombre de billes dans chaque sac (au total) :',ans:14,unit:'billes',hint:'Divise chaque couleur par 16, puis additionne.',why:'48 ÷ 16 = 3, 64 ÷ 16 = 4, 112 ÷ 16 = 7 → 3 + 4 + 7 = <b>14</b> billes (3 rouges, 4 bleues, 7 vertes).'}],
+ steps:[
+  {t:'Reconnais le PGCD',h:`<p>« Le plus grand nombre de sacs <b>identiques</b> » et « il ne reste aucune bille » → on cherche le plus grand nombre qui <b>divise</b> 48, 64 et 112 : le <span class="k">PGCD</span>.</p>`,act:{n1:48,n2:64,n3:112,use3:true,view:'bags'}},
+  {t:'Décompose',h:`<p><span class="m">48 = 2⁴ × 3</span> · <span class="m">64 = 2⁶</span> · <span class="m">112 = 2⁴ × 7</span></p>`,act:{n1:48,n2:64,n3:112,use3:true,view:'bags'}},
+  {t:'Calcule le PGCD',h:`<p>Seul le 2 est commun, avec la plus petite puissance : <span class="m">2⁴ = 16</span>. Il remplira <span class="k">16 sacs</span>.</p>`,act:{n1:48,n2:64,n3:112,use3:true,view:'bags'}},
+  {t:'Que contient un sac ?',h:`<p><span class="m">48 ÷ 16 = 3</span> rouges · <span class="m">64 ÷ 16 = 4</span> bleues · <span class="m">112 ÷ 16 = 7</span> vertes.</p><p>Total : <span class="m">3 + 4 + 7 = 14</span> billes par sac. Réponse : <span class="k">16 sacs de 14 billes</span>.</p>`,act:{n1:48,n2:64,n3:112,use3:true,view:'bags'}}],
+ big:'<b>Idée clé :</b> « partager en parts <i>identiques</i> sans reste, le plus grand nombre possible » → <b>PGCD</b>.',
+ movie:[
+  S('Julien a quarante-huit billes rouges, soixante-quatre bleues et cent douze vertes. Il veut faire le plus grand nombre possible de sacs identiques, sans reste.',{n1:48,n2:64,n3:112,use3:true,view:'bags'},1,{snap:['n1','n2','n3']}),
+  S('Un nombre de sacs qui partage toutes les billes sans reste : c’est un diviseur commun. Le plus grand, c’est le PGCD.',{},1),
+  S('Quarante-huit égale deux puissance quatre fois trois. Soixante-quatre égale deux puissance six. Cent douze égale deux puissance quatre fois sept.',{},2),
+  S('Le seul facteur commun est deux, avec la plus petite puissance : deux puissance quatre, c’est seize. Il fera seize sacs.',{},3),
+  S('Dans chaque sac : quarante-huit divisé par seize fait trois rouges, soixante-quatre divisé par seize fait quatre bleues, cent douze divisé par seize fait sept vertes. Trois plus quatre plus sept font quatorze billes par sac.',{},4)]},
+
+/* ---------------- 11 ---------------- */
+{id:'m8',part:2,title:'Révision : le salaire de deux semaines',src:'Sem-6 · Révision (page 11)',stage:'paye',
+ statement:`Un travailleur gagne <b>1200 $ par semaine</b>. Les 3/10 de cette somme sont retenus pour les impôts, les 3/20 pour la caisse de retraite et le 1/50 pour l’assurance-chômage. Combien reste-t-il à ce travailleur sur une paye de <b>deux semaines</b> ?`,
+ def:{w:1,pct:false},controls:[{k:'w',t:'range',label:'Nombre de semaines',min:1,max:4,step:1,fmt:v=>v},{k:'pct',t:'check',label:'Tout écrire en centièmes (/100)'}],
+ presets:[['1 semaine',{w:1}],['2 semaines',{w:2,pct:true}]],
+ goal:s=>s.w===2?'✔ Il reste 636 $ par semaine, donc 1272 $ sur deux semaines':'',
+ qs:[{id:'a',t:'num',lab:'Fraction totale retenue :',ans:[47,100],hint:'Mets 3/10, 3/20 et 1/50 sur 100.',why:'30/100 + 15/100 + 2/100 = <b>47/100</b>.'},
+     {id:'b',t:'num',lab:'Il reste sur deux semaines :',ans:1272,unit:'$',hint:'Reste = 1 − 47/100 = 53/100 de 1200, puis × 2.',why:'53/100 × 1200 = 636 $ ; 636 × 2 = <b>1272 $</b>.'}],
+ steps:[
+  {t:'Mets tout en centièmes',h:`<p><span class="m">3/10 = 30/100</span> · <span class="m">3/20 = 15/100</span> · <span class="m">1/50 = 2/100</span>.</p>`,act:{w:1,pct:true}},
+  {t:'Additionne les retenues',h:`<p><span class="m">30 + 15 + 2 = 47</span> → <span class="k">47/100</span> du salaire est retenu.</p>`,act:{w:1,pct:true}},
+  {t:'Calcule ce qui reste pour une semaine',h:`<p><span class="m">100/100 − 47/100 = 53/100</span>. <span class="m">1200 ÷ 100 = 12</span>, puis <span class="m">12 × 53 = 636</span> $.</p>`,act:{w:1,pct:true}},
+  {t:'Deux semaines',h:`<p><span class="m">636 × 2 = 1272</span>. Vérifie en grand : 53/100 × 2400 = 1272 ✔ Réponse : <span class="k">1272 $</span>.</p>`,act:{w:2,pct:true}}],
+ big:'<b>Idée clé :</b> additionne d’abord toutes les fractions retenues, puis prends le « reste » (1 − la fraction). Un seul calcul avec le salaire à la fin.',
+ movie:[
+  S('Un travailleur gagne mille deux cents dollars par semaine. On retire trois dixièmes pour les impôts, trois vingtièmes pour la retraite et un cinquantième pour l’assurance-chômage.',{w:1,pct:false},1),
+  S('Pour les additionner, on met tout en centièmes : trente centièmes, quinze centièmes et deux centièmes.',{pct:true},2),
+  S('Trente plus quinze plus deux font quarante-sept. Quarante-sept centièmes sont retenus. Il reste cinquante-trois centièmes.',{},3),
+  S('Mille deux cents divisé par cent font douze, et douze fois cinquante-trois font six cent trente-six dollars pour une semaine.',{},3),
+  S('Pour deux semaines, on double : six cent trente-six fois deux égale mille deux cent soixante-douze dollars.',{w:2},4,{snap:['w']})]},
+
+/* ---------------- 12 ---------------- */
+{id:'f4',part:3,title:'Quelle est la fonction de la subordonnée ?',src:'Sem-6 · Subordonnée circonstancielle · Exercice 1',stage:'circ',
+ statement:`Précise la fonction des propositions subordonnées <u>soulignées</u> (temps, cause, but, conséquence, condition, opposition ou comparaison). La carte de droite affiche les conjonctions du cahier.`,
+ def:{cat:'Temps'},controls:[{k:'cat',t:'seg',label:'Carte des circonstances',opts:CATOPT}],presets:[],goal:()=>'',
+ qs:[Q('a','a) Elle ne va pas au bal <u>parce qu’elle n’a pas de nouvelle robe</u>.',CATOPT.map(x=>x[0]),1,'« parce que » donne la <b>raison</b> : <b>cause</b>.','Pourquoi ne va-t-elle pas au bal ?',{cat:'Cause'}),
+     Q('b','b) <u>Si je deviens président</u>, il n’y aura plus de vacances.',CATOPT.map(x=>x[0]),4,'« si » pose une <b>hypothèse</b> : <b>condition</b>.','Peut-on remplacer par « à condition que » ?',{cat:'Hypothèse ou condition'}),
+     Q('c','c) L’athlète s’entraîne beaucoup <u>pour qu’il ait une médaille d’or</u>.',CATOPT.map(x=>x[0]),2,'« pour que » + subjonctif : l’<b>objectif</b> → <b>but</b>.','Dans quel but s’entraîne-t-il ?',{cat:'But'}),
+     Q('d','d) Il ment <u>comme il respire</u>.',CATOPT.map(x=>x[0]),6,'« comme » compare deux choses : <b>comparaison</b>.','Il ment… de la même façon que quoi ?',{cat:'Comparaison'}),
+     Q('e','e) Elle s’assoit sur le fauteuil <u>puisqu’elle est épuisée</u>.',CATOPT.map(x=>x[0]),1,'« puisque » donne la raison : <b>cause</b>.','Pourquoi s’assoit-elle ?',{cat:'Cause'})],
+ steps:[
+  {t:'Trouve la conjonction',h:`<p>La conjonction de subordination est le petit groupe de mots qui <b>ouvre</b> la subordonnée (parce que, si, pour que, comme, puisque…).</p>`,act:{cat:'Cause'}},
+  {t:'Cherche-la dans la carte',h:`<p>Clique sur les catégories : chacune a sa liste de conjonctions. « parce que » et « puisque » sont dans <b>Cause</b>.</p>`,act:{cat:'Cause'}},
+  {t:'Vérifie avec une question',h:`<p>Cause → <i>pourquoi ?</i> · But → <i>pour quoi faire ?</i> · Condition → <i>à quelle condition ?</i> · Comparaison → <i>de quelle façon ?</i></p>`,act:{cat:'But'}}],
+ big:'<b>Idée clé :</b> la conjonction révèle la circonstance. Apprends les petits mots : <i>parce que, puisque</i> = cause · <i>pour que</i> = but · <i>si</i> = condition · <i>comme</i> = comparaison.'},
+
+/* ---------------- 13 ---------------- */
+{id:'f5',part:3,title:'Souligne la conjonction de subordination',src:'Sem-6 · Subordonnée circonstancielle · Exercice 2',stage:'circ',
+ statement:`Dans chaque phrase, trouve la <b>conjonction de subordination</b> qui introduit la subordonnée.`,
+ def:{cat:'Temps'},controls:[{k:'cat',t:'seg',label:'Carte des circonstances',opts:CATOPT}],presets:[],goal:()=>'',
+ qs:[Q('a','a) <i>Lorsqu’il aura terminé son tableau, il le vendra.</i>',['lorsque (lorsqu’)','il aura','son tableau','il le vendra'],0,'<b>Lorsque</b> (écrit « lorsqu’ » devant « il ») annonce le <b>temps</b>.','C’est le petit mot qui ouvre la subordonnée, au début.',{cat:'Temps'}),
+     Q('b','b) <i>Ils fouillent chaque rue de peur que le voleur ne s’enfuie.</i>',['chaque rue','de peur que','le voleur','ne'],1,'<b>de peur que</b> exprime un <b>but négatif</b> (on veut éviter quelque chose).','Cherche un groupe de 3 mots qui finit par « que ».',{cat:'But'}),
+     Q('c','c) <i>Les enfants jouent dans la maison parce qu’il pleut.</i>',['dans la maison','Les enfants','parce que (parce qu’)','il pleut'],2,'<b>parce que</b> donne la raison : <b>cause</b>.','Pourquoi jouent-ils dans la maison ?',{cat:'Cause'}),
+     Q('d','d) <i>Nous sommes venus alors que nous étions malades.</i>',['nous sommes','venus','nous étions','alors que'],3,'<b>alors que</b> exprime ici une <b>opposition</b> : ils sont venus malgré la maladie.','Quel groupe de 3 mots relie les deux idées ?',{cat:'Opposition ou concession'}),
+     Q('e','e) <i>S’il remporte ce tournoi, il sera considéré comme un champion.</i>',['comme','si (s’il)','considéré','ce tournoi'],1,'<b>si</b> (écrit « s’ » devant « il ») pose une <b>condition</b>. « comme un champion » n’est pas une subordonnée.','C’est le petit mot qui commence la phrase.',{cat:'Hypothèse ou condition'})],
+ steps:[
+  {t:'Trouve la subordonnée',h:`<p>La subordonnée dépend de l’autre proposition. Elle commence par un petit mot de liaison.</p>`,act:{cat:'Temps'}},
+  {t:'Repère le petit mot (ou groupe de mots)',h:`<p>Ce sont les conjonctions de la carte : <i>lorsque, de peur que, parce que, alors que, si</i>…</p>`,act:{cat:'But'}},
+  {t:'Attention aux élisions',h:`<p>Devant une voyelle, « que » et « si » perdent leur lettre : <i>lorsqu’il</i> = lorsque + il, <i>parce qu’il</i> = parce que + il, <i>s’il</i> = si + il.</p>`,act:{cat:'Hypothèse ou condition'}}],
+ big:'<b>Idée clé :</b> la conjonction ouvre la subordonnée. Garde en tête sa famille (temps, cause, but, conséquence, condition, opposition, comparaison).'},
+
+/* ---------------- 14 ---------------- */
+{id:'f6',part:3,title:'Relie chaque phrase à sa circonstance',src:'Sem-6 · Subordonnée circonstancielle · Exercice 3',stage:'circ',
+ statement:`Relie la phrase contenant une proposition subordonnée circonstancielle à la <b>circonstance</b> exprimée.`,
+ def:{cat:'But'},controls:[{k:'cat',t:'seg',label:'Carte des circonstances',opts:CATOPT}],presets:[],goal:()=>'',
+ qs:[Q('1','1. Il travaille dur pour qu’il achète une voiture.',['Conséquence','Cause','But','Comparaison','Condition'],2,'« pour que » : le <b>but</b>.','Pour quoi faire travaille-t-il ?',{cat:'But'}),
+     Q('2','2. Si tu veux, je peux te prêter mon livre.',['Conséquence','Cause','But','Comparaison','Condition'],4,'« si » : la <b>condition</b>.','Je te prête mon livre… à quelle condition ?',{cat:'Hypothèse ou condition'}),
+     Q('3','3. Il lui a parlé comme s’il était son ami.',['Conséquence','Cause','But','Comparaison','Condition'],3,'« comme si » : la <b>comparaison</b> (il parle de la même façon que s’il était son ami).','Regarde la liste de la comparaison dans la carte.',{cat:'Comparaison'}),
+     Q('4','4. Le train n’est pas arrivé si bien qu’il a pris un taxi.',['Conséquence','Cause','But','Comparaison','Condition'],0,'« si bien que » : la <b>conséquence</b> (le résultat).','Quel est le résultat ?',{cat:'Conséquence'}),
+     Q('5','5. Elle a échoué à son examen parce qu’elle n’a pas travaillé.',['Conséquence','Cause','But','Comparaison','Condition'],1,'« parce que » : la <b>cause</b>.','Pourquoi a-t-elle échoué ?',{cat:'Cause'})],
+ steps:[
+  {t:'Souligne la conjonction',h:`<p>Repère le petit groupe de mots qui ouvre chaque subordonnée.</p>`,act:{cat:'But'}},
+  {t:'Associe-la à sa famille',h:`<p>Utilise la carte : <i>pour que</i> → But · <i>si</i> → Condition · <i>comme si</i> → Comparaison · <i>si bien que</i> → Conséquence · <i>parce que</i> → Cause.</p>`,act:{cat:'Conséquence'}},
+  {t:'Cause ou conséquence ?',h:`<p>Cause = <b>pourquoi</b> ça arrive. Conséquence = <b>ce qui en résulte</b>. « Échoué <b>parce que</b> pas travaillé » (cause) ≠ « train absent <b>si bien que</b> taxi » (conséquence).</p>`,act:{cat:'Cause'}}],
+ big:'<b>Idée clé :</b> Cause et conséquence sont deux sens d’une même flèche : la cause est <i>avant</i> (pourquoi), la conséquence est <i>après</i> (résultat).'}
+];
+const FINALS={m1:'2/15',m2:'a) 5/7 · b) 40 chèvres',m3:'a) 1/6 · b) 5/6 · c) 1/25 · d) 18 · e) 375 · f) 3/10',f1:'qui · qui · que · que · que',f2:'dont · que · dont · dont · dont · qu’ · qui · que · où · à qui · dont · où',f3:'La fille dont je te parle… · L’homme à qui… · La voiture que j’ai achetée… · …le pays où je suis allé',m4:'144 · 12 · 1728 · 132 et 1 · 77 et 1',m5:'PPCM = 720 · PGCD = 6',m6:'120 minutes',m7:'16 sacs · 14 billes par sac',m8:'47/100 retenus · 1272 $',f4:'cause · condition · but · comparaison · cause',f5:'lorsque · de peur que · parce que · alors que · si',f6:'but · condition · comparaison · conséquence · cause'};
+
+/* ================= ENGINE ================= */
+const SPEECH='speechSynthesis' in window&&typeof SpeechSynthesisUtterance!=='undefined';
+const main=$('#main');
+let curMovie=null,seriesOn=false;
+const itemOf=id=>(ST.items[id]=ST.items[id]||{q:{},steps:0});
+const qOf=(id,qid)=>{const it=itemOf(id);return it.q[qid]=it.q[qid]||{ok:false,att:0,hint:false};};
+const secDone=sec=>sec.qs.every(q=>qOf(sec.id,q.id).ok);
+const fmtT=ms=>{const s=Math.round(ms/1000);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
+const hasMovie=p=>!!p.movie;
+
+function renderStars(){
+  const n=SECTIONS.filter(secDone).length;
+  $('#stars').innerHTML=SECTIONS.map(s=>`<span class="s${secDone(s)?' on':''}" title="${s.title}">⭐</span>`).join('')+`<span style="margin-left:8px">${n} / ${SECTIONS.length}</span>`;
+  SECTIONS.forEach(s=>{if(s.sec){const t=$('.tag.done',s.sec);if(t)t.style.display=secDone(s)?'':'none';}});
+}
+function confetti(){
+  const cs=['#ffd166','#06d6a0','#ef476f','#4cc9f0','#b794f6'];
+  for(let i=0;i<26;i++){const d=document.createElement('div');d.className='conf';d.style.left=(20+Math.random()*60)+'vw';d.style.background=cs[i%5];d.style.setProperty('--dx',(Math.random()*240-120)+'px');d.style.animationDelay=(Math.random()*.25)+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),2200);}
+}
+
+/* ---------- stage sync ---------- */
+function sync(p){
+  const r=STAGES[p.stage].render(p.s,p);
+  if(r.svg)p.fig.innerHTML=`<svg viewBox="0 0 ${r.svg.w} ${r.svg.h}" role="img" aria-label="Figure interactive : ${p.title}">${r.svg.body}</svg>`;
+  else p.fig.innerHTML=r.html;
+  p.read.innerHTML=r.read||'';
+  const g=p.goal?p.goal(p.s):'';
+  p.win.style.display=g?'block':'none';p.win.textContent=g||'';
+  p.controls.forEach(c=>{
+    if(c.t==='range'){c.el.value=p.s[c.k];c.out.textContent=c.fmt?c.fmt(p.s[c.k]):p.s[c.k];}
+    else if(c.t==='check'){c.el.checked=!!p.s[c.k];}
+    else if(c.t==='seg'){c.btns.forEach(b=>b.classList.toggle('on',String(b.dataset.v)===String(p.s[c.k])));}
+  });
+  updPrompt(p);
+}
+
+/* ---------- ask-for-help message ---------- */
+function updPrompt(p){
+  const ch=[];for(const k in p.s){if(JSON.stringify(p.s[k])!==JSON.stringify(p.def[k]))ch.push(k+' = '+p.s[k]);}
+  const done=p.qs.filter(q=>qOf(p.id,q.id).ok).length;
+  const want=['m’expliquer la prochaine étape avec des mots plus simples','me donner un exercice semblable pour m’entraîner','vérifier mon travail (je vais le coller)','me montrer une autre méthode'][p.ask||0];
+  $('pre',p.sec).textContent=`Bonjour Claude ! Je travaille sur « ${p.title} » (${p.src}). J’ai réussi ${done} question${done>1?'s':''} sur ${p.qs.length} et j’ai vu ${p.shown} étape${p.shown>1?'s':''} sur ${p.steps.length}.`+(ch.length?` Mes réglages : ${ch.join(', ')}.`:'')+` Peux-tu ${want} ?`;
+}
+function fallbackCopy(t,done){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}ta.remove();done();}
+function copyText(t,done){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,()=>fallbackCopy(t,done));}else fallbackCopy(t,done);}
+
+/* ---------- steps ---------- */
+function cnt(p){$('.cnt',p.sec).textContent=p.shown+' / '+p.steps.length+' étapes';$('[data-next]',p.sec).disabled=p.shown>=p.steps.length;}
+function showSteps(p,n){
+  const lis=$$('ol.steps li',p.sec);lis.forEach((l,i)=>{l.classList.toggle('on',i<n);l.classList.remove('cur');});
+  if(n>0&&lis[n-1])lis[n-1].classList.add('cur');p.shown=n;
+  $('.big',p.sec).classList.toggle('on',n>=p.steps.length);cnt(p);
+}
+function reveal(p,k){
+  pauseMovie(p);
+  const n=Math.min(p.steps.length,p.shown+k);showSteps(p,n);
+  const act=n>0?p.steps[n-1].act:null;
+  p.s=Object.assign({},p.def,act||{});sync(p);
+  const it=itemOf(p.id);if(n>(it.steps||0)){it.steps=n;saveST();}
+}
+
+/* ---------- movie engine ---------- */
+function setupMovie(p){
+  let t=0;
+  p.mv=p.movie.map(sc=>{const d=sc.dur||Math.max(3400,Math.round(sc.say.length*72+900));const o=Object.assign({},sc,{t0:t,d:d});t+=d;return o;});
+  p.mvTotal=t;p.mvT=0;p.playing=false;p.speed=ST.speed||1;p.narr=SPEECH&&ST.voice===true;p.curScene=-1;
+}
+function stateAt(p,T){
+  const s=Object.assign({},p.def);
+  for(let i=0;i<p.mv.length;i++){const sc=p.mv[i];
+    if(T>=sc.t0+sc.d){Object.assign(s,sc.to);continue;}
+    const lt=Math.max(0,T-sc.t0),tw=Math.min(sc.d*0.7,3000),u=Math.min(1,lt/tw),e=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2,from=Object.assign({},s);
+    for(const k in sc.to){const v=sc.to[k];
+      if(typeof v==='number'&&typeof from[k]==='number'&&!(sc.snap&&sc.snap.indexOf(k)>=0)){let x=from[k]+(v-from[k])*e;if(sc.int)x=Math.round(x);s[k]=u>=1?v:x;}
+      else s[k]=v;}
+    return{s:s,idx:i};}
+  return{s:s,idx:p.mv.length-1};
+}
+function setCaption(p,sc,i){const say=$('.caption .say',p.sec);$('.caption .scn',p.sec).textContent='Scène '+(i+1)+' sur '+p.mv.length;
+  say.textContent=sc.say;say.classList.remove('fade');void say.offsetWidth;say.classList.add('fade');}
+function frVoices(){try{return speechSynthesis.getVoices().filter(x=>/^fr/i.test(x.lang));}catch(e){return[];}}
+function pickVoice(){const vs=frVoices();if(!vs.length)return null;
+  return vs.find(x=>x.name===ST.vname)||vs.find(x=>/enhanced|premium|natural|neural|siri/i.test(x.name)&&/fr[-_]CA/i.test(x.lang))||vs.find(x=>/enhanced|premium|natural|neural|siri/i.test(x.name))||vs.find(x=>/fr[-_]CA/i.test(x.lang))||vs[0];}
+function fillVoices(){$$('[data-voice]').forEach(sel=>{const vs=frVoices();sel.innerHTML='<option value="">Voix automatique</option>'+vs.map(v=>`<option value="${v.name}">${v.name} (${v.lang})</option>`).join('');sel.value=ST.vname||'';});}
+if(SPEECH){try{speechSynthesis.addEventListener('voiceschanged',fillVoices);}catch(e){}}
+function speak(p,text){if(!SPEECH)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='fr-CA';u.rate=Math.min(1.5,0.95*p.speed);
+  const v=pickVoice();if(v){u.voice=v;u.lang=v.lang;}speechSynthesis.speak(u);}catch(e){}}
+function stopSpeech(){if(SPEECH){try{speechSynthesis.cancel();}catch(e){}}}
+function frame(p){
+  const r=stateAt(p,p.mvT);p.s=r.s;
+  if(r.idx!==p.curScene){p.curScene=r.idx;const sc=p.mv[r.idx];setCaption(p,sc,r.idx);showSteps(p,sc.step);if(p.playing&&p.narr)speak(p,sc.say);}
+  p.scrub.value=Math.round(p.mvT/p.mvTotal*1000);p.tm.textContent=fmtT(p.mvT)+' / '+fmtT(p.mvTotal);
+  sync(p);
+}
+function pauseMovie(p){if(!p.mv||!p.playing)return;p.playing=false;p.btn.textContent='▶ Reprendre';p.figwrap.classList.remove('live');stopSpeech();}
+function afterSpeech(cb){let n=0;(function w(){if(SPEECH&&speechSynthesis.speaking&&n++<40)setTimeout(w,250);else cb();})();}
+function endMovie(p){p.playing=false;p.btn.textContent='↻ Revoir';p.figwrap.classList.remove('live');const cb=p.onend;p.onend=null;if(cb)cb();}
+function playMovie(p,onend){
+  if(curMovie&&curMovie!==p)pauseMovie(curMovie);
+  curMovie=p;p.onend=onend||null;if(p.mvT>=p.mvTotal)p.mvT=0;
+  p.playing=true;p.last=null;p.curScene=-1;p.btn.textContent='⏸ Pause';p.figwrap.classList.add('live');
+  const loop=ts=>{if(!p.playing)return;if(p.last==null)p.last=ts;const dt=Math.min(120,ts-p.last)*p.speed;p.last=ts;
+    p.mvT=Math.min(p.mvTotal,p.mvT+dt);frame(p);if(p.mvT>=p.mvTotal)endMovie(p);else requestAnimationFrame(loop);};
+  requestAnimationFrame(loop);
+}
+function initPlayer(p){
+  const sec=p.sec;p.figwrap=$('.figwrap',sec);p.btn=$('[data-play]',sec);p.scrub=$('.scrub',sec);p.tm=$('.tm',sec);
+  p.tm.textContent='0:00 / '+fmtT(p.mvTotal);
+  const nr=$('[data-narr]',sec),sp=$('[data-speed]',sec);
+  if(!SPEECH){nr.parentNode.style.display='none';$('[data-voice]',sec).parentNode.style.display='none';}else nr.checked=p.narr;
+  sp.value=String(p.speed);
+  const vs=$('[data-voice]',sec);vs.addEventListener('change',e=>{ST.vname=e.target.value;saveST();fillVoices();});fillVoices();
+  p.btn.addEventListener('click',()=>{seriesOn=false;resetSeriesBtn();if(p.playing)pauseMovie(p);else playMovie(p);});
+  p.scrub.addEventListener('input',()=>{if(curMovie&&curMovie!==p)pauseMovie(curMovie);curMovie=p;pauseMovie(p);stopSpeech();p.mvT=p.scrub.value/1000*p.mvTotal;p.last=null;p.curScene=-1;frame(p);});
+  nr.addEventListener('change',e=>{p.narr=e.target.checked;ST.voice=p.narr;saveST();if(!p.narr)stopSpeech();});
+  sp.addEventListener('change',e=>{p.speed=parseFloat(e.target.value);ST.speed=p.speed;saveST();});
+  $('[data-restart]',sec).addEventListener('click',()=>{pauseMovie(p);p.mvT=0;playMovie(p);});
+}
+const playAllBtn=$('#playall');
+function resetSeriesBtn(){playAllBtn.textContent='🎬 Lancer toutes les vidéos de maths ('+SECTIONS.filter(hasMovie).length+')';}
+playAllBtn.addEventListener('click',()=>{
+  if(seriesOn){seriesOn=false;if(curMovie)pauseMovie(curMovie);resetSeriesBtn();return;}
+  const list=SECTIONS.filter(hasMovie);seriesOn=true;playAllBtn.textContent='⏹ Arrêter la série';let i=0;
+  const next=()=>{if(!seriesOn)return;if(i>=list.length){seriesOn=false;resetSeriesBtn();return;}
+    const p=list[i++];p.sec.scrollIntoView({behavior:'smooth',block:'start'});
+    setTimeout(()=>{if(!seriesOn)return;p.mvT=0;playMovie(p,()=>afterSpeech(()=>setTimeout(next,900)));},700);};
+  next();
+});
+
+/* ---------- questions ---------- */
+function parseNum(raw){
+  let t=String(raw).trim().replace(/\s+/g,'').replace(/[$A-Za-zéèêàç.]+$/,'').replace(',','.');
+  if(!t)return null;
+  const m=t.match(/^(-?\d+)\/(\d+)$/);
+  if(m)return{p:+m[1],q:+m[2]};
+  if(/^-?\d+(\.\d+)?$/.test(t))return{v:parseFloat(t)};
+  return null;
+}
+function qFeedback(p,qe,ok,msg){
+  const fb=$('.fb',qe);fb.className='fb '+(ok?'good':'no');fb.textContent=msg;
+}
+function qCorrect(p,q,qe){
+  const st=qOf(p.id,q.id),first=!st.ok,wasDone=secDone(p);
+  st.ok=true;qe.classList.add('done');$('.why',qe).classList.add('on');$('.why',qe).innerHTML=q.why||'';
+  if(q.set){Object.assign(p.s,q.set);pauseMovie(p);sync(p);}
+  if(q.onDone)q.onDone(p);
+  saveST();renderStars();updPrompt(p);
+  if(first&&!wasDone&&secDone(p)){confetti();const t=$('.tag.done',p.sec);if(t)t.style.display='';}
+}
+function qWrong(p,q,qe,msg){
+  const st=qOf(p.id,q.id);st.att++;saveST();
+  qFeedback(p,qe,false,msg||'Pas tout à fait, mais c’est comme ça qu’on apprend ! Regarde l’indice 💡 ou ouvre la première étape.');
+}
+function buildQ(p,q,idx){
+  const st=qOf(p.id,q.id);
+  const qe=document.createElement('div');qe.className='q'+(st.ok?' done':'');qe.dataset.q=q.id;
+  qe.innerHTML=`<div class="lab"><span class="qn0"></span>${q.lab}</div><div class="ans"></div><div class="fb"></div><button class="btn" data-hint>💡 Indice</button><div class="hint">${q.hint||''}</div><div class="why"></div>`;
+  const ans=$('.ans',qe);
+  if(q.t==='mc'){
+    ans.innerHTML='<div class="opts">'+q.opts.map((o,i)=>`<button class="opt" data-i="${i}">${o}</button>`).join('')+'</div>';
+    ans.addEventListener('click',e=>{const bt=e.target.closest('.opt');if(!bt||bt.disabled)return;if(qOf(p.id,q.id).ok)return;
+      const i=+bt.dataset.i;
+      if(i===q.c){bt.classList.add('right');qFeedback(p,qe,true,'🎉 Oui, bravo !');qCorrect(p,q,qe);$$('.opt',ans).forEach(b=>b.disabled=true);}
+      else{bt.classList.add('wrong');bt.disabled=true;qWrong(p,q,qe);}});
+    if(st.ok){$$('.opt',ans).forEach((b,i)=>{b.disabled=true;if(i===q.c)b.classList.add('right');});$('.why',qe).classList.add('on');$('.why',qe).innerHTML=q.why||'';qFeedback(p,qe,true,'✔ Réussi !');}
+  }else if(q.t==='num'){
+    const unit=q.unit||'';
+    ans.innerHTML=`<div class="numin"><input type="text" inputmode="text" autocomplete="off" placeholder="${Array.isArray(q.ans)?'ex. 3/4':'ta réponse'}" aria-label="${q.lab.replace(/<[^>]+>/g,'')}"><span>${unit}</span><button class="btn gold" data-check>Vérifier ✓</button></div>`;
+    const inp=$('input',ans);
+    const chk=()=>{
+      if(qOf(p.id,q.id).ok)return;
+      const r=parseNum(inp.value);
+      if(!r){qFeedback(p,qe,false,Array.isArray(q.ans)?'Écris une fraction comme 3/4.':'Écris un nombre.');return;}
+      let ok=false,almost=false;
+      if(Array.isArray(q.ans)){
+        if(r.p!==undefined&&r.q){ok=r.p*q.ans[1]===r.q*q.ans[0];if(ok&&gcd(r.p,r.q)!==1){ok=false;almost=true;}}
+      }else if(r.v!==undefined)ok=Math.abs(r.v-q.ans)<1e-9;
+      if(ok){qFeedback(p,qe,true,'🎉 Oui, c’est ça !');qCorrect(p,q,qe);}
+      else if(almost)qFeedback(p,qe,false,'Bonne valeur ! Simplifie encore la fraction pour finir.');
+      else qWrong(p,q,qe);
+    };
+    $('[data-check]',ans).addEventListener('click',chk);inp.addEventListener('keydown',e=>{if(e.key==='Enter')chk();});
+    if(st.ok){inp.value=Array.isArray(q.ans)?q.ans[0]+'/'+q.ans[1]:String(q.ans);inp.disabled=true;$('.why',qe).classList.add('on');$('.why',qe).innerHTML=q.why||'';qFeedback(p,qe,true,'✔ Réussi !');}
+  }else if(q.t==='build'){
+    const order=q.tokens.map((t,i)=>({t:t,i:i}));
+    let h=0;for(const c of q.id+p.id)h=(h*31+c.charCodeAt(0))>>>0;
+    for(let i=order.length-1;i>0;i--){h=(h*1103515245+12345)>>>0;const j=h%(i+1);[order[i],order[j]]=[order[j],order[i]];}
+    ans.innerHTML=`<div class="built" aria-label="ma phrase"></div><div class="bank"></div><div class="row"><button class="btn gold" data-check>Vérifier ✓</button><button class="btn" data-clear>Effacer</button></div>`;
+    const built=$('.built',ans),bank=$('.bank',ans);let seq=[];
+    const draw=()=>{
+      built.innerHTML='';seq.forEach((i,k)=>{const b=document.createElement('button');b.className='tok';b.textContent=q.tokens[i];b.addEventListener('click',()=>{if(qOf(p.id,q.id).ok)return;seq.splice(k,1);draw();});built.appendChild(b);});
+      if(!seq.length)built.innerHTML='<span style="color:var(--mut);font-size:14px">Touche les mots dans le bon ordre…</span>';
+      $$('.tok',bank).forEach(b=>b.classList.toggle('used',seq.indexOf(+b.dataset.i)>=0));
+    };
+    order.forEach(o=>{const b=document.createElement('button');b.className='tok';b.dataset.i=o.i;b.textContent=o.t;b.addEventListener('click',()=>{if(qOf(p.id,q.id).ok||seq.indexOf(o.i)>=0)return;seq.push(o.i);draw();});bank.appendChild(b);});
+    $('[data-clear]',ans).addEventListener('click',()=>{if(qOf(p.id,q.id).ok)return;seq=[];draw();});
+    $('[data-check]',ans).addEventListener('click',()=>{
+      if(qOf(p.id,q.id).ok)return;
+      const s=norm(seq.map(i=>q.tokens[i]).join(' '));
+      if(q.ok.some(o=>norm(o)===s)){qFeedback(p,qe,true,'🎉 Super, la phrase est bien construite !');qCorrect(p,q,qe);}
+      else qWrong(p,q,qe,'Pas encore : relis la phrase 2. Quel pronom ? Où le placer ? Utilise l’indice 💡.');
+    });
+    if(st.ok){seq=q.ok[0]?q.tokens.map((t,i)=>i).filter(()=>false):[];built.innerHTML='<b>'+(q.why||'')+'</b>';$$('.tok',bank).forEach(b=>b.classList.add('used'));$('.why',qe).classList.add('on');$('.why',qe).innerHTML=q.why||'';qFeedback(p,qe,true,'✔ Réussi !');}
+    else draw();
+  }
+  $('[data-hint]',qe).addEventListener('click',()=>{const hh=$('.hint',qe);hh.classList.toggle('on');if(hh.classList.contains('on')){qOf(p.id,q.id).hint=true;saveST();}});
+  return qe;
+}
+
+/* ---------- section builder ---------- */
+function buildSection(p,i){
+  p.s=Object.assign({},p.def);p.shown=0;p.ask=0;
+  const sec=document.createElement('section');sec.id=p.id;p.sec=sec;
+  const mv=hasMovie(p);
+  sec.innerHTML=`
+  <h3 class="sec"><span class="num">${i+1}</span>${p.title}<span class="tag">${p.src}</span><span class="tag done" style="display:none">✔ réussi</span></h3>
+  <div class="statement">${p.statement}</div>
+  <div class="grid">
+    <div class="card">
+      <div class="figwrap"></div>
+      ${mv?`<div class="player">
+        <div class="pbar"><button class="btn main" data-play>▶ Regarder la vidéo</button><input type="range" class="scrub" min="0" max="1000" value="0" aria-label="ligne du temps de la vidéo"><span class="tm">0:00</span></div>
+        <div class="pbar2"><label><input type="checkbox" data-narr> 🔊 Voix (facultatif)</label><label>Choisir <select data-voice><option value="">Voix automatique</option></select></label><label>Vitesse <select data-speed><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.5">1,5×</option></select></label><button class="btn" data-restart>⏮ Recommencer</button></div>
+        <div class="caption"><div class="scn">Scène</div><div class="say">Appuie sur ▶ pour une courte explication animée de cet exercice.</div></div>
+      </div>`:''}
+      <div class="read"></div>
+      <div class="win" style="display:none"></div>
+      <div class="ctls"></div>
+      <div class="presets"></div>
+    </div>
+    <div class="card">
+      <div class="try"><h4>🤔 Essaie d’abord !</h4><div class="qs"></div></div>
+      <ol class="steps"></ol>
+      <div class="big">${p.big}</div>
+      <div class="stepbtns"><button class="btn main" data-next>Étape suivante ▶</button><button class="btn" data-all>Tout montrer</button><button class="btn" data-reset>↺ Recommencer</button><span class="cnt"></span></div>
+    </div>
+  </div>
+  <details class="pm"><summary>📋 Demander de l’aide à Claude (message prêt à copier)</summary>
+    <div class="row"><label>Je voudrais : <select data-ask>
+      <option>une explication de la prochaine étape avec des mots plus simples</option>
+      <option>un exercice semblable pour m’entraîner</option>
+      <option>qu’on vérifie mon travail (je vais le coller)</option>
+      <option>une autre méthode</option></select></label></div>
+    <pre></pre><button class="btn gold" data-copy>Copier le message</button></details>`;
+  p.fig=$('.figwrap',sec);p.read=$('.read',sec);p.win=$('.win',sec);
+  /* questions */
+  const qs=$('.qs',sec);p.qs.forEach((q,k)=>qs.appendChild(buildQ(p,q,k)));
+  /* controls */
+  const cb=$('.ctls',sec);
+  p.controls.forEach(c=>{
+    if(c.t==='range'){const row=document.createElement('label');row.className='ctl';row.innerHTML=`<span>${c.label}</span><output></output><input type="range" min="${c.min}" max="${c.max}" step="${c.step}">`;
+      c.el=$('input',row);c.out=$('output',row);c.el.addEventListener('input',()=>{pauseMovie(p);p.s[c.k]=parseFloat(c.el.value);sync(p);});cb.appendChild(row);}
+    else if(c.t==='check'){const row=document.createElement('label');row.className='ctl chk';row.innerHTML=`<input type="checkbox"><span>${c.label}</span>`;
+      c.el=$('input',row);c.el.addEventListener('change',()=>{pauseMovie(p);p.s[c.k]=c.el.checked;sync(p);});cb.appendChild(row);}
+    else{const row=document.createElement('div');row.className='seg';row.innerHTML=`<span>${c.label}</span>`;c.btns=[];
+      c.opts.forEach(o=>{const b=document.createElement('button');b.dataset.v=o[0];b.textContent=o[1];b.addEventListener('click',()=>{pauseMovie(p);p.s[c.k]=o[0];sync(p);});row.appendChild(b);c.btns.push(b);});cb.appendChild(row);}
+  });
+  const pb=$('.presets',sec);
+  p.presets.forEach(pr=>{const b=document.createElement('button');b.className='pre';b.textContent=pr[0];b.addEventListener('click',()=>{pauseMovie(p);Object.assign(p.s,pr[1]);sync(p);});pb.appendChild(b);});
+  /* steps */
+  const ol=$('.steps',sec);
+  p.steps.forEach((st,k)=>{const li=document.createElement('li');li.dataset.n=k+1;li.innerHTML=`<h4>${st.t}</h4>${st.h}`;ol.appendChild(li);});
+  $('[data-next]',sec).addEventListener('click',()=>reveal(p,1));
+  $('[data-all]',sec).addEventListener('click',()=>reveal(p,p.steps.length-p.shown));
+  $('[data-reset]',sec).addEventListener('click',()=>{pauseMovie(p);showSteps(p,0);p.s=Object.assign({},p.def);sync(p);});
+  $('[data-ask]',sec).addEventListener('change',e=>{p.ask=e.target.selectedIndex;updPrompt(p);});
+  $('[data-copy]',sec).addEventListener('click',e=>{const bt=e.target;copyText($('pre',sec).textContent,()=>{bt.textContent='Copié ! ✔';setTimeout(()=>bt.textContent='Copier le message',1400);});});
+  sec.addEventListener('pointerdown',()=>{if(ST.last!==p.id){ST.last=p.id;saveST();}});
+  main.appendChild(sec);
+  if(mv){setupMovie(p);initPlayer(p);}
+  /* restore steps seen */
+  const seen=Math.min(itemOf(p.id).steps||0,p.steps.length);
+  if(seen>0){showSteps(p,seen);p.s=Object.assign({},p.def,p.steps[seen-1].act||{});}else cnt(p);
+  // restore solved mc stage patches
+  p.qs.forEach(q=>{if(qOf(p.id,q.id).ok&&q.set&&seen===0)Object.assign(p.s,q.set);});
+  sync(p);
+  if(secDone(p))$('.tag.done',sec).style.display='';
+}
+
+/* ---------- page assembly ---------- */
+function buildAll(){
+  main.innerHTML='';curMovie=null;
+  let lastPart=-1;
+  SECTIONS.forEach((p,i)=>{
+    if(p.part!==lastPart){lastPart=p.part;const h=document.createElement('h2');h.className='part';h.id='part'+p.part;h.textContent=PARTS[p.part];main.appendChild(h);}
+    buildSection(p,i);
+  });
+  renderStars();buildAnswers();
+}
+function buildAnswers(){
+  $('#anstable').innerHTML='<tr><th>#</th><th>Exercice</th><th>Réponse</th><th>Idée clé</th></tr>'+SECTIONS.map((p,i)=>`<tr><td>${i+1}</td><td><a href="#${p.id}" style="color:var(--blue)">${p.title}</a></td><td><b>${FINALS[p.id]}</b></td><td>${p.big.replace(/<b>Idée clé :<\/b>\s*/,'').split('. ')[0].replace(/\.$/,'')}.</td></tr>`).join('');
+}
+function buildToolbox(){$('#toolbox').innerHTML=TOOLBOX.map(t=>`<div class="tool"><b>${t[0]}</b><br>${t[1]}</div>`).join('');}
+
+/* ---------- welcome ---------- */
+function showWelcome(){
+  const w=$('#welcome');const n=SECTIONS.filter(secDone).length;
+  const touched=n>0||Object.values(ST.items).some(it=>it.steps>0||Object.keys(it.q||{}).length);
+  if(!touched){w.classList.remove('on');return;}
+  w.classList.add('on');
+  w.innerHTML=`👋 Bon retour ! Tu as réussi <b>${n}</b> exercice${n>1?'s':''} sur ${SECTIONS.length}. ${n===SECTIONS.length?'Tout est fini, quelle belle réussite ! 🏆':'Tu peux continuer là où tu t’étais arrêté(e).'}`+(ST.last?`<br><button class="btn gold" id="continuebtn">Continuer là où je me suis arrêté(e) ▶</button>`:'');
+  const cb=$('#continuebtn');if(cb)cb.addEventListener('click',()=>{const el=document.getElementById(ST.last);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});});
+}
+
+/* ---------- theme ---------- */
+function applyTheme(){document.documentElement.setAttribute('data-theme',ST.theme==='light'?'light':'night');readCols();$('#themebtn').textContent=ST.theme==='light'?'🌙 Mode nuit':'☀️ Mode clair';}
+$('#themebtn').addEventListener('click',()=>{ST.theme=ST.theme==='light'?'night':'light';saveST();applyTheme();SECTIONS.forEach(p=>{if(p.sec)sync(p);});});
+
+/* ---------- save / restore / reset ---------- */
+function writeNow(){clearTimeout(saveTimer);ST.ts=Date.now();try{localStorage.setItem(KEY,JSON.stringify(ST));}catch(e){memOnly=true;}}
+$('#codecopy').addEventListener('click',()=>{const code=encodeST();$('#codebox').value=code;copyText(code,()=>{const f=$('#codefb');f.className='fb good';f.textContent='Code copié ! Garde-le en lieu sûr.';});});
+$('#coderestore').addEventListener('click',()=>{
+  const f=$('#codefb');
+  try{const o=decodeST($('#codebox').value);ST=Object.assign({v:1,items:{},sec:{},last:'',theme:'night',narr:true,voice:false,vname:'',speed:1,ts:0},o);writeNow();applyTheme();buildAll();showWelcome();f.className='fb good';f.textContent='Progression restaurée ✔';}
+  catch(e){f.className='fb no';f.textContent='Ce code ne fonctionne pas. Vérifie que tu as tout copié.';}
+});
+$('#resetbtn').addEventListener('click',()=>{$('#resetask').style.display='inline';$('#resetbtn').style.display='none';});
+$('#resetno').addEventListener('click',()=>{$('#resetask').style.display='none';$('#resetbtn').style.display='';});
+$('#resetyes').addEventListener('click',()=>{
+  const th=ST.theme;ST={v:1,items:{},sec:{},last:'',theme:th,narr:true,voice:false,vname:'',speed:1,ts:0};writeNow();buildAll();showWelcome();
+  $('#resetask').style.display='none';$('#resetbtn').style.display='';const f=$('#codefb');f.className='fb good';f.textContent='Progression effacée. On repart à zéro !';
+});
+
+/* ---------- init ---------- */
+loadST();applyTheme();buildToolbox();buildAll();resetSeriesBtn();showWelcome();
+(function stars(){const s=$('#stars');})();
+
+</script>
+<!-- NAV-WIDGET:START (floating hamburger TOC top-left + back-to-top bottom-right) -->
+<style>
+:root{--nav-bg:var(--card);--nav-fg:var(--tx);--nav-line:var(--line);--nav-acc:var(--gold);--nav-shadow:0 2px 10px rgba(0,0,0,.4)}
+html{scroll-behavior:smooth}
+#navw-btn,#navw-top{position:fixed;z-index:9999;width:44px;height:44px;border-radius:50%;border:1px solid var(--nav-line);background:var(--nav-bg);color:var(--nav-fg);box-shadow:var(--nav-shadow);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;font:inherit}
+#navw-btn{top:12px;left:12px}
+#navw-top{bottom:16px;right:16px;opacity:0;pointer-events:none;transition:opacity .2s}
+#navw-top.show{opacity:1;pointer-events:auto}
+#navw-btn svg,#navw-top svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#navw-panel{position:fixed;z-index:9998;top:0;left:0;bottom:0;width:min(320px,86vw);background:var(--nav-bg);color:var(--nav-fg);border-right:1px solid var(--nav-line);box-shadow:var(--nav-shadow);padding:68px 8px 24px;overflow-y:auto;transform:translateX(-105%);transition:transform .22s;font:14px/1.5 -apple-system,"PingFang SC","Noto Sans SC",sans-serif}
+#navw-panel.open{transform:none}
+#navw-panel a{display:block;padding:6px 10px;border-radius:6px;color:inherit;text-decoration:none;word-break:normal}
+#navw-panel a:hover{background:rgba(127,127,127,.15)}
+#navw-panel a.active{color:var(--nav-acc);font-weight:600;background:rgba(127,127,127,.12)}
+#navw-panel a.l1{font-weight:600}
+#navw-panel a.l3{padding-left:26px;font-size:13px;opacity:.9}
+#navw-panel a.l2{padding-left:16px}
+@media print{#navw-btn,#navw-top,#navw-panel{display:none!important}}
+</style>
+<button id="navw-btn" type="button" aria-label="Table des matières" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+<nav id="navw-panel" aria-label="Table des matières" hidden></nav>
+<button id="navw-top" type="button" aria-label="Retour en haut"><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></button>
+<script>
+(function(){
+  var btn=document.getElementById('navw-btn'),panel=document.getElementById('navw-panel'),top=document.getElementById('navw-top');
+  var hs=[].slice.call(document.querySelectorAll('h1,h2,h3')).filter(function(h){return !h.closest('#navw-panel')&&h.textContent.trim()});
+  hs.forEach(function(h,i){
+    if(!h.id){h.id='sec-'+(i+1)}
+    var a=document.createElement('a');a.href='#'+h.id;a.textContent=h.textContent.trim();
+    a.className='l'+h.tagName.charAt(1);a.dataset.t=h.id;panel.appendChild(a);
+  });
+  function setOpen(o){panel.classList.toggle('open',o);btn.setAttribute('aria-expanded',o);if(o)panel.hidden=false}
+  btn.addEventListener('click',function(e){e.stopPropagation();setOpen(!panel.classList.contains('open'))});
+  panel.addEventListener('click',function(e){if(e.target.tagName==='A')setOpen(false)});
+  document.addEventListener('click',function(e){if(!panel.contains(e.target)&&e.target!==btn)setOpen(false)});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')setOpen(false)});
+  top.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+  var links=[].slice.call(panel.querySelectorAll('a'));
+  function onScroll(){
+    top.classList.toggle('show',window.scrollY>400);
+    var cur=null;for(var i=0;i<hs.length;i++){if(hs[i].getBoundingClientRect().top<=120)cur=hs[i].id;else break}
+    links.forEach(function(a){a.classList.toggle('active',a.dataset.t===cur)});
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+  if(hs.length<2){btn.style.display='none'}
+})();
+</script>
+<!-- NAV-WIDGET:END -->
+</body>
+</html>

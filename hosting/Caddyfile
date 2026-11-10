@@ -2,7 +2,7 @@
 # Everything lives under ONE address, whatever name you reach this machine by
 # (mac-studio.local, an IP, a Tailscale name, ...):
 #     /        portal        /fund/   Fund Accounting Academy
-#     /math/   MathCompetition        /notes/  family notes (password)
+#     /math/   MathCompetition (contest lab; /math/study/ = school study)        /notes/  family notes (password)
 #     /budget/ family budget dashboard (Streamlit + Postgres, password)
 # TLS is NOT handled here: Cloudflare Tunnel / Tailscale terminate it, so Caddy speaks plain HTTP.
 {

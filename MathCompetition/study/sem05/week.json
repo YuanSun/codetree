@@ -2,7 +2,7 @@
   "number": 5,
   "title": "Fractions",
   "tagline": "A fraction OF a fraction is a multiplication. Brackets first, then × ÷, then + −. And always ask: a fraction of WHAT?",
-  "level": "G5–G6 · Class sheet",
+  "level": "School study · Hu Education",
   "emoji": "🍰",
   "skills": [
     "Fraction of a fraction",
@@ -28,5 +28,6 @@
       "emoji": "🏋️",
       "desc": "9 questions from the sheet, split into small steps. Hints, trap-spotting and full solutions."
     }
-  ]
+  ],
+  "label": "Sem 5"
 }

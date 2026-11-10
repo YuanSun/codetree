@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Helper for adding and checking weeks.
 
-    python3 weekctl.py new 9 "Geometry & Angles"     # scaffold weeks/week09/
-    python3 weekctl.py check                          # validate every week
-    python3 weekctl.py check week08                   # validate one week
+    python3 weekctl.py new 9 "Geometry & Angles"     # scaffold weeks/week09/        (Math Contest Lab)
+    python3 weekctl.py new 7 "Decimals" --study       # scaffold study/sem07/         (School Study)
+    python3 weekctl.py check                          # validate every unit in both tracks
+    python3 weekctl.py check week08                   # validate one unit (also: sem05)
 
 `check` catches the mistakes that would otherwise show up as a broken page in front
 of the kid: an answer index outside the choices, duplicate question ids, a skill that
@@ -20,7 +21,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-WEEKS = ROOT / "weeks"
+WEEKS = ROOT / "weeks"          # contest track  -> /week/<id>/
+STUDY = ROOT / "study"          # study track    -> /study/<id>/
 DIFFICULTIES = {"easy", "medium", "medium-hard", "hard"}
 
 
@@ -108,13 +110,13 @@ LESSON_HTML = """<!doctype html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Week __NUMBER__ · The Quest</title>
+  <title>__LABEL__ · The Quest</title>
   <link rel="stylesheet" href="/static/css/base.css">
 </head>
-<body data-page="lesson" data-week="__ID__" data-page-slug="lesson" data-week-title="Week __NUMBER__">
+<body data-page="lesson"__TRACK__ data-week="__ID__" data-page-slug="lesson" data-week-title="__LABEL__">
 <div id="mc-nav"></div>
 <main class="wrap">
-  <section class="hero"><div class="eyebrow">Week __NUMBER__ · The Quest</div><h1>__TITLE__</h1></section>
+  <section class="hero"><div class="eyebrow">__LABEL__ · The Quest</div><h1>__TITLE__</h1></section>
 
   <section class="level">
     <div class="lab"><div class="lab-title">🧪 Lab 1</div>
@@ -153,27 +155,33 @@ QUIZ_JSON = {
 }
 
 
-def new_week(number: int, title: str) -> None:
-    wid = f"week{number:02d}"
-    folder = WEEKS / wid
+def new_week(number: int, title: str, study: bool = False) -> None:
+    wid = f"{'sem' if study else 'week'}{number:02d}"
+    label = f"{'Sem' if study else 'Week'} {number}"
+    folder = (STUDY if study else WEEKS) / wid
     if folder.exists():
         sys.exit(f"{folder} already exists")
-    hw_title = f"Homework Week {number}"
+    hw_title = f"Homework {label}"
     meta = {
-        "number": number, "title": title, "tagline": "", "level": "G6–G7 · Contest Prep", "emoji": "📘", "skills": [], "credit": "",
+        "number": number, "title": title, "tagline": "", "level": "School study" if study else "G6–G7 · Contest Prep", "emoji": "📘", "skills": [], "credit": "",
         "pages": [
             {"slug": "lesson", "type": "html", "file": "lesson.html", "title": "The Quest", "emoji": "🗺️", "desc": "", "tasks": 1},
             {"slug": "practice", "type": "quiz", "file": "exercises.json", "title": "Exercise Bank", "emoji": "🏋️", "desc": ""},
             {"slug": "homework", "type": "quiz", "file": "homework.json", "title": hw_title, "emoji": "📝", "desc": ""},
         ],
     }
-    lesson = LESSON_HTML.replace("__ID__", wid).replace("__NUMBER__", str(number)).replace("__TITLE__", title)
+    lesson = (LESSON_HTML.replace("__ID__", wid).replace("__LABEL__", label).replace("__TITLE__", title)
+              .replace("__TRACK__", ' data-track="study"' if study else ""))
+    if study:   # the study track's own look comes from body[data-track="study"] in base.css
+        meta["pages"] = [p for p in meta["pages"] if p["slug"] != "homework"]
     files = {
         "week.json": json.dumps(meta, indent=2, ensure_ascii=False) + "\n",
         "lesson.html": lesson,
-        "exercises.json": json.dumps(dict(QUIZ_JSON, eyebrow=f"Week {number}", title="Exercise Bank"), indent=2, ensure_ascii=False) + "\n",
-        "homework.json": json.dumps(dict(QUIZ_JSON, eyebrow=f"Week {number}", title=hw_title), indent=2, ensure_ascii=False) + "\n",
+        "exercises.json": json.dumps(dict(QUIZ_JSON, eyebrow=label, title="Class Sheet" if study else "Exercise Bank"), indent=2, ensure_ascii=False) + "\n",
+        "homework.json": json.dumps(dict(QUIZ_JSON, eyebrow=label, title=hw_title), indent=2, ensure_ascii=False) + "\n",
     }
+    if study:
+        del files["homework.json"]
     folder.mkdir(parents=True)   # everything is built in memory first, so a bug above can't leave a half-made week
     for name, content in files.items():
         (folder / name).write_text(content, encoding="utf-8")
@@ -187,14 +195,18 @@ def main() -> None:
     n = sub.add_parser("new", help="scaffold a new week")
     n.add_argument("number", type=int)
     n.add_argument("title")
+    n.add_argument("--study", action="store_true", help="create it in the School Study track (study/semNN) instead of the contest lab")
     c = sub.add_parser("check", help="validate week content")
-    c.add_argument("week", nargs="?", help="e.g. week08 (default: all)")
+    c.add_argument("week", nargs="?", help="e.g. week08 or sem05 (default: every unit in both tracks)")
     args = ap.parse_args()
 
     if args.cmd == "new":
-        new_week(args.number, args.title)
+        new_week(args.number, args.title, args.study)
         return
-    folders = [WEEKS / args.week] if args.week else sorted(p for p in WEEKS.iterdir() if p.is_dir())
+    if args.week:
+        folders = [r / args.week for r in (WEEKS, STUDY) if (r / args.week).is_dir()] or [WEEKS / args.week]
+    else:
+        folders = [p for r in (WEEKS, STUDY) if r.is_dir() for p in sorted(r.iterdir()) if p.is_dir()]
     problems: list[str] = []
     for f in folders:
         if not f.is_dir():

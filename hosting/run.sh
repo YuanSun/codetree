@@ -42,5 +42,5 @@ else
   echo "Skipping /budget/: need streamlit installed and $BUDGET_DIR/.env (see budget-advisor/budget-dashboard/README.md)." >&2
 fi
 
-echo "Gateway on port $GATEWAY_PORT: http://<this-machine>:$GATEWAY_PORT/  (/fund/  /math/  /notes/  /budget/)"
+echo "Gateway on port $GATEWAY_PORT: http://<this-machine>:$GATEWAY_PORT/  (/fund/  /math/  /math/study/  /notes/  /budget/)"
 caddy run --config "$HERE/Caddyfile" --adapter caddyfile

@@ -38,19 +38,28 @@ predict-the-time game · share-the-cake ratio bars · change-one-side dressing b
 undo machine · does-order-matter · level-it-out cube bars · remove-a-number · cumulative-mean decoder · combine-two-groups tug-of-war · median/mode playground.
 After solving the Betty & Ann boss question there is also an interactive park simulator.
 
-## Other weeks
+## Two tracks: contest lab and school study
 
-| Week | Topic | Source |
+One server, one engine, two clearly separate sections:
+
+| Track | URL | Folder | What it is |
+|---|---|---|---|
+| 🧪 **Math Contest Lab** | `/` and `/week/<id>/` | `weeks/weekNN/` | Weekly CJMC / Gauss contest prep (Weeks 7, 8, …) |
+| 📚 **School Study** | `/study/` and `/study/<id>/` | `study/semNN/` | Normal class sheets (Hu Education Sem-5, Sem-6, …) — *not* contest prep |
+
+The study track has its own home page, teal colours, a "📚 Study" navigation bar and plain "⭐ XP" (no contest level names); the two home pages
+link to each other. Behind the hosting gateway the study track lives at `/math/study/` and has its own card on the portal.
+
+| Unit | Topic | Source |
 |---|---|---|
-| 5 | **Fractions** — a fraction *of* a fraction, brackets & dividing by a fraction, the farm problem | Hu Education 190-Grace, Sem-5 sheet |
-| 6 | **PPCM & PGCD** — beep race, prime-factor bubbles, divide-down ladder, marble bags, fractions review | Hu Education 190-Grace, Sem-6 sheet |
-| 7 | **Area & Perimeter** — *Math Detective* (standalone page, see below) | The Learning Lab, Week 7 homework |
-| 8 | Rates, Ratio, Percent & Mean (described above) | The Learning Lab, Week 8 |
+| `study/sem05` | **Fractions** — a fraction *of* a fraction, brackets & dividing by a fraction, the farm problem. Quest + Class Sheet | Hu Education 190-Grace, Sem-5 sheet |
+| `study/sem06` | **PPCM & PGCD** — beep race, prime-factor bubbles, divide-down ladder, marble bags, fractions review. Quest + Class Sheet | Hu Education 190-Grace, Sem-6 sheet |
+| `study/sem0506` | **Parcours d'étude** — French study playground for both sheets: fractions, PPCM/PGCD, pronoms relatifs, subordonnées (14 exercises, animated steps, read-aloud). *Standalone page* | same sheets |
+| `weeks/week07` | **Area & Perimeter** — *Math Detective* (standalone page, see below) | The Learning Lab, Week 7 homework |
+| `weeks/week08` | Rates, Ratio, Percent & Mean (described above) | The Learning Lab, Week 8 |
 
-Weeks 5 and 6 each have **The Quest** (7 hands-on labs + guided examples, skill badges) and a **Class Sheet** (every question from the PDF, split into
-small steps, with hints, trap explanations and solutions). The questions keep the sheet's original French; help text is in English.
-The French-grammar pages of those PDFs (pronoms relatifs, subordonnées) are not part of this math site.
-Shared lesson styling lives in `static/css/lesson-common.css` (new weeks can link it instead of copying Week 8's CSS).
+The Sem-5/6 Quests and Class Sheets keep the sheet's original French in the questions; help text is in English.
+Shared lesson styling lives in `static/css/lesson-common.css` (new lessons can link it instead of copying Week 8's CSS).
 
 ## Layout
 
@@ -59,6 +68,7 @@ MathCompetition/
 ├── server.py            # the web server (auto-discovers weeks)
 ├── weekctl.py           # `new` scaffolds a week, `check` validates content
 ├── static/              # shared CSS + JS engine (core.js: store, XP, guided steps, quiz)
+├── study/               # School Study track: study/sem05, sem06, sem0506 … (same layout as a week)
 ├── templates/layout.html
 ├── tests/               # python3 -m unittest discover -s tests
 └── weeks/
@@ -74,7 +84,8 @@ MathCompetition/
 ## Adding a new week
 
 ```bash
-python3 weekctl.py new 9 "Geometry & Angles"   # creates weeks/week09/ with working placeholders
+python3 weekctl.py new 9 "Geometry & Angles"   # creates weeks/week09/ with working placeholders (contest lab)
+python3 weekctl.py new 7 "Decimals" --study    # creates study/sem07/ (school study track)
 # ...fill in lesson.html, exercises.json, homework.json, week.json...
 python3 weekctl.py check week09                 # catches bad answer keys, missing hints, etc.
 ```

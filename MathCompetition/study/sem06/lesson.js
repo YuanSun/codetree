@@ -1,8 +1,8 @@
-/* Week 6 lesson — PPCM & PGCD. Each lab = something to play with + a "guided" worked example where YOU do each step. */
+/* Sem 6 lesson — PPCM & PGCD. Each lab = something to play with + a "guided" worked example where YOU do each step. */
 (function () {
   'use strict';
   const { h, $, $$, gcd, shuffle } = MC;
-  const WEEK = 'week06', PAGE = 'lesson';
+  const WEEK = 'sem06', PAGE = 'lesson';
   const lcm = (a, b) => (a / gcd(a, b)) * b;
   const fr = (a, b) => `[[${a}/${b}]]`;
   const F = (s) => MC.fmt(s);

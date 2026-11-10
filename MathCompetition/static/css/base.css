@@ -268,3 +268,22 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 28px;
 input[type=range]::-moz-range-track { height: 10px; border-radius: 999px; background: #dcd8ff; }
 input[type=range]::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: var(--orange); border: 4px solid #fff; box-shadow: 0 3px 8px rgba(27, 31, 94, .35); cursor: grab; }
 input[type=range]:disabled { opacity: .5; }
+
+/* ---------- track switcher (home pages) ---------- */
+.track-switch { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin: 14px 0 4px; }
+.track-switch a { text-decoration: none; font-family: var(--head); font-weight: 600; font-size: 18px; background: #fff; color: var(--navy); border: 3px solid var(--line); border-radius: 16px; padding: 8px 18px; box-shadow: 0 3px 0 var(--line); }
+.track-switch a:hover { border-color: var(--navy-2); }
+.track-switch a.on { background: var(--navy); border-color: var(--navy); color: #fff; box-shadow: 0 3px 0 rgba(0, 0, 0, .25); }
+
+/* ---------- School Study track: same engine, calmer teal look so it never reads as contest prep ---------- */
+body[data-track="study"] { --navy: #0b4f4a; --navy-2: #12857c; --ink: #12302d; --muted: #5a7873; --bg: #effaf6; --line: #d3eee5; }
+body[data-track="study"] .nav { background: linear-gradient(90deg, #0b4f4a, #12857c); box-shadow: 0 4px 18px rgba(11, 79, 74, .35); }
+body[data-track="study"] .hero-home, body[data-track="study"] .hero-quest {
+  background: radial-gradient(circle at 85% 10%, rgba(255, 200, 61, .30), transparent 35%), linear-gradient(135deg, #0b4f4a 0%, #12857c 55%, #34c3a8 100%);
+  box-shadow: 0 18px 50px rgba(18, 133, 124, .30);
+}
+body[data-track="study"] .hero-home p, body[data-track="study"] .hero-quest p { color: #dcfbf3; }
+body[data-track="study"] .finale { background: linear-gradient(135deg, #0b4f4a, #12857c 60%, #34c3a8); box-shadow: 0 18px 50px rgba(18, 133, 124, .3); }
+body[data-track="study"] .week-num { color: var(--navy-2); }
+body[data-track="study"] .chip { background: #d9f4ec; color: #0b4f4a; }
+body[data-track="study"] .meter { background: #d9f4ec; }
