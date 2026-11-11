@@ -7,7 +7,7 @@
 ## 已定的决定
 
 - 后端：Python 3.12 + FastAPI。包管理用 `uv`。
-- 数据库：现有 Postgres 里的 `family_budget` 库，新建 schema `lecture`。应用用专用角色 `lecture_app` 连接，**不得访问其他 schema**。
+- 数据库：现有 Postgres 的 `postgres` 库（记账数据在其中的 `family_budget` schema），新建 schema `lecture`。应用用专用角色 `lecture_app` 连接，**不得访问其他 schema**（尤其是 `family_budget`）。
 - 前端：React + Vite + TypeScript，构建产物由 FastAPI 作为静态文件提供（单进程）。
 - 设备：iPad（Safari）+ 学校发的 Chromebook（Chrome）。只在家里内网用，**http，不做 PWA / service worker**（service worker 只能在 HTTPS 下注册）。
 - 词典：法语释义用 Petit Robert 2007（`tools/ld2.py` + `tools/robert_extract.py` 已能解析，85,062 条）。英文释义用 Wiktionary（wiktextract 数据，第二期接入）。
@@ -40,7 +40,7 @@ lecture-magique/
 ## 配置（`.env`，不提交）
 
 ```
-DATABASE_URL=postgresql+psycopg://lecture_app:***@localhost:5432/family_budget
+DATABASE_URL=postgresql+psycopg://lecture_app:***@localhost:5432/postgres
 DATABASE_ADMIN_URL=...      # 只给迁移和 schema 初始化用
 ROBERT_LD2_PATH=/path/to/Le_Nouveau_Petit_Robert_de_la_langue_francaise_2007.ld2
 SESSION_SECRET=...
@@ -83,7 +83,7 @@ PORT=8090
 - [ ] 用一篇公有领域的测试文章（比如 Jules Verne 作品的一段）导入后，`is_word=true` 的 token 中 ≥ 95% 能匹配到 `lemma`；没匹配上的列在导入报告里。
 - [ ] iPad Safari 和 Chromebook Chrome 上都能：登录 → 打开文章 → 点词 → 卡片 100ms 内出现 → 刷新页面后 `lookup_event` 里有记录。
 - [ ] 学生 A 不能读到学生 B 的进度和词表（写测试覆盖）。
-- [ ] `pytest` 全部通过；测试连的是独立的测试 schema 或 Docker 里的 Postgres，**不能连 family_budget 的正式数据**。
+- [ ] `pytest` 全部通过；测试连的是独立的测试 schema 或 Docker 里的 Postgres，**不能连正式库（含 `family_budget` schema 的那个库）**。
 
 ## 工作方式
 

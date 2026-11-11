@@ -12,7 +12,7 @@ load_dotenv(ROOT / "backend" / ".env")
 
 @dataclass
 class Settings:
-    database_url: str = os.environ.get("DATABASE_URL", "postgresql+psycopg://lecture_app@localhost:5432/family_budget")
+    database_url: str = os.environ.get("DATABASE_URL", "postgresql+psycopg://lecture_app@localhost:5432/postgres")
     admin_url: str = os.environ.get("DATABASE_ADMIN_URL", "") or os.environ.get("DATABASE_URL", "")
     session_secret: str = os.environ.get("SESSION_SECRET", "")
     robert_ld2_path: str = os.environ.get("ROBERT_LD2_PATH", "")

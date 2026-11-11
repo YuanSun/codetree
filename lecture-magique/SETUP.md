@@ -8,18 +8,19 @@ ends with a **Check**: don't move on until it passes.
 | Item | How to get it |
 |---|---|
 | `uv` and Node.js 18+ | `brew install uv node` |
-| Postgres running with the `family_budget` database | already there (the budget app uses it) |
+| Postgres running, database `postgres` with your `family_budget` schema | already there (your expense data) |
 | The Petit Robert file | `Le_Nouveau_Petit_Robert_de_la_langue_francaise_2007.ld2`, anywhere on the Mac |
 | The book | `mega-trouille-content.zip` (sent separately, not in git) |
 
 **Check:**
 
 ```bash
-uv --version && node --version && psql -d family_budget -c "select 1"
+uv --version && node --version && psql -d postgres -c "\dn"
 ```
 
-The psql command should connect without errors. On Homebrew Postgres, your macOS username is the admin
-(superuser) role, so `psql -d family_budget` works without `-U`.
+The schema list should include `family_budget`. Nothing in that schema is touched: the site gets its own new
+schema, `lecture`, next to it in the same `postgres` database. On Homebrew Postgres, your macOS username is the admin
+(superuser) role, so `psql -d postgres` works without `-U`.
 
 ## 1. Get the code and the book
 
@@ -39,23 +40,33 @@ Pick a password for the website's database account. Use **letters and digits onl
 in step 3.
 
 ```bash
-psql -d family_budget -v app_password="'PICK_A_PASSWORD'" -f deploy/init_role.sql
+psql -d postgres -v app_password="'PICK_A_PASSWORD'" -f deploy/init_role.sql
 ```
 
-This creates the `lecture` schema and a `lecture_app` role that can only use that schema, so the website can never
-read your budget tables.
+This creates the new `lecture` schema and a `lecture_app` role that can only use that schema. It grants nothing on
+`family_budget` or `public` and doesn't change anything for your other roles.
 
-> ⚠️ The script also contains `REVOKE CONNECT ON DATABASE family_budget FROM PUBLIC`. If any other app connects
-> to `family_budget` with a role that has no explicit `GRANT CONNECT`, open `deploy/init_role.sql` and delete that
-> line before running it. If unsure, delete it; the website is still isolated without it.
+```
+database: postgres
+├── schema family_budget   ← your expense data (untouched)
+├── schema public
+└── schema lecture         ← NEW: the reading site's 18 tables
+```
 
-**Check:**
+**Check** (two commands):
 
 ```bash
-psql -d family_budget -c "\du lecture_app"
+psql -d postgres -c "\du lecture_app"
 ```
 
 One row, `lecture_app`.
+
+```bash
+psql -d postgres -tAc "SELECT count(*) FROM pg_tables WHERE schemaname = 'family_budget'
+  AND has_table_privilege('lecture_app', format('%I.%I', schemaname, tablename), 'SELECT,INSERT,UPDATE,DELETE')"
+```
+
+Prints `0`: the website's account has no access to any of your expense tables.
 
 ## 3. Write the config file
 
@@ -68,13 +79,14 @@ open -e .env
 Fill in the four values (`.env` is git-ignored):
 
 ```ini
-DATABASE_URL=postgresql+psycopg://lecture_app:PICK_A_PASSWORD@localhost:5432/family_budget
-DATABASE_ADMIN_URL=postgresql+psycopg://YOUR_MAC_USERNAME@localhost:5432/family_budget
+DATABASE_URL=postgresql+psycopg://lecture_app:PICK_A_PASSWORD@localhost:5432/postgres
+DATABASE_ADMIN_URL=postgresql+psycopg://YOUR_MAC_USERNAME@localhost:5432/postgres
 ROBERT_LD2_PATH=/Users/YOUR_MAC_USERNAME/path/to/Le_Nouveau_Petit_Robert_de_la_langue_francaise_2007.ld2
 SESSION_SECRET=<the long random string>
 PORT=8090
 ```
 
+- Both URLs end in `/postgres`: that's the database name. The schema (`lecture`) is set by the app itself.
 - `DATABASE_URL`: the website's own account, with the password from step 2.
 - `DATABASE_ADMIN_URL`: **the same admin role that ran step 2.** It's used only for migrations and imports. Add
   `:password` after the username if your Postgres requires one.
@@ -106,7 +118,7 @@ It prints a summary line (`"lemmas": …, "senses": …`).
 **Check** (the acceptance test from CLAUDE.md):
 
 ```bash
-psql -d family_budget -c "SELECT s.sense_key, left(s.definition_fr, 45) FROM lecture.sense s
+psql -d postgres -c "SELECT s.sense_key, left(s.definition_fr, 45) FROM lecture.sense s
   JOIN lecture.lemma l ON l.id = s.lemma_id WHERE l.lemma = 'entamer' ORDER BY s.seq"
 ```
 
@@ -166,10 +178,11 @@ The site is `http://<that-name>.local:8090/`.
 
 ## 9. Back up her reading history (recommended)
 
-Add this to your existing backup routine (daily). It saves only the `lecture` schema:
+Add this to your existing backup routine (daily). It saves only the `lecture` schema (your `family_budget`
+backup stays as it is):
 
 ```bash
-pg_dump -d family_budget --schema=lecture -Fc -f ~/Backups/lecture-$(date +%F).dump
+pg_dump -d postgres --schema=lecture -Fc -f ~/Backups/lecture-$(date +%F).dump
 ```
 
 ---
@@ -190,10 +203,11 @@ pg_dump -d family_budget --schema=lecture -Fc -f ~/Backups/lecture-$(date +%F).d
 | Symptom | Cause and fix |
 |---|---|
 | `Missing …/.env` from deploy.sh | Step 3 not done, or `.env` isn't in `lecture-magique/`. |
-| `password authentication failed for user "lecture_app"` | The password in `DATABASE_URL` differs from step 2. Reset it: `psql -d family_budget -c "ALTER ROLE lecture_app PASSWORD 'NEW'"` and update `.env`, then `launchctl kickstart -k gui/$(id -u)/com.lecture-magique`. |
-| `permission denied for table …` or `for schema lecture` in the log | Migrations ran as a different role than step 2. Run as admin: `psql -d family_budget -c "GRANT USAGE ON SCHEMA lecture TO lecture_app; GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA lecture TO lecture_app; GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA lecture TO lecture_app;"` |
+| `password authentication failed for user "lecture_app"` | The password in `DATABASE_URL` differs from step 2. Reset it: `psql -d postgres -c "ALTER ROLE lecture_app PASSWORD 'NEW'"` and update `.env`, then `launchctl kickstart -k gui/$(id -u)/com.lecture-magique`. |
+| `permission denied for table …` or `for schema lecture` in the log | Migrations ran as a different role than step 2. Run as admin: `psql -d postgres -c "GRANT USAGE ON SCHEMA lecture TO lecture_app; GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA lecture TO lecture_app; GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA lecture TO lecture_app;"` |
 | `✗ not answering yet` from deploy.sh | Read `~/Library/Logs/lecture-magique.log`. Usually a typo in `.env` or Postgres isn't running. |
 | Works on the Mac but not on the iPad | Same Wi-Fi? Firewall: System Settings → Network → Firewall → allow Python. Try the IP instead of `.local`. |
+| Tests (`pytest`) say "Refusing to run tests…" | On purpose: tests delete and recreate the `lecture` schema, so they refuse the `postgres` database and any database with a `family_budget` schema. Use a separate test database (see README → Tests). |
 | Almost every word unmatched after importing the book | The book was imported before the dictionary. Run step 7's import again; it replaces the draft (allowed until someone has tapped words in it). |
 | `… lookups already point at this article's tokens` | Someone already read it, so re-import is blocked to protect her history. Import the corrected pack under a new `slug`. |
 | Card shows "pas encore dans le dictionnaire" | That word isn't in Petit Robert (often a name); expected, and the tap is still recorded. |
