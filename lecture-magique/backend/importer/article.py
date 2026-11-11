@@ -148,7 +148,7 @@ def analyse(text_: str, lex: Lexicon) -> list[tuple[Tok, Match, str, str]]:
             continue
         lemma, pos = spacy_for(t)
         m = lex.match(t.surface, lemma, pos)
-        if m.lemma_id is None and "-" in t.surface.strip("-"):
+        if m.lemma_id is None and "-" in t.surface and not t.surface.startswith("-"):
             for p in split_hyphenated(t):
                 if not p.is_word:
                     out.append((p, Match(None, None, ""), "", ""))

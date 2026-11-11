@@ -24,3 +24,4 @@ frontend/dist/
 content/
 import-reports/
 uv.lock.bak
+frontend/*.tsbuildinfo
