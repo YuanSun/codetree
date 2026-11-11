@@ -1,0 +1,27 @@
+# Dictionary data — commercial content, never commit
+*.ld2
+robert*.jsonl
+data/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# Frontend
+node_modules/
+frontend/dist/
+
+.DS_Store
+
+# Copyrighted reading material (article packs made from books) — family use only, never commit
+content/
+import-reports/
+uv.lock.bak
+frontend/*.tsbuildinfo
