@@ -1,0 +1,19 @@
+{
+  "slug": "test-verne-tour-du-monde",
+  "title": "Le Tour du monde en quatre-vingts jours (extrait)",
+  "week_of": "2026-11-16",
+  "source_note": "Jules Verne, 1872 — domaine public",
+  "chapters": [
+    {"seq": 1, "title": "Phileas Fogg",
+     "paragraphs": [
+       "En l'année 1872, la maison portant le numéro 7 de Saville-row, Burlington Gardens — maison dans laquelle Sheridan mourut en 1814 —, était habitée par Phileas Fogg, esq., l'un des membres les plus singuliers et les plus remarqués du Reform-Club de Londres, bien qu'il semblât prendre à tâche de ne rien faire qui pût attirer l'attention.",
+       "À l'un des plus grands orateurs qui honorent l'Angleterre, succédait donc ce Phileas Fogg, personnage énigmatique, dont on ne savait rien, sinon que c'était un fort galant homme et l'un des plus beaux gentlemen de la haute société anglaise."
+     ],
+     "question": {"kind": "open", "prompt": "Pourquoi dit-on que Phileas Fogg est énigmatique ?",
+                  "rubric": {"must_answer": "on ne sait rien de lui", "avoid": "décrire sa maison"}}},
+    {"seq": 2, "title": "Passepartout",
+     "paragraphs": ["« Vous êtes Français et vous vous nommez John ? » lui demanda Phileas Fogg. — Jean, n’en déplaise à monsieur, répondit le nouveau venu, Jean Passepartout, un surnom qui m'est resté, et que justifiait mon aptitude naturelle à me tirer d'affaire. Peut-être."]}
+  ],
+  "questions": [{"kind": "writing", "prompt": "Décris un personnage mystérieux que tu connais."}],
+  "focus_words": ["énigmatique"]
+}
