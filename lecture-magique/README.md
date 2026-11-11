@@ -16,38 +16,9 @@ content/   article packs made from books — git-ignored, family use only
 
 ## First-time setup on the Mac Studio
 
-1. **Database role** (once, as your Postgres admin role; use the same role for step 3):
-
-   ```bash
-   psql -U <admin> -d family_budget -v app_password="'<pick a password>'" -f deploy/init_role.sql
-   ```
-
-   `lecture_app` gets rights on the `lecture` schema only. Note the script also revokes the default
-   `CONNECT ON DATABASE family_budget FROM PUBLIC`; read the comment in it and drop that line if other roles
-   rely on the default.
-
-2. **Config:** `cp deploy/env.example .env` and fill it in (`DATABASE_URL` uses `lecture_app`,
-   `DATABASE_ADMIN_URL` uses the admin role, `SESSION_SECRET` from the command in the file).
-
-3. **Build, migrate, start:** `deploy/deploy.sh` (needs `uv`, `node`/`npm`). It builds the front end, runs
-   `alembic upgrade head`, installs `~/Library/LaunchAgents/com.lecture-magique.plist` and checks
-   `http://<mac>.local:8090/`. Logs: `~/Library/Logs/lecture-magique.log`. Re-run it after every `git pull`.
-
-4. **Dictionary** (once, ~1 min; re-runnable, it updates in place):
-
-   ```bash
-   cd backend && uv run python -m importer.robert          # reads ROBERT_LD2_PATH
-   psql "$DATABASE_ADMIN_URL" -c "SELECT sense_key, left(definition_fr, 40) FROM lecture.sense s
-     JOIN lecture.lemma l ON l.id = s.lemma_id WHERE l.lemma = 'entamer' ORDER BY seq"
-   ```
-
-   Acceptance check: 6 rows, and `I.2` starts with “Couper en enlevant une partie”.
-
-5. **Accounts:** `cd backend && uv run python -m app.cli create-user grace --role student` (and one for yourself
-   with `--role parent`; parents also see drafts).
-
-6. On the iPad, open `http://<mac>.local:8090/` in Safari → Share → *Add to Home Screen*. On the Chromebook,
-   bookmark it.
+Follow **[SETUP.md](SETUP.md)**: step by step, with a check after each step and a troubleshooting table. In short:
+create the `lecture_app` role (`deploy/init_role.sql`) → fill in `.env` → `deploy/deploy.sh` → import the
+dictionary → create accounts → import and publish the book → bookmark it on the iPad and Chromebook.
 
 ## Every week: a new article
 
