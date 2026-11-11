@@ -74,6 +74,18 @@ engine with hint ladders, "trap" explanations for wrong answers, stars, XP and s
 See [MathCompetition/README.md](MathCompetition/README.md) for how to run it and add a week, and
 [MathCompetition/CLAUDE.md](MathCompetition/CLAUDE.md) for the authoring playbook used to convert each week's PDFs.
 
+### Lecture Magique
+
+A home French reading site for a child: read an article chapter by chapter, tap any word for its Petit Robert
+definition (lemma, IPA, examples, read-aloud), and every tap is logged so word familiarity can be tracked (phase 2 adds
+FSRS review quizzes). Works on iPad Safari and a Chromebook on the home network.
+
+- **Location**: `lecture-magique/`
+- **Status**: Phase 1 (read, tap, record) complete — schema, dictionary and article importers, auth, API, React reader; 24 backend tests + browser checks
+- **Tech Stack**: Python (FastAPI, spaCy, Alembic), Postgres, React + Vite + TypeScript
+
+See [lecture-magique/README.md](lecture-magique/README.md) for setup and the weekly article workflow.
+
 ### Fund Accounting Academy
 
 A self-paced training website for fund accountants: 13 modules from fund structures and NAV mechanics to investor accounting,
