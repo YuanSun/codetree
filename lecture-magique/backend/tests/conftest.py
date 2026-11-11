@@ -1,9 +1,10 @@
 """Test database setup.
 
 Tests run against TEST_DATABASE_URL (default: a local database named lecture_test).
-They drop and recreate the lecture schema, so they refuse to touch family_budget.
+They drop and recreate the lecture schema, so they refuse any database that holds the real
+data (one with a family_budget schema).
 On the Mac:  docker run -d --name lecture-pg -e POSTGRES_PASSWORD=test -p 55432:5432 postgres:16
-             TEST_DATABASE_URL=postgresql+psycopg://postgres:test@localhost:55432/postgres uv run pytest
+             TEST_DATABASE_URL=postgresql+psycopg://postgres:test@localhost:55432/lecture_test uv run pytest
 """
 import os
 
@@ -12,8 +13,8 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.engine import make_url
 
 TEST_URL = os.environ.get("TEST_DATABASE_URL", "postgresql+psycopg://postgres@localhost:5432/lecture_test")
-if make_url(TEST_URL).database == "family_budget":
-    raise RuntimeError("Refusing to run tests against family_budget")
+if make_url(TEST_URL).database in ("family_budget", "postgres"):
+    raise RuntimeError("Refusing to run tests in the 'postgres' database: point TEST_DATABASE_URL at e.g. /lecture_test")
 
 os.environ["DATABASE_URL"] = TEST_URL
 os.environ["DATABASE_ADMIN_URL"] = TEST_URL
@@ -42,6 +43,10 @@ def engine():
 
     _ensure_database()
     raw = create_engine(TEST_URL)
+    with raw.connect() as c:
+        if c.execute(text("SELECT 1 FROM information_schema.schemata WHERE schema_name = 'family_budget'")).first():
+            raise RuntimeError(f"Refusing to run tests: {make_url(TEST_URL).database} has a family_budget schema "
+                               "(real data). Use a separate test database.")
     with raw.begin() as c:
         c.execute(text("DROP SCHEMA IF EXISTS lecture CASCADE"))
     raw.dispose()

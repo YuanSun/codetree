@@ -1,21 +1,19 @@
 -- Run ONCE by Ryan with an admin account, before the first migration:
---   psql -U <admin> -d family_budget -v app_password="'choose-a-password'" -f deploy/init_role.sql
+--   psql -U <admin> -d postgres -v app_password="'choose-a-password'" -f deploy/init_role.sql
 --
--- Creates the lecture schema and the lecture_app role. lecture_app can use only the
--- lecture schema: it has no rights on public or on any budget schema, so even a
--- compromised web app cannot read the family budget data.
+-- Creates the lecture schema (next to the existing family_budget schema, in the same database)
+-- and the lecture_app role. lecture_app gets rights on the lecture schema only: nothing on
+-- family_budget or public, so even a compromised web app cannot read the expense data.
+-- Works in whichever database you run it in (current_database()).
 
 \set ON_ERROR_STOP on
 
 CREATE ROLE lecture_app LOGIN PASSWORD :app_password;
 
--- Nothing in other schemas: drop the default PUBLIC grants this role would inherit.
+-- Connect to this database only. Nothing is granted on family_budget or public; database-wide
+-- defaults for other roles are left untouched.
+SELECT format('GRANT CONNECT ON DATABASE %I TO lecture_app', current_database()) \gexec
 REVOKE ALL ON SCHEMA public FROM lecture_app;
-REVOKE CONNECT ON DATABASE family_budget FROM PUBLIC;
-GRANT CONNECT ON DATABASE family_budget TO lecture_app;
--- NOTE: the REVOKE CONNECT ... FROM PUBLIC above means every other role that connects to
--- family_budget needs an explicit GRANT CONNECT. If you would rather not touch that, delete
--- that line; lecture_app still cannot read other schemas without USAGE on them.
 
 CREATE SCHEMA IF NOT EXISTS lecture;
 GRANT USAGE ON SCHEMA lecture TO lecture_app;

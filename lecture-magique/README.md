@@ -37,11 +37,12 @@ questions). It's copyrighted, so it stays out of git.
 
 ```bash
 cd backend
-TEST_DATABASE_URL=postgresql+psycopg://postgres:test@localhost:55432/postgres uv run pytest
+TEST_DATABASE_URL=postgresql+psycopg://postgres:test@localhost:55432/lecture_test uv run pytest
 ```
 
 Use a throwaway Postgres (e.g. `docker run -d -p 55432:5432 -e POSTGRES_PASSWORD=test postgres:16`). The suite
-drops and recreates the `lecture` schema in that database and refuses to run against `family_budget`. Tests use only
+creates `lecture_test` if needed, drops and recreates the `lecture` schema in it, and refuses to run against any
+database that has a `family_budget` schema (i.e. the real one). Tests use only
 invented dictionary entries and a Jules Verne excerpt (public domain).
 
 ## Implementation notes (decisions not spelled out in the design)
