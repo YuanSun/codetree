@@ -87,7 +87,7 @@ def get_chapter(article_id: int, seq: int, user: User = Depends(current_user), c
                                    {"u": user.id, "ids": lemma_ids})}
     q = conn.execute(text("SELECT prompt FROM lecture.question WHERE chapter_id = :c ORDER BY seq LIMIT 1"),
                      {"c": ch.id}).scalar()
-    prog = conn.execute(text("SELECT last_chapter, chapters_done FROM lecture.reading_progress "
+    prog = conn.execute(text("SELECT last_chapter, last_paragraph, chapters_done FROM lecture.reading_progress "
                              "WHERE user_id = :u AND article_id = :a"), {"u": user.id, "a": article_id}).first()
     return {
         "article": {"id": art.id, "slug": art.slug, "title": art.title, "status": art.status},
@@ -98,7 +98,8 @@ def get_chapter(article_id: int, seq: int, user: User = Depends(current_user), c
         "senses": senses,
         "words": words,
         "question": q,
-        "progress": {"last_chapter": prog.last_chapter, "chapters_done": sorted(prog.chapters_done)} if prog else None,
+        "progress": {"last_chapter": prog.last_chapter, "last_paragraph": prog.last_paragraph,
+                     "chapters_done": sorted(prog.chapters_done)} if prog else None,
     }
 
 
