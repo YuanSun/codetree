@@ -322,9 +322,10 @@ button { font: inherit; color: inherit; }
 
 @media (max-width: 900px) {
   .tiles { grid-template-columns: repeat(2, 1fr); }
-  .charts { grid-template-columns: 1fr; }
+  .charts { grid-template-columns: repeat(2, 1fr); }  /* each chart stays near its drawn size (~320px) */
 }
 @media (max-width: 640px) {
+  .charts { grid-template-columns: 1fr; }
   .hard-list { grid-template-columns: 1fr; }
   .book-row { grid-template-columns: 1fr; }
   .quick { grid-template-columns: 1fr; }

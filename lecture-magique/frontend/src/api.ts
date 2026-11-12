@@ -124,6 +124,7 @@ export const api = {
     call<AnswerResult>("POST", `/quiz/items/${itemId}/answer`, { response, response_ms: responseMs }),
   words: () => call<BagWord[]>("GET", "/words"),
   children: () => call<{ id: number; username: string; display_name: string }[]>("GET", "/parent/children"),
+  myReport: (weeks = 8) => call<ChildReport>("GET", `/me/report?weeks=${weeks}`),
   report: (childId: number, weeks = 8) => call<ChildReport>("GET", `/parent/children/${childId}/report?weeks=${weeks}`),
   conjugation: (lemmaId: number) => call<Conjugation>("GET", `/lemmas/${lemmaId}/conjugation`),
   lookups: (events: LookupEvent[], keepalive = false) =>

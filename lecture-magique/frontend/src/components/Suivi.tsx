@@ -26,20 +26,22 @@ function Highlight({ sentence, surface }: { sentence: string; surface: string | 
   return <>{sentence.slice(0, i)}<mark>{surface}</mark>{sentence.slice(i + surface.length)}</>;
 }
 
-export default function Suivi({ theme }: { theme: [ThemePref, (t: ThemePref) => void, boolean] }) {
+/** Parents: any child's progress (child picker). self: the logged-in child's own progress, kid-friendly words. */
+export default function Suivi({ theme, self = false }: { theme: [ThemePref, (t: ThemePref) => void, boolean]; self?: boolean }) {
   const [kids, setKids] = useState<{ id: number; display_name: string }[] | null>(null);
   const [kid, setKid] = useState<number | null>(null);
   const [rep, setRep] = useState<ChildReport | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (self) { api.myReport(8).then(setRep, (e) => setError(e.message)); return; }
     api.children().then((k) => { setKids(k); if (k.length) setKid(k[0].id); }, (e) => setError(e.message));
-  }, []);
+  }, [self]);
   useEffect(() => {
-    if (kid === null) return;
+    if (self || kid === null) return;
     setRep(null);
     api.report(kid, 8).then(setRep, (e) => setError(e.message));
-  }, [kid]);
+  }, [kid, self]);
 
   const thisWeek = rep ? rep.weeks[rep.weeks.length - 1] : undefined;
   const lastDefi = rep ? [...rep.weeks].reverse().find((w) => w.defi && w.defi.answered > 0) : undefined;
@@ -48,7 +50,7 @@ export default function Suivi({ theme }: { theme: [ThemePref, (t: ThemePref) => 
     <main className="suivi">
       <header className="topbar">
         <button className="btn ghost small" onClick={() => go("/")}>← Bibliothèque</button>
-        <h1 className="page-title">📊 Suivi</h1>
+        <h1 className="page-title">{self ? "📊 Mes progrès" : "📊 Suivi"}</h1>
         <ThemeButton theme={theme} />
       </header>
       {error && <p className="error">{error}</p>}
@@ -60,16 +62,16 @@ export default function Suivi({ theme }: { theme: [ThemePref, (t: ThemePref) => 
           ))}
         </div>
       )}
-      {!rep && kid !== null && !error && <p className="muted">…</p>}
+      {!rep && (self || kid !== null) && !error && <p className="muted">…</p>}
       {rep && thisWeek && (
         <>
-          <h2 className="suivi-name">{rep.child.display_name}</h2>
+          {!self && <h2 className="suivi-name">{rep.child.display_name}</h2>}
           <div className="tiles">
             <Tile value={thisWeek.minutes} label="minutes de lecture cette semaine" />
             <Tile value={thisWeek.active_days} label="jours actifs cette semaine" note="lecture ≥ 1 min, mot cherché ou défi" />
             <Tile value={lastDefi?.defi ? `${lastDefi.defi.correct}/${lastDefi.defi.questions}` : "—"}
                   label={lastDefi ? `défi du ${short(lastDefi.week)}` : "pas encore de défi"} note="justes du premier coup" />
-            <Tile value={rep.bag.new + rep.bag.learning + rep.bag.mastered} label="mots dans son sac"
+            <Tile value={rep.bag.new + rep.bag.learning + rep.bag.mastered} label={self ? "mots dans ton sac" : "mots dans son sac"}
                   note={`${rep.bag.mastered} en or · ${rep.bag.due_soon} à revoir cette semaine`} />
           </div>
 
@@ -89,9 +91,11 @@ export default function Suivi({ theme }: { theme: [ThemePref, (t: ThemePref) => 
           <p className="small muted">Les minutes par jour sont enregistrées depuis cette mise à jour ; le temps lu avant
             ne compte que dans le total par livre.</p>
 
-          <h2 className="bag-title">Mots difficiles</h2>
-          <p className="muted small">Classés par erreurs au défi, puis oublis, puis nombre de fois cherchés.</p>
-          {rep.hard_words.length === 0 && <p className="muted">Rien à signaler pour l’instant.</p>}
+          <h2 className="bag-title">{self ? "Mots à retravailler 💪" : "Mots difficiles"}</h2>
+          <p className="muted small">{self
+            ? "Ces mots te donnent un peu de mal : relis la phrase, écoute-les, ils reviendront au prochain défi."
+            : "Classés par erreurs au défi, puis oublis, puis nombre de fois cherchés."}</p>
+          {rep.hard_words.length === 0 && <p className="muted">{self ? "Aucun pour l’instant, bravo !" : "Rien à signaler pour l’instant."}</p>}
           <div className="hard-list">
             {rep.hard_words.map((h) => (
               <div key={h.lemma} className="card hard">

@@ -6,7 +6,7 @@ review). Design: [`docs/DESIGN.md`](docs/DESIGN.md). Engineering rules and phase
 
 **Done:** phase 1 (read, tap, record) and the review half of phase 2: Wiktionary conjugations and English glosses,
 the tense of each verb on the card, FSRS scheduling, the Monday *Défi de la semaine* and *Mon sac à mots*.
-Parents get a **📊 Suivi** page (log in with a `parent` account): minutes read and words looked up per week,
+Children get **📊 Mes progrès** (their own data only). Parents get a **📊 Suivi** page (log in with a `parent` account): minutes read and words looked up per week,
 défi scores, the hardest words with the sentence where she met them, and books in progress. The same data is
 available in the terminal: `psql -d postgres -v kid=grace -f tools/progress.sql`.
 **Not yet:** model-chosen senses, phase 3 (open answers, writing).

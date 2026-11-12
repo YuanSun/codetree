@@ -1,11 +1,11 @@
-"""Parent-only progress report ("Suivi"). Reads children's data; never writes."""
+"""Progress report ("Suivi"): parents see any child's, a child sees her own ("Mes progrès"). Read-only."""
 from datetime import timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import Connection, text
 
 from .. import review
-from ..auth import User, require_parent
+from ..auth import User, current_user, require_parent
 from ..db import get_conn
 
 router = APIRouter()
@@ -26,6 +26,18 @@ def report(child_id: int, weeks: int = Query(8, ge=1, le=52), user: User = Depen
                        {"k": child_id}).first()
     if not kid:
         raise HTTPException(404, "Enfant introuvable")
+    return build_report(conn, kid, weeks)
+
+
+@router.get("/me/report")
+def my_report(weeks: int = Query(8, ge=1, le=52), user: User = Depends(current_user),
+              conn: Connection = Depends(get_conn)):
+    """The same report about the logged-in user only (no id parameter: a child can only see herself)."""
+    kid = conn.execute(text("SELECT id, display_name FROM lecture.app_user WHERE id = :k"), {"k": user.id}).one()
+    return build_report(conn, kid, weeks)
+
+
+def build_report(conn: Connection, kid, weeks: int) -> dict:
     p = {"k": kid.id}
     this_monday = review.monday()
     first = this_monday - timedelta(weeks=weeks - 1)

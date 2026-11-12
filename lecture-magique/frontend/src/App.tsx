@@ -14,8 +14,9 @@ import { useTheme } from "./prefs";
 //   #/defi                  this week's challenge
 //   #/mots                  word bag
 //   #/suivi                 parents: children's progress
+//   #/progres               a child's own progress
 type Route = { name: "shelf" } | { name: "read"; articleId: number; seq: number } | { name: "defi" } | { name: "mots" }
-  | { name: "suivi" };
+  | { name: "suivi" } | { name: "progres" };
 
 function parse(hash: string): Route {
   const m = hash.match(/^#\/lire\/(\d+)\/(\d+)/);
@@ -23,6 +24,7 @@ function parse(hash: string): Route {
   if (hash.startsWith("#/defi")) return { name: "defi" };
   if (hash.startsWith("#/mots")) return { name: "mots" };
   if (hash.startsWith("#/suivi")) return { name: "suivi" };
+  if (hash.startsWith("#/progres")) return { name: "progres" };
   return { name: "shelf" };
 }
 
@@ -54,5 +56,6 @@ export default function App() {
   if (route.name === "defi") return <Defi theme={theme} />;
   if (route.name === "mots") return <WordBag theme={theme} />;
   if (route.name === "suivi" && (me.role === "parent" || me.role === "admin")) return <Suivi theme={theme} />;
+  if (route.name === "progres") return <Suivi theme={theme} self />;
   return <Shelf me={me} onLogout={() => api.logout().finally(() => setMe(null))} theme={theme} />;
 }

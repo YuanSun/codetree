@@ -55,3 +55,16 @@ def test_report_reflects_activity(world):
     assert hard[wrong]["sentence"]
     assert rep["books"][0]["minutes"] == 8 and rep["books"][0]["chapters"] == 2
     assert r.get("/api/parent/children/999999/report").status_code == 404
+
+
+def test_child_sees_only_her_own_report(world):
+    g, l = login(world, "grace"), login(world, "leo")
+    t = tokens(world, 3)
+    for tok in t:
+        tap(g, tok.id)
+    mine = g.get("/api/me/report").json()
+    assert mine["child"]["display_name"] == "grace"
+    assert mine["weeks"][-1]["taps"] == 3 and len(mine["hard_words"]) == 0  # nothing hard yet
+    other = l.get("/api/me/report").json()
+    assert other["child"]["display_name"] == "leo" and other["weeks"][-1]["taps"] == 0
+    assert l.get("/api/me/report?child_id=1").json()["child"]["display_name"] == "leo"  # extra params ignored
