@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Week 9 · The Quest</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/lesson-common.css">
+  <link rel="stylesheet" href="lesson.css">
+</head>
+<body data-page="lesson" data-week="week09" data-page-slug="lesson" data-week-title="Week 9">
+<div id="mc-nav"></div>
+<main class="wrap">
+
+  <section class="hero-quest">
+    <div class="floaters" aria-hidden="true">
+      <span style="left:5%;top:14%;font-size:54px">?</span><span style="left:90%;top:18%;font-size:46px;animation-delay:-2s">$</span>
+      <span style="left:18%;top:70%;font-size:60px;animation-delay:-4s">×</span><span style="left:78%;top:62%;font-size:52px;animation-delay:-1s">÷</span>
+      <span style="left:50%;top:6%;font-size:40px;animation-delay:-3s">=</span><span style="left:93%;top:80%;font-size:44px;animation-delay:-5s">+</span>
+    </div>
+    <div class="eyebrow">Week 9 · The Quest</div>
+    <h1>Word Problems: find <span class="one">ONE</span> first</h1>
+    <p>Four moves that turn a long word problem into a few easy steps. Play with each one — then the homework is yours.</p>
+    <div class="four">
+      <a class="skill sk-rates"   href="#rates"><i>🚜</i><b>Rates</b><span>Find the amount for <u>ONE</u>, then scale.</span></a>
+      <a class="skill sk-ratio"   href="#kinds"><i>🐔</i><b>Two kinds</b><span>Pretend they’re <u>all one kind</u>, then swap.</span></a>
+      <a class="skill sk-percent" href="#carts"><i>🛒</i><b>Compare carts</b><span>Make two carts match. The <u>difference</u> is ONE item.</span></a>
+      <a class="skill sk-mean"    href="#detective"><i>🕵️</i><b>What’s missing?</b><span>List <u>all</u> the possibilities first.</span></a>
+    </div>
+    <a class="btn warm start" href="#rates">▶ Start the quest</a>
+  </section>
+
+  <!-- ===================================================================== RATES -->
+  <section class="level sk-rates" id="rates">
+    <div class="world-banner" data-bg="÷"><div class="big">🚜</div><div><div class="eyebrow">World 1</div><h2>Rates</h2><p>Share a big amount equally, then ask how long <b>one</b> share lasts.</p></div></div>
+    <div class="big-idea"><span>⚡</span><div>Find the amount for ONE.<small>One bag, one day, one item. Then it is just ÷ or ×.</small></div></div>
+
+    <div class="lab">
+      <div class="lab-title">🛍️ Explore · The share-out machine</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">A machine shares rice <b>equally</b> into bags. Change the amount and the number of bags — how much goes into <b>ONE</b> bag? Then tap how much a family eats a day.</div></div>
+      <div id="share-lab"></div>
+      <div id="share-steps"></div>
+    </div>
+
+    <div class="mission" style="--c:var(--rates)">
+      <div class="mission-top"><span class="src">📜 Gauss 2018 · Grade 7 · Q13</span><span class="tag medium">Medium</span></div>
+      <p class="ask">🌾 A factory shares <b>11 410 kg</b> of rice equally into <b>3260 bags</b>. A family eats <b>0.25 kg</b> a day. How many days does <b>one bag</b> last?</p>
+      <details><summary>Show the exact contest wording</summary><div class="orig">At a factory, 11 410 kg of rice is distributed equally into 3260 bags. A family uses 0.25 kg of rice each day. How many days would it take this family to use up one bag of rice?
+        <div class="opts"><span>(A) 9</span><span>(B) 12</span><span>(C) 13</span><span>(D) 14</span><span>(E) 15</span></div></div></details>
+      <div id="rice-steps"></div>
+    </div>
+  </section>
+
+  <!-- ===================================================================== KINDS -->
+  <section class="level sk-ratio" id="kinds">
+    <div class="world-banner" data-bg="🐔"><div class="big">🐔</div><div><div class="eyebrow">World 2</div><h2>Two kinds, one total</h2><p>Some are one kind, the rest are another. You know the total. How many of each?</p></div></div>
+    <div class="big-idea"><span>⚡</span><div>Pretend they are ALL one kind.<small>Then swap one at a time: each swap changes the total by the same amount.</small></div></div>
+
+    <div class="lab">
+      <div class="lab-title">🐄 Explore · The swap lab</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">A farm has <b>10 animals</b>: ducks (2 legs) and cows (4 legs). Slide the number of cows and watch the <b>legs</b>. Start with all ducks!</div></div>
+      <div id="swap-lab"></div>
+      <div id="swap-steps"></div>
+    </div>
+
+    <div class="mission" style="--c:var(--ratio)">
+      <div class="mission-top"><span class="src">📜 Gauss 2018 · Grade 7 · Q15</span><span class="tag medium">Medium</span></div>
+      <p class="ask">🐦 Karl has <b>30 birds</b>: emus and chickens. He gives out <b>100 treats</b>: <b>2</b> for each emu, <b>4</b> for each chicken. How many <b>chickens</b>?</p>
+      <details><summary>Show the exact contest wording</summary><div class="orig">Karl has 30 birds. Some of his birds are emus and the rest are chickens. Karl hands out 100 treats to his birds. Each emu gets 2 treats and each chicken gets 4 treats. How many chickens does Karl have?
+        <div class="opts"><span>(A) 10</span><span>(B) 15</span><span>(C) 25</span><span>(D) 20</span><span>(E) 6</span></div></div></details>
+      <div id="birds-steps"></div>
+    </div>
+  </section>
+
+  <!-- ===================================================================== CARTS -->
+  <section class="level sk-percent" id="carts">
+    <div class="world-banner" data-bg="🛒"><div class="big">🛒</div><div><div class="eyebrow">World 3</div><h2>Compare the carts</h2><p>Two shopping carts, two totals. Make the carts look alike — then the <b>difference</b> is just ONE item.</p></div></div>
+    <div class="big-idea"><span>⚡</span><div>Line up the carts, then subtract.<small>If a cart doesn’t match, double or triple it first.</small></div></div>
+
+    <div class="lab">
+      <div class="lab-title">✏️ Explore · Pens and notebooks</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Cart A: <b>1 pen + 1 notebook = $5</b>. Cart B: <b>1 pen + 2 notebooks = $8</b>. Guess the pen price and see if cart B comes out right. Or <b>compare the carts</b> and skip the guessing!</div></div>
+      <div id="cart-lab"></div>
+      <div id="cart-steps"></div>
+    </div>
+
+    <div class="mission" style="--c:var(--percent)">
+      <div class="mission-top"><span class="src">📜 Gauss 2016 · Grade 8 · Q14</span><span class="tag medium">Medium</span></div>
+      <p class="ask">⚽ <b>1 ball + 1 shirt = $100</b>. <b>2 balls + 3 shirts = $262</b>. What does <b>one ball</b> cost?</p>
+      <details><summary>Show the exact contest wording</summary><div class="orig">One soccer ball and one soccer shirt together cost $100. Two soccer balls and three soccer shirts together cost $262. What is the cost of one soccer ball?
+        <div class="opts"><span>(A) $38</span><span>(B) $50</span><span>(C) $87.30</span><span>(D) $45</span><span>(E) $40</span></div></div></details>
+      <div id="shop-steps"></div>
+    </div>
+  </section>
+
+  <!-- ================================================================== DETECTIVE -->
+  <section class="level sk-mean" id="detective">
+    <div class="world-banner" data-bg="🕵️"><div class="big">🕵️</div><div><div class="eyebrow">World 4 · optional challenge</div><h2>What’s missing?</h2><p>Sometimes the question isn’t “what’s the answer?” but “what <b>one more fact</b> would let us find it?”</p></div></div>
+    <div class="big-idea"><span>⚡</span><div>List ALL the possibilities first.<small>The missing clue is the fact that splits them apart.</small></div></div>
+
+    <div class="mission" style="--c:var(--mean)">
+      <div class="mission-top"><span class="src">📜 CJMC (Gray Jay) 2021 · Q11</span><span class="tag hard">Hard</span></div>
+      <p class="ask">🥪 A vending machine starts with <b>13 chicken</b> ($3), <b>14 cheese</b> ($3) and <b>15 egg</b> ($2.50) sandwiches. It made <b>$61</b>, of which <b>$21</b> was cheese. Which extra fact lets us find how many of each type are <b>left</b>?</p>
+      <details><summary>Show the exact contest wording</summary><div class="orig">At the start of the day a vending machine had 42 sandwiches in it: 13 chicken sandwiches at $3 each, 14 cheese sandwiches at $3 each, 15 egg sandwiches at $2.50 each. At the end of the day the total money made was $61, of which $21 came from cheese sandwich sales. What additional piece of information would allow us to solve the question “How many sandwiches of each type were left at the end of the day?”
+        <div class="opts"><span>(A) Total price of remaining sandwiches.</span><span>(B) Number of remaining sandwiches.</span><span>(C) Total price of sandwiches at the beginning of the day.</span><span>(D) Number of remaining cheese sandwiches.</span><span>(E) No additional information is needed.</span></div></div></details>
+      <div id="vend-lab"></div>
+      <div id="vend-steps"></div>
+    </div>
+  </section>
+
+  <section class="level" id="finale">
+    <div class="finale">
+      <div class="eyebrow" style="color:var(--gold)">The point to land</div>
+      <h2>Long word problems become short when you pick the right <u>move</u>.</h2>
+      <ul class="finale-list">
+        <li style="--c:#8fbaff"><b>Rate</b> → the amount for ONE</li>
+        <li style="--c:#7ee8c0"><b>Two kinds</b> → all one kind, then swap</li>
+        <li style="--c:#ffd08a"><b>Two carts</b> → match them, subtract</li>
+        <li style="--c:#c9b5ff"><b>Missing clue</b> → list every possibility</li>
+      </ul>
+      <div class="row"><a class="btn warm" href="homework">📝 Go to Homework Week 9</a></div>
+    </div>
+  </section>
+</main>
+
+<script src="/static/js/core.js"></script>
+<script src="lesson.js"></script>
+</body>
+</html>

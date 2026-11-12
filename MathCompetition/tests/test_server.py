@@ -92,6 +92,22 @@ class ServerTests(unittest.TestCase):
         status, _, headers = self.get("/study/sem05")
         self.assertEqual((status, headers["Location"]), (301, "/study/sem05/"))
 
+    def test_exam_page_type_and_new_units(self):
+        status, body, _ = self.get("/week/cjmc2021-exam2/exam")
+        self.assertEqual(status, 200)
+        self.assertIn('data-page="exam"', body)
+        self.assertIn('id="exam-data"', body)
+        self.assertIn('src="/static/js/exam.js"', body)
+        self.assertIn('"minutes": 90', body)
+        self.assertEqual(body.count("<script"), body.count("</script>"))   # the embedded JSON cannot close its own <script>
+        for path in ("/week/cjmc2021-exam2/practice", "/week/cjmc2021-exam2/figures.js", "/static/js/exam.js", "/week/week09/", "/week/week09/lesson", "/week/week09/homework", "/week/week09/figures.js"):
+            with self.subTest(path=path):
+                self.assertEqual(self.get(path)[0], 200)
+        _, home, _ = self.get("/")
+        order = [home.index(f'/week/{i}/"') for i in ("week09", "cjmc2021-exam2", "week08", "week07")]
+        self.assertEqual(order, sorted(order))                         # week 9, the 8.5 exam, week 8, week 7
+        self.assertIn("Exam 2", home)
+
     def test_week_without_trailing_slash_redirects(self):
         status, _, headers = self.get("/week/week08")
         self.assertEqual(status, 301)
@@ -105,7 +121,10 @@ class ServerTests(unittest.TestCase):
     def test_api(self):
         status, body, _ = self.get("/api/weeks")
         self.assertEqual(status, 200)
-        self.assertEqual(json.loads(body)[0]["id"], "week08")
+        units = json.loads(body)
+        self.assertIn("week08", [u["id"] for u in units])
+        numbers = [float(u["number"]) for u in units]
+        self.assertEqual(numbers, sorted(numbers, reverse=True))      # newest first
 
     def test_static_and_week_files(self):
         for path in ("/static/css/base.css", "/static/js/core.js", "/week/week08/lesson.js", "/week/week08/figures.js"):
@@ -131,6 +150,22 @@ class ContentTests(unittest.TestCase):
         for folder in sorted(p for root in ("weeks", "study") for p in (ROOT / root).iterdir() if p.is_dir()):
             with self.subTest(week=folder.name):
                 self.assertEqual(weekctl.check_week(folder), [])
+
+    def test_exam_checker_needs_points_and_minutes(self):
+        bad = {"exam": {}, "groups": [{"id": "A", "label": "Part A"}], "questions": [{"id": "q", "skill": "A"}]}
+        tmp = ROOT / "tests" / "_bad_exam.json"
+        tmp.write_text(json.dumps(bad))
+        try:
+            errs = weekctl.check_exam("w", "p", tmp)
+        finally:
+            tmp.unlink()
+        self.assertTrue(any("minutes" in e for e in errs) and any("points" in e for e in errs))
+
+    def test_exam_answer_key(self):
+        data = json.loads((ROOT / "weeks" / "cjmc2021-exam2" / "exercises.json").read_text(encoding="utf-8"))
+        key = "".join("ABCDE"[q["answer"]] for q in data["questions"])
+        self.assertEqual(key, "CDEDBACDCABDDBB")                    # computed independently while building the unit
+        self.assertEqual(sum(g["points"] * sum(1 for q in data["questions"] if q["skill"] == g["id"]) for g in data["groups"]), 80)
 
     def test_checker_catches_bad_answer_index(self):
         bad = {"questions": [{"id": "q", "text": "t", "choices": ["a", "b"], "answer": 5, "difficulty": "easy", "hints": ["h"], "solution": ["s"]}]}
@@ -180,6 +215,12 @@ class BasePathTests(unittest.TestCase):
                 self.assertNotRegex(body, r'(?:href|src)="/(?!math/|/)', "unprefixed absolute link")
         self.assertIn('href="/math/static/css/base.css"', self.get("/")[1])
         self.assertIn('href="/math/week/week08/"', self.get("/")[1])
+
+    def test_exam_links_are_prefixed(self):
+        status, body, _ = self.get("/week/cjmc2021-exam2/exam")
+        self.assertEqual(status, 200)
+        self.assertIn('src="/math/static/js/exam.js"', body)
+        self.assertIn('src="/math/week/cjmc2021-exam2/figures.js"', body)
 
     def test_study_links_are_prefixed(self):
         for path in ("/study/", "/study/sem05/", "/study/sem0506/parcours"):

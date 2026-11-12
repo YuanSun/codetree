@@ -1,0 +1,212 @@
+{
+  "eyebrow": "Week 9",
+  "title": "Homework Week 9",
+  "intro": "Rates & word problems. Do them on paper first, then check here. The last one is an **optional challenge**.",
+  "groups": [
+    {
+      "id": "rates",
+      "label": "Rates",
+      "emoji": "🚜",
+      "color": "#3b82f6"
+    },
+    {
+      "id": "kinds",
+      "label": "Two kinds",
+      "emoji": "🐔",
+      "color": "#10b981"
+    },
+    {
+      "id": "carts",
+      "label": "Compare carts",
+      "emoji": "🛒",
+      "color": "#f59e0b"
+    },
+    {
+      "id": "detective",
+      "label": "What's missing?",
+      "emoji": "🕵️",
+      "color": "#8b5cf6"
+    }
+  ],
+  "questions": [
+    {
+      "id": "hw1",
+      "skill": "rates",
+      "difficulty": "medium",
+      "source": "Gauss 2018, Grade 7 — Q13",
+      "text": "At a factory, 11 410 kg of rice is distributed equally into 3260 bags. A family uses 0.25 kg of rice each day. How many days would it take this family to use up one bag of rice?",
+      "choices": [
+        "9",
+        "12",
+        "13",
+        "14",
+        "15"
+      ],
+      "answer": 3,
+      "hints": [
+        "Find ONE first: how much rice is in one bag?",
+        "One bag holds 11 410 ÷ 3260 kg. Simplify it (÷ 10, then think: 3260 × 3.5 = ?).",
+        "A bag holds 3.5 kg. The family eats 0.25 kg a day — how many quarter-kilos are in 3.5 kg?"
+      ],
+      "traps": {
+        "0": "Test it: 9 days would mean a bag holds 9 × 0.25 = 2.25 kg, and 3260 × 2.25 = 7335 kg, not 11 410 kg.",
+        "1": "Test it: 12 days means 12 × 0.25 = 3 kg per bag. 3260 × 3 = 9780 kg, not 11 410. (A bag holds 3.5 kg, not 3.)",
+        "2": "Test it: 13 days → 3.25 kg per bag; 3260 × 3.25 = 10 595 kg, not 11 410.",
+        "4": "Test it: 15 days → 3.75 kg per bag; 3260 × 3.75 = 12 225 kg, not 11 410."
+      },
+      "solution": [
+        "One bag: 11 410 ÷ 3260 = 3.5 kg (check: 3260 × 3.5 = 11 410 ✔).",
+        "Days = 3.5 ÷ 0.25. There are 4 quarters in 1 kg, so 3.5 kg has 3.5 × 4 = 14 of them.",
+        "**14 days** → **(D)**."
+      ],
+      "idea": "Find the amount for ONE (one bag), then ask how many daily portions fit in it.",
+      "figure": {
+        "type": "facts",
+        "rows": [
+          [
+            "🌾 Rice at the factory",
+            "11 410 kg"
+          ],
+          [
+            "🛍️ Equal bags",
+            "3260"
+          ],
+          [
+            "🏠 A family eats",
+            "0.25 kg per day"
+          ]
+        ]
+      },
+      "explorer": {
+        "type": "bagdays"
+      }
+    },
+    {
+      "id": "hw2",
+      "skill": "kinds",
+      "difficulty": "medium",
+      "source": "Gauss 2018, Grade 7 — Q15",
+      "text": "Karl has 30 birds. Some of his birds are emus and the rest are chickens. Karl hands out 100 treats to his birds. Each emu gets 2 treats and each chicken gets 4 treats. How many chickens does Karl have?",
+      "choices": [
+        "10",
+        "15",
+        "25",
+        "20",
+        "6"
+      ],
+      "answer": 3,
+      "hints": [
+        "There are two kinds of bird. Pretend they are all the same kind first — which kind makes the sum easy?",
+        "If all 30 birds were emus, that would be 60 treats. But Karl gave out 100.",
+        "Each time you swap one emu for one chicken, the treats go up by 2. How many swaps to go from 60 to 100?"
+      ],
+      "traps": {
+        "0": "Test it: 10 chickens and 20 emus → 10 × 4 + 20 × 2 = 80 treats, not 100.",
+        "1": "Test it: 15 chickens and 15 emus → 60 + 30 = 90 treats, not 100. (An even split is only a guess.)",
+        "2": "Test it: 25 chickens and 5 emus → 100 + 10 = 110 treats, not 100.",
+        "4": "Test it: 6 chickens and 24 emus → 24 + 48 = 72 treats, not 100."
+      },
+      "solution": [
+        "Pretend all 30 are emus: 30 × 2 = 60 treats. We need 100, so 100 − 60 = 40 extra treats.",
+        "Swapping an emu for a chicken adds 4 − 2 = 2 treats. Swaps needed: 40 ÷ 2 = 20.",
+        "20 chickens and 10 emus: 20 × 4 + 10 × 2 = 80 + 20 = 100 ✔ → **(D)**."
+      ],
+      "idea": "Two kinds, one total: start with all one kind, then swap one at a time.",
+      "explorer": {
+        "type": "treats"
+      }
+    },
+    {
+      "id": "hw3",
+      "skill": "carts",
+      "difficulty": "medium",
+      "source": "Gauss 2016, Grade 8 — Q14",
+      "text": "One soccer ball and one soccer shirt together cost $100. Two soccer balls and three soccer shirts together cost $262. What is the cost of one soccer ball?",
+      "choices": [
+        "$38",
+        "$50",
+        "$87.30",
+        "$45",
+        "$40"
+      ],
+      "answer": 0,
+      "hints": [
+        "Write down the two shopping carts. How can you make them look alike?",
+        "Double the first cart: 2 balls + 2 shirts cost $200. Compare it with the second cart.",
+        "The second cart has exactly one more shirt and costs $62 more. So a shirt costs $62."
+      ],
+      "traps": {
+        "1": "Test it: if both cost $50, then 2 balls + 3 shirts = $250, not $262.",
+        "3": "Test it: ball $45 → shirt $55; 2 × 45 + 3 × 55 = 90 + 165 = $255, not $262.",
+        "4": "Test it: ball $40 → shirt $60; 2 × 40 + 3 × 60 = 80 + 180 = $260, not $262.",
+        "2": "Test it: ball $87.30 → shirt $12.70; 2 × 87.30 + 3 × 12.70 = 174.60 + 38.10 = $212.70, not $262."
+      },
+      "solution": [
+        "Cart 1: 1 ball + 1 shirt = $100. Double it: 2 balls + 2 shirts = $200.",
+        "Cart 2: 2 balls + 3 shirts = $262. Compared with the doubled cart, the extra item is 1 shirt, which costs $262 − $200 = $62.",
+        "Then a ball costs $100 − $62 = **$38** → **(A)**. (Check: 2 × 38 + 3 × 62 = 76 + 186 = 262 ✔)"
+      ],
+      "idea": "Make two carts match by doubling, then the difference is ONE item.",
+      "explorer": {
+        "type": "ballprice"
+      }
+    },
+    {
+      "id": "hw4",
+      "skill": "detective",
+      "difficulty": "hard",
+      "source": "CJMC (Gray Jay) 2021 — Q11 (optional challenge)",
+      "text": "At the start of the day a vending machine had 42 sandwiches in it: 13 chicken sandwiches at $3 each, 14 cheese sandwiches at $3 each, 15 egg sandwiches at $2.50 each. At the end of the day the total money made was $61, of which $21 came from cheese sandwich sales. What additional piece of information would allow us to solve the question “How many sandwiches of each type were left at the end of the day?”",
+      "choices": [
+        "Total price of remaining sandwiches.",
+        "Number of remaining sandwiches.",
+        "Total price of sandwiches at the beginning of the day.",
+        "Number of remaining cheese sandwiches.",
+        "No additional information is needed."
+      ],
+      "answer": 1,
+      "hints": [
+        "Work out what is already known before asking what is missing. How many cheese sandwiches were sold?",
+        "Chicken + egg sales were $61 − $21 = $40. List every (chicken, egg) pair that makes exactly $40.",
+        "There are two pairs. Does a different number of sandwiches remain in each case?"
+      ],
+      "traps": {
+        "0": "The money left in the machine is always $118.50 − $61 = $57.50 — identical for both possibilities, so it can't separate them.",
+        "2": "The starting total ($118.50) can already be worked out from the table, and it is the same either way.",
+        "3": "Cheese is already known: $21 ÷ $3 = 7 sold, so 7 remain in both possibilities.",
+        "4": "Two different sales fit what we know: (10 chicken, 4 egg) and (5 chicken, 10 egg). So more is needed."
+      },
+      "solution": [
+        "Cheese sold: $21 ÷ $3 = 7 → 7 cheese left.",
+        "3c + 2.5e = 40 (c ≤ 13, e ≤ 15) → (c, e) = (10, 4) or (5, 10).",
+        "They leave 42 − 7 − 14 = 21 or 42 − 7 − 15 = 20 sandwiches, so the **number of remaining sandwiches** decides it → **(B)**."
+      ],
+      "idea": "List all the possibilities that fit, then ask which fact splits them apart.",
+      "optional": true,
+      "figure": {
+        "type": "facts",
+        "rows": [
+          [
+            "Chicken",
+            "13 at $3 each"
+          ],
+          [
+            "Cheese",
+            "14 at $3 each"
+          ],
+          [
+            "Egg",
+            "15 at $2.50 each"
+          ],
+          [
+            "Money made",
+            "$61, of which $21 from cheese"
+          ]
+        ]
+      },
+      "explorer": {
+        "type": "vendcombos"
+      }
+    }
+  ]
+}

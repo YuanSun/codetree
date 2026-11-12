@@ -50,8 +50,8 @@ def check_week(folder: Path) -> list[str]:
         if slug in slugs:
             err(f"duplicate page slug '{slug}'")
         slugs.add(slug)
-        if page.get("type", "html") not in ("html", "quiz"):
-            err(f"page '{slug}': type must be 'html' or 'quiz'")
+        if page.get("type", "html") not in ("html", "quiz", "exam"):
+            err(f"page '{slug}': type must be 'html', 'quiz' or 'exam'")
         target = folder / page.get("file", "")
         if not target.is_file():
             err(f"page '{slug}': file '{page.get('file')}' not found")
@@ -59,8 +59,10 @@ def check_week(folder: Path) -> list[str]:
         for script in page.get("scripts", []):
             if not (folder / script).is_file():
                 err(f"page '{slug}': script '{script}' not found")
-        if page.get("type") == "quiz":
+        if page.get("type") in ("quiz", "exam"):
             errs.extend(check_quiz(folder.name, slug, target))
+            if page.get("type") == "exam":
+                errs.extend(check_exam(folder.name, slug, target))
         elif page.get("type", "html") == "html" and not page.get("tasks"):
             print(f"  note: {folder.name}/{slug} has no 'tasks' count, so its progress bar stays hidden")
     return errs
@@ -101,6 +103,23 @@ def check_quiz(week: str, slug: str, path: Path) -> list[str]:
             err(qid, "no hints (the hint ladder is the point — aim for 3)")
         if not q.get("solution"):
             err(qid, "empty solution")
+    return errs
+
+
+def check_exam(week: str, slug: str, path: Path) -> list[str]:
+    """A mock exam needs scoring: every question's skill is a group with ``points`` and the ``exam`` block has minutes."""
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return []        # check_quiz already reported it
+    errs: list[str] = []
+    exam = data.get("exam") or {}
+    if not isinstance(exam.get("minutes"), (int, float)) or exam["minutes"] <= 0:
+        errs.append(f"{week}/{slug}: exam.minutes must be a positive number")
+    points = {g.get("id"): g.get("points") for g in data.get("groups", [])}
+    for q in data.get("questions", []):
+        if not isinstance(points.get(q.get("skill")), (int, float)):
+            errs.append(f"{week}/{slug} [{q.get('id')}]: its group {q.get('skill')!r} needs a numeric 'points' (the exam scores by group)")
     return errs
 
 

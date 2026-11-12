@@ -28,6 +28,18 @@ for an **11-year-old**. Goal: the child *understands the concept by interacting*
 - A ready-made single-file HTML (e.g. a `kid-study-playground` page) is dropped in as `study/<id>/page.html` with `"standalone": true` in `week.json`.
 - Progress keys are per unit id, so `sem05` and `week05` would never collide; `week.json` may set `"label"` (e.g. "Sem 5 + 6").
 
+## Past exams: the `exam` page type
+
+For a full past paper (CJMC / Gauss) use a unit like `weeks/cjmc2021-exam2/` with two pages built from ONE `exercises.json`:
+`{"slug":"exam","type":"exam",…}` (timed mock exam, `static/js/exam.js`) and `{"slug":"practice","type":"quiz",…}` (hints / traps / solutions).
+- The JSON is a normal quiz file plus an `"exam"` block (`minutes`, `blank` = points for an unanswered question, `review` = quiz slug, `rules[]`) and
+  `points` on every group (a question's `skill` names its group: Part A 4, Part B 5, Part C 7). `weekctl check` enforces this.
+- Wrong = 0, blank = `blank`: the intro and the results explain why guessing blindly does not pay (that is the contest's own rule).
+- `"number": 8.5` + `"label": "Exam 2"` in `week.json` slots the unit between weeks on the home page (sorted newest first).
+- Every diagram must be redrawn in `figures.js` (the child never sees the PDF); verify answers independently — for puzzles, with a solver
+  (see how Q15's hexagon grid has a unique solution) — and zoom the PDF page (`pdftoppm -r 220`) before trusting a fold/diagram question.
+- An in-progress attempt is saved in `localStorage` (`mc.exam.<unit>.<slug>`), the result in the normal progress store.
+
 ## Question schema (`exercises.json` / `homework.json`)
 
 ```jsonc
