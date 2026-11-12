@@ -1,0 +1,29 @@
+{
+  "number": 9,
+  "title": "Rates & Word Problems",
+  "tagline": "Find ONE first. Then two kinds, two carts and a missing clue: four word-problem moves that crack contest questions.",
+  "level": "G6–G7 · Contest Prep",
+  "emoji": "🧩",
+  "skills": ["Rates", "Two kinds", "Compare carts", "What's missing?"],
+  "credit": "Based on The Learning Lab · Homework Week 9 · Rates & Word Problems (Instructor: Sam Cai, MSc). Contest questions © CEMC, University of Waterloo — used here for personal study.",
+  "pages": [
+    {
+      "slug": "lesson",
+      "type": "html",
+      "file": "lesson.html",
+      "title": "The Quest",
+      "emoji": "🗺️",
+      "desc": "Play with each idea first — then solve the homework questions step by step.",
+      "tasks": 7
+    },
+    {
+      "slug": "homework",
+      "type": "quiz",
+      "file": "homework.json",
+      "scripts": ["figures.js"],
+      "title": "Homework Week 9",
+      "emoji": "📝",
+      "desc": "3 questions + 1 optional challenge (the vending machine). Do them on paper first, then check here."
+    }
+  ]
+}

@@ -117,12 +117,14 @@ def load_weeks(track: str = "week") -> list[dict]:
             page.setdefault("title", page.get("slug", ""))
             page["total"] = page_total(folder, page)
         weeks.append(meta)
-    weeks.sort(key=lambda w: (-int(w["number"]), w["id"]))
+    weeks.sort(key=lambda w: (-float(w["number"]), w["id"]))   # a past exam can sit between weeks with e.g. number 8.5
     return weeks
 
 
 def page_total(folder: Path, page: dict) -> int:
     """How many things there are to complete on a page (used for progress rings)."""
+    if page["type"] == "exam":
+        return 1          # "take the exam once" fills the progress ring
     if page["type"] == "quiz":
         try:
             data = json.loads((folder / page["file"]).read_text(encoding="utf-8"))
@@ -281,6 +283,32 @@ def quiz_page(week: dict, page: dict) -> str:
     )
 
 
+def exam_page(week: dict, page: dict) -> str:
+    """A timed mock exam (see static/js/exam.js). Uses the same JSON as a quiz page, plus an ``exam`` block."""
+    t = TRACKS[week["track"]]
+    data = json.loads((t["dir"] / week["id"] / page["file"]).read_text(encoding="utf-8"))
+    extra = "".join(
+        f'<script src="{t["prefix"]}/{esc(week["id"])}/{esc(s)}"></script>' for s in page.get("scripts", [])
+    )
+    return render(
+        "layout.html",
+        title=f"{page['title']} · {week['label']}",
+        body_attrs=(
+            f'data-page="exam" data-track="{week["track"]}" data-week="{esc(week["id"])}" data-page-slug="{esc(page["slug"])}" '
+            f'data-week-title="{esc(week["label"])}"'
+        ),
+        head="",
+        body='<div id="exam-root"></div>',
+        scripts=(
+            '<script src="/static/js/exam.js"></script>\n'
+            f"{extra}\n"
+            f'<script id="exam-data" type="application/json">{json_for_script(data)}</script>\n'
+            '<script>MC.exam(document.getElementById("exam-root"),'
+            'JSON.parse(document.getElementById("exam-data").textContent));</script>'
+        ),
+    )
+
+
 # ------------------------------------------------------------------------- handler
 
 
@@ -383,6 +411,8 @@ class Handler(BaseHTTPRequestHandler):
                 if page is not None:
                     if page["type"] == "quiz":
                         return self._html(quiz_page(week, page))
+                    if page["type"] == "exam":
+                        return self._html(exam_page(week, page))
                     if page.get("standalone"):
                         return self._standalone(week, page)
                     return self._file(t["dir"] / week["id"], page["file"])

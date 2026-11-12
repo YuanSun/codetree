@@ -1,0 +1,674 @@
+{
+  "eyebrow": "CJMC 2021 · Gray Jay",
+  "title": "Question Bank — CJMC 2021 Exam 2",
+  "intro": "All 15 questions of the 2021 Canadian Mathematical Gray Jay Competition. Try each one on paper first; use the hints only when stuck. Q11 is also the optional challenge in Week 9.",
+  "exam": {
+    "title": "CJMC 2021 · Gray Jay — Mock Exam",
+    "intro": "Sit the real 2021 paper the way you would on contest day: no hints, no calculator, the clock running. Afterwards every question has a full solution.",
+    "minutes": 90,
+    "blank": 1,
+    "review": "practice",
+    "rules": [
+      "📵 No phones or calculators. Diagrams are not drawn to scale — they are aids only.",
+      "🧠 Scrap paper is fine. Only your answers on the sheet count.",
+      "📝 The real exam is **15 questions in 1 hour 30 minutes**."
+    ]
+  },
+  "groups": [
+    {
+      "id": "A",
+      "label": "Part A",
+      "emoji": "🅰️",
+      "color": "#3b82f6",
+      "points": 4
+    },
+    {
+      "id": "B",
+      "label": "Part B",
+      "emoji": "🅱️",
+      "color": "#10b981",
+      "points": 5
+    },
+    {
+      "id": "C",
+      "label": "Part C",
+      "emoji": "🏆",
+      "color": "#f59e0b",
+      "points": 7
+    }
+  ],
+  "questions": [
+    {
+      "id": "c01",
+      "skill": "A",
+      "difficulty": "easy",
+      "source": "CJMC (Gray Jay) 2021 — Q1",
+      "text": "Calculate the following (hint: remember order of operations, BEDMAS).<div style='font-size:22px;margin:8px 0'>1 − 2 × 2 + 3 × 3 × 3</div>",
+      "choices": [
+        "9",
+        "10",
+        "24",
+        "25",
+        "45"
+      ],
+      "answer": 2,
+      "hints": [
+        "Which operations come before adding and subtracting?",
+        "Do all the multiplications first: 2 × 2 and 3 × 3 × 3.",
+        "1 − 4 + 27 — now go left to right."
+      ],
+      "traps": {
+        "0": "9 is what you get going strictly left to right: ((1 − 2) × 2 + 3) × 3 × 3. Multiplication comes first (BEDMAS)."
+      },
+      "solution": [
+        "Multiplications first: 2 × 2 = 4 and 3 × 3 × 3 = 27.",
+        "Now 1 − 4 + 27 = −3 + 27 = **24** → **(C)**."
+      ],
+      "idea": "BEDMAS: multiply and divide before you add and subtract."
+    },
+    {
+      "id": "c02",
+      "skill": "A",
+      "difficulty": "easy",
+      "source": "CJMC (Gray Jay) 2021 — Q2",
+      "text": "Romina is working with a rectangle on her computer. It started as a 45 × 45 square. She resized it, keeping its **perimeter the same**. Its **area is now 2021**. What are the new length and width?",
+      "choices": [
+        "33 × 39",
+        "33 × 37",
+        "39 × 49",
+        "43 × 47",
+        "41 × 49"
+      ],
+      "answer": 3,
+      "hints": [
+        "Keeping the perimeter means length + width stays the same. What is it for the 45 × 45 square?",
+        "Perimeter 180, so length + width = 90. Test the choices: which pairs add to 90?",
+        "Two choices add to 90: 41 × 49 and 43 × 47. Multiply them."
+      ],
+      "traps": {
+        "4": "41 + 49 = 90 ✔ (perimeter OK) — but 41 × 49 = 2009, not 2021. The area has to match too.",
+        "0": "33 + 39 = 72, so the perimeter would be 144, not 180.",
+        "1": "33 + 37 = 70 → perimeter 140, not 180.",
+        "2": "39 + 49 = 88 → perimeter 176, not 180."
+      },
+      "solution": [
+        "Perimeter of the square = 4 × 45 = 180, so length + width = 90.",
+        "Only (D) 43 + 47 and (E) 41 + 49 add to 90.",
+        "43 × 47 = 2021 ✔ (41 × 49 = 2009 ✘) → **(D)**."
+      ],
+      "idea": "Check BOTH conditions (perimeter and area) before choosing."
+    },
+    {
+      "id": "c03",
+      "skill": "A",
+      "difficulty": "easy",
+      "source": "CJMC (Gray Jay) 2021 — Q3",
+      "text": "Sophia does an experiment at school. On Monday morning she puts a beaker of water outside and marks the water level. Each day the water level changes, due to rainfall and evaporation. At the end of each school day Sophia measures the water level **with respect to the starting level on Monday**. The bar chart shows the end of each day. **By how much did the water level increase from the end of the school day on Tuesday to the end of the school day on Wednesday?**",
+      "choices": [
+        "7 mm",
+        "9 mm",
+        "11 mm",
+        "12 mm",
+        "14 mm"
+      ],
+      "answer": 4,
+      "hints": [
+        "Read the two bars you need: Tuesday and Wednesday. Is Tuesday above or below the zero line?",
+        "Tuesday is at −5 mm and Wednesday at +9 mm.",
+        "How far is it from −5 up to 9? Count through zero."
+      ],
+      "traps": {
+        "0": "7 mm is Monday's bar. The question compares Tuesday with Wednesday.",
+        "1": "9 mm is Wednesday's level above the starting line. The question asks how much it rose **since Tuesday**, which was below the line."
+      },
+      "solution": [
+        "Tuesday: −5 mm (below the starting level). Wednesday: +9 mm.",
+        "From −5 up to 0 is 5, then up to 9 is 9 more: 5 + 9 = **14 mm** → **(E)**."
+      ],
+      "idea": "A change = end − start. Mind the signs: 9 − (−5) = 14.",
+      "figure": {
+        "type": "bars",
+        "labels": [
+          "Mon.",
+          "Tues.",
+          "Wed.",
+          "Thurs.",
+          "Fri."
+        ],
+        "values": [
+          7,
+          -5,
+          9,
+          4,
+          -7
+        ],
+        "title": "Water level (mm)"
+      }
+    },
+    {
+      "id": "c04",
+      "skill": "A",
+      "difficulty": "medium",
+      "source": "CJMC (Gray Jay) 2021 — Q4",
+      "text": "Tarik rolls a standard die numbered 1, 2, 3, 4, 5, 6 a number of times and writes down the results. When he is done, he adds all the numbers and finds the sum is 10. He is shocked to find that when he multiplies all the numbers together the product is also 10. **How many times did he roll the die?**",
+      "choices": [
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "answer": 3,
+      "hints": [
+        "Start with the product: 10 = 2 × 5 × 1 × 1 × … Which numbers on a die can multiply to 10?",
+        "The 5 and the 2 must be there (a die has no 10). Everything else must be 1s, which do not change a product.",
+        "2 + 5 = 7. How many 1s are needed to reach a sum of 10?"
+      ],
+      "traps": {
+        "1": "Only {1, 2, 5} gives product 10 with 3 rolls, and 1 + 2 + 5 = 8, not 10.",
+        "2": "{1, 1, 2, 5} has product 10 but sum 9, not 10.",
+        "4": "{1, 1, 1, 1, 2, 5}: product 10 but sum 11. One too many 1s.",
+        "0": "With 2 rolls, 2 × 5 = 10 but 2 + 5 = 7, not 10."
+      },
+      "solution": [
+        "Product 10 = 2 × 5, and any extra rolls must be 1s (they don't change the product).",
+        "2 + 5 = 7; the sum must be 10, so we need 3 more: three 1s.",
+        "Rolls: 2, 5, 1, 1, 1 → **5 rolls** → **(D)**."
+      ],
+      "idea": "Use the product to find the numbers, then use the sum to count the 1s."
+    },
+    {
+      "id": "c05",
+      "skill": "A",
+      "difficulty": "medium",
+      "source": "CJMC (Gray Jay) 2021 — Q5",
+      "text": "Chen folded a rectangular-shaped piece of paper in the directions shown by the arrows, and then he cuts off the shaded corner as in the figure. **What shape is Chen going to get when he opens the folded piece of paper?**",
+      "choices": [
+        "<svg viewBox=\"-4 -4 68 128\" width=\"54\" height=\"104\" style=\"vertical-align:middle\"><path d=\"M14,0 L46,0 L60,14 L60,46 L46,60 L60,74 L60,106 L46,120 L14,120 L0,106 L0,74 L14,60 L0,46 L0,14 Z\" fill=\"#e6e9ff\" stroke=\"#1d2150\" stroke-width=\"2\" fill-rule=\"evenodd\" stroke-linejoin=\"round\"/></svg>",
+        "<svg viewBox=\"-4 -4 68 128\" width=\"54\" height=\"104\" style=\"vertical-align:middle\"><path d=\"M0,0 L16,0 L30,14 L44,0 L60,0 L60,120 L44,120 L30,106 L16,120 L0,120 Z M30,46 L44,60 L30,74 L16,60 Z\" fill=\"#e6e9ff\" stroke=\"#1d2150\" stroke-width=\"2\" fill-rule=\"evenodd\" stroke-linejoin=\"round\"/></svg>",
+        "<svg viewBox=\"-4 -4 68 128\" width=\"54\" height=\"104\" style=\"vertical-align:middle\"><path d=\"M0,0 L60,0 L60,16 L46,30 L60,44 L60,76 L46,90 L60,104 L60,120 L0,120 L0,104 L14,90 L0,76 L0,44 L14,30 L0,16 Z\" fill=\"#e6e9ff\" stroke=\"#1d2150\" stroke-width=\"2\" fill-rule=\"evenodd\" stroke-linejoin=\"round\"/></svg>",
+        "<svg viewBox=\"-4 -4 68 128\" width=\"54\" height=\"104\" style=\"vertical-align:middle\"><path d=\"M0,0 L60,0 L60,120 L0,120 Z M30,16 L44,30 L30,44 L16,30 Z M30,76 L44,90 L30,104 L16,90 Z\" fill=\"#e6e9ff\" stroke=\"#1d2150\" stroke-width=\"2\" fill-rule=\"evenodd\" stroke-linejoin=\"round\"/></svg>",
+        "<svg viewBox=\"-4 -4 68 128\" width=\"54\" height=\"104\" style=\"vertical-align:middle\"><path d=\"M0,0 L16,0 L30,14 L44,0 L60,0 L60,46 L46,60 L60,74 L60,120 L44,120 L30,106 L16,120 L0,120 L0,74 L14,60 L0,46 Z\" fill=\"#e6e9ff\" stroke=\"#1d2150\" stroke-width=\"2\" fill-rule=\"evenodd\" stroke-linejoin=\"round\"/></svg>"
+      ],
+      "answer": 1,
+      "hints": [
+        "Where does the cut corner sit on the folded paper — on an edge of the original sheet, or on a fold line?",
+        "The corner touches the fold made by the sideways fold (the middle line of the sheet), and the other fold lines too.",
+        "A cut at the end of a fold line makes a V-notch on the edge. A cut where two fold lines cross makes a hole. Where do both happen here?"
+      ],
+      "traps": {
+        "0": "Cut corners on all four sides would mean the cut was at the corners of the sheet. Here the cut is on the middle line of the sheet.",
+        "2": "Notches along the long sides would come from a cut on the last fold only. The cut corner here sits on the middle fold line, so the notches are at the top and bottom.",
+        "3": "Two diamond holes would need two places where fold lines cross. After the folds, the sheet's folds cross only at its centre.",
+        "4": "Notches at the top and bottom are right, but the long sides are not cut, and the middle of the sheet should have a diamond hole (the two middle fold lines cross there)."
+      },
+      "solution": [
+        "Unfold step by step. The cut corner touches the sideways fold (the sheet's middle line) and also the top fold (the sheet's horizontal middle) and the long fold.",
+        "At the top and bottom edges of the sheet the cut lands on the middle line → a V-notch at the top and one at the bottom.",
+        "At the centre of the sheet the two middle lines cross → the cut makes a diamond-shaped hole.",
+        "So the sheet has a notch at the top, a notch at the bottom, and one diamond in the middle → **(B)**."
+      ],
+      "idea": "Unfold backwards: a cut on a fold line makes a notch; where folds cross it makes a hole.",
+      "figure": {
+        "type": "folds"
+      }
+    },
+    {
+      "id": "c06",
+      "skill": "B",
+      "difficulty": "medium",
+      "source": "CJMC (Gray Jay) 2021 — Q6",
+      "text": "Waneek picks a two-digit number, subtracts the tens digit and then subtracts the ones digit to get a new number. For example if she had picked 37, she would get 37 − 3 − 7 = 27, so her new number would be 27. **How many different numbers can be formed using Waneek's process?**",
+      "choices": [
+        "9",
+        "10",
+        "11",
+        "90",
+        "99"
+      ],
+      "answer": 0,
+      "hints": [
+        "Write the number as 10a + b (tens digit a, ones digit b). What is left after subtracting a and b?",
+        "10a + b − a − b = 9a. So the result depends only on the tens digit.",
+        "How many choices are there for the tens digit of a two-digit number?"
+      ],
+      "traps": {
+        "3": "90 is how many two-digit numbers there are — but different numbers can give the same result: 37 → 27 and 31 → 27.",
+        "1": "To get 0 you would need a tens digit of 0, but then it isn't a two-digit number.",
+        "4": "99 would count numbers from 1 to 99, but the ones digit never changes the result."
+      },
+      "solution": [
+        "A number with tens digit a and ones digit b is 10a + b.",
+        "10a + b − a − b = 9a — the ones digit disappears!",
+        "a can be 1, 2, …, 9 → results 9, 18, 27, …, 81: **9 different numbers** → **(A)**."
+      ],
+      "idea": "Use algebra to see which digit really matters: the ones digit cancels."
+    },
+    {
+      "id": "c07",
+      "skill": "B",
+      "difficulty": "medium-hard",
+      "source": "CJMC (Gray Jay) 2021 — Q7",
+      "text": "The digits 1, 2, 3, 4, 5, 6 are used once each to make two three-digit numbers. **What is the smallest possible difference between these two numbers?**",
+      "choices": [
+        "31",
+        "39",
+        "47",
+        "60",
+        "76"
+      ],
+      "answer": 2,
+      "hints": [
+        "The hundreds digits matter most. How close can they be?",
+        "Make the hundreds digits consecutive. Then the bigger number's last two digits should be as small as possible and the smaller number's as big as possible.",
+        "Try 4__ and 3__ with the digits 1, 2, 5, 6 left: 412 − 365."
+      ],
+      "traps": {
+        "0": "Find two numbers that really give 31. With the hundreds digits 1 apart the difference is 100 − (big tail gap), and the biggest the tail gap can be is 53 (65 − 12).",
+        "1": "The same check: with hundreds digits 1 apart, the smallest gap is 100 − 53 = 47, so 39 can't happen."
+      },
+      "solution": [
+        "Hundreds digits must differ by at least 1. If they are exactly 1 apart: difference = 100 + (tail of big) − (tail of small).",
+        "Make the big tail small (12) and the small tail big (65): digits 1, 2, 5, 6 go in the tails, so the hundreds digits are 4 and 3.",
+        "412 − 365 = **47**. Other pairs of hundreds digits give 49 or more → **(C)**."
+      ],
+      "idea": "To make a difference small: equalise the big place values, then separate the small ones as much as possible."
+    },
+    {
+      "id": "c08",
+      "skill": "B",
+      "difficulty": "medium",
+      "source": "CJMC (Gray Jay) 2021 — Q8",
+      "text": "A square is broken up into smaller squares of side length 1, 2, 3, 4, or 5, as shown in the diagram. If a dart is thrown randomly at the square, **what is the probability that it strikes one of the squares with side length 2?**",
+      "choices": [
+        "[[4/81]]",
+        "[[3/10]]",
+        "[[6/25]]",
+        "[[4/27]]",
+        "[[2/3]]"
+      ],
+      "answer": 3,
+      "hints": [
+        "Probability here is area of the target ÷ area of the whole square. What is the side of the whole square?",
+        "The big square has side 5 + 4 = 9. How many squares of side 2 can you count?",
+        "Three squares of side 2: area 3 × 4 = 12. Then 12 ÷ 81."
+      ],
+      "traps": {
+        "0": "[[4/81]] is the area of just ONE 2 × 2 square. Count them: there are three.",
+        "1": "[[3/10]] counts squares (3 out of 10 pieces). But a dart is more likely to hit a big square — use areas, not the number of pieces."
+      },
+      "solution": [
+        "Side of the big square = 5 + 4 = 9, so its area is 81.",
+        "Squares with side 2: two stacked at the bottom and one on the right → 3 squares × 4 = 12.",
+        "Probability = [[12/81]] = **[[4/27]]** → **(D)**."
+      ],
+      "idea": "Dart probability = target area ÷ total area, never a count of pieces.",
+      "figure": {
+        "type": "squares"
+      },
+      "explorer": {
+        "type": "squares",
+        "count": true
+      }
+    },
+    {
+      "id": "c09",
+      "skill": "B",
+      "difficulty": "medium",
+      "source": "CJMC (Gray Jay) 2021 — Q9",
+      "text": "The 2021st number which is **not** divisible by 3 is…",
+      "choices": [
+        "2021",
+        "3019",
+        "3031",
+        "3033",
+        "6064"
+      ],
+      "answer": 2,
+      "hints": [
+        "Out of every 3 numbers in a row, how many are not multiples of 3?",
+        "2 out of every 3. So 2020 of these numbers (1010 groups of two) are used up by the time you reach 3030. What is the next number that is not a multiple of 3?",
+        "After 3030 (a multiple of 3), the next non-multiple is 3031."
+      ],
+      "traps": {
+        "0": "2021 would be the 2021st number overall. Many of the numbers on the way are multiples of 3 and don't count.",
+        "3": "3033 = 3 × 1011 is a multiple of 3 (3 + 0 + 3 + 3 = 9), so it can't be an answer.",
+        "1": "Up to 3019 there are 3019 − 1006 = 2013 numbers that are not multiples of 3 — the 2013th, not the 2021st."
+      },
+      "solution": [
+        "In every block 3k + 1, 3k + 2, 3k + 3 there are 2 numbers not divisible by 3.",
+        "2021 = 2 × 1010 + 1: after 1010 blocks (up to 3030) we have 2020 such numbers.",
+        "The next one, 3031, is the 2021st → **(C)**."
+      ],
+      "idea": "Count in blocks: 2 good numbers out of every 3."
+    },
+    {
+      "id": "c10",
+      "skill": "B",
+      "difficulty": "hard",
+      "source": "CJMC (Gray Jay) 2021 — Q10",
+      "text": "In the diagram, 9 identical copies of an isosceles triangle share a common vertex and fit together. **What is the difference between the largest and smallest angles in the identical triangles?**",
+      "choices": [
+        "60°",
+        "65°",
+        "70°",
+        "75°",
+        "80°"
+      ],
+      "answer": 0,
+      "hints": [
+        "The nine angles at the common vertex add up to 360°. Which angle of each triangle sits there?",
+        "Let the triangle be (apex a, base b, b) with a + 2b = 180. Some triangles use their apex at the centre, others a base angle.",
+        "Try 6 apex angles and 3 base angles: 6a + 3b = 360 with a = 180 − 2b."
+      ],
+      "traps": {
+        "4": "80° is the largest angle itself. The question asks for the difference between the largest (80°) and the smallest (20°)."
+      },
+      "solution": [
+        "Call the angles a (apex), b, b (base): a + 2b = 180. The picture shows three fans, each with two thin triangles (apex at the centre) and one wide one (base angle at the centre).",
+        "6a + 3b = 360 and a = 180 − 2b → 6a + 3(90 − a/2) = 360 → 4.5a = 90 → a = 20°, so b = 80°.",
+        "Largest 80°, smallest 20°: difference **60°** → **(A)**."
+      ],
+      "idea": "Angles around a point add to 360° — set up one equation with the right counts.",
+      "figure": {
+        "type": "fan"
+      }
+    },
+    {
+      "id": "c11",
+      "skill": "C",
+      "difficulty": "hard",
+      "source": "CJMC (Gray Jay) 2021 — Q11",
+      "text": "At the start of the day a vending machine had 42 sandwiches in it: 13 chicken sandwiches at $3 each, 14 cheese sandwiches at $3 each, 15 egg sandwiches at $2.50 each. At the end of the day the total money made was $61, of which $21 came from cheese sandwich sales. **What additional piece of information would allow us to solve the question “How many sandwiches of each type were left at the end of the day?”**",
+      "choices": [
+        "Total price of remaining sandwiches.",
+        "Number of remaining sandwiches.",
+        "Total price of sandwiches at the beginning of the day.",
+        "Number of remaining cheese sandwiches.",
+        "No additional information is needed."
+      ],
+      "answer": 1,
+      "hints": [
+        "First work out what is already known: how many cheese sandwiches were sold?",
+        "Chicken + egg sales were $61 − $21 = $40. List the ways 3c + 2.5e = 40 can happen (c ≤ 13, e ≤ 15).",
+        "There are two ways. How do they differ — in total value, or in how many sandwiches were sold?"
+      ],
+      "traps": {
+        "0": "The money left in the machine is always $118.50 − $61 = $57.50 — the same for both possibilities, so it can't tell them apart.",
+        "2": "The starting total ($118.50) can already be computed from the table, and it is the same either way.",
+        "3": "Cheese is already known: $21 ÷ $3 = 7 sold, so 7 remain — the same in both possibilities.",
+        "4": "Two different sales fit the facts (10 chicken + 4 egg, or 5 chicken + 10 egg), so something more is needed."
+      },
+      "solution": [
+        "Cheese sold: $21 ÷ $3 = 7, so 7 cheese remain.",
+        "Chicken + egg sales = $40: 3c + 2.5e = 40 → 6c + 5e = 80. Solutions: (c, e) = (10, 4) or (5, 10).",
+        "They leave 42 − 7 − 14 = 21 or 42 − 7 − 15 = 20 sandwiches. The **number of remaining sandwiches** tells them apart → **(B)**."
+      ],
+      "idea": "Before asking “what's missing?”, list ALL the possibilities that fit what you know.",
+      "figure": {
+        "type": "vending"
+      },
+      "explorer": {
+        "type": "vendcombos"
+      }
+    },
+    {
+      "id": "c12",
+      "skill": "C",
+      "difficulty": "hard",
+      "source": "CJMC (Gray Jay) 2021 — Q12",
+      "text": "Which of the numbers 3, 5, 11 and 37 is a divisor of **111 111 111 111 111 111 111** (twenty-one 1s)?",
+      "choices": [
+        "3, 11, 37",
+        "5, 11",
+        "3, 11",
+        "3, 37",
+        "3, 5, 11, 37"
+      ],
+      "answer": 3,
+      "hints": [
+        "Test each number on its own. The easiest tests first: 5 and 3.",
+        "The number ends in 1 — what does that say about 5? Add its digits for 3.",
+        "111 = 3 × 37, and the number is made of seven blocks of 111. For 11, compare the alternating digit sum."
+      ],
+      "traps": {
+        "0": "11 divides a number of repeated 1s only when the number of 1s is even (11, 1111, …). Here there are 21 — odd.",
+        "2": "11 doesn't work (21 ones is odd) — and 37 does.",
+        "1": "A number ending in 1 is never divisible by 5.",
+        "4": "5 and 11 both fail: it ends in 1, and 21 ones is an odd count."
+      },
+      "solution": [
+        "Ends in 1 → not divisible by 5.",
+        "Digit sum 21 → divisible by 3.",
+        "Write it as 111 × 1 001 001 … 001 (seven blocks). 111 = 3 × 37, so 3 and 37 divide it.",
+        "11: alternating sum of the digits = 1 − 1 + 1 − … + 1 = 1 (21 digits), not 0 → not divisible. → **(D)**."
+      ],
+      "idea": "Use divisibility tests, and split a long number into a nicer product."
+    },
+    {
+      "id": "c13",
+      "skill": "C",
+      "difficulty": "hard",
+      "source": "CJMC (Gray Jay) 2021 — Q13",
+      "text": "Right angled triangle ABC has its right angle at C, side AC has length 9 cm and side BC has length 12 cm. Points D and E are on AC so that AD = DE = EC. Similarly, points F and G are on AB so that AF = FG = GB. **What is the area of trapezoid DFGE?** Hint: the area of a triangle is A = b × h ÷ 2.",
+      "choices": [
+        "9 cm²",
+        "12 cm²",
+        "15 cm²",
+        "18 cm²",
+        "27 cm²"
+      ],
+      "answer": 3,
+      "hints": [
+        "Which sides of the trapezoid are parallel? Think about lines perpendicular to AC.",
+        "DF and EG are both parallel to BC. Use similar triangles: ADF is a small copy of ACB, and so is AEG.",
+        "DF = 4 cm (since AD is 1/3 of AC) and EG = 8 cm (AE is 2/3 of AC). The distance between them is DE = 3 cm."
+      ],
+      "traps": {
+        "4": "27 cm² is half of the big triangle (½ × 9 × 12 = 54, half = 27), but the trapezoid is smaller than that. Use trapezoid area = (sum of parallel sides) × height ÷ 2.",
+        "2": "Check by measuring: parallel sides 4 and 8, height 3 gives 18 — not 15."
+      },
+      "solution": [
+        "AD = 3 is one third of AC, so DF = one third of BC = 4 cm. AE = 6 is two thirds, so EG = 8 cm.",
+        "DF ∥ EG ∥ BC and the distance between them is DE = 3 cm.",
+        "Area = (4 + 8) × 3 ÷ 2 = **18 cm²** → **(D)**."
+      ],
+      "idea": "Similar triangles: points a third of the way along make a third-size copy.",
+      "figure": {
+        "type": "tri13"
+      }
+    },
+    {
+      "id": "c14",
+      "skill": "C",
+      "difficulty": "hard",
+      "source": "CJMC (Gray Jay) 2021 — Q14",
+      "text": "Two creeper plants, one golden hop and the other tea rose, are both climbing up and around a cylindrical tree trunk. The golden hop twists clockwise and the tea rose counterclockwise, and they both start at the same point on the ground. Before they reach the first tree branch, the golden hop has made 5 complete turns around the tree trunk and the tea rose has made 3 complete turns. The turns are equidistant for each creeper. **Without counting the ground and the first tree branch, how many times do the two creepers cross before reaching the first branch?**",
+      "choices": [
+        "6",
+        "7",
+        "8",
+        "9",
+        "10"
+      ],
+      "answer": 1,
+      "hints": [
+        "Imagine the trunk cut open and laid flat: each creeper becomes a set of diagonal lines.",
+        "Going in opposite directions, their turns add up: 5 + 3 = 8 turns of “meeting up” in total.",
+        "They meet at the start, at the end, and 8 − 1 = 7 times in between. Don't count the ends."
+      ],
+      "traps": {
+        "2": "8 includes the meeting at the branch itself — the question says not to count the ground or the branch.",
+        "3": "9 counts every meeting point, including both the ground and the first branch."
+      },
+      "solution": [
+        "Cut the trunk open: the golden hop is 5 diagonal runs one way, the tea rose is 3 runs the other way.",
+        "Two creepers going opposite ways meet every 1/(5 + 3) = 1/8 of the climb.",
+        "Meetings at 1/8, 2/8, …, 7/8 of the height: **7** (the 0/8 is the ground and the 8/8 is the branch) → **(B)**."
+      ],
+      "idea": "Opposite directions: add the turns. Then remove the two end points.",
+      "explorer": {
+        "type": "creep"
+      }
+    },
+    {
+      "id": "c15",
+      "skill": "C",
+      "difficulty": "hard",
+      "source": "CJMC (Gray Jay) 2021 — Q15",
+      "text": "Nick needs to fill in the picture as follows: in every hexagon within the bird outline, there is a zero or a one. The **sum** of the numbers on each diagonal is given above the picture and to the right, and the **product** of the numbers in each row is given along the side. Once the picture is completed, **how many zeros will there be?** Note: the shaded hexagons help to form the bird and are NOT part of the sum/product counts.",
+      "choices": [
+        "18",
+        "19",
+        "20",
+        "21",
+        "22"
+      ],
+      "answer": 1,
+      "hints": [
+        "Zeros = (number of white hexagons) − (number of ones). The number of ones is easy: look at the sums.",
+        "Add up all the sums on one family of diagonals: they all count the same ones. 6 + 2 + 2 + 3 + 2 + 5 + 7 + 3 = ?",
+        "There are 30 ones. Count the white hexagons row by row (4, 3, 4, 6, 4, 6, 5, 4, 4, 5, 4) and subtract."
+      ],
+      "traps": {
+        "0": "Check by counting: 49 white hexagons − 30 ones = 19. If you got 18, one white hexagon was probably missed.",
+        "3": "Shaded hexagons are not part of the puzzle: don't count them as zeros.",
+        "4": "Shaded hexagons are not part of the puzzle — 22 would include some of them."
+      },
+      "solution": [
+        "Every 1 lies on exactly one blue diagonal, so the number of ones = 6 + 2 + 2 + 3 + 2 + 5 + 7 + 3 = 30. (The green sums also add to 30 ✔.)",
+        "Count the white hexagons in each row: 4 + 3 + 4 + 6 + 4 + 6 + 5 + 4 + 4 + 5 + 4 = 49.",
+        "Zeros = 49 − 30 = **19** → **(B)**. (The puzzle can really be filled in, in exactly one way — see the picture after you answer.)"
+      ],
+      "idea": "You don't need to solve the whole puzzle: count the cells and use the total of the sums.",
+      "figure": {
+        "type": "hexpuzzle"
+      },
+      "explorer": {
+        "type": "hexsolved",
+        "ones": [
+          [
+            0,
+            2
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            -1
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            -2
+          ],
+          [
+            4,
+            2
+          ],
+          [
+            4,
+            3
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            5,
+            -3
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            6,
+            -3
+          ],
+          [
+            6,
+            3
+          ],
+          [
+            6,
+            4
+          ],
+          [
+            7,
+            -3
+          ],
+          [
+            7,
+            3
+          ],
+          [
+            8,
+            -3
+          ],
+          [
+            9,
+            -3
+          ],
+          [
+            9,
+            1
+          ],
+          [
+            10,
+            -3
+          ],
+          [
+            10,
+            -2
+          ],
+          [
+            10,
+            -1
+          ],
+          [
+            10,
+            0
+          ]
+        ]
+      }
+    }
+  ]
+}

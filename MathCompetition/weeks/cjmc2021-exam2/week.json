@@ -1,0 +1,30 @@
+{
+  "number": 8.5,
+  "label": "Exam 2",
+  "title": "CJMC 2021 · Gray Jay Past Exam",
+  "tagline": "The real 2021 Canadian Mathematical Gray Jay Competition paper: 15 questions, 90 minutes. Take it like the real thing, then learn from every question.",
+  "level": "G6–G7 · Past Exam",
+  "emoji": "📝",
+  "skills": ["Part A", "Part B", "Part C", "Timed"],
+  "credit": "Canadian Mathematical Gray Jay Competition (CJMC), November 2021 — © Canadian Mathematical Society. Retyped here for personal study; diagrams redrawn.",
+  "pages": [
+    {
+      "slug": "exam",
+      "type": "exam",
+      "file": "exercises.json",
+      "scripts": ["figures.js"],
+      "title": "Mock Exam",
+      "emoji": "⏱️",
+      "desc": "The full paper with a 90-minute timer, an answer sheet and the official scoring (4 / 5 / 7 points, blank = 1 point)."
+    },
+    {
+      "slug": "practice",
+      "type": "quiz",
+      "file": "exercises.json",
+      "scripts": ["figures.js"],
+      "title": "Question Bank",
+      "emoji": "🏋️",
+      "desc": "The same 15 questions, one at a time: 3-step hints, trap explanations, full solutions and interactive diagrams."
+    }
+  ]
+}
