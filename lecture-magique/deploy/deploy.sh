@@ -32,10 +32,31 @@ echo "▸ installing launchd service"
 mkdir -p "$HOME/Library/LaunchAgents" "$HOME/Library/Logs"
 sed -e "s#__APP__#$APP#g" -e "s#__HOME__#$HOME#g" "$APP/deploy/$LABEL.plist" > "$PLIST"
 chmod +x "$APP/deploy/run.sh"
-if launchctl print "gui/$(id -u)/$LABEL" >/dev/null 2>&1; then
-  launchctl bootout "gui/$(id -u)/$LABEL" || true
+plutil -lint "$PLIST" >/dev/null || { echo "✗ $PLIST is not a valid plist" >&2; exit 1; }
+DOMAIN="gui/$(id -u)"
+# Stop the running copy and wait until launchd has really unloaded it: starting it again too early
+# fails with "Bootstrap failed: 5: Input/output error".
+if launchctl print "$DOMAIN/$LABEL" >/dev/null 2>&1; then
+  launchctl bootout "$DOMAIN/$LABEL" 2>/dev/null || true
+  for i in $(seq 1 20); do
+    launchctl print "$DOMAIN/$LABEL" >/dev/null 2>&1 || break
+    sleep 0.5
+  done
 fi
-launchctl bootstrap "gui/$(id -u)" "$PLIST"
+# A service turned off with `launchctl disable` cannot be started until it is enabled again.
+launchctl enable "$DOMAIN/$LABEL" 2>/dev/null || true
+started=""
+for i in 1 2 3; do
+  if launchctl bootstrap "$DOMAIN" "$PLIST" 2>/dev/null; then started=1; break; fi
+  launchctl print "$DOMAIN/$LABEL" >/dev/null 2>&1 && { started=1; break; }  # already loaded: fine
+  sleep 2
+done
+if [ -z "$started" ]; then
+  echo "✗ launchd refused to start $LABEL. Details:" >&2
+  launchctl bootstrap "$DOMAIN" "$PLIST" || true
+  launchctl print-disabled "$DOMAIN" 2>/dev/null | grep -i "$LABEL" >&2 || true
+  exit 1
+fi
 
 PORT="$(grep -E '^PORT=' "$APP/.env" | cut -d= -f2 || true)"; PORT="${PORT:-8090}"
 for i in 1 2 3 4 5 6 7 8 9 10; do
