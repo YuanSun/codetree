@@ -3,16 +3,23 @@ import { api, Me } from "./api";
 import Login from "./components/Login";
 import Shelf from "./components/Shelf";
 import Reader from "./components/Reader";
+import Defi from "./components/Defi";
+import WordBag from "./components/WordBag";
 import { useTheme } from "./prefs";
 
 // Hash routes keep the server simple (no SPA fallback needed):
 //   #/                      bookshelf
 //   #/lire/<articleId>/<n>  chapter n of an article
-type Route = { name: "shelf" } | { name: "read"; articleId: number; seq: number };
+//   #/defi                  this week's challenge
+//   #/mots                  word bag
+type Route = { name: "shelf" } | { name: "read"; articleId: number; seq: number } | { name: "defi" } | { name: "mots" };
 
 function parse(hash: string): Route {
   const m = hash.match(/^#\/lire\/(\d+)\/(\d+)/);
-  return m ? { name: "read", articleId: +m[1], seq: +m[2] } : { name: "shelf" };
+  if (m) return { name: "read", articleId: +m[1], seq: +m[2] };
+  if (hash.startsWith("#/defi")) return { name: "defi" };
+  if (hash.startsWith("#/mots")) return { name: "mots" };
+  return { name: "shelf" };
 }
 
 export const go = (path: string) => {
@@ -40,5 +47,7 @@ export default function App() {
   if (me === null) return <Login onLogin={setMe} />;
   if (route.name === "read")
     return <Reader key={`${route.articleId}/${route.seq}`} articleId={route.articleId} seq={route.seq} theme={theme} />;
+  if (route.name === "defi") return <Defi theme={theme} />;
+  if (route.name === "mots") return <WordBag theme={theme} />;
   return <Shelf me={me} onLogout={() => api.logout().finally(() => setMe(null))} theme={theme} />;
 }

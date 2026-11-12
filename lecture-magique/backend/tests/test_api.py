@@ -117,7 +117,9 @@ def test_lookups_logged_idempotent_and_update_user_word(world):
     assert n == 3
     assert (e.self_rating, e.dwell_ms) == ("unknown", 1500)
     assert (w[lid].lookup_count, w[lid].status, w[lid].familiarity, w[lid].first_token_id) == (2, "learning", 0, tid)
-    assert w[lid].stability is None and w[lid].due_at is None  # FSRS untouched in phase 1
+    # Phase 2: the first tap is an FSRS "Again"; the second tap the same day is logged but not re-rated.
+    assert w[lid].stability is not None and w[lid].due_at is not None and w[lid].reps == 1
+    assert w[lid2].stability is None  # first tap "known": kept out of review
     assert (w[lid2].lookup_count, w[lid2].status) == (1, "known")
     d = c.get(f"/api/articles/{world['published']}/chapters/1").json()
     assert d["words"][str(lid)]["lookups"] == 2

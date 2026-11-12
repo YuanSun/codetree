@@ -220,6 +220,24 @@ pg_dump -d postgres --schema=lecture -Fc -f ~/Backups/lecture-$(date +%F).dump
 
 ---
 
+## Upgrading an existing install
+
+When a `git pull` brings new features (for example the Wiktionary conjugations, verb tenses and the weekly défi):
+
+```bash
+deploy/deploy.sh
+```
+
+This builds the front end and applies database migrations. Then, if you have not imported Wiktionary yet (step 5b),
+import it and re-match the books already on the shelf. The re-match keeps her lookups:
+
+```bash
+cd backend && uv run python -m importer.wiktionary && uv run python -m importer.article rematch
+```
+
+The site is also on the family gateway at `http://<mac>:12999/lecture/` once the hosting gateway is restarted
+(`hosting/run.sh`; check the config first with `caddy validate --config hosting/Caddyfile`).
+
 ## Later
 
 | Task | Command |

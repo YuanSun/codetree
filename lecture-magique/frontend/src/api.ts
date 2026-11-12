@@ -42,6 +42,29 @@ export type ChapterData = {
   progress: null | { last_chapter: number; last_paragraph: number; chapters_done: number[] };
 };
 
+export type QuizItem = {
+  id: number;
+  seq: number;
+  type: "meaning" | "cloze" | "definition" | "dictation";
+  prompt: { word?: string; sentence?: string; definition?: string; say?: string; hint?: string | null;
+            choices?: string[]; retry?: boolean };
+  answered: boolean;
+  correct: boolean | null;
+};
+export type Quiz = {
+  id: number; week_of: string; status: "open" | "done"; items: QuizItem[];
+  summary: { total: number; correct: number; gold: string[]; practice: string[] };
+};
+export type AnswerResult = {
+  correct: boolean; answer: string; hint: string | null; sentence: string | null; familiarity: number | null;
+  left: number; already: boolean;
+};
+export type BagWord = {
+  lemma_id: number; lemma: string; pos: string; gender: string | null; ipa: string | null;
+  group: "new" | "learning" | "mastered" | "known"; familiarity: number; lookups: number; due: string | null;
+  definition: string | null; gloss: string | null; sentence: string | null; surface: string | null;
+};
+
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);
@@ -81,6 +104,10 @@ export const api = {
   complete: (chapterId: number, openedAt: string) =>
     call<{ next_seq: number | null; exposures: number; finished: boolean; chapters_done: number[] }>(
       "POST", `/chapters/${chapterId}/complete`, { opened_at: openedAt }),
+  quiz: () => call<{ quiz: Quiz | null; message?: string }>("GET", "/quiz/current"),
+  answer: (itemId: number, response: string, responseMs: number) =>
+    call<AnswerResult>("POST", `/quiz/items/${itemId}/answer`, { response, response_ms: responseMs }),
+  words: () => call<BagWord[]>("GET", "/words"),
   conjugation: (lemmaId: number) => call<Conjugation>("GET", `/lemmas/${lemmaId}/conjugation`),
   lookups: (events: LookupEvent[], keepalive = false) =>
     call<{ accepted: string[]; duplicate: string[]; rejected: string[] }>("POST", "/lookups", { events }, keepalive),

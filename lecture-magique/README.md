@@ -4,7 +4,21 @@ A home French reading site for Grace. She reads an article chapter by chapter, t
 definition, and every tap is logged quietly so we can later see which words she struggles with (phase 2: spaced
 review). Design: [`docs/DESIGN.md`](docs/DESIGN.md). Engineering rules and phase scope: [`CLAUDE.md`](CLAUDE.md).
 
-**Phase 1 (this code): read, tap, record.** No LLM, no FSRS, no weekly quiz yet.
+**Done:** phase 1 (read, tap, record) and the review half of phase 2: Wiktionary conjugations and English glosses,
+the tense of each verb on the card, FSRS scheduling, the Monday *Défi de la semaine* and *Mon sac à mots*.
+**Not yet:** model-chosen senses, the parent's weekly report, phase 3 (open answers, writing).
+
+## How the weekly défi works
+
+- Every tap is an FSRS rating (*je ne connais pas* = Again, *ça me dit quelque chose* = Hard, *je connais* = Good;
+  first tap of a day only). Taps from before this feature are replayed from `lookup_event` the first time.
+- From Monday, the first visit to **⭐ Défi de la semaine** builds the week's défi: up to 15 words, first those due
+  before next Monday (most-forgotten first), then words never quizzed (most looked-up first), at most 5 new ones per
+  défi (the very first défi may use all 15).
+- Question types follow familiarity: English meaning / her own sentence with a blank → Petit Robert definition →
+  listen and spell (accents count). Answer wrong → Again; right within 8 s → Good (Easy when very fast on a familiar
+  word); right but slow → Hard. A wrong word comes back once at the end as another kind of question, logged only.
+- Familiarity 0-5 = FSRS stability once quizzed (<2 d, <7 d, <14 d, <30 d, ≥30 d = gold). Code: `backend/app/review.py`.
 
 ```
 backend/   FastAPI app (app/), importers (importer/), Alembic migration (migrations/), pytest suite (tests/)

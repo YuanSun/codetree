@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 from sqlalchemy import Connection, text
 
+from .. import review
 from ..auth import User, current_user
 from ..db import get_conn
 from .reading import visible_statuses
@@ -68,11 +69,13 @@ def post_lookups(batch: LookupBatch, user: User = Depends(current_user), conn: C
         if lemma_id is None:
             continue
         # First tap creates the word (familiarity 0); "known" on the first tap marks it known.
-        # FSRS fields stay NULL until phase 2 replays lookup_event.
+        # FSRS state is (re)built from lookup_event in app/review.py.
         conn.execute(text("""
             INSERT INTO lecture.user_word (user_id, lemma_id, status, familiarity, lookup_count, first_token_id, first_seen_at)
             VALUES (:u, :l, :status, 0, 1, :t, :at)
             ON CONFLICT (user_id, lemma_id) DO UPDATE SET lookup_count = lecture.user_word.lookup_count + 1"""),
             {"u": user.id, "l": lemma_id, "t": e.token_id, "at": at,
              "status": "known" if e.self_rating == "known" else "learning"})
+        # Spaced repetition: the tap is also an FSRS rating (first one of the day only; see app/review.py).
+        review.on_lookup(conn, user.id, lemma_id, e.self_rating, at)
     return {"accepted": accepted, "duplicate": duplicate, "rejected": rejected}
