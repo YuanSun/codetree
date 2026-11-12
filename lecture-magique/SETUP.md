@@ -3,12 +3,16 @@
 About 20 minutes. Run every command from the `lecture-magique/` folder unless a step says otherwise. Each step
 ends with a **Check**: don't move on until it passes.
 
+> ⚠️ **Keep the repo outside `~/Documents`, `~/Desktop`, `~/Downloads` and iCloud Drive** (e.g. in `~/Projects`).
+> macOS blocks launchd services from reading those folders; the site would fail with `Operation not permitted`.
+
 ## 0. What you need
 
 | Item | How to get it |
 |---|---|
 | `uv` and Node.js 18+ | `brew install uv node` |
 | Postgres running, database `postgres` with your `family_budget` schema | already there (your expense data) |
+| Internet access during setup | for Python packages, the spaCy model and the Wiktionary data (kaikki.org) |
 | The Petit Robert file | `Le_Nouveau_Petit_Robert_de_la_langue_francaise_2007.ld2`, anywhere on the Mac |
 | The book | `mega-trouille-content.zip` (sent separately, not in git) |
 
@@ -19,13 +23,19 @@ uv --version && node --version && psql -d postgres -c "\dn"
 ```
 
 The schema list should include `family_budget`. Nothing in that schema is touched: the site gets its own new
-schema, `lecture`, next to it in the same `postgres` database. On Homebrew Postgres, your macOS username is the admin
-(superuser) role, so `psql -d postgres` works without `-U`.
+schema, `lecture`, next to it in the same `postgres` database.
+
+If your Postgres admin role is not your macOS username (e.g. it is `RyanSun`), tell `psql` once, so every command
+in this guide uses it:
+
+```bash
+echo 'export PGUSER=RyanSun' >> ~/.zshrc && source ~/.zshrc
+```
 
 ## 1. Get the code and the book
 
 ```bash
-cd ~/path/to/codetree
+cd ~/Projects/codetree        # or: git clone https://github.com/YuanSun/codetree.git ~/Projects/codetree
 git pull
 cd lecture-magique
 mkdir -p content
@@ -125,6 +135,29 @@ psql -d postgres -c "SELECT s.sense_key, left(s.definition_fr, 45) FROM lecture.
 There should be 6 rows, and the `I.2` row starts with *Couper en enlevant une partie*. You can re-run the import
 safely: it updates entries, it never duplicates them.
 
+## 5b. Import Wiktionary: conjugations and English glosses (once, about a minute)
+
+Still in `backend/`. This streams the French Wiktionary extract from kaikki.org (~590 MB, not saved to disk) and
+adds every verb's conjugation table, noun/adjective forms (*beaux → beau*) and short English glosses:
+
+```bash
+uv run python -m importer.wiktionary
+```
+
+It prints a summary (`"forms": …, "glossed_lemmas": …`). With it, a conjugated verb such as *demande* is matched
+to **demander** instead of the noun *la demande*, the card shows its tense (*présent · il/elle*) and offers a
+**Conjugaison** table. Re-running it is safe. Offline? Download the file once
+(`curl -O https://kaikki.org/dictionary/French/kaikki.org-dictionary-French.jsonl`) and pass its path.
+
+**Check:**
+
+```bash
+psql -d postgres -c "SELECT l.lemma, f.tags FROM lecture.word_form f JOIN lecture.lemma l ON l.id = f.lemma_id
+  WHERE f.form = 'demande' AND l.pos = 'VERB'"
+```
+
+One row: `demander` with tags such as `ind.pres.1s, ind.pres.3s, subj.pres.3s …`.
+
 ## 6. Create the accounts
 
 Still in `backend/`. Each command asks for the password twice.
@@ -192,6 +225,7 @@ pg_dump -d postgres --schema=lecture -Fc -f ~/Backups/lecture-$(date +%F).dump
 | Task | Command |
 |---|---|
 | Update after a `git pull` | `deploy/deploy.sh` (or `deploy/deploy.sh --no-build` if only Python changed) |
+| Re-match words of books already imported (after a new Wiktionary/Robert import) | `cd backend && uv run python -m importer.article rematch` (keeps her lookups) |
 | Restart | `launchctl kickstart -k gui/$(id -u)/com.lecture-magique` |
 | Stop / start | `launchctl bootout gui/$(id -u)/com.lecture-magique` / `deploy/deploy.sh --no-build` |
 | Logs | `tail -f ~/Library/Logs/lecture-magique.log` |
@@ -202,6 +236,9 @@ pg_dump -d postgres --schema=lecture -Fc -f ~/Backups/lecture-$(date +%F).dump
 
 | Symptom | Cause and fix |
 |---|---|
+| `Operation not permitted` in the log | The repo is under `~/Documents` (or Desktop/Downloads/iCloud). Clone it to `~/Projects`, copy `.env` and `content/`, delete `backend/.venv`, run `deploy/deploy.sh`. |
+| `password authentication failed for user "ryan"` (or another name) during migration | `DATABASE_ADMIN_URL` in `.env` must use your real admin role (e.g. `RyanSun`). |
+| `Failed to spawn: alembic` | `backend/.venv` was copied from another folder. `rm -rf backend/.venv` and deploy again. |
 | `Missing …/.env` from deploy.sh | Step 3 not done, or `.env` isn't in `lecture-magique/`. |
 | `password authentication failed for user "lecture_app"` | The password in `DATABASE_URL` differs from step 2. Reset it: `psql -d postgres -c "ALTER ROLE lecture_app PASSWORD 'NEW'"` and update `.env`, then `launchctl kickstart -k gui/$(id -u)/com.lecture-magique`. |
 | `permission denied for table …` or `for schema lecture` in the log | Migrations ran as a different role than step 2. Run as admin: `psql -d postgres -c "GRANT USAGE ON SCHEMA lecture TO lecture_app; GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA lecture TO lecture_app; GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA lecture TO lecture_app;"` |
