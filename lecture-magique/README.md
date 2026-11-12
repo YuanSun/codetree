@@ -6,7 +6,10 @@ review). Design: [`docs/DESIGN.md`](docs/DESIGN.md). Engineering rules and phase
 
 **Done:** phase 1 (read, tap, record) and the review half of phase 2: Wiktionary conjugations and English glosses,
 the tense of each verb on the card, FSRS scheduling, the Monday *Défi de la semaine* and *Mon sac à mots*.
-**Not yet:** model-chosen senses, the parent's weekly report, phase 3 (open answers, writing).
+Children get **📊 Mes progrès** (their own data only). Parents get a **📊 Suivi** page (log in with a `parent` account): minutes read and words looked up per week,
+défi scores, the hardest words with the sentence where she met them, and books in progress. The same data is
+available in the terminal: `psql -d postgres -v kid=grace -f tools/progress.sql`.
+**Not yet:** model-chosen senses, phase 3 (open answers, writing).
 
 ## How the weekly défi works
 
@@ -68,6 +71,7 @@ Schema additions (all additive; flagged here because CLAUDE.md asks to raise dat
 | `lemma.homograph`, unique key `(lemma, pos, homograph)` instead of `(lemma, pos)` | Robert homographs (`1. livre` / `2. livre`) share lemma and POS |
 | `sense.seq` + unique `(lemma_id, source, seq)` | lets the dictionary import be an idempotent upsert, and fixes sense order |
 | `lookup_event.client_event_id` (unique UUID) + `received_at` | a batch the tablet retries is stored once; `created_at` is the tap time |
+| `reading_day` table (migration 0003) | reading seconds per child, book and day, for the weekly minutes chart (`reading_progress.seconds_read` keeps the per-book total) |
 | `token.morph` (migration 0002) | spaCy grammar of each occurrence (*Tense=Pres, Person=3…*), so the card shows the tense of the word in its sentence |
 
 Other choices:

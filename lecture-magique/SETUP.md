@@ -249,6 +249,7 @@ The site is also on the family gateway at `http://<mac>:12999/lecture/` once the
 | Logs | `tail -f ~/Library/Logs/lecture-magique.log` |
 | New password for Grace | `cd backend && uv run python -m app.cli set-password grace` |
 | Weekly article | see "Every week" in [README.md](README.md) |
+| See Grace's progress | log in as your parent account → **📊 Suivi**, or `psql -d postgres -v kid=grace -f tools/progress.sql` |
 
 ## If something goes wrong
 
@@ -256,6 +257,7 @@ The site is also on the family gateway at `http://<mac>:12999/lecture/` once the
 |---|---|
 | `Operation not permitted` in the log | The repo is under `~/Documents` (or Desktop/Downloads/iCloud). Clone it to `~/Projects`, copy `.env` and `content/`, delete `backend/.venv`, run `deploy/deploy.sh`. |
 | `password authentication failed for user "ryan"` (or another name) during migration | `DATABASE_ADMIN_URL` in `.env` must use your real admin role (e.g. `RyanSun`). |
+| `Bootstrap failed: 5: Input/output error` | launchd had not finished stopping the old copy, or the service was turned off with `launchctl disable`. `deploy.sh` now waits, re-enables and retries; on an older checkout run `launchctl enable gui/$(id -u)/com.lecture-magique` then `launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.lecture-magique.plist`. |
 | `Failed to spawn: alembic` | `backend/.venv` was copied from another folder. `rm -rf backend/.venv` and deploy again. |
 | `Missing …/.env` from deploy.sh | Step 3 not done, or `.env` isn't in `lecture-magique/`. |
 | `password authentication failed for user "lecture_app"` | The password in `DATABASE_URL` differs from step 2. Reset it: `psql -d postgres -c "ALTER ROLE lecture_app PASSWORD 'NEW'"` and update `.env`, then `launchctl kickstart -k gui/$(id -u)/com.lecture-magique`. |

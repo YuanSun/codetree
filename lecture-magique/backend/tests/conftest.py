@@ -63,7 +63,7 @@ def engine():
     eng.dispose()
 
 
-USER_TABLES = "lookup_event, user_word, reading_progress, review_log, answer, quiz_item, quiz, app_user"
+USER_TABLES = "lookup_event, user_word, reading_progress, reading_day, review_log, answer, quiz_item, quiz, app_user"
 CONTENT_TABLES = "token, paragraph, chapter, question, article, word_form, sense, lemma"
 
 
