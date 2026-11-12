@@ -28,6 +28,31 @@ echo "▸ migrating the lecture schema (DATABASE_ADMIN_URL)"
 # python -m alembic (not the alembic script) keeps working even if .venv was moved or copied
 (cd "$APP/backend" && uv run --frozen python -m alembic upgrade head)
 
+RUN_BY="$(grep -E '^RUN_BY=' "$APP/.env" | cut -d= -f2 | tr -d '[:space:]' || true)"
+if [ "$RUN_BY" = "gateway" ]; then
+  # Served by the family gateway (hosting/run.sh starts it): remove the separate service, restart the gateway.
+  echo "▸ RUN_BY=gateway: removing the separate launchd service, restarting the family gateway"
+  launchctl bootout "gui/$(id -u)/$LABEL" 2>/dev/null || true
+  rm -f "$PLIST"
+  for i in $(seq 1 20); do launchctl print "gui/$(id -u)/$LABEL" >/dev/null 2>&1 || break; sleep 0.5; done
+  GW=com.codetree.gateway
+  if launchctl print "gui/$(id -u)/$GW" >/dev/null 2>&1; then
+    launchctl kickstart -k "gui/$(id -u)/$GW"
+  else
+    echo "  The gateway service ($GW) is not installed: see hosting/README.md (section 4), or run hosting/run.sh." >&2
+    exit 0
+  fi
+  for i in $(seq 1 30); do
+    if curl -fs "http://127.0.0.1:${LECTURE_PORT:-8090}/api/health" >/dev/null; then
+      echo "✓ running behind the gateway: http://$(scutil --get LocalHostName 2>/dev/null || hostname).local:12999/lecture/"
+      exit 0
+    fi
+    sleep 1
+  done
+  echo "✗ not answering yet — see /tmp/codetree-gateway.log" >&2
+  exit 1
+fi
+
 echo "▸ installing launchd service"
 mkdir -p "$HOME/Library/LaunchAgents" "$HOME/Library/Logs"
 sed -e "s#__APP__#$APP#g" -e "s#__HOME__#$HOME#g" "$APP/deploy/$LABEL.plist" > "$PLIST"

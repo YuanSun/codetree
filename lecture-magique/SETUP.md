@@ -238,20 +238,21 @@ cd backend && uv run python -m importer.wiktionary && uv run python -m importer.
 The site is also on the family gateway at `http://<mac>:12999/lecture/` once the hosting gateway is restarted
 (`hosting/run.sh`; check the config first with `caddy validate --config hosting/Caddyfile`).
 
-## Serve it through the family gateway (optional)
+## Serve it from the family gateway (optional)
 
-The family gateway (`hosting/`, Caddy on port 12999) already routes `/lecture/` to this service, so the site is also
-at `http://<mac>.local:12999/lecture/`. To make that the **only** way in (port 8090 stops answering other devices):
+The family gateway (`hosting/`, Caddy on port 12999) can run Lecture Magique together with the other family sites.
+It is then at `http://<mac>.local:12999/lecture/` only, and port 8090 no longer answers other devices.
 
-1. Add `HOST=127.0.0.1` to `lecture-magique/.env`, then `deploy/deploy.sh --no-build`. It now reports
-   "running (this Mac only)".
-2. Install or reinstall the gateway from this checkout (it must not live under `~/Documents` either):
-   `cd ../hosting`, copy your old `hosting/.env` (or `cp env.example .env` + `caddy hash-password` for
-   `NOTES_HASH`), try `./run.sh` in the foreground, then install its launchd job (hosting/README.md, section 4).
+1. Install the gateway from this checkout, not from `~/Documents` (hosting/README.md: `.env`, `./run.sh` once in the
+   foreground, then section 4 for the launchd job).
+2. Add `RUN_BY=gateway` to `lecture-magique/.env` and run `deploy/deploy.sh --no-build`. It removes the separate
+   `com.lecture-magique` service, restarts the gateway (whose `run.sh` starts the site on `127.0.0.1`), and ends with
+   "running behind the gateway".
 3. On the iPad and Chromebook, replace the bookmark with `http://<mac>.local:12999/lecture/` and log in once.
 
-Keep the Lecture Magique service itself running: the gateway forwards to it. To undo, remove the `HOST` line and
-redeploy.
+After a `git pull`, `deploy/deploy.sh` keeps working the same way. To go back to the separate service, set
+`RUN_BY=launchd` and deploy again. (If you only want to close port 8090 but keep the separate service, use
+`HOST=127.0.0.1` instead.)
 
 ## Later
 

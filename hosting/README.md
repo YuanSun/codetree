@@ -11,7 +11,7 @@ address and one port. Reach it by whatever name the machine has (`mac-studio.loc
 | `/math/study/` | the same project's **School Study** track (normal class sheets, not contest prep) | same server and proxy rule as `/math/`; it has its own portal card, colours and navigation |
 | `/notes/` | Family Obsidian vault | static site built by [Quartz](https://quartz.jzhao.xyz); **password-protected** |
 | `/budget/` | [Family budget dashboard](../budget-advisor/budget-dashboard) | reverse proxy to its Streamlit app on `127.0.0.1:12997` (`--server.baseUrlPath budget`); **same login as the notes** |
-| `/lecture/` | [Lecture Magique](../lecture-magique) (French reading site) | reverse proxy to its own launchd service on `127.0.0.1:8090` (`LECTURE_PORT`); uses relative URLs, so the prefix is simply stripped; **its own login** (set up per [lecture-magique/SETUP.md](../lecture-magique/SETUP.md)) |
+| `/lecture/` | [Lecture Magique](../lecture-magique) (French reading site) | reverse proxy to `127.0.0.1:8090` (`LECTURE_PORT`). `run.sh` starts it (local-only) unless it already runs as its own service; set `RUN_BY=gateway` in `lecture-magique/.env` so its `deploy.sh` restarts the gateway instead. Relative URLs, so the prefix is simply stripped; **its own login** (set up per [lecture-magique/SETUP.md](../lecture-magique/SETUP.md)) |
 
 Because everything is a path on one host, there is no DNS or hosts-file setup on the devices that connect.
 Adding another project later = one more `handle_path` block in `Caddyfile` (static folder or `reverse_proxy`
