@@ -59,9 +59,14 @@ if [ -z "$started" ]; then
 fi
 
 PORT="$(grep -E '^PORT=' "$APP/.env" | cut -d= -f2 || true)"; PORT="${PORT:-8090}"
+HOST_SETTING="$(grep -E '^HOST=' "$APP/.env" | cut -d= -f2 || true)"
 for i in 1 2 3 4 5 6 7 8 9 10; do
   if curl -fs "http://127.0.0.1:$PORT/api/health" >/dev/null; then
-    echo "✓ running: http://$(scutil --get LocalHostName 2>/dev/null || hostname).local:$PORT/"
+    if [ "$HOST_SETTING" = "127.0.0.1" ]; then
+      echo "✓ running (this Mac only): open it through the gateway at http://$(scutil --get LocalHostName 2>/dev/null || hostname).local:12999/lecture/"
+    else
+      echo "✓ running: http://$(scutil --get LocalHostName 2>/dev/null || hostname).local:$PORT/"
+    fi
     exit 0
   fi
   sleep 1

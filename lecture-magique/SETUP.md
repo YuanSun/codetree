@@ -238,6 +238,21 @@ cd backend && uv run python -m importer.wiktionary && uv run python -m importer.
 The site is also on the family gateway at `http://<mac>:12999/lecture/` once the hosting gateway is restarted
 (`hosting/run.sh`; check the config first with `caddy validate --config hosting/Caddyfile`).
 
+## Serve it through the family gateway (optional)
+
+The family gateway (`hosting/`, Caddy on port 12999) already routes `/lecture/` to this service, so the site is also
+at `http://<mac>.local:12999/lecture/`. To make that the **only** way in (port 8090 stops answering other devices):
+
+1. Add `HOST=127.0.0.1` to `lecture-magique/.env`, then `deploy/deploy.sh --no-build`. It now reports
+   "running (this Mac only)".
+2. Install or reinstall the gateway from this checkout (it must not live under `~/Documents` either):
+   `cd ../hosting`, copy your old `hosting/.env` (or `cp env.example .env` + `caddy hash-password` for
+   `NOTES_HASH`), try `./run.sh` in the foreground, then install its launchd job (hosting/README.md, section 4).
+3. On the iPad and Chromebook, replace the bookmark with `http://<mac>.local:12999/lecture/` and log in once.
+
+Keep the Lecture Magique service itself running: the gateway forwards to it. To undo, remove the `HOST` line and
+redeploy.
+
 ## Later
 
 | Task | Command |
