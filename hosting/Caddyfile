@@ -4,6 +4,7 @@
 #     /        portal        /fund/   Fund Accounting Academy
 #     /math/   MathCompetition (contest lab; /math/study/ = school study)        /notes/  family notes (password)
 #     /budget/ family budget dashboard (Streamlit + Postgres, password)
+#     /lecture/ Lecture Magique French reading site (its own login)
 # TLS is NOT handled here: Cloudflare Tunnel / Tailscale terminate it, so Caddy speaks plain HTTP.
 {
 	auto_https off
@@ -48,6 +49,15 @@ http://:{$GATEWAY_PORT:12999} {
 		reverse_proxy 127.0.0.1:{$MATH_PORT:12998}
 	}
 
+	# Lecture Magique (FastAPI, own launchd service on :8090, see lecture-magique/SETUP.md). The prefix is
+	# stripped; the app uses relative URLs so it works under /lecture/. No basic_auth: the site has its own
+	# login, and the child would otherwise need two passwords. Petit Robert content: keep this off the
+	# public internet (if the gateway is ever exposed, put /lecture/ behind Cloudflare Access too).
+	redir /lecture /lecture/
+	handle_path /lecture/* {
+		reverse_proxy 127.0.0.1:{$LECTURE_PORT:8090}
+	}
+
 	# Family Obsidian notes (static site from build-notes.sh). Private: password-protected here;
 	# also put Cloudflare Access / Tailscale in front before exposing it beyond your home network.
 	redir /notes /notes/
@@ -77,7 +87,7 @@ http://:{$GATEWAY_PORT:12999} {
 	# /notes/some/page), the click arrives here with the notes page as Referer. Send it back under /notes/.
 	@notes_stray {
 		header_regexp Referer ^https?://[^/]+/notes/
-		not path / /fund/* /math/* /budget/* /notes/*
+		not path / /fund/* /math/* /budget/* /notes/* /lecture/*
 	}
 	handle @notes_stray {
 		redir /notes{uri} 302

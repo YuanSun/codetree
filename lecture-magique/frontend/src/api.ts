@@ -39,7 +39,8 @@ export class ApiError extends Error {
 }
 
 async function call<T>(method: string, path: string, body?: unknown, keepalive = false): Promise<T> {
-  const res = await fetch(`/api${path}`, {
+  // Relative URL ("api/..."): resolves to /api/... on port 8090 and to /lecture/api/... behind the gateway.
+  const res = await fetch(`api${path}`, {
     method,
     credentials: "same-origin",
     headers: body === undefined ? {} : { "Content-Type": "application/json" },
