@@ -19,6 +19,9 @@
   --seen: #b69de8;
   --active: #fff1c9;
   --shadow: 0 10px 30px rgba(27, 33, 80, 0.14), 0 2px 6px rgba(27, 33, 80, 0.08);
+  /* chart series (validated with the dataviz palette checks against the card surface) */
+  --chart-1: #008a7e;
+  --chart-2: #6250d6;
   --ui: ui-rounded, "SF Pro Rounded", "Nunito", "Segoe UI", system-ui, -apple-system, sans-serif;
   --read: "Iowan Old Style", "Palatino", "Book Antiqua", Georgia, "Times New Roman", serif;
   color-scheme: light;
@@ -39,6 +42,8 @@
   --seen: #8f7ac9;
   --active: #4a3c1c;
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  --chart-1: #1f9d8f;
+  --chart-2: #9085e9;
   color-scheme: dark;
 }
 
@@ -277,7 +282,51 @@ button { font: inherit; color: inherit; }
 .f5 .dots span.on { background: #c98f00; }
 .fk { border-left-color: var(--grape); opacity: 0.85; }
 
+/* ---------- suivi (parents) ---------- */
+.quick-btn.suivi { background: linear-gradient(135deg, var(--sky-l), var(--card)); }
+.suivi { max-width: 960px; margin: 0 auto; padding: 16px 16px 48px; }
+.suivi-name { color: var(--ink); margin: 10px 0; }
+.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.tile { padding: 14px 16px; }
+.tile-value { font-size: 2rem; font-weight: 800; color: var(--ink); line-height: 1.1; }
+.tile-label { font-weight: 700; color: var(--text); font-size: 0.9rem; }
+.charts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 14px; }
+.chart { margin: 0; background: var(--card); border-radius: 20px; box-shadow: var(--shadow); padding: 12px 14px; }
+.chart figcaption { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.chart-title { font-weight: 800; color: var(--ink); font-size: 0.95rem; }
+.chart-wrap { position: relative; }
+.chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+.chart .grid { stroke: var(--line); stroke-width: 1; }
+.chart .axis { stroke: var(--muted); stroke-width: 1; opacity: 0.6; }
+.chart .tick { fill: var(--muted); font-size: 12px; font-family: var(--ui); }
+.chart .val { fill: var(--text); font-size: 13px; font-weight: 700; font-family: var(--ui); }
+.chart .bar.c1 { fill: var(--chart-1); }
+.chart .bar.c2 { fill: var(--chart-2); }
+.chart .bar { stroke: var(--card); stroke-width: 2px; paint-order: stroke; }
+.chart .bar.on { opacity: 0.85; }
+.chart .hit { fill: transparent; cursor: pointer; }
+.tooltip { position: absolute; bottom: calc(100% + 4px); transform: translateX(-50%); background: var(--ink); color: var(--paper);
+  font-size: 0.8rem; padding: 6px 9px; border-radius: 8px; pointer-events: none; white-space: nowrap; z-index: 2; }
+.chart-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 6px; }
+.chart-table th { text-align: left; font-weight: 600; color: var(--muted); padding: 3px 0; }
+.chart-table td { text-align: right; padding: 3px 0; }
+.hard-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.hard { padding: 14px 16px; display: grid; gap: 6px; }
+.hard-head { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.hard-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+.pill { font-size: 0.78rem; font-weight: 700; background: var(--sky-l); color: var(--ink); border-radius: 999px; padding: 2px 9px; }
+.pill.bad { background: var(--rose-l); color: var(--rose); }
+.hard-def { margin: 0; font-size: 0.92rem; }
+.book-row { display: grid; grid-template-columns: 1fr 160px auto; gap: 12px; align-items: center; padding: 12px 16px; margin-bottom: 10px; }
+.progress.small-bar { margin: 0; height: 8px; }
+
+@media (max-width: 900px) {
+  .tiles { grid-template-columns: repeat(2, 1fr); }
+  .charts { grid-template-columns: 1fr; }
+}
 @media (max-width: 640px) {
+  .hard-list { grid-template-columns: 1fr; }
+  .book-row { grid-template-columns: 1fr; }
   .quick { grid-template-columns: 1fr; }
   .choices { grid-template-columns: 1fr; }
   .page { font-size: 20px; padding: 16px 16px 56px; }

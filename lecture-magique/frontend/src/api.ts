@@ -65,6 +65,21 @@ export type BagWord = {
   definition: string | null; gloss: string | null; sentence: string | null; surface: string | null;
 };
 
+export type ChildReport = {
+  child: { id: number; display_name: string };
+  bag: { new: number; learning: number; mastered: number; known: number; due_soon: number };
+  weeks: {
+    week: string; taps: number; words: number; unknown: number; active_days: number; minutes: number;
+    defi: null | { status: string; questions: number; answered: number; correct: number };
+  }[];
+  hard_words: {
+    lemma: string; pos: string; lookups: number; lapses: number; familiarity: number; errors: number; asked: number;
+    definition: string | null; gloss: string | null; sentence: string | null; surface: string | null; since: string;
+  }[];
+  books: { title: string; chapters_done: number; chapters: number; last_chapter: number; minutes: number;
+           finished: boolean; started: string; lookups: number }[];
+};
+
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);
@@ -108,6 +123,8 @@ export const api = {
   answer: (itemId: number, response: string, responseMs: number) =>
     call<AnswerResult>("POST", `/quiz/items/${itemId}/answer`, { response, response_ms: responseMs }),
   words: () => call<BagWord[]>("GET", "/words"),
+  children: () => call<{ id: number; username: string; display_name: string }[]>("GET", "/parent/children"),
+  report: (childId: number, weeks = 8) => call<ChildReport>("GET", `/parent/children/${childId}/report?weeks=${weeks}`),
   conjugation: (lemmaId: number) => call<Conjugation>("GET", `/lemmas/${lemmaId}/conjugation`),
   lookups: (events: LookupEvent[], keepalive = false) =>
     call<{ accepted: string[]; duplicate: string[]; rejected: string[] }>("POST", "/lookups", { events }, keepalive),

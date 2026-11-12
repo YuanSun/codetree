@@ -249,6 +249,7 @@ The site is also on the family gateway at `http://<mac>:12999/lecture/` once the
 | Logs | `tail -f ~/Library/Logs/lecture-magique.log` |
 | New password for Grace | `cd backend && uv run python -m app.cli set-password grace` |
 | Weekly article | see "Every week" in [README.md](README.md) |
+| See Grace's progress | log in as your parent account → **📊 Suivi**, or `psql -d postgres -v kid=grace -f tools/progress.sql` |
 
 ## If something goes wrong
 

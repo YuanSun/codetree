@@ -131,6 +131,11 @@ def put_progress(article_id: int, body: ProgressIn, user: User = Depends(current
         ON CONFLICT (user_id, article_id) DO UPDATE SET last_chapter = :c, last_paragraph = :p,
             seconds_read = lecture.reading_progress.seconds_read + :s"""),
                  {"u": user.id, "a": article_id, "c": body.chapter, "p": body.paragraph, "s": seconds})
+    if seconds:
+        conn.execute(text("""
+            INSERT INTO lecture.reading_day (user_id, article_id, day, seconds) VALUES (:u, :a, current_date, :s)
+            ON CONFLICT (user_id, day, article_id) DO UPDATE SET seconds = lecture.reading_day.seconds + :s"""),
+                     {"u": user.id, "a": article_id, "s": seconds})
     return {"ok": True}
 
 

@@ -51,6 +51,11 @@ export default function Shelf({ me, onLogout, theme }: {
         <button className="card quick-btn bag" onClick={() => go("/mots")}>
           <span className="qi">👜</span><span><b>Mon sac à mots</b><br /><span className="small muted">Tous les mots que tu as cherchés</span></span>
         </button>
+        {(me.role === "parent" || me.role === "admin") && (
+          <button className="card quick-btn suivi" onClick={() => go("/suivi")}>
+            <span className="qi">📊</span><span><b>Suivi</b><br /><span className="small muted">Progrès des enfants (parents)</span></span>
+          </button>
+        )}
       </div>
       <h2 className="shelf-title">Ma bibliothèque</h2>
       {error && <p className="error">{error}</p>}

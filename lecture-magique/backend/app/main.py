@@ -8,11 +8,11 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
 from .config import settings
-from .routers import auth, lookups, reading, review
+from .routers import auth, lookups, parent, reading, review
 
 app = FastAPI(title="Lecture Magique", docs_url="/api/docs", openapi_url="/api/openapi.json")
 app.add_middleware(GZipMiddleware, minimum_size=1000)
-for r in (auth.router, reading.router, lookups.router, review.router):
+for r in (auth.router, reading.router, lookups.router, review.router, parent.router):
     app.include_router(r, prefix="/api")
 
 
