@@ -92,7 +92,7 @@ def test_chapter_payload_has_everything_for_instant_cards(world):
     assert d["chapter"]["seq"] == 1 and len(d["chapters"]) == 2
     assert d["question"].startswith("Pourquoi")
     for p in d["paragraphs"]:
-        for tid, s, e, lemma_id, sense_id in p["tokens"]:
+        for tid, s, e, lemma_id, sense_id, morph in p["tokens"]:
             if lemma_id:
                 lem = d["lemmas"][str(lemma_id)]
                 assert sense_id in lem["senses"]

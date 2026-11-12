@@ -54,6 +54,7 @@ Schema additions (all additive; flagged here because CLAUDE.md asks to raise dat
 | `lemma.homograph`, unique key `(lemma, pos, homograph)` instead of `(lemma, pos)` | Robert homographs (`1. livre` / `2. livre`) share lemma and POS |
 | `sense.seq` + unique `(lemma_id, source, seq)` | lets the dictionary import be an idempotent upsert, and fixes sense order |
 | `lookup_event.client_event_id` (unique UUID) + `received_at` | a batch the tablet retries is stored once; `created_at` is the tap time |
+| `token.morph` (migration 0002) | spaCy grammar of each occurrence (*Tense=Pres, Person=3…*), so the card shows the tense of the word in its sentence |
 
 Other choices:
 
@@ -69,6 +70,11 @@ Other choices:
 - The card also offers “Autres sens” (collapsed): until phase 2 picks the sense per sentence, the first Robert sense
   is often not the one in the text (the `entamer` case).
 - Chapter-end question is shown as something to think about only; answers are phase 3.
+- Wiktionary (`importer.wiktionary`, kaikki.org extract, CC BY-SA) supplies conjugation tables and inflected forms
+  as `word_form` rows with codes like `ind.pres.3s`, plus English glosses as `sense` rows with
+  `source='wiktionary_en'`. Verbs/nouns/adjectives missing from Petit Robert get a lemma row. When spaCy tags a word
+  as a verb, the matcher prefers verb forms, so *demande* → **demander** rather than the noun.
+  `importer.article rematch` re-matches already-imported books in place (token ids, hence lookups, are kept).
 - `focus_words` in a pack are reported but not stored yet (no table for them until the phase 2 quiz).
 
 ## Not verified here

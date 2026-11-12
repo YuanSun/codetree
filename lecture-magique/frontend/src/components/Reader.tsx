@@ -143,7 +143,7 @@ export default function Reader({ articleId, seq, theme }: {
     const tid = Number(span.dataset.t);
     const tok = tokenIndex.current.get(tid);
     if (!tok) return;
-    const [, , , lemmaId, senseId] = tok;
+    const [, , , lemmaId, senseId, morph] = tok;
     const root = rootRef.current!.getBoundingClientRect();
     const r = span.getBoundingClientRect();
     const sheet = window.innerWidth < 640;
@@ -154,7 +154,7 @@ export default function Reader({ articleId, seq, theme }: {
       ? { left, top: r.bottom - root.top + 8, width }
       : { left, bottom: root.bottom - r.top + 8, width };
     setCard({
-      tokenId: tid, surface: span.textContent ?? "", senseId,
+      tokenId: tid, surface: span.textContent ?? "", senseId, morph, lemmaId,
       lemma: lemmaId ? data.lemmas[lemmaId] ?? null : null,
       word: lemmaId ? words[lemmaId] ?? null : null,
       openedAt: performance.now(), style, sheet,

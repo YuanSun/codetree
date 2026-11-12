@@ -1,6 +1,8 @@
 import { CSSProperties, forwardRef, useState } from "react";
 import { Lemma, Sense, WordState } from "../api";
+import { parseMorph, tenseKey, tenseLabel } from "../grammar";
 import { canSpeak, speak } from "../speech";
+import ConjugationTable from "./ConjugationTable";
 
 const POS_FR: Record<string, string> = {
   VERB: "v.", AUX: "v.", NOUN: "n.", PROPN: "n. pr.", ADJ: "adj.", ADV: "adv.", ADP: "prép.", PRON: "pron.",
@@ -12,8 +14,10 @@ export type Rating = "unknown" | "vague" | "known";
 export type CardInfo = {
   tokenId: number;
   surface: string;
+  lemmaId: number | null;
   lemma: Lemma | null;
   senseId: number | null;
+  morph: string | null;
   word: WordState | null;
 };
 
@@ -33,9 +37,14 @@ type Props = {
 
 const WordCard = forwardRef<HTMLDivElement, Props>(function WordCard({ info, senses, style, sheet, onRate }, ref) {
   const [showOthers, setShowOthers] = useState(false);
+  const [showConj, setShowConj] = useState(false);
   const { lemma } = info;
   const chosen = info.senseId ? senses[info.senseId] : lemma?.senses.length ? senses[lemma.senses[0]] : undefined;
   const others = lemma ? lemma.senses.filter((id) => id !== info.senseId && senses[id]) : [];
+  const isVerb = lemma?.pos === "VERB" || lemma?.pos === "AUX";
+  const tense = isVerb ? tenseLabel(info.morph) : null;
+  // English (Wiktionary) only when Petit Robert has nothing for this word.
+  const english = chosen?.def ? null : chosen?.en ?? lemma?.en[0] ?? null;
 
   return (
     <div ref={ref} className={`word-card${sheet ? " sheet" : ""}`} style={style} role="dialog" aria-label={info.surface}>
@@ -49,6 +58,7 @@ const WordCard = forwardRef<HTMLDivElement, Props>(function WordCard({ info, sen
               {lemma.ipa && <span className="wc-ipa"> [{lemma.ipa}]</span>}
             </div>
           )}
+          {tense && <div className="wc-tense">{tense}</div>}
         </div>
         {canSpeak() && (
           <button className="btn icon speak" aria-label="Écouter (espace)" title="Écouter (espace)"
@@ -56,7 +66,7 @@ const WordCard = forwardRef<HTMLDivElement, Props>(function WordCard({ info, sen
         )}
       </div>
 
-      {chosen ? (
+      {chosen?.def ? (
         <div className="wc-sense">
           {chosen.key && <span className="sense-key">{chosen.key}</span>}
           <span className="wc-def">{chosen.def}</span>
@@ -64,8 +74,22 @@ const WordCard = forwardRef<HTMLDivElement, Props>(function WordCard({ info, sen
             <ul className="wc-ex">{chosen.ex.slice(0, 3).map((e, i) => <li key={i}>{e}</li>)}</ul>
           )}
         </div>
+      ) : english ? (
+        <p className="wc-en"><span className="en-tag">EN</span> {english}</p>
       ) : (
         <p className="muted small">Ce mot n’est pas encore dans le dictionnaire. On le note quand même !</p>
+      )}
+
+      {isVerb && info.lemmaId && (
+        <div className="wc-conj">
+          <button className="link" onClick={() => setShowConj(!showConj)}>
+            {showConj ? "Masquer la conjugaison" : "Conjugaison"}
+          </button>
+          {showConj && (
+            <ConjugationTable lemmaId={info.lemmaId} surface={info.surface}
+                              initialTense={tenseKey(parseMorph(info.morph))} />
+          )}
+        </div>
       )}
 
       {others.length > 0 && (

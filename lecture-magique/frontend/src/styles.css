@@ -185,6 +185,20 @@ button { font: inherit; color: inherit; }
 .wc-others { margin-top: 6px; }
 .wc-other-list { margin: 4px 0 0; padding-left: 1.3em; font-size: 0.92rem; color: var(--muted); }
 .wc-other-list li { margin-bottom: 4px; }
+.wc-tense { margin-top: 3px; font-size: 0.9rem; font-weight: 700; color: var(--sky); }
+.wc-en { margin: 10px 0 0; }
+.en-tag { font-size: 0.7rem; font-weight: 800; background: var(--sky-l); color: var(--sky); border-radius: 6px; padding: 1px 6px; }
+.wc-conj { margin-top: 4px; }
+.conj { margin-top: 6px; }
+.conj-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.chip { border: 0; border-radius: 999px; padding: 0.35em 0.8em; font-size: 0.8rem; font-weight: 700;
+  background: var(--sky-l); color: var(--ink); cursor: pointer; min-height: 32px; }
+.chip.on { background: var(--sky); color: #fff; }
+.conj-table { border-collapse: collapse; width: 100%; font-size: 0.98rem; }
+.conj-table th { text-align: right; font-weight: 600; color: var(--muted); padding: 3px 10px 3px 0; width: 5.5em; white-space: nowrap; }
+.conj-table td { font-family: var(--read); padding: 3px 0; }
+.conj-table .me { background: var(--active); border-radius: 4px; padding: 0 3px; font-weight: 700; }
+.conj-foot { font-size: 0.82rem; margin: 8px 0 0; }
 .wc-seen { margin: 8px 0 0; font-size: 0.86rem; color: var(--mint); font-weight: 700; }
 .wc-rate { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
 .btn.rate { font-size: 0.86rem; padding: 0.55em 0.4em; line-height: 1.2; }

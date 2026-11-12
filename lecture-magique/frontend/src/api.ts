@@ -13,11 +13,21 @@ export type ArticleCard = {
   progress: null | { last_chapter: number; chapters_done: number[]; seconds_read: number; finished: boolean };
 };
 
-// [token_id, char_start, char_end, lemma_id, sense_id]
-export type TokenTuple = [number, number, number, number | null, number | null];
+// [token_id, char_start, char_end, lemma_id, sense_id, morph (verb forms only, e.g. "Mood=Ind|…|Tense=Pres")]
+export type TokenTuple = [number, number, number, number | null, number | null, string | null];
 
-export type Lemma = { lemma: string; pos: string; gender: string | null; ipa: string | null; senses: number[] };
-export type Sense = { key: string | null; def: string | null; ex: string[] };
+// en: English glosses from Wiktionary (shown when Petit Robert has no entry)
+export type Lemma = { lemma: string; pos: string; gender: string | null; ipa: string | null; senses: number[]; en: string[] };
+export type Sense = { key: string | null; def: string | null; ex: string[]; en?: string };
+
+export type Conjugation = {
+  lemma: string;
+  infinitive: string[];
+  participle_present: string[];
+  participle_past: string[];
+  tenses: { key: string; label: string; forms: Record<string, string[]> }[];
+  source: string;
+};
 export type WordState = { status: string; familiarity: number; lookups: number; exposures: number };
 
 export type ChapterData = {
@@ -71,6 +81,7 @@ export const api = {
   complete: (chapterId: number, openedAt: string) =>
     call<{ next_seq: number | null; exposures: number; finished: boolean; chapters_done: number[] }>(
       "POST", `/chapters/${chapterId}/complete`, { opened_at: openedAt }),
+  conjugation: (lemmaId: number) => call<Conjugation>("GET", `/lemmas/${lemmaId}/conjugation`),
   lookups: (events: LookupEvent[], keepalive = false) =>
     call<{ accepted: string[]; duplicate: string[]; rejected: string[] }>("POST", "/lookups", { events }, keepalive),
 };
