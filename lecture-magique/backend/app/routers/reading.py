@@ -57,16 +57,19 @@ def get_chapter(article_id: int, seq: int, user: User = Depends(current_user), c
     paras = conn.execute(text("SELECT id, seq, text FROM lecture.paragraph WHERE chapter_id = :c ORDER BY seq"),
                          {"c": ch.id}).all()
     toks = conn.execute(text("""
-        SELECT t.id, t.paragraph_id, t.char_start, t.char_end, t.lemma_id, t.sense_id
+        SELECT t.id, t.paragraph_id, t.char_start, t.char_end, t.lemma_id, t.sense_id, t.morph
         FROM lecture.token t JOIN lecture.paragraph p ON p.id = t.paragraph_id
         WHERE p.chapter_id = :c AND t.is_word ORDER BY t.paragraph_id, t.seq"""), {"c": ch.id}).all()
     by_para: dict[int, list] = {}
     for t in toks:
-        by_para.setdefault(t.paragraph_id, []).append([t.id, t.char_start, t.char_end, t.lemma_id, t.sense_id])
+        # 6th element: spaCy grammar of this occurrence, only for verb forms (tense/person on the card)
+        morph = t.morph if t.morph and "VerbForm=" in t.morph else None
+        by_para.setdefault(t.paragraph_id, []).append(
+            [t.id, t.char_start, t.char_end, t.lemma_id, t.sense_id, morph])
 
     lemma_ids = sorted({t.lemma_id for t in toks if t.lemma_id})
     chosen = {t.sense_id for t in toks if t.sense_id}
-    lemmas = {r.id: {"lemma": r.lemma, "pos": r.pos, "gender": r.gender, "ipa": r.ipa, "senses": []}
+    lemmas = {r.id: {"lemma": r.lemma, "pos": r.pos, "gender": r.gender, "ipa": r.ipa, "senses": [], "en": []}
               for r in conn.execute(text("SELECT id, lemma, pos, gender, ipa FROM lecture.lemma WHERE id = ANY(:ids)"),
                                     {"ids": lemma_ids})}
     senses = {}
@@ -80,6 +83,14 @@ def get_chapter(article_id: int, seq: int, user: User = Depends(current_user), c
         lemmas[s.lemma_id]["senses"].append(s.id)
         senses[s.id] = {"key": s.sense_key, "def": s.definition_fr,
                         "ex": (s.examples or [])[:EXAMPLES_SHOWN]}
+    # English glosses from Wiktionary: shown on the card only when Petit Robert has no entry.
+    for s in conn.execute(text("""
+            SELECT id, lemma_id, gloss_en, seq FROM lecture.sense
+            WHERE lemma_id = ANY(:ids) AND source = 'wiktionary_en' AND seq < 2 ORDER BY lemma_id, seq"""),
+            {"ids": lemma_ids}):
+        lemmas[s.lemma_id]["en"].append(s.gloss_en)
+        if s.id in chosen:
+            senses[s.id] = {"key": None, "def": None, "ex": [], "en": s.gloss_en}
     words = {r.lemma_id: {"status": r.status, "familiarity": r.familiarity, "lookups": r.lookup_count,
                           "exposures": r.exposure_count}
              for r in conn.execute(text("""SELECT lemma_id, status, familiarity, lookup_count, exposure_count
@@ -172,3 +183,26 @@ def complete_chapter(chapter_id: int, body: CompleteIn | None = None, user: User
             WHERE user_id = :u AND article_id = :a"""), {"u": user.id, "a": ch.article_id})
     return {"next_seq": next_seq, "exposures": exposures, "finished": finished,
             "chapters_done": sorted(row.chapters_done)}
+
+
+@router.get("/lemmas/{lemma_id}/conjugation")
+def conjugation(lemma_id: int, user: User = Depends(current_user), conn: Connection = Depends(get_conn)):
+    """Conjugation table of a verb, built from Wiktionary forms (importer.wiktionary)."""
+    from importer.wiktionary import PERSONS, TENSES
+
+    lem = conn.execute(text("SELECT id, lemma, pos FROM lecture.lemma WHERE id = :l"), {"l": lemma_id}).first()
+    if not lem or lem.pos != "VERB":
+        raise HTTPException(404, "Pas un verbe")
+    cells: dict[str, list[str]] = {}
+    for form, tags in conn.execute(text("SELECT form, tags FROM lecture.word_form WHERE lemma_id = :l ORDER BY form"),
+                                   {"l": lemma_id}):
+        for code in tags or []:
+            cells.setdefault(code, []).append(form)
+    tenses = []
+    for key, label in TENSES:
+        row = {p: cells.get(f"{key}.{p}", []) for p in PERSONS}
+        if any(row.values()):
+            tenses.append({"key": key, "label": label, "forms": row})
+    return {"lemma": lem.lemma, "infinitive": cells.get("inf", [lem.lemma]),
+            "participle_present": cells.get("part.pres", []), "participle_past": cells.get("part.past", []),
+            "tenses": tenses, "source": "Wiktionary (CC BY-SA)"}

@@ -44,6 +44,14 @@ export default function Shelf({ me, onLogout, theme }: {
           <button className="btn ghost small" onClick={onLogout}>Sortir</button>
         </div>
       </header>
+      <div className="quick">
+        <button className="card quick-btn defi" onClick={() => go("/defi")}>
+          <span className="qi">⭐</span><span><b>Défi de la semaine</b><br /><span className="small muted">Revois tes mots</span></span>
+        </button>
+        <button className="card quick-btn bag" onClick={() => go("/mots")}>
+          <span className="qi">👜</span><span><b>Mon sac à mots</b><br /><span className="small muted">Tous les mots que tu as cherchés</span></span>
+        </button>
+      </div>
       <h2 className="shelf-title">Ma bibliothèque</h2>
       {error && <p className="error">{error}</p>}
       {items && items.length === 0 && <p className="muted">Pas encore de lecture ici. Bientôt !</p>}

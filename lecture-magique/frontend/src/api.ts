@@ -13,11 +13,21 @@ export type ArticleCard = {
   progress: null | { last_chapter: number; chapters_done: number[]; seconds_read: number; finished: boolean };
 };
 
-// [token_id, char_start, char_end, lemma_id, sense_id]
-export type TokenTuple = [number, number, number, number | null, number | null];
+// [token_id, char_start, char_end, lemma_id, sense_id, morph (verb forms only, e.g. "Mood=Ind|…|Tense=Pres")]
+export type TokenTuple = [number, number, number, number | null, number | null, string | null];
 
-export type Lemma = { lemma: string; pos: string; gender: string | null; ipa: string | null; senses: number[] };
-export type Sense = { key: string | null; def: string | null; ex: string[] };
+// en: English glosses from Wiktionary (shown when Petit Robert has no entry)
+export type Lemma = { lemma: string; pos: string; gender: string | null; ipa: string | null; senses: number[]; en: string[] };
+export type Sense = { key: string | null; def: string | null; ex: string[]; en?: string };
+
+export type Conjugation = {
+  lemma: string;
+  infinitive: string[];
+  participle_present: string[];
+  participle_past: string[];
+  tenses: { key: string; label: string; forms: Record<string, string[]> }[];
+  source: string;
+};
 export type WordState = { status: string; familiarity: number; lookups: number; exposures: number };
 
 export type ChapterData = {
@@ -32,6 +42,29 @@ export type ChapterData = {
   progress: null | { last_chapter: number; last_paragraph: number; chapters_done: number[] };
 };
 
+export type QuizItem = {
+  id: number;
+  seq: number;
+  type: "meaning" | "cloze" | "definition" | "dictation";
+  prompt: { word?: string; sentence?: string; definition?: string; say?: string; hint?: string | null;
+            choices?: string[]; retry?: boolean };
+  answered: boolean;
+  correct: boolean | null;
+};
+export type Quiz = {
+  id: number; week_of: string; status: "open" | "done"; items: QuizItem[];
+  summary: { total: number; correct: number; gold: string[]; practice: string[] };
+};
+export type AnswerResult = {
+  correct: boolean; answer: string; hint: string | null; sentence: string | null; familiarity: number | null;
+  left: number; already: boolean;
+};
+export type BagWord = {
+  lemma_id: number; lemma: string; pos: string; gender: string | null; ipa: string | null;
+  group: "new" | "learning" | "mastered" | "known"; familiarity: number; lookups: number; due: string | null;
+  definition: string | null; gloss: string | null; sentence: string | null; surface: string | null;
+};
+
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);
@@ -39,7 +72,8 @@ export class ApiError extends Error {
 }
 
 async function call<T>(method: string, path: string, body?: unknown, keepalive = false): Promise<T> {
-  const res = await fetch(`/api${path}`, {
+  // Relative URL ("api/..."): resolves to /api/... on port 8090 and to /lecture/api/... behind the gateway.
+  const res = await fetch(`api${path}`, {
     method,
     credentials: "same-origin",
     headers: body === undefined ? {} : { "Content-Type": "application/json" },
@@ -70,6 +104,11 @@ export const api = {
   complete: (chapterId: number, openedAt: string) =>
     call<{ next_seq: number | null; exposures: number; finished: boolean; chapters_done: number[] }>(
       "POST", `/chapters/${chapterId}/complete`, { opened_at: openedAt }),
+  quiz: () => call<{ quiz: Quiz | null; message?: string }>("GET", "/quiz/current"),
+  answer: (itemId: number, response: string, responseMs: number) =>
+    call<AnswerResult>("POST", `/quiz/items/${itemId}/answer`, { response, response_ms: responseMs }),
+  words: () => call<BagWord[]>("GET", "/words"),
+  conjugation: (lemmaId: number) => call<Conjugation>("GET", `/lemmas/${lemmaId}/conjugation`),
   lookups: (events: LookupEvent[], keepalive = false) =>
     call<{ accepted: string[]; duplicate: string[]; rejected: string[] }>("POST", "/lookups", { events }, keepalive),
 };

@@ -3,6 +3,7 @@
     uv run python -m importer.article import path/to/pack.json   # -> status draft + coverage report
     uv run python -m importer.article publish <slug>
     uv run python -m importer.article unpublish <slug>
+    uv run python -m importer.article rematch [<slug>]    # after importing Wiktionary: re-match in place
     uv run python -m importer.article list
 
 Pipeline per paragraph: tokenize (exact offsets) -> spaCy fr_core_news_sm lemma + POS ->
@@ -69,9 +70,11 @@ class Lexicon:
         self.forms: dict[str, list[int]] = {}
         for form, lid in conn.execute(text("SELECT form, lemma_id FROM lecture.word_form")):
             self.forms.setdefault(form.lower(), []).append(lid)
+        # First Petit Robert sense; for words Robert lacks, the first Wiktionary (English) gloss.
         self.first_sense: dict[int, int] = dict(conn.execute(text(
             "SELECT DISTINCT ON (lemma_id) lemma_id, id FROM lecture.sense "
-            "WHERE source = 'petit_robert' ORDER BY lemma_id, seq")).all())
+            "WHERE source IN ('petit_robert', 'wiktionary_en') "
+            "ORDER BY lemma_id, (source = 'petit_robert') DESC, seq")).all())
 
     def _pick(self, rows: list[tuple[int, str, int]], upos: str | None) -> int | None:
         if not rows:
@@ -91,8 +94,14 @@ class Lexicon:
             s = lem = s.lstrip("-").removeprefix("t-")
         lid, how = None, ""
         exact = [r for r in self.by_lemma.get(lem, []) if r[1] in (upos, UPOS_EQUIV.get(upos))]
+        verb_forms = [i for i in self.forms.get(s, []) if self.pos.get(i) == "VERB"] if upos in ("VERB", "AUX") else []
         if exact:
             lid, how = exact[0][0], "lemma+pos"
+        elif verb_forms:
+            # spaCy says verb but its lemma is wrong ("demande" -> "demande"): use the conjugation tables
+            # (Wiktionary word_form) instead of falling through to the noun with the same spelling.
+            lid = next((i for i in verb_forms if i in {r[0] for r in self.by_lemma.get(lem, [])}), verb_forms[0])
+            how = "verb_form"
         elif s in self.forms:
             ids = self.forms[s]
             lid = next((i for i in ids if self.pos.get(i) == upos), ids[0])
@@ -126,37 +135,47 @@ def nlp():
     return _nlp
 
 
-def analyse(text_: str, lex: Lexicon) -> list[tuple[Tok, Match, str, str]]:
-    """Tokens of one paragraph with their dictionary match and spaCy (lemma, upos)."""
-    doc = nlp()(text_)
-    spans = [(t.idx, t.idx + len(t.text), t.lemma_, t.pos_) for t in doc]
+class SpacyParagraph:
+    """spaCy analysis of one paragraph, looked up by our token spans."""
 
-    def spacy_for(t: Tok) -> tuple[str, str]:
-        best, overlap = (t.surface, "X"), 0
-        for s, e, lemma, pos in spans:
-            o = min(e, t.end) - max(s, t.start)
+    def __init__(self, text_: str):
+        self.spans = [(t.idx, t.idx + len(t.text), t.lemma_, t.pos_, str(t.morph)) for t in nlp()(text_)]
+
+    def for_token(self, t: Tok) -> tuple[str, str, str]:
+        """(lemma, upos, morph) of the spaCy token that matches our token's span."""
+        best, overlap = (t.surface, "X", ""), 0
+        for s, e, lemma, pos, morph in self.spans:
             if s == t.start and e == t.end:
-                return lemma, pos
+                return lemma, pos, morph
+            o = min(e, t.end) - max(s, t.start)
             if o > overlap:
-                best, overlap = (lemma if (e - s) == (t.end - t.start) else t.surface, pos), o
+                same = (e - s) == (t.end - t.start)
+                best, overlap = (lemma if same else t.surface, pos, morph if same else ""), o
         return best
 
+
+NO_MATCH = Match(None, None, "")
+
+
+def analyse(text_: str, lex: Lexicon) -> list[tuple[Tok, Match, str, str, str]]:
+    """Tokens of one paragraph with their dictionary match and spaCy (lemma, upos, morph)."""
+    sp = SpacyParagraph(text_)
     out = []
     for t in tokenize(text_):
         if not t.is_word:
-            out.append((t, Match(None, None, ""), "", ""))
+            out.append((t, NO_MATCH, "", "", ""))
             continue
-        lemma, pos = spacy_for(t)
+        lemma, pos, morph = sp.for_token(t)
         m = lex.match(t.surface, lemma, pos)
         if m.lemma_id is None and "-" in t.surface and not t.surface.startswith("-"):
             for p in split_hyphenated(t):
                 if not p.is_word:
-                    out.append((p, Match(None, None, ""), "", ""))
+                    out.append((p, NO_MATCH, "", "", ""))
                     continue
-                pl, pp = spacy_for(p)
-                out.append((p, lex.match(p.surface, pl, pp), pl, pp))
+                pl, pp, pm = sp.for_token(p)
+                out.append((p, lex.match(p.surface, pl, pp), pl, pp, pm))
             continue
-        out.append((t, m, lemma, pos))
+        out.append((t, m, lemma, pos, morph))
     return out
 
 
@@ -193,7 +212,7 @@ def import_pack(conn: Connection, pack: dict, lex: Lexicon | None = None) -> dic
             pid = conn.execute(text("""INSERT INTO lecture.paragraph (chapter_id, seq, text)
                 VALUES (:c, :s, :t) RETURNING id"""), {"c": chapter_id, "s": pseq, "t": ptext}).scalar()
             rows = []
-            for i, (t, m, lemma, pos) in enumerate(analyse(ptext, lex), start=1):
+            for i, (t, m, lemma, pos, morph) in enumerate(analyse(ptext, lex), start=1):
                 if t.is_word:
                     words += 1
                     if m.lemma_id:
@@ -203,11 +222,12 @@ def import_pack(conn: Connection, pack: dict, lex: Lexicon | None = None) -> dic
                         unmatched[(t.surface, lemma, pos)] += 1
                         propn += pos == "PROPN"
                 rows.append({"p": pid, "seq": i, "surface": t.surface, "s": t.start, "e": t.end, "w": t.is_word,
-                             "l": m.lemma_id, "sn": m.sense_id, "r": t.is_word and m.lemma_id is None})
+                             "l": m.lemma_id, "sn": m.sense_id, "r": t.is_word and m.lemma_id is None,
+                             "m": morph or None})
             if rows:
                 conn.execute(text("""INSERT INTO lecture.token
-                    (paragraph_id, seq, surface, char_start, char_end, is_word, lemma_id, sense_id, needs_review)
-                    VALUES (:p, :seq, :surface, :s, :e, :w, :l, :sn, :r)"""), rows)
+                    (paragraph_id, seq, surface, char_start, char_end, is_word, lemma_id, sense_id, needs_review, morph)
+                    VALUES (:p, :seq, :surface, :s, :e, :w, :l, :sn, :r, :m)"""), rows)
         if ch.get("question"):
             qseq += 1
             q = ch["question"]
@@ -235,6 +255,40 @@ def import_pack(conn: Connection, pack: dict, lex: Lexicon | None = None) -> dic
     }
 
 
+def rematch(conn: Connection, slug: str, lex: Lexicon | None = None) -> dict:
+    """Re-run spaCy + dictionary matching on an imported article without touching its token ids
+    (so lookups already recorded stay attached). Use after importing Wiktionary or a new dictionary."""
+    lex = lex or Lexicon(conn)
+    art = conn.execute(text("SELECT id FROM lecture.article WHERE slug = :s"), {"s": slug}).scalar()
+    if not art:
+        raise SystemExit(f"no article with slug {slug!r}")
+    words = matched = changed = 0
+    unmatched: Counter = Counter()
+    paras = conn.execute(text("""SELECT p.id, p.text FROM lecture.paragraph p JOIN lecture.chapter c ON c.id = p.chapter_id
+        WHERE c.article_id = :a ORDER BY c.seq, p.seq"""), {"a": art}).all()
+    for pid, ptext in paras:
+        sp = SpacyParagraph(ptext)
+        updates = []
+        for tid, surface, s, e, old_lemma in conn.execute(text("""SELECT id, surface, char_start, char_end, lemma_id
+                FROM lecture.token WHERE paragraph_id = :p AND is_word ORDER BY seq"""), {"p": pid}):
+            t = Tok(surface, s, e, True)
+            lemma, pos, morph = sp.for_token(t)
+            m = lex.match(surface, lemma, pos)
+            words += 1
+            matched += m.lemma_id is not None
+            changed += m.lemma_id != old_lemma
+            if m.lemma_id is None:
+                unmatched[(surface, lemma, pos)] += 1
+            updates.append({"id": tid, "l": m.lemma_id, "sn": m.sense_id, "m": morph or None, "r": m.lemma_id is None})
+        if updates:
+            conn.execute(text("""UPDATE lecture.token SET lemma_id = :l, sense_id = :sn, morph = :m, needs_review = :r
+                WHERE id = :id"""), updates)
+    return {"slug": slug, "words": words, "matched": matched, "coverage": round(matched / words, 4) if words else 1.0,
+            "lemma_changed": changed,
+            "unmatched": [{"surface": s, "spacy_lemma": l, "upos": p, "count": n}
+                          for (s, l, p), n in unmatched.most_common()]}
+
+
 def set_status(conn: Connection, slug: str, status: str) -> None:
     n = conn.execute(text("UPDATE lecture.article SET status = :st WHERE slug = :s"), {"st": status, "s": slug}).rowcount
     if not n:
@@ -245,6 +299,8 @@ def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("import"); p.add_argument("pack")
+    p = sub.add_parser("rematch", help="re-match words of an imported article in place (keeps lookups)")
+    p.add_argument("slug", nargs="?", help="omit to rematch every article")
     p = sub.add_parser("publish"); p.add_argument("slug")
     p = sub.add_parser("unpublish"); p.add_argument("slug")
     sub.add_parser("list")
@@ -265,6 +321,13 @@ def main(argv: list[str] | None = None) -> None:
             for u in rep["unmatched"][:40]:
                 print(f"  {u['count']:>3}  {u['surface']}  (spaCy: {u['spacy_lemma']} {u['upos']})")
             print(f"publish with: python -m importer.article publish {rep['slug']}")
+        elif a.cmd == "rematch":
+            slugs = [a.slug] if a.slug else list(conn.execute(text("SELECT slug FROM lecture.article ORDER BY id")).scalars())
+            lex = Lexicon(conn)
+            for slug in slugs:
+                rep = rematch(conn, slug, lex)
+                print(f"{slug}: coverage {rep['coverage']:.1%}, {rep['lemma_changed']} words now point to a "
+                      f"different entry, {len(rep['unmatched'])} distinct unmatched")
         elif a.cmd == "publish":
             set_status(conn, a.slug, "published"); print(f"{a.slug}: published")
         elif a.cmd == "unpublish":

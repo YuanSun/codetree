@@ -8,6 +8,13 @@ LABEL=com.lecture-magique
 PLIST="$HOME/Library/LaunchAgents/$LABEL.plist"
 
 [ -f "$APP/.env" ] || { echo "Missing $APP/.env — copy deploy/env.example and fill it in." >&2; exit 1; }
+command -v uv >/dev/null || { echo "uv is not installed (or not on PATH): brew install uv" >&2; exit 1; }
+case "$APP" in
+  "$HOME/Documents"*|"$HOME/Desktop"*|"$HOME/Downloads"*|"$HOME/Library/Mobile Documents"*)
+    echo "This folder ($APP) is protected by macOS: the launchd service could not read it." >&2
+    echo "Clone the repo somewhere like ~/Projects and deploy from there (see SETUP.md)." >&2
+    exit 1 ;;
+esac
 
 if [ "${1:-}" != "--no-build" ]; then
   echo "▸ building front end"
@@ -18,7 +25,8 @@ echo "▸ syncing Python deps"
 (cd "$APP/backend" && uv sync --frozen)
 
 echo "▸ migrating the lecture schema (DATABASE_ADMIN_URL)"
-(cd "$APP/backend" && uv run --frozen alembic upgrade head)
+# python -m alembic (not the alembic script) keeps working even if .venv was moved or copied
+(cd "$APP/backend" && uv run --frozen python -m alembic upgrade head)
 
 echo "▸ installing launchd service"
 mkdir -p "$HOME/Library/LaunchAgents" "$HOME/Library/Logs"

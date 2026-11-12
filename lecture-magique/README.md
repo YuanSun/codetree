@@ -4,7 +4,21 @@ A home French reading site for Grace. She reads an article chapter by chapter, t
 definition, and every tap is logged quietly so we can later see which words she struggles with (phase 2: spaced
 review). Design: [`docs/DESIGN.md`](docs/DESIGN.md). Engineering rules and phase scope: [`CLAUDE.md`](CLAUDE.md).
 
-**Phase 1 (this code): read, tap, record.** No LLM, no FSRS, no weekly quiz yet.
+**Done:** phase 1 (read, tap, record) and the review half of phase 2: Wiktionary conjugations and English glosses,
+the tense of each verb on the card, FSRS scheduling, the Monday *Défi de la semaine* and *Mon sac à mots*.
+**Not yet:** model-chosen senses, the parent's weekly report, phase 3 (open answers, writing).
+
+## How the weekly défi works
+
+- Every tap is an FSRS rating (*je ne connais pas* = Again, *ça me dit quelque chose* = Hard, *je connais* = Good;
+  first tap of a day only). Taps from before this feature are replayed from `lookup_event` the first time.
+- From Monday, the first visit to **⭐ Défi de la semaine** builds the week's défi: up to 15 words, first those due
+  before next Monday (most-forgotten first), then words never quizzed (most looked-up first), at most 5 new ones per
+  défi (the very first défi may use all 15).
+- Question types follow familiarity: English meaning / her own sentence with a blank → Petit Robert definition →
+  listen and spell (accents count). Answer wrong → Again; right within 8 s → Good (Easy when very fast on a familiar
+  word); right but slow → Hard. A wrong word comes back once at the end as another kind of question, logged only.
+- Familiarity 0-5 = FSRS stability once quizzed (<2 d, <7 d, <14 d, <30 d, ≥30 d = gold). Code: `backend/app/review.py`.
 
 ```
 backend/   FastAPI app (app/), importers (importer/), Alembic migration (migrations/), pytest suite (tests/)
@@ -54,6 +68,7 @@ Schema additions (all additive; flagged here because CLAUDE.md asks to raise dat
 | `lemma.homograph`, unique key `(lemma, pos, homograph)` instead of `(lemma, pos)` | Robert homographs (`1. livre` / `2. livre`) share lemma and POS |
 | `sense.seq` + unique `(lemma_id, source, seq)` | lets the dictionary import be an idempotent upsert, and fixes sense order |
 | `lookup_event.client_event_id` (unique UUID) + `received_at` | a batch the tablet retries is stored once; `created_at` is the tap time |
+| `token.morph` (migration 0002) | spaCy grammar of each occurrence (*Tense=Pres, Person=3…*), so the card shows the tense of the word in its sentence |
 
 Other choices:
 
@@ -69,6 +84,11 @@ Other choices:
 - The card also offers “Autres sens” (collapsed): until phase 2 picks the sense per sentence, the first Robert sense
   is often not the one in the text (the `entamer` case).
 - Chapter-end question is shown as something to think about only; answers are phase 3.
+- Wiktionary (`importer.wiktionary`, kaikki.org extract, CC BY-SA) supplies conjugation tables and inflected forms
+  as `word_form` rows with codes like `ind.pres.3s`, plus English glosses as `sense` rows with
+  `source='wiktionary_en'`. Verbs/nouns/adjectives missing from Petit Robert get a lemma row. When spaCy tags a word
+  as a verb, the matcher prefers verb forms, so *demande* → **demander** rather than the noun.
+  `importer.article rematch` re-matches already-imported books in place (token ids, hence lookups, are kept).
 - `focus_words` in a pack are reported but not stored yet (no table for them until the phase 2 quiz).
 
 ## Not verified here
