@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Week 10 · The Quest</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/lesson-common.css">
+  <link rel="stylesheet" href="lesson.css">
+</head>
+<body data-page="lesson" data-week="week10" data-page-slug="lesson" data-week-title="Week 10">
+<div id="mc-nav"></div>
+<main class="wrap">
+
+  <section class="hero-quest">
+    <div class="floaters" aria-hidden="true">
+      <span style="left:5%;top:14%;font-size:54px">🎲</span><span style="left:90%;top:18%;font-size:46px;animation-delay:-2s">⏱️</span>
+      <span style="left:18%;top:70%;font-size:60px;animation-delay:-4s">?</span><span style="left:78%;top:62%;font-size:52px;animation-delay:-1s">🐦</span>
+      <span style="left:50%;top:6%;font-size:40px;animation-delay:-3s">%</span><span style="left:93%;top:80%;font-size:44px;animation-delay:-5s">!</span>
+    </div>
+    <div class="eyebrow">Week 10 · The Quest</div>
+    <h1>CJMC Prep: <span class="one">blank</span> or guess?</h1>
+    <p>Practice round on the <b>2024 Canada Jay paper</b>. First the contest’s scoring rule — when does a guess pay? Then your game plan, and Sam’s smart moves from the paper.</p>
+    <div class="four">
+      <a class="skill sk-rates"   href="#guess"><i>🎲</i><b>Blank or guess?</b><span>A guess is worth its <u>average</u>.</span></a>
+      <a class="skill sk-ratio"   href="#plan"><i>⏱️</i><b>Game plan</b><span>90 minutes. <u>Easy first</u>, plan your time.</span></a>
+      <a class="skill sk-percent" href="#moves"><i>🧰</i><b>Smart moves</b><span>Count the <u>gaps</u>, test an answer, chain the factorials.</span></a>
+      <a class="skill sk-mean"    href="#cases"><i>🔍</i><b>Worst case & fractions</b><span><u>Case work</u> for chance, fractions of the side.</span></a>
+    </div>
+    <a class="btn warm start" href="#guess">▶ Start the quest</a>
+  </section>
+
+  <!-- ===================================================================== GUESS -->
+  <section class="level sk-rates" id="guess">
+    <div class="world-banner" data-bg="🎲"><div class="big">🎲</div><div><div class="eyebrow">World 1</div><h2>Blank or guess?</h2><p>Every question ends up <b>correct</b>, <b>blank</b> or <b>wrong</b>. A <b>blank</b> is worth <b>1 point</b>, a <b>wrong</b> answer 0. So is it worth guessing?</p></div></div>
+    <div class="big-idea"><span>⚡</span><div>A guess is worth its AVERAGE.<small>Imagine 100 questions just like it. Add up the points of the guesses — and compare with 100 blanks (= 100 points).</small></div></div>
+
+    <div class="lab">
+      <div class="lab-title">🎲 Explore · The guessing simulator</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Pick a part of the paper, then <b>close your eyes and guess</b> 100 questions. Press the button a few times — do the totals beat the <b>100</b> you’d get from leaving them blank?</div></div>
+      <div id="guess-lab"></div>
+      <div id="expect-steps"></div>
+    </div>
+
+    <div class="lab">
+      <div class="lab-title">✂️ Explore · Cross out first!</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Smart guessers <b>cross out</b> options that can’t be right. Use the <b>“crossed out”</b> buttons in the simulator above — each crossed-out option makes a guess worth more. Where does a <b>Part B</b> guess start to pay?</div></div>
+      <div id="rule-steps"></div>
+      <div class="callout green"><b>Our guessing strategy</b> (Sam’s table):
+        <table class="strat">
+          <tr><th>Part</th><th>Options</th><th>Points</th><th>A random guess is worth</th><th>Our rule</th></tr>
+          <tr><td>A</td><td>4</td><td>5</td><td>1¼ points</td><td>Always answer. Never leave it blank.</td></tr>
+          <tr><td>B</td><td>5</td><td>5</td><td>1 point</td><td>Same as blank — guess once you can cross out even <b>1</b> option.</td></tr>
+          <tr><td>C</td><td>5</td><td>6</td><td>1⅕ points</td><td>Always answer. Never leave it blank.</td></tr>
+        </table>
+        <b>How to guess smartly:</b> cross out first — wrong size, wrong units, wrong last digit, wrong even/odd. The fewer options left, the better the guess.
+        <br><b>Always read the scoring box on page 1.</b> The rules change by year: in the <b>2021</b> paper Part A was <b>4 points with 5 options</b> — a blind guess there was worth only <b>0.8</b>, <i>less</i> than leaving it blank!
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================== PLAN -->
+  <section class="level sk-ratio" id="plan">
+    <div class="world-banner" data-bg="⏱️"><div class="big">⏱️</div><div><div class="eyebrow">World 2</div><h2>Game plan</h2><p><b>15 questions</b>, <b>90 minutes</b>: five in Part A, five in Part B, five in Part C. Part C is the hardest — so give it the most time.</p></div></div>
+    <div class="big-idea"><span>⚡</span><div>Easy first. Don’t get stuck.<small>If a question eats your time, mark it, move on, and come back at the end.</small></div></div>
+
+    <div class="lab">
+      <div class="lab-title">🗓️ Explore · The time planner</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Share the <b>90 minutes</b> between the three parts. Whatever you don’t spend on Parts A and B is left for Part C. Try <b>Sam’s plan</b>!</div></div>
+      <div id="plan-lab"></div>
+      <div id="plan-steps"></div>
+    </div>
+  </section>
+
+  <!-- ===================================================================== MOVES -->
+  <section class="level sk-percent" id="moves">
+    <div class="world-banner" data-bg="🧰"><div class="big">🧰</div><div><div class="eyebrow">World 3</div><h2>Smart moves</h2><p>Three moves from Sam’s walk-through of the paper: count the <b>gaps</b>, <b>test</b> a choice, and let a <b>chain</b> do the work.</p></div></div>
+
+    <!-- A01 -->
+    <div class="big-idea"><span>⚡</span><div>Count in groups — then count the gaps.<small>100 numbers have only 99 gaps between them. Fence posts and fence panels!</small></div></div>
+    <div class="lab">
+      <div class="lab-title">🪵 Explore · Numbers and commas</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Slide the last number. How many <b>commas</b> are needed to separate the numbers? Compare with how many numbers there are.</div></div>
+      <div id="fence-lab"></div>
+    </div>
+    <div class="mission" style="--c:var(--percent)">
+      <div class="mission-top"><span class="src">📜 CJMC 2024 · A01</span><span class="tag easy">Easy</span></div>
+      <p class="ask">⌨️ Mike types <b>1, 2, 3 … 100</b> with a comma between each pair. Typing 1 to 11 takes 23 key presses. How many presses for 1 to 100?</p>
+      <details><summary>Show the exact contest wording</summary><div class="orig">Bob asks his friend Mike to type all numbers between 1 and 100, inclusive, with a comma (“,”) between each pair of consecutive numbers. To type the numbers 1 to 11 Mike presses 23 keys to get: 1,2,3,4,5,6,7,8,9,10,11. How many key presses does Mike need to complete Bob’s task?
+        <div class="opts"><span>(A) 192</span><span>(B) 201</span><span>(C) 287</span><span>(D) 291</span></div></div></details>
+      <div id="commas-steps"></div>
+    </div>
+
+    <!-- A03 -->
+    <div class="big-idea"><span>⚡</span><div>Test a choice — or let x be the unknown.<small>Try 80 small blocks: 80 ÷ 3 leaves 2 over, so it can’t work. Or ask: how much does ONE combine change the total?</small></div></div>
+    <div class="lab">
+      <div class="lab-title">🧱 Explore · Combine the blocks</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Dana has <b>100 blocks</b>. Slide how many are <b>big</b> at the start. All the small ones get combined, 3 into 1. Find the start that ends with <b>40 big</b>.</div></div>
+      <div id="blocks-lab"></div>
+    </div>
+    <div class="mission" style="--c:var(--percent)">
+      <div class="mission-top"><span class="src">📜 CJMC 2024 · A03</span><span class="tag easy">Easy</span></div>
+      <p class="ask">🧱 Dana has <b>100 blocks</b>, big and small. She combines <b>all</b> her small blocks, 3 small into 1 big, and ends with <b>40 big</b> blocks. How many big blocks did she start with?</p>
+      <details><summary>Show the exact contest wording</summary><div class="orig">Dana has 100 building blocks. Some are small and some are big. She can combine 3 small blocks into a big one. After combining all her small blocks, she now has 40 big blocks. How many big blocks did she start with?
+        <div class="opts"><span>(A) 10</span><span>(B) 15</span><span>(C) 20</span><span>(D) 40</span></div></div></details>
+      <div id="blocks-steps"></div>
+    </div>
+
+    <!-- B01 -->
+    <div class="big-idea"><span>⚡</span><div>n! = n × (n − 1)!<small>Each factorial is the one before it, times n. So a factorial that ends in 0 keeps ending in 0.</small></div></div>
+    <div class="lab">
+      <div class="lab-title">⛓️ Explore · The factorial chain</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Slide <b>n</b> up the chain. Each link is the one before it, <b>times n</b>. Watch the last digit — when does it become 0, and does it ever change back?</div></div>
+      <div id="fact-lab"></div>
+    </div>
+    <div class="mission" style="--c:var(--percent)">
+      <div class="mission-top"><span class="src">📜 CJMC 2024 · B01</span><span class="tag medium">Medium</span></div>
+      <p class="ask">❗ What is the <b>last digit</b> of 1! + 2! + 3! + 4! + 5! + … + 2024! ?</p>
+      <details><summary>Show the exact contest wording</summary><div class="orig">The factorial of a positive integer n, denoted by n!, is the product of all positive integers less than or equal to n. For example, 3! = 3 × 2 × 1 while 5! = 5 × 4 × 3 × 2 × 1. What is the last digit of 1! + 2! + 3! + 4! + 5! + … + 2024! ?
+        <div class="opts"><span>(A) 0</span><span>(B) 1</span><span>(C) 2</span><span>(D) 3</span><span>(E) 4</span></div></div></details>
+      <div id="fact-steps"></div>
+    </div>
+  </section>
+
+  <!-- ===================================================================== CASES -->
+  <section class="level sk-mean" id="cases">
+    <div class="world-banner" data-bg="🔍"><div class="big">🔍</div><div><div class="eyebrow">World 4</div><h2>Worst case & fractions</h2><p>Think about the <b>extreme</b> case, split a chance question into <b>cases</b>, and use <b>fractions</b> instead of ugly numbers.</p></div></div>
+
+    <!-- B02 -->
+    <div class="big-idea"><span>⚡</span><div>Biggest overlap, smallest overlap.<small>Put one club inside the other for the biggest overlap. Squeeze them apart as far as the school allows for the smallest.</small></div></div>
+    <div class="lab">
+      <div class="lab-title">⭕ Explore · Two clubs in one school</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Slide how many students are in <b>both</b> clubs. The two clubs must still fit inside the school of 105. Press the buttons to find the <b>smallest</b> and the <b>biggest</b> overlap.</div></div>
+      <div id="venn-lab"></div>
+    </div>
+    <div class="mission" style="--c:var(--mean)">
+      <div class="mission-top"><span class="src">📜 CJMC 2024 · B02</span><span class="tag medium">Medium</span></div>
+      <p class="ask">🏫 <b>⅔</b> of the 105 students are in math club, <b>⅖</b> are in physics club. What is the <b>smallest</b> number of students who must be in <b>both</b>?</p>
+      <details><summary>Show the exact contest wording</summary><div class="orig">At Canada Jay School, two thirds of the students are in math club, and two fifths of the students are in physics club. If there are 105 students in the school, what is the smallest number of students that must belong to both clubs?
+        <div class="opts"><span>(A) 0</span><span>(B) 5</span><span>(C) 7</span><span>(D) 42</span><span>(E) 105</span></div></div></details>
+      <div id="venn-steps"></div>
+    </div>
+
+    <!-- B03 -->
+    <div class="big-idea"><span>⚡</span><div>Chance = case work.<small>List the ways to get what you want, work out the chance of each way, and add them up.</small></div></div>
+    <div class="lab">
+      <div class="lab-title">🎲 Explore · Two prime dice</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Both dice show the first six primes: <b>2, 3, 5, 7, 11, 13</b>. Roll lots of pairs and watch how often the <b>sum is even</b>. Then work out the exact chance with <b>case work</b>.</div></div>
+      <div id="dice-lab"></div>
+    </div>
+    <div class="mission" style="--c:var(--mean)">
+      <div class="mission-top"><span class="src">📜 CJMC 2024 · B03</span><span class="tag medium">Medium</span></div>
+      <p class="ask">🎲 Two dice are labelled with the <b>first six prime numbers</b>. They are rolled. What is the chance that the <b>sum is even</b>?</p>
+      <details><summary>Show the exact contest wording</summary><div class="orig">A prime number is an integer, greater than and not including 1, that is divisible by only 1 and itself. The faces of two six sided dice are labelled with the first six prime numbers. If the two dice are rolled, what is the probability that the sum of the two faces is even?
+        <div class="opts"><span>(A) ¼</span><span>(B) 5/18</span><span>(C) ½</span><span>(D) 13/18</span><span>(E) ¾</span></div></div></details>
+      <div id="dice-steps"></div>
+    </div>
+
+    <!-- C04 -->
+    <div class="big-idea"><span>⚡</span><div>Use fractions of the side — not the side.<small>The brick and blue triangles are always the same <i>fraction</i> of the square, whatever its size. No √6000 needed!</small></div></div>
+    <div class="lab">
+      <div class="lab-title">🌲 Explore · The forest at any size</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Slide the <b>side</b> of the square forest. The corners of the triangles stay at the same <b>fractions</b> of the sides. Does the <b>share</b> of the area they cover change?</div></div>
+      <div id="forest-lab"></div>
+    </div>
+    <div class="mission" style="--c:var(--mean)">
+      <div class="mission-top"><span class="src">📜 CJMC 2024 · C04</span><span class="tag hard">Hard</span></div>
+      <p class="ask">🐦 A square forest has area <b>6000 km²</b>. Eagle is the <b>middle</b> of the bottom side, Grebe is <b>⅕</b> of the way up the left side, Finch is <b>⅔</b> of the way up the right side. The brick and blue triangles have no Canada Jays. How big is the rest?</p>
+      <details><summary>Show the exact contest wording</summary><div class="orig">Campers arrive to Algonquin park to find a perfectly square forest with an area of 6000 km² … The walk from Albatross to Eagle took as long as the walk from Eagle to Bobwhite. The walk from Dove to Grebe took 4 times as long as the walk from Grebe to Albatross. The walk from Bobwhite to Finch took twice as long as the walk from Finch to Crane. How big is the area (marked with green stars) where a Canada Jay might be spotted?
+        <div class="opts"><span>(A) 3400</span><span>(B) 4700</span><span>(C) 5000</span><span>(D) 5700</span><span>(E) 6000</span></div></div></details>
+      <div id="forest-steps"></div>
+    </div>
+  </section>
+
+  <section class="level" id="finale">
+    <div class="finale">
+      <div class="eyebrow" style="color:var(--gold)">The point to land</div>
+      <h2>Know the rule. Plan the time. Pick the right <u>move</u>.</h2>
+      <ul class="finale-list">
+        <li style="--c:#8fbaff"><b>Guess?</b> → chance × points vs 1</li>
+        <li style="--c:#7ee8c0"><b>Time</b> → easy first, C gets 60 min</li>
+        <li style="--c:#ffd08a"><b>Moves</b> → gaps, test, chain</li>
+        <li style="--c:#c9b5ff"><b>Cases</b> → worst case, case work, fractions</li>
+      </ul>
+      <div class="row"><a class="btn warm" href="homework">📝 Go to Homework Week 10</a> <a class="btn ghost" href="/week/cjmc2024/exam">🐦 Take the full 2024 mock exam</a></div>
+    </div>
+  </section>
+</main>
+
+<script src="/static/js/core.js"></script>
+<script src="lesson.js"></script>
+</body>
+</html>

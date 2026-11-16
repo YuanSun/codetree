@@ -124,7 +124,8 @@
         "Try a start of 10 big + 90 small: what do you get at the end?"
       ],
       "traps": {
-        "3": "40 is how many big blocks she has **after** combining. The question asks how many she began with."
+        "3": "40 is how many big blocks she has **after** combining. The question asks how many she began with.",
+        "2": "20 comes from 100 − 40 = 60 and then 60 ÷ **3**. But each combine turns 3 blocks into 1, so the total only drops by **2** each time: 60 ÷ 2 = 30 combines. (Test it: 20 big + 80 small leaves 2 small blocks that can’t be combined.)"
       },
       "solution": [
         "Start: big + small = 100. After combining, each 3 small blocks make 1 big block: big + small ÷ 3 = 40.",

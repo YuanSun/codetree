@@ -1,0 +1,21 @@
+/* Week 10 lesson — guessing simulator, time planner, fence/blocks/factorial labs, venn, dice, forest */
+.qtty { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 8px 0; font-weight: 800; }
+.qtty button { font: inherit; font-family: var(--head); font-weight: 600; border: 3px solid var(--line); background: #fff; border-radius: 14px; padding: 6px 14px; cursor: pointer; color: var(--navy); }
+.qtty button.on { border-color: var(--navy-2); background: #e6e9ff; }
+.runrow { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0; }
+.strat { width: 100%; border-collapse: collapse; margin: 10px 0 12px; font-weight: 700; font-size: 15px; background: #fff; border-radius: 10px; overflow: hidden; }
+.strat th { background: var(--navy); color: #fff; padding: 7px 10px; text-align: left; font-size: 13px; }
+.strat td { padding: 7px 10px; border-bottom: 2px solid var(--line); vertical-align: top; }
+.timebar { display: flex; height: 44px; border-radius: 14px; overflow: hidden; border: 3px solid var(--line); margin: 10px 0; }
+.timebar i { display: grid; place-items: center; font-style: normal; font-weight: 800; font-size: 14px; color: var(--navy); white-space: nowrap; overflow: hidden; transition: width .15s; }
+.fence { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin: 10px 0; font-weight: 800; font-size: 20px; }
+.fence .num { background: #e6e9ff; border: 2px solid var(--line); border-radius: 10px; padding: 2px 10px; }
+.fence .comma { color: #b3261e; font-size: 26px; line-height: 1; }
+.bagrow { display: flex; flex-wrap: wrap; gap: 3px; margin: 10px 0; }
+.blk { width: 16px; height: 16px; border-radius: 4px; display: inline-block; }
+.blk.big { background: #3b6cf0; width: 22px; height: 16px; } .blk.sml { background: #ffc83d; }
+.faces { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 8px 0; }
+.faces span { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 10px; font-weight: 900; font-size: 18px; border: 3px solid var(--navy); }
+.faces .odd { background: #ffe9e5; } .faces .even { background: #d8f2e4; }
+.faces small { font-weight: 800; color: var(--muted); }
+.diceline { font-family: var(--head); font-size: 20px; color: var(--navy); margin: 6px 0; }
