@@ -1,0 +1,36 @@
+{
+  "number": 10,
+  "title": "CJMC Prep: Blank or Guess?",
+  "tagline": "When does a guess pay? Plan your 90 minutes, then learn Sam’s smart moves from the 2024 Canada Jay paper — count the gaps, test a choice, think worst case.",
+  "level": "G6–G7 · Contest Prep",
+  "emoji": "🎲",
+  "skills": [
+    "Blank or guess?",
+    "Game plan",
+    "Smart moves",
+    "Worst case & fractions"
+  ],
+  "credit": "Based on The Learning Lab · Week 10 CJMC Prep (practice round on the 2024 paper) and Homework Week 10 (Instructor: Sam Cai, MSc). Contest questions from the Canada Jay Mathematical Competition (CJMC) 2024 — used here for personal study.",
+  "pages": [
+    {
+      "slug": "lesson",
+      "type": "html",
+      "file": "lesson.html",
+      "title": "The Quest",
+      "emoji": "🗺️",
+      "desc": "Blank or guess? A game plan for the 90 minutes, and Sam’s smart moves from the 2024 paper — play with each idea, then solve step by step.",
+      "tasks": 9
+    },
+    {
+      "slug": "homework",
+      "type": "quiz",
+      "file": "homework.json",
+      "scripts": [
+        "figures.js"
+      ],
+      "title": "Homework Week 10",
+      "emoji": "📝",
+      "desc": "CJMC 2024 B04, B05 and C02, plus C05 as an optional challenge. Do them on paper first, then check here."
+    }
+  ]
+}

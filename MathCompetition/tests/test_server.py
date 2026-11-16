@@ -1,6 +1,7 @@
 """Server + content tests. Run:  python3 -m unittest discover -s tests   (from MathCompetition/)"""
 
 import json
+import re
 import sys
 import threading
 import unittest
@@ -104,10 +105,22 @@ class ServerTests(unittest.TestCase):
             with self.subTest(path=path):
                 self.assertEqual(self.get(path)[0], 200)
         _, home, _ = self.get("/")
-        order = [home.index(f'/week/{i}/"') for i in ("cjmc2024", "week09", "cjmc2021-exam2", "week08", "week07")]
-        self.assertEqual(order, sorted(order))                         # 9.5 exam, week 9, the 8.5 exam, week 8, week 7
+        order = [home.index(f'/week/{i}/"') for i in ("week10", "cjmc2024", "week09", "cjmc2021-exam2", "week08", "week07")]
+        self.assertEqual(order, sorted(order))                         # week 10, 9.5 exam, week 9, the 8.5 exam, week 8, week 7
         self.assertIn("Exam 2", home)
         self.assertIn("Exam 3", home)
+
+    def test_week10_pages_and_homework(self):
+        for path in ("/week/week10/", "/week/week10/lesson", "/week/week10/homework", "/week/week10/figures.js", "/week/week10/lesson.js", "/week/week10/lesson.css"):
+            with self.subTest(path=path):
+                self.assertEqual(self.get(path)[0], 200)
+        data = json.loads((ROOT / "weeks" / "week10" / "homework.json").read_text(encoding="utf-8"))
+        self.assertEqual("".join("ABCDE"[q["answer"]] for q in data["questions"]), "BCDB")   # B04, B05, C02 + optional C05 (same as the paper's key)
+        self.assertEqual([bool(q.get("optional")) for q in data["questions"]], [False, False, False, True])
+        _, lesson, _ = self.get("/week/week10/lesson")
+        self.assertEqual(lesson.count('id="') , len(set(re.findall(r'id="([^"]+)"', lesson))))   # no duplicate ids (every lab mounts by id)
+        for mount in ("guess-lab", "expect-steps", "rule-steps", "plan-steps", "commas-steps", "blocks-steps", "fact-steps", "venn-steps", "dice-steps", "forest-steps"):
+            self.assertIn(f'id="{mount}"', lesson)
 
     def test_cjmc2024_unit_pages(self):
         for path in ("/week/cjmc2024/exam", "/week/cjmc2024/practice", "/week/cjmc2024/figures.js"):
@@ -239,6 +252,8 @@ class BasePathTests(unittest.TestCase):
         self.assertIn('src="/math/static/js/exam.js"', body)
         self.assertIn('src="/math/week/cjmc2021-exam2/figures.js"', body)
         self.assertIn('src="/math/week/cjmc2024/figures.js"', self.get("/week/cjmc2024/exam")[1])
+        for path in ("/week/week10/lesson", "/week/week10/homework"):
+            self.assertNotRegex(self.get(path)[1], r'(?:href|src)="/(?!math/|/)', "unprefixed absolute link")
 
     def test_study_links_are_prefixed(self):
         for path in ("/study/", "/study/sem05/", "/study/sem0506/parcours"):

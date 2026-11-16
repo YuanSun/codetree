@@ -41,6 +41,7 @@ For a full past paper (CJMC / Gauss) use a unit like `weeks/cjmc2021-exam2/` wit
 - Every diagram must be redrawn in `figures.js` (the child never sees the PDF); verify answers independently — for puzzles, with a solver
   (see how Q15's hexagon grid has a unique solution) — and zoom the PDF page (`pdftoppm -r 220`) before trusting a fold/diagram question.
 - An in-progress attempt is saved in `localStorage` (`mc.exam.<unit>.<slug>`), the result in the normal progress store.
+- When the class **re-teaches a paper you already have as an exam unit** (e.g. Week 10 on the 2024 paper), don't duplicate the question bank: build the *lesson* around what is new (scoring/guessing strategy, pacing, the instructor's annotated moves) and make the homework page reuse the exam unit's questions and `figures.js` widgets (slice them out of the exam unit's file by script, don't hand-copy).
 
 ## Question schema (`exercises.json` / `homework.json`)
 
