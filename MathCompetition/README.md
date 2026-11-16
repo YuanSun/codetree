@@ -57,6 +57,7 @@ link to each other. Behind the hosting gateway the study track lives at `/math/s
 | `study/sem0506` | **Parcours d'étude** — French study playground for both sheets: fractions, PPCM/PGCD, pronoms relatifs, subordonnées (14 exercises, animated steps, read-aloud). *Standalone page* | same sheets |
 | `weeks/week09` | **Rates & Word Problems** — share-out machine, swap lab, compare-the-carts, vending detective. Quest + Homework (3 + 1 optional) | The Learning Lab, Homework Week 9 |
 | `weeks/cjmc2021-exam2` | **CJMC 2021 · Gray Jay past exam** — a timed *Mock Exam* (90 min, official 4/5/7-point scoring, blank = 1) + a *Question Bank* with hints, traps, solutions and redrawn diagrams for all 15 questions | CMS Canadian Mathematical Gray Jay Competition 2021 |
+| `weeks/cjmc2024` | **CJMC 2024 · Canada Jay past exam** — a timed *Mock Exam* (90 min, official 5/5/6-point scoring, blank = 1) + a *Question Bank* with 3-step hints, trap explanations, full solutions and a hands-on “Play with it” lab for every question (flask filling live, runners you can scrub, star-edge counter, digit builder…) | Canada Jay Mathematical Competition 2024 official booklet |
 | `weeks/week07` | **Area & Perimeter** — *Math Detective* (standalone page, see below) | The Learning Lab, Week 7 homework |
 | `weeks/week08` | Rates, Ratio, Percent & Mean (described above) | The Learning Lab, Week 8 |
 
