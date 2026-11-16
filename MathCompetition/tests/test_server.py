@@ -104,9 +104,18 @@ class ServerTests(unittest.TestCase):
             with self.subTest(path=path):
                 self.assertEqual(self.get(path)[0], 200)
         _, home, _ = self.get("/")
-        order = [home.index(f'/week/{i}/"') for i in ("week09", "cjmc2021-exam2", "week08", "week07")]
-        self.assertEqual(order, sorted(order))                         # week 9, the 8.5 exam, week 8, week 7
+        order = [home.index(f'/week/{i}/"') for i in ("cjmc2024", "week09", "cjmc2021-exam2", "week08", "week07")]
+        self.assertEqual(order, sorted(order))                         # 9.5 exam, week 9, the 8.5 exam, week 8, week 7
         self.assertIn("Exam 2", home)
+        self.assertIn("Exam 3", home)
+
+    def test_cjmc2024_unit_pages(self):
+        for path in ("/week/cjmc2024/exam", "/week/cjmc2024/practice", "/week/cjmc2024/figures.js"):
+            with self.subTest(path=path):
+                self.assertEqual(self.get(path)[0], 200)
+        _, body, _ = self.get("/week/cjmc2024/exam")
+        self.assertIn('"minutes": 90', body)
+        self.assertEqual(body.count("<script"), body.count("</script>"))
 
     def test_week_without_trailing_slash_redirects(self):
         status, _, headers = self.get("/week/week08")
@@ -167,6 +176,14 @@ class ContentTests(unittest.TestCase):
         self.assertEqual(key, "CDEDBACDCABDDBB")                    # computed independently while building the unit
         self.assertEqual(sum(g["points"] * sum(1 for q in data["questions"] if q["skill"] == g["id"]) for g in data["groups"]), 80)
 
+    def test_cjmc2024_answer_key(self):
+        data = json.loads((ROOT / "weeks" / "cjmc2024" / "exercises.json").read_text(encoding="utf-8"))
+        key = "".join("ABCDE"[q["answer"]] for q in data["questions"])
+        self.assertEqual(key, "DCAABDCDBCADCBB")                    # computed independently (brute force / solvers) while building the unit
+        self.assertEqual(len(data["questions"]), 15)
+        self.assertEqual(sum(g["points"] * sum(1 for q in data["questions"] if q["skill"] == g["id"]) for g in data["groups"]), 80)
+        self.assertEqual([g["points"] for g in data["groups"]], [5, 5, 6])
+
     def test_checker_catches_bad_answer_index(self):
         bad = {"questions": [{"id": "q", "text": "t", "choices": ["a", "b"], "answer": 5, "difficulty": "easy", "hints": ["h"], "solution": ["s"]}]}
         tmp = ROOT / "tests" / "_bad_quiz.json"
@@ -221,6 +238,7 @@ class BasePathTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertIn('src="/math/static/js/exam.js"', body)
         self.assertIn('src="/math/week/cjmc2021-exam2/figures.js"', body)
+        self.assertIn('src="/math/week/cjmc2024/figures.js"', self.get("/week/cjmc2024/exam")[1])
 
     def test_study_links_are_prefixed(self):
         for path in ("/study/", "/study/sem05/", "/study/sem0506/parcours"):

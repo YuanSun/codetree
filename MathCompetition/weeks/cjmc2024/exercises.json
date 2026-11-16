@@ -1,0 +1,556 @@
+{
+  "eyebrow": "CJMC 2024 · Canada Jay",
+  "title": "Question Bank — CJMC 2024",
+  "intro": "All 15 questions of the 2024 Canada Jay Mathematical Competition. Try each one on paper first; use the hints only when stuck. After you solve a question, open “Play with it” to see the idea move.",
+  "exam": {
+    "title": "CJMC 2024 · Canada Jay — Mock Exam",
+    "intro": "Sit the real 2024 paper the way you would on contest day: no hints, no calculator, the clock running. Afterwards every question has a full solution and a little lab to play with.",
+    "minutes": 90,
+    "blank": 1,
+    "review": "practice",
+    "rules": [
+      "📵 No phones or calculators. Diagrams are not drawn to scale — they are aids only.",
+      "🧠 Scrap paper is fine. Only your answers on the sheet count.",
+      "📝 The real exam is **15 questions in 1 hour 30 minutes**."
+    ]
+  },
+  "groups": [
+    {
+      "id": "A",
+      "label": "Part A",
+      "emoji": "🅰️",
+      "color": "#3b82f6",
+      "points": 5
+    },
+    {
+      "id": "B",
+      "label": "Part B",
+      "emoji": "🅱️",
+      "color": "#10b981",
+      "points": 5
+    },
+    {
+      "id": "C",
+      "label": "Part C",
+      "emoji": "🏆",
+      "color": "#f59e0b",
+      "points": 6
+    }
+  ],
+  "questions": [
+    {
+      "id": "a01",
+      "skill": "A",
+      "difficulty": "easy",
+      "source": "CJMC (Canada Jay) 2024 — A01",
+      "text": "Bob asks his friend Mike to type all numbers between 1 and 100, inclusive, with a comma (“,”) between each pair of consecutive numbers. To type the numbers 1 to 11 Mike presses 23 keys to get:<div style='font-size:22px;margin:8px 0;letter-spacing:1px'>1,2,3,4,5,6,7,8,9,10,11</div>**How many key presses does Mike need to complete Bob’s task?**",
+      "choices": [
+        "192",
+        "201",
+        "287",
+        "291"
+      ],
+      "answer": 3,
+      "hints": [
+        "Split the keys into two kinds: keys for the digits, and keys for the commas.",
+        "Count the digit keys in groups: 1–9 use one key each, 10–99 use two keys each, and 100 uses three keys. How many commas are there between 100 numbers?",
+        "9 × 1 = 9, 90 × 2 = 180, 100 → 3, and 99 commas. Add all four."
+      ],
+      "traps": {
+        "0": "192 = 9 + 180 + 3 counts only the digit keys. The question says there is a **comma between each pair** of numbers — those are keys too (99 of them)."
+      },
+      "solution": [
+        "**Digit keys.** Numbers 1–9: 9 numbers × 1 key = 9. Numbers 10–99: 90 numbers × 2 keys = 180. The number 100: 3 keys. That is 9 + 180 + 3 = 192.",
+        "**Commas.** 100 numbers have 99 gaps between them, so 99 commas = 99 keys.",
+        "Total: 192 + 99 = **291** → **(D)**.",
+        "Check on the small example: 1–11 → 9 + 2 × 2 + 10 commas = 23 ✓."
+      ],
+      "idea": "Break a big count into easy groups (1-digit, 2-digit, 3-digit) — and don’t forget the commas.",
+      "explorer": {
+        "type": "keycount"
+      }
+    },
+    {
+      "id": "a02",
+      "skill": "A",
+      "difficulty": "easy",
+      "source": "CJMC (Canada Jay) 2024 — A02",
+      "text": "Reem took a trip. The graph shows the speeds Reem drove during her trip. **What percentage of the time did Reem drive at 80 km/h or faster?**",
+      "figure": {
+        "type": "speed"
+      },
+      "choices": [
+        "30 %",
+        "40 %",
+        "50 %",
+        "75 %"
+      ],
+      "answer": 2,
+      "hints": [
+        "First find the **total time** of the trip, then the time spent at 80 km/h or more. Percentage = part ÷ whole.",
+        "The trip runs from 8:00 to 10:30 = 150 minutes. Draw a line at 80 km/h: the graph is on or above it for one stretch.",
+        "It reaches 80 at 8:30 and stays on or above 80 until it comes back down through 80 on the way from 100 to 60. When does that happen? (100 → 60 is 40 km/h in 30 min.)"
+      ],
+      "traps": {
+        "1": "40 % = 1 hour ÷ 2.5 hours counts only 8:30–9:30. But after the peak at 9:30 the speed is still **above 80 for another 15 minutes** (it drops 20 km/h in the first 15 min)."
+      },
+      "solution": [
+        "The whole trip: 8:00 → 10:30 = 2 h 30 min = **150 min**.",
+        "At 80 km/h or faster: from 8:30 until the line falls back to 80. From 100 down to 60 in 30 min is −40 km/h per 30 min, so it loses 20 km/h in 15 min → it is at 80 at **9:45**.",
+        "So 8:30 → 9:45 = 75 min. 75 ÷ 150 = [[1/2]] = **50 %** → **(C)**."
+      ],
+      "idea": "Percentage = part ÷ whole. Where a slanted line crosses a level, use the slope (equal steps) to find when.",
+      "explorer": {
+        "type": "speed",
+        "solved": true
+      }
+    },
+    {
+      "id": "a03",
+      "skill": "A",
+      "difficulty": "easy",
+      "source": "CJMC (Canada Jay) 2024 — A03",
+      "text": "Dana has 100 building blocks. Some are small and some are big. She can combine 3 small blocks into a big one. After combining all her small blocks, she now has 40 big blocks. **How many big blocks did she start with?**",
+      "choices": [
+        "10",
+        "15",
+        "20",
+        "40"
+      ],
+      "answer": 0,
+      "hints": [
+        "The 40 is the number of big blocks **at the end**. The question asks about the **start**.",
+        "Let the start be “some big + some small = 100”. Every 3 small blocks turn into 1 big block.",
+        "Try a start of 10 big + 90 small: what do you get at the end?"
+      ],
+      "traps": {
+        "3": "40 is how many big blocks she has **after** combining. The question asks how many she began with."
+      },
+      "solution": [
+        "Start: big + small = 100. After combining, each 3 small blocks make 1 big block: big + small ÷ 3 = 40.",
+        "Try **10 big + 90 small**: 90 ÷ 3 = 30 new big blocks → 10 + 30 = **40** ✓ and 10 + 90 = 100 ✓.",
+        "Check one other choice: 20 big + 80 small → 80 is not a multiple of 3, so it can’t be right. Answer **10** → **(A)**."
+      ],
+      "idea": "Read which moment the question asks about (start or end) — then test a choice back through the story.",
+      "explorer": {
+        "type": "blocks"
+      }
+    },
+    {
+      "id": "a04",
+      "skill": "A",
+      "difficulty": "easy",
+      "source": "CJMC (Canada Jay) 2024 — A04",
+      "text": "In a small town there are two stores, three utility companies (gas, power, and water) and four houses. A map of the town is drawn below.",
+      "figure": {
+        "type": "town"
+      },
+      "choices": [
+        "18",
+        "20",
+        "26",
+        "36"
+      ],
+      "answer": 0,
+      "hints": [
+        "Each pipe joins **one building** to **one utility company**. Start by connecting just the gas company.",
+        "How many buildings does the gas company have to reach? (Houses **and** stores.)",
+        "One utility needs one pipe to each of the 6 buildings. There are 3 utilities."
+      ],
+      "traps": {
+        "3": "36 counts each pipe twice (once from the building’s end, once from the utility’s end). A pipe between a house and the gas company is **one** pipe."
+      },
+      "solution": [
+        "Buildings that need pipes: 4 houses + 2 stores = **6**.",
+        "Each of the 3 utilities (gas, power, water) needs a pipe to each of the 6 buildings: 3 × 6 = **18** pipes → **(A)**."
+      ],
+      "idea": "“Each one to each one” → multiply: (how many of the first kind) × (how many of the second kind).",
+      "explorer": {
+        "type": "pipes"
+      }
+    },
+    {
+      "id": "a05",
+      "skill": "A",
+      "difficulty": "easy",
+      "source": "CJMC (Canada Jay) 2024 — A05",
+      "text": "Together, Ana, Brenda, and Carla have 67 candies. Aunt Mary gives more candies to each one of them. If they each received the same amount of candy from Aunt Mary and Ana now has 27 candies, Brenda has 39 candies, and Carla has 31 candies, then **how many candies did Aunt Mary give to each of them?**",
+      "choices": [
+        "8",
+        "10",
+        "15",
+        "30"
+      ],
+      "answer": 1,
+      "hints": [
+        "How many candies do the three children have **now**, all together? Compare it with 67.",
+        "The extra candies are what Aunt Mary handed out in total. She gave the **same** amount to each child.",
+        "27 + 39 + 31 = 97. Then 97 − 67 is the total gift. Split it fairly between 3 children."
+      ],
+      "traps": {
+        "3": "30 is the **total** Aunt Mary gave (97 − 67). The question asks how many she gave to **each** child, so divide by 3."
+      },
+      "solution": [
+        "Now: 27 + 39 + 31 = **97** candies.",
+        "Before: 67. So Aunt Mary gave 97 − 67 = **30** candies altogether.",
+        "Same amount each, 3 children: 30 ÷ 3 = **10** → **(B)**. (Check: 27 − 10 = 17, 39 − 10 = 29, 31 − 10 = 21 and 17 + 29 + 21 = 67 ✓.)"
+      ],
+      "idea": "Total change ÷ number of people = change for each.",
+      "explorer": {
+        "type": "candy"
+      }
+    },
+    {
+      "id": "b01",
+      "skill": "B",
+      "difficulty": "medium",
+      "source": "CJMC (Canada Jay) 2024 — B01",
+      "text": "The factorial of a positive integer *n*, denoted by *n*!, is the product of all positive integers less than or equal to *n*. For example, 3! (pronounced “3 factorial”) is<div style=\"font-size:20px;margin:6px 0\">3! = 3 × 2 × 1</div>while<div style=\"font-size:20px;margin:6px 0\">5! = 5 × 4 × 3 × 2 × 1.</div>**What is the last digit of** <div style=\"font-size:20px;margin:6px 0\">1! + 2! + 3! + 4! + 5! + … + 2024! ?</div>",
+      "choices": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "answer": 3,
+      "hints": [
+        "Don’t calculate 2024!! Write out the first few factorials and look at their **last digits**.",
+        "1! = 1, 2! = 2, 3! = 6, 4! = 24, 5! = 120, 6! = 720 … what do you notice from 5! on?",
+        "From 5! on, every factorial ends in 0 — adding it does not change the last digit. So only 1! + 2! + 3! + 4! matters."
+      ],
+      "traps": {
+        "0": "Yes, 5! and all later factorials end in 0 — but 1! + 2! + 3! + 4! = 33 does **not**. Those four small ones still count."
+      },
+      "solution": [
+        "From 5! = 5 × 4 × 3 × 2 × 1 onward, each factorial contains a 5 **and** a 2 → a factor 10 → it ends in **0**.",
+        "Adding numbers that end in 0 never changes the last digit, so ignore 5! … 2024!.",
+        "1! + 2! + 3! + 4! = 1 + 2 + 6 + 24 = 33 → last digit **3** → **(D)**."
+      ],
+      "idea": "When a huge calculation is asked, look for a **pattern in the last digits** and drop the parts that don’t matter.",
+      "explorer": {
+        "type": "factorials"
+      }
+    },
+    {
+      "id": "b02",
+      "skill": "B",
+      "difficulty": "medium",
+      "source": "CJMC (Canada Jay) 2024 — B02",
+      "text": "At Canada Jay School, two thirds of the students are in math club, and two fifths of the students are in physics club. If there are 105 students in the school, **what is the smallest number of students that must belong to both clubs?**",
+      "choices": [
+        "0",
+        "5",
+        "7",
+        "42",
+        "105"
+      ],
+      "answer": 2,
+      "hints": [
+        "Find how many students are in each club: [[2/3]] of 105 and [[2/5]] of 105.",
+        "If the two clubs had no students in common, how many different students would that need? Is there room in the school?",
+        "70 + 42 = 112, but the school has only 105. The extra students must be counted twice — they are in both clubs."
+      ],
+      "traps": {
+        "0": "0 would mean no student is in both clubs. Then 70 + 42 = 112 different students would be needed — but the school only has 105.",
+        "3": "42 is the **whole** physics club. If all 42 were in math club too, that would be the **largest** possible overlap, not the smallest."
+      },
+      "solution": [
+        "Math club: [[2/3]] × 105 = **70**. Physics club: [[2/5]] × 105 = **42**.",
+        "Together that is 70 + 42 = 112 memberships, but there are only **105** students. Each student in **both** clubs was counted twice, so the overlap is at least 112 − 105 = **7**.",
+        "It can really happen with exactly 7: the clubs cover every student. → **(C)**."
+      ],
+      "idea": "Overlap ≥ (sum of the two groups) − (total people). Count twice → too many → the extras are the overlap.",
+      "explorer": {
+        "type": "overlap"
+      }
+    },
+    {
+      "id": "b03",
+      "skill": "B",
+      "difficulty": "medium",
+      "source": "CJMC (Canada Jay) 2024 — B03",
+      "text": "A prime number is an integer, greater than and not including 1, that is divisible by only 1 and itself. Example: 2 and 3 are prime, but 4 and 6 are not (4 is divisible by 2, and 6 is divisible by 2 and 3).<br>The faces of two six-sided dice are labelled with the **first six prime numbers**. If the two dice are rolled, **what is the probability that the sum of the two faces is even?**",
+      "choices": [
+        "[[1/4]]",
+        "[[5/18]]",
+        "[[1/2]]",
+        "[[13/18]]",
+        "[[3/4]]"
+      ],
+      "answer": 3,
+      "hints": [
+        "First list the first six primes. Which of them are even?",
+        "An even sum happens when both numbers are even **or** both are odd. How many ways for each?",
+        "Primes: 2, 3, 5, 7, 11, 13. Only 2 is even. Total outcomes: 6 × 6 = 36."
+      ],
+      "traps": {
+        "2": "[[1/2]] would be right if half the faces were even. But only **one** of the six primes (2) is even, so “both odd” is very likely.",
+        "1": "[[5/18]] = 10 ÷ 36 is the chance the sum is **odd** (one even + one odd = 5 + 5 ways). The question asks for even."
+      },
+      "solution": [
+        "The first six primes: 2, 3, 5, 7, 11, 13 — **one** even (2) and **five** odd.",
+        "Even sum ⟹ both even (1 × 1 = 1 way) **or** both odd (5 × 5 = 25 ways) = 26 ways out of 6 × 6 = 36.",
+        "[[26/36]] = **[[13/18]]** → **(D)**."
+      ],
+      "idea": "Even + even = even, odd + odd = even, even + odd = odd. Count the favourable outcomes ÷ all outcomes.",
+      "explorer": {
+        "type": "dicegrid"
+      }
+    },
+    {
+      "id": "b04",
+      "skill": "B",
+      "difficulty": "medium",
+      "source": "CJMC (Canada Jay) 2024 — B04",
+      "text": "Two runners, Joy and Hope, run around a square (ABCD) with side lengths of 200 m.",
+      "figure": {
+        "type": "square"
+      },
+      "choices": [
+        "9 : 06",
+        "9 : 07",
+        "9 : 08",
+        "9 : 09",
+        "9 : 10"
+      ],
+      "answer": 1,
+      "hints": [
+        "Do they run **towards** each other or in the same direction? When runners come towards each other, add their speeds.",
+        "How far apart are they at 9:00 along the way they are heading towards each other? After the first meeting, how much *more* distance must they cover together to meet again?",
+        "Together they cover 75 + 125 = 200 m every minute. First meeting: 600 m ÷ 200. Next meeting: one whole lap of 800 m later."
+      ],
+      "traps": {
+        "0": "9:06 would be “twice as long as the first meeting”. But the second meeting comes after they have together covered **one more lap (800 m)** — that takes 4 minutes after the first meeting, not 3.",
+        "2": "9:08 assumes the first meeting is after 4 minutes (800 ÷ 200). But at the start they are only **600 m** apart the way they are running towards each other, so the first meeting is at 9:03."
+      },
+      "solution": [
+        "Joy runs A → D → C → B and Hope runs B → C → D → A, so they run **towards** each other.",
+        "The way they are heading towards each other, Joy at A and Hope at B are 600 m apart (A → D → C → B). Together they close the gap at 75 + 125 = **200 m/min**.",
+        "First meeting: 600 ÷ 200 = **3 min** → 9:03.",
+        "To meet a second time they must together cover one whole lap: 800 ÷ 200 = **4 min** later → 3 + 4 = 7 min → **9:07** → **(B)**."
+      ],
+      "idea": "Running towards each other: **add the speeds**. A repeat meeting needs one extra whole lap between them.",
+      "explorer": {
+        "type": "runners"
+      }
+    },
+    {
+      "id": "b05",
+      "skill": "B",
+      "difficulty": "medium",
+      "source": "CJMC (Canada Jay) 2024 — B05",
+      "text": "Grandma is sewing a traditional Indigenous design typically found on blankets and elsewhere, called a star-blanket design, on a tapestry. The pattern is made up of **200 rhombi**.",
+      "figure": {
+        "type": "star"
+      },
+      "choices": [
+        "34 m",
+        "40 m",
+        "44 m",
+        "48 m",
+        "80 m"
+      ],
+      "answer": 2,
+      "hints": [
+        "“Each edge” means each little line segment **once**, even though two rhombi may share it.",
+        "Each rhombus has 4 sides. If nothing were shared, how many sides would there be? Then think: shared edges got counted twice.",
+        "Count the edges on the **outside** of the star (counted once) — 8 points, each with 2 outside sides of 5 small edges."
+      ],
+      "traps": {
+        "4": "80 m = 200 × 4 × 10 cm counts every rhombus’s four sides separately, so every shared edge is counted **twice**. Edges between two rhombi should only be sewn once."
+      },
+      "solution": [
+        "The star is 8 big diamonds, each a 5 × 5 block of small rhombi: 8 × 25 = 200 ✓.",
+        "200 rhombi × 4 sides = **800** sides. An edge **between** two rhombi is counted twice; an edge on the **outside** only once.",
+        "Outside edges: 8 points × 2 sides × 5 small edges = **80**.",
+        "Real edges = (800 + 80) ÷ 2 = **440**. Thread: 440 × 10 cm = 4400 cm = **44 m** → **(C)**."
+      ],
+      "idea": "Add up all the sides, then fix the double counting: shared edges are counted twice.",
+      "explorer": {
+        "type": "starcount"
+      }
+    },
+    {
+      "id": "c01",
+      "skill": "C",
+      "difficulty": "hard",
+      "source": "CJMC (Canada Jay) 2024 — C01",
+      "text": "Chemists use round-bottom flasks in their labs and one is shown below.<br>If water flows into the flask at a **constant rate** and a scientist makes continuous measurements of the **height of water in the flask over time**, then which graph shows the measurements taken by the scientist?",
+      "figure": {
+        "type": "flaskshape"
+      },
+      "choices": [
+        "<svg viewBox=\"0 0 120 92\" style=\"width:120px;height:92px;vertical-align:middle\" aria-label=\"graph A\"><path d=\"M14 80V6M10 10L14 5L18 10M10 78H112M107 74L113 78L107 82\" fill=\"none\" stroke=\"#1d2150\" stroke-width=\"1.4\"/><text x=\"19\" y=\"10\" font-size=\"9\" fill=\"#666d96\" font-family=\"Nunito,sans-serif\">height</text><text x=\"86\" y=\"90\" font-size=\"9\" fill=\"#666d96\" font-family=\"Nunito,sans-serif\">time</text><path d=\"M14.0 78.0 C14.2 77.5 14.5 75.8 14.9 74.9 C15.4 74.0 15.8 73.2 16.8 72.4 C17.7 71.6 19.1 70.6 20.4 69.9 C21.8 69.3 21.8 69.9 25.0 68.5 C28.3 67.0 33.9 63.8 39.8 61.3 C45.6 58.7 53.9 55.6 60.0 53.2 C66.1 50.8 72.4 49.0 76.6 47.0 C80.7 45.0 82.1 44.5 84.8 41.4 C87.6 38.3 89.6 32.6 93.1 28.4 C96.6 24.2 103.9 18.1 106.0 16.0\" fill=\"none\" stroke=\"#2f55d4\" stroke-width=\"2.2\" stroke-linecap=\"round\"/></svg>",
+        "<svg viewBox=\"0 0 120 92\" style=\"width:120px;height:92px;vertical-align:middle\" aria-label=\"graph B\"><path d=\"M14 80V6M10 10L14 5L18 10M10 78H112M107 74L113 78L107 82\" fill=\"none\" stroke=\"#1d2150\" stroke-width=\"1.4\"/><text x=\"19\" y=\"10\" font-size=\"9\" fill=\"#666d96\" font-family=\"Nunito,sans-serif\">height</text><text x=\"86\" y=\"90\" font-size=\"9\" fill=\"#666d96\" font-family=\"Nunito,sans-serif\">time</text><path d=\"M14.0 78.0 C17.2 73.9 28.7 58.4 33.3 53.2 C37.9 48.0 36.7 49.6 41.6 47.0 C46.5 44.4 55.7 40.6 62.8 37.7 C69.8 34.8 77.6 32.1 83.9 29.6 C90.2 27.2 96.8 25.1 100.5 22.8 C104.2 20.5 105.1 17.1 106.0 16.0\" fill=\"none\" stroke=\"#2f55d4\" stroke-width=\"2.2\" stroke-linecap=\"round\"/></svg>",
+        "<svg viewBox=\"0 0 120 92\" style=\"width:120px;height:92px;vertical-align:middle\" aria-label=\"graph C\"><path d=\"M14 80V6M10 10L14 5L18 10M10 78H112M107 74L113 78L107 82\" fill=\"none\" stroke=\"#1d2150\" stroke-width=\"1.4\"/><text x=\"19\" y=\"10\" font-size=\"9\" fill=\"#666d96\" font-family=\"Nunito,sans-serif\">height</text><text x=\"86\" y=\"90\" font-size=\"9\" fill=\"#666d96\" font-family=\"Nunito,sans-serif\">time</text><path d=\"M14.0 78.0 C17.1 76.5 27.0 71.9 32.4 68.7 C37.8 65.5 43.1 62.0 46.2 58.8 C49.3 55.6 49.9 52.2 50.8 49.5 C51.7 46.8 49.7 45.3 51.7 42.7 C53.7 40.0 57.4 36.5 62.8 33.4 C68.1 30.3 76.7 27.0 83.9 24.1 C91.1 21.2 102.3 17.3 106.0 16.0\" fill=\"none\" stroke=\"#2f55d4\" stroke-width=\"2.2\" stroke-linecap=\"round\"/></svg>",
+        "<svg viewBox=\"0 0 120 92\" style=\"width:120px;height:92px;vertical-align:middle\" aria-label=\"graph D\"><path d=\"M14 80V6M10 10L14 5L18 10M10 78H112M107 74L113 78L107 82\" fill=\"none\" stroke=\"#1d2150\" stroke-width=\"1.4\"/><text x=\"19\" y=\"10\" font-size=\"9\" fill=\"#666d96\" font-family=\"Nunito,sans-serif\">height</text><text x=\"86\" y=\"90\" font-size=\"9\" fill=\"#666d96\" font-family=\"Nunito,sans-serif\">time</text><path d=\"M14.0 78.0 C14.3 77.4 14.9 75.5 15.8 74.3 C16.8 73.0 15.5 73.1 19.5 70.6 C23.5 68.0 32.6 62.4 39.8 58.8 C47.0 55.1 55.6 52.2 62.8 48.5 C70.0 44.9 77.0 40.7 83.0 37.1 C89.0 33.4 94.8 30.1 98.6 26.5 C102.5 23.0 104.8 17.8 106.0 16.0\" fill=\"none\" stroke=\"#2f55d4\" stroke-width=\"2.2\" stroke-linecap=\"round\"/></svg>",
+        "<svg viewBox=\"0 0 120 92\" style=\"width:120px;height:92px;vertical-align:middle\" aria-label=\"graph E\"><path d=\"M14 80V6M10 10L14 5L18 10M10 78H112M107 74L113 78L107 82\" fill=\"none\" stroke=\"#1d2150\" stroke-width=\"1.4\"/><text x=\"19\" y=\"10\" font-size=\"9\" fill=\"#666d96\" font-family=\"Nunito,sans-serif\">height</text><text x=\"86\" y=\"90\" font-size=\"9\" fill=\"#666d96\" font-family=\"Nunito,sans-serif\">time</text><path d=\"M14.0 78.0 C14.7 76.8 15.8 72.7 18.1 70.6 C20.4 68.4 23.6 67.2 27.8 65.0 C32.0 62.8 38.1 60.1 43.4 57.5 C48.8 55.0 55.2 51.9 60.0 49.5 C64.8 47.1 69.4 45.3 72.0 43.3 C74.6 41.2 74.7 39.0 75.6 37.1 C76.6 35.1 75.8 33.5 77.5 31.5 C79.2 29.5 81.0 27.9 85.8 25.3 C90.5 22.7 102.6 17.6 106.0 16.0\" fill=\"none\" stroke=\"#2f55d4\" stroke-width=\"2.2\" stroke-linecap=\"round\"/></svg>"
+      ],
+      "answer": 0,
+      "hints": [
+        "Constant rate = the same amount of water every second. When the flask is **narrow** at the water level the height rises fast; when it is **wide** it rises slowly.",
+        "Follow the water: round bottom (narrow → wide), then top of the ball (wide → narrow), then the thin neck. Describe the slope of the graph in each part: steep / flatter / steeper / ?",
+        "In the neck the width never changes, so the height rises at a **constant** speed — a **straight** line, steeper than in the middle of the ball."
+      ],
+      "traps": {
+        "1": "Check the start: graph B begins as a straight line, as if the bottom were a straight tube. A round bottom is **very narrow at the very bottom**, so the water level should shoot up steeply at first and then slow down (curve).",
+        "3": "Check the end: this curve keeps bending all the way. But once the water reaches the **narrow neck** (same width all the way up), the height rises at a constant speed — the graph must finish as a straight line.",
+        "2": "Check the start: graph C begins slowly and then suddenly becomes steeper in the middle. A round-bottom flask is the other way round: **fast at the very bottom**, slower around the middle of the ball.",
+        "4": "Check the end: graph E has a sudden bend that then flattens out again. After the ball, the water enters a **narrow** neck, which should make the graph **steeper** and straight, not flatter."
+      },
+      "solution": [
+        "Constant inflow, so the water level rises **fast where the flask is narrow** and **slowly where it is wide**.",
+        "**Bottom of the ball:** the surface starts tiny and grows wider → the graph starts very steep and flattens.",
+        "**Top of the ball:** the surface now gets narrower again → the graph slowly steepens.",
+        "**Neck:** same narrow width the whole way → constant speed → a **straight, steep line**. Only graph **A** does all that → **(A)**."
+      ],
+      "idea": "Match the **shape width** to the **slope**: narrow = steep, wide = flat, straight tube = straight line.",
+      "explorer": {
+        "type": "flaskfill"
+      }
+    },
+    {
+      "id": "c02",
+      "skill": "C",
+      "difficulty": "hard",
+      "source": "CJMC (Canada Jay) 2024 — C02",
+      "text": "The numbers 1, 2, 3, 4, 5, 6, 7, 8 can be placed in the circles below with each number used exactly once and such that the sum of the three numbers in the circles on each side of the square is the same for all sides.<br>**What is the largest possible value that sum can take?**",
+      "figure": {
+        "type": "ring"
+      },
+      "choices": [
+        "12",
+        "13",
+        "14",
+        "15",
+        "16"
+      ],
+      "answer": 3,
+      "hints": [
+        "The 4 corner circles belong to **two** sides each; the 4 middle circles belong to only one side.",
+        "Add the four sides: every number is counted once, **corner numbers twice**. So 4 × (side sum) = 36 + (sum of the corners).",
+        "To make the side sum as big as possible, the corners should be big. But 4 × (side sum) has to be a multiple of 4. What are the biggest corners that work?"
+      ],
+      "traps": {
+        "4": "A side sum of 16 would need the corners to add to 4 × 16 − 36 = 28. The four biggest numbers only add to 8 + 7 + 6 + 5 = 26, so 16 is impossible."
+      },
+      "solution": [
+        "Let S be the side sum. Adding all 4 sides counts every number once and every **corner twice**: 4S = 36 + (corners).",
+        "Corners add to at most 8 + 7 + 6 + 5 = 26, so 4S ≤ 62, so S ≤ 15 (S is a whole number).",
+        "Can S = 15? Then the corners add to 4 × 15 − 36 = 24. Try corners 3, 8, 6, 7 (clockwise) with middles 4, 1, 2, 5: 3 + 4 + 8 = 15, 8 + 1 + 6 = 15, 6 + 2 + 7 = 15, 7 + 5 + 3 = 15 ✓.",
+        "So the largest possible sum is **15** → **(D)**."
+      ],
+      "idea": "Count how many times each position is used, build an equation, then bound it (largest corners) and test the best case.",
+      "explorer": {
+        "type": "ringfill"
+      }
+    },
+    {
+      "id": "c03",
+      "skill": "C",
+      "difficulty": "hard",
+      "source": "CJMC (Canada Jay) 2024 — C03",
+      "text": "A store sells bottles of juice. The bottles come packed in boxes of either 4, 9 or 15 bottles per box and the store only sells full boxes. Sarah is having a party and she needs exactly 50 bottles (as she doesn’t want leftovers). **What is the smallest number of boxes Sarah needs to buy to get exactly 50 bottles?**",
+      "choices": [
+        "4",
+        "5",
+        "6",
+        "7",
+        "10"
+      ],
+      "answer": 2,
+      "hints": [
+        "Try to use the biggest boxes first, but check whether the leftover can be made with 4s and 9s.",
+        "Using two 15-boxes leaves 20 bottles — that needs five 4-boxes (7 boxes total). Is there a better way with fewer 15s?",
+        "Try one 15-box: 35 are left. Can you make 35 from 9s and 4s? 9 × 3 = 27 and 35 − 27 = 8 = 4 × 2."
+      ],
+      "traps": {
+        "3": "7 boxes comes from grabbing as many 15-boxes as possible: 15 + 15 + 4 × 5 = 50. But using the biggest box most is **not always** the fewest boxes — one 15 plus some 9s does better."
+      },
+      "solution": [
+        "Boxes: 15 + 15 = 30 → 20 left → 4 × 5 = 20 → 7 boxes. Can we beat 7?",
+        "One 15-box → 35 left. 35 = 9 × 3 + 4 × 2 = 27 + 8 ✓ → 1 + 3 + 2 = **6** boxes: 15 + 27 + 8 = 50 ✓.",
+        "Checking every combination (three 15s leave 5 — not possible; zero 15s needs 10 boxes) shows nothing uses fewer than 6.",
+        "So the answer is **6** → **(C)**."
+      ],
+      "idea": "Systematically try how many of the biggest box you use (0, 1, 2, 3) and see what is left over — “biggest first” is a guess, not a rule.",
+      "explorer": {
+        "type": "boxes"
+      }
+    },
+    {
+      "id": "c04",
+      "skill": "C",
+      "difficulty": "hard",
+      "source": "CJMC (Canada Jay) 2024 — C04",
+      "text": "Campers arrive to Algonquin park to find a perfectly **square forest with an area of 6000 km²** whose map is given below. They are looking to find a Canada Jay bird. They know the Canada Jay is **not found where no conifers grow** (marked with orange bricks on the map) **or where there is only the Sitka spruce** (marked solid blue on the map).<br>Two campers, Ali and Bria, decide to map the areas where a Canada Jay cannot be found. They walk with a steady pace, measuring their times between points of interest. When they return, they make the following comments:<ul><li>The walk from Albatross to Eagle took as long as the walk from Eagle to Bobwhite.</li><li>The walk from Dove to Grebe took 4 times as long as the walk from Grebe to Albatross.</li><li>The walk from Bobwhite to Finch took twice as long as the walk from Finch to Crane.</li></ul>**How big is the area (marked with green stars) where a Canada Jay might be spotted?**",
+      "figure": {
+        "type": "forest"
+      },
+      "choices": [
+        "3400",
+        "4700",
+        "5000",
+        "5700",
+        "6000"
+      ],
+      "answer": 1,
+      "hints": [
+        "A steady pace means **walking time is proportional to distance**. So the comments tell you how the sides are split into parts.",
+        "Call the side of the square 1. Eagle is the middle of the bottom (½). Grebe splits the left side 4 : 1, and Finch splits the right side 2 : 1. Which fraction of each side is that?",
+        "Each shaded region is a right triangle: area = ½ × base × height. Use fractions of the side, then fractions of the area 6000."
+      ],
+      "traps": {
+        "3": "5700 = 6000 − 300 only removes the **brick** triangle. The blue (only-Sitka) triangle is a Canada Jay-free area as well.",
+        "2": "5000 = 6000 − 1000 only removes the **blue** triangle. The brick triangle is also a place where the bird cannot be found."
+      },
+      "solution": [
+        "Steady pace → distances are in the same ratios as the times. Let the side be 1.",
+        "Albatross–Eagle = Eagle–Bobwhite → each ½. Dove–Grebe : Grebe–Albatross = 4 : 1 → Grebe–Albatross = [[1/5]]. Bobwhite–Finch : Finch–Crane = 2 : 1 → Bobwhite–Finch = [[2/3]].",
+        "**Brick** triangle (Albatross, Grebe, Eagle): ½ × ½ × [[1/5]] = [[1/20]] of the square = 6000 ÷ 20 = **300**.",
+        "**Blue** triangle (Eagle, Bobwhite, Finch): ½ × ½ × [[2/3]] = [[1/6]] of the square = 6000 ÷ 6 = **1000**.",
+        "Green stars: 6000 − 300 − 1000 = **4700** → **(B)**."
+      ],
+      "idea": "You don’t need the side length (√6000)! Use fractions of the side and then fractions of the whole area.",
+      "explorer": {
+        "type": "forest",
+        "solved": true
+      }
+    },
+    {
+      "id": "c05",
+      "skill": "C",
+      "difficulty": "hard",
+      "source": "CJMC (Canada Jay) 2024 — C05",
+      "text": "A 6-digit number is said to be “exciting” if it satisfies each of the following properties.<ul><li>Each of the digits 4, 5, 6, 7, 8, 9 occur exactly once;</li><li>The number formed by the first *n* digits is divisible by *n*, for each *n* = 1, 2, 3, 4, 5, 6.</li></ul>For example, 987654 is exciting because 9 is divisible by 1, 98 is divisible by 2, 987 is divisible by 3, 9876 is divisible by 4, 98765 is divisible by 5, and 987654 is divisible by 6.<br>**Not including 987654, how many exciting numbers exist?**",
+      "choices": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "answer": 1,
+      "hints": [
+        "Start with the strictest clue: the first **5** digits must be divisible by **5**. What can the 5th digit be (using only 4–9)?",
+        "Divisible by 2, 4 and 6 means the 2nd, 4th and 6th digits are even. Which even digits do you have? Then use “digit sum divisible by 3” for the first three digits.",
+        "After the 5th digit = 5 and evens in places 2, 4, 6 → places 1 and 3 hold 7 and 9. The 2nd digit must make 7 + 9 + ? divisible by 3."
+      ],
+      "traps": {
+        "2": "There are exactly **two** exciting numbers, but one of them is the example 987654 — and the question says “not including 987654”."
+      },
+      "solution": [
+        "**5th digit:** the first 5 digits must be divisible by 5, so they end in 0 or 5 → the 5th digit is **5**.",
+        "**Evens:** the 2nd, 4th and 6th digits must be even (divisible by 2, 4 and 6). The even digits are 4, 6, 8 — so they fill places 2, 4, 6 and the 1st and 3rd digits are **7 and 9**.",
+        "**2nd digit:** 7 + 9 + ? must be a multiple of 3 → 16 + 8 = 24 → the 2nd digit is **8**.",
+        "**4th digit:** the 3rd and 4th digits must make a number divisible by 4: 76 ✓ (96 ✓), so the 4th digit is 6 and the 6th digit is 4.",
+        "The only exciting numbers are 789654 and 987654. Not counting the example: **1** → **(B)**."
+      ],
+      "idea": "Start with the clue that leaves the **fewest choices** (divisible by 5 → ends in 5) and build up one place at a time.",
+      "explorer": {
+        "type": "exciting"
+      }
+    }
+  ]
+}
