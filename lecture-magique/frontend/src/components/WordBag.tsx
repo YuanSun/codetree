@@ -28,6 +28,28 @@ export default function WordBag({ theme, lang = "fr" }: { theme: [ThemePref, (t:
   const [words, setWords] = useState<BagWord[] | null>(null);
   const [open, setOpen] = useState<number | null>(null);
   const [error, setError] = useState("");
+  const [removed, setRemoved] = useState<BagWord | null>(null);
+
+  // A word tapped by mistake: out of the bag (and of the défi) at once, with an undo while the note shows.
+  const remove = async (w: BagWord) => {
+    try { await api.removeWord(w.lemma_id); } catch (e) { setError((e as Error).message); return; }
+    setWords((ws) => ws && ws.filter((x) => x.lemma_id !== w.lemma_id));
+    setOpen(null);
+    setRemoved(w);
+  };
+  const undo = async () => {
+    const w = removed;
+    if (!w) return;
+    setRemoved(null);
+    try { await api.restoreWord(w.lemma_id, w.group === "known" ? "known" : "learning"); }
+    catch (e) { setError((e as Error).message); return; }
+    setWords((ws) => ws && [...ws, w].sort((a, b) => b.familiarity - a.familiarity));
+  };
+  useEffect(() => {
+    if (!removed) return;
+    const id = window.setTimeout(() => setRemoved(null), 8000);
+    return () => window.clearTimeout(id);
+  }, [removed]);
 
   useEffect(() => { api.words(lang).then(setWords, (e) => setError(e.message)); }, [lang]);
 
@@ -73,6 +95,11 @@ export default function WordBag({ theme, lang = "fr" }: { theme: [ThemePref, (t:
                         <span role="button" tabIndex={0} className="btn icon speak"
                               onClick={(e) => { e.stopPropagation(); speak(w.lemma, 0.85, lang); }}>🔊</span>
                       )}
+                      <span role="button" tabIndex={0} className="btn ghost small remove"
+                            onClick={(e) => { e.stopPropagation(); void remove(w); }}
+                            onKeyDown={(e) => { if (e.key === "Enter") { e.stopPropagation(); void remove(w); } }}>
+                        🗑 {t.remove}
+                      </span>
                     </span>
                   )}
                 </button>
@@ -81,6 +108,12 @@ export default function WordBag({ theme, lang = "fr" }: { theme: [ThemePref, (t:
           </section>
         );
       })}
+      {removed && (
+        <div className="undo-bar" role="status">
+          <span>{t.removed(removed.lemma)}</span>
+          <button className="btn small" onClick={undo}>{t.undo}</button>
+        </div>
+      )}
     </main>
   );
 }

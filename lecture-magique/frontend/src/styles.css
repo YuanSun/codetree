@@ -271,6 +271,10 @@ main.defi, main.bag { max-width: 720px; margin: 0 auto; padding: 16px 16px 48px;
 .wcard[aria-expanded="true"] { grid-column: 1 / -1; }
 .wcard-word { font-family: var(--read); font-size: 1.15rem; font-weight: 700; color: var(--ink); }
 .wcard-more { display: grid; gap: 6px; font-size: 0.95rem; }
+.wcard .remove { justify-self: start; color: var(--muted); }
+.undo-bar { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 40; display: flex;
+  align-items: center; gap: 12px; padding: 10px 14px; border-radius: 14px; background: var(--ink); color: var(--paper);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25); max-width: calc(100vw - 32px); }
 .wcard-def { line-height: 1.4; }
 .wcard-sent { font-family: var(--read); font-style: italic; color: var(--muted); }
 .wcard-sent mark { background: var(--active); color: inherit; border-radius: 3px; padding: 0 2px; }

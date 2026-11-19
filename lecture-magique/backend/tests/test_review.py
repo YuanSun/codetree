@@ -184,3 +184,48 @@ def test_check_dictation_accents():
 
 def test_familiarity_thresholds():
     assert [review.familiarity(s) for s in (None, 0.2, 3, 10, 20, 45)] == [0, 1, 2, 3, 4, 5]
+
+
+def test_remove_word_tapped_by_mistake(world):
+    g, l = login(world, "grace"), login(world, "leo")
+    t = tokens(world, 3)
+    for tok in t:
+        tap(g, tok.id)
+    qid = g.get("/api/quiz/current").json()["quiz"]["id"]
+
+    def quiz_lemmas():
+        with world["db"].connect() as c:
+            return set(c.execute(text("SELECT lemma_id FROM lecture.quiz_item WHERE quiz_id = :q"), {"q": qid}).scalars())
+    gone = t[0].lemma_id
+    assert gone in quiz_lemmas()
+    assert l.delete(f"/api/words/{gone}").status_code == 404  # not in Leo's bag
+    assert g.delete(f"/api/words/{gone}").json() == {"removed": gone}
+    assert g.delete(f"/api/words/{gone}").status_code == 404  # already removed
+    # out of the bag and of this week's défi; the lookup log is kept
+    assert gone not in {w["lemma_id"] for w in g.get("/api/words").json()}
+    assert g.get("/api/quiz/current").json()["quiz"]["id"] == qid
+    assert gone not in quiz_lemmas() and quiz_lemmas()
+    with world["db"].connect() as c:
+        assert c.execute(text("SELECT count(*) FROM lecture.lookup_event WHERE lemma_id = :l"), {"l": gone}).scalar() == 1
+    # undo
+    assert g.post(f"/api/words/{gone}/restore", json={"status": "learning"}).status_code == 200
+    assert gone in {w["lemma_id"] for w in g.get("/api/words").json()}
+    # removed again, then tapped again while reading: back in the bag
+    g.delete(f"/api/words/{gone}")
+    tap(g, t[0].id, at=datetime.now(timezone.utc) + timedelta(days=1))
+    bag = {w["lemma_id"]: w for w in g.get("/api/words").json()}
+    assert bag[gone]["lookups"] == 2
+
+
+def test_removing_every_word_of_the_defi_resets_it(world):
+    g = login(world, "grace")
+    t = tokens(world, 2)
+    for tok in t:
+        tap(g, tok.id)
+    first = g.get("/api/quiz/current").json()["quiz"]["id"]
+    for tok in t:
+        assert g.delete(f"/api/words/{tok.lemma_id}").status_code == 200
+    assert g.get("/api/quiz/current").json()["quiz"] is None
+    assert g.get("/api/words").json() == []
+    with world["db"].connect() as c:
+        assert c.execute(text("SELECT count(*) FROM lecture.quiz WHERE id = :q"), {"q": first}).scalar() == 0

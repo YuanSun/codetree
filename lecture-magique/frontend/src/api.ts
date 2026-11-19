@@ -132,6 +132,9 @@ export const api = {
   answer: (itemId: number, response: string, responseMs: number) =>
     call<AnswerResult>("POST", `/quiz/items/${itemId}/answer`, { response, response_ms: responseMs }),
   words: (lang: Lang) => call<BagWord[]>("GET", `/words?lang=${lang}`),
+  removeWord: (lemmaId: number) => call("DELETE", `/words/${lemmaId}`),
+  restoreWord: (lemmaId: number, status: "learning" | "known") =>
+    call("POST", `/words/${lemmaId}/restore`, { status }),
   children: () => call<{ id: number; username: string; display_name: string }[]>("GET", "/parent/children"),
   myReport: (lang: Lang, weeks = 8) => call<ChildReport>("GET", `/me/report?weeks=${weeks}&lang=${lang}`),
   report: (childId: number, lang: Lang, weeks = 8) =>

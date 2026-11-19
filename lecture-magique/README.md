@@ -88,6 +88,9 @@ Other choices:
 - Word matching order: spaCy lemma + POS → surface in `word_form` → lemma any POS → a small suffix heuristic for
   spaCy misses (`beaux` → beau, `remarqués` → remarquer). Unknown hyphenated words fall back to their parts.
   Proper nouns stay unmatched; the import report gives coverage with and without them.
+- A word tapped by mistake can be taken out of the word bag (“Retirer de mon sac”, with Annuler): `user_word.status`
+  becomes `ignored`, so the bag, the défi and the reviews skip it and its open défi questions are dropped. The
+  lookup log is kept, and tapping the word again while reading puts it back.
 - Exposure (“seen but not tapped”) counts words in her word bag that appear in the chapter and were not tapped since
   the chapter was opened.
 - The card also offers “Autres sens” (collapsed): until phase 2 picks the sense per sentence, the first Robert sense

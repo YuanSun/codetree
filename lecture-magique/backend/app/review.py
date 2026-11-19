@@ -355,6 +355,35 @@ def answer(conn: Connection, user_id: int, item_id: int, response: str, response
     return _result(conn, item, correct, hint, state=state, left=left)
 
 
+def remove_word(conn: Connection, user_id: int, lemma_id: int) -> bool:
+    """Take a word out of her bag (a mistaken tap): status 'ignored', so the bag, the défi and the reviews skip
+    it. The lookup log is kept. Its unanswered questions leave this week's open défi. A new tap brings it back."""
+    n = conn.execute(text("""UPDATE lecture.user_word SET status = 'ignored'
+        WHERE user_id = :u AND lemma_id = :l AND status <> 'ignored'"""), {"u": user_id, "l": lemma_id}).rowcount
+    if not n:
+        return False
+    open_quizzes = conn.execute(text("""SELECT DISTINCT q.id FROM lecture.quiz q JOIN lecture.quiz_item i ON i.quiz_id = q.id
+        WHERE q.user_id = :u AND q.status <> 'done' AND i.lemma_id = :l AND i.answered_at IS NULL"""),
+                                {"u": user_id, "l": lemma_id}).scalars().all()
+    for qid in open_quizzes:
+        conn.execute(text("DELETE FROM lecture.quiz_item WHERE quiz_id = :q AND lemma_id = :l AND answered_at IS NULL"),
+                     {"q": qid, "l": lemma_id})
+        total, left = conn.execute(text("""SELECT count(*), count(*) FILTER (WHERE answered_at IS NULL)
+            FROM lecture.quiz_item WHERE quiz_id = :q"""), {"q": qid}).one()
+        if total == 0:  # nothing left of it: this week's défi is built again on her next visit
+            conn.execute(text("DELETE FROM lecture.quiz WHERE id = :q"), {"q": qid})
+        elif left == 0:
+            conn.execute(text("UPDATE lecture.quiz SET status = 'done', finished_at = coalesce(finished_at, now()) "
+                              "WHERE id = :q"), {"q": qid})
+    return True
+
+
+def restore_word(conn: Connection, user_id: int, lemma_id: int, status: str) -> bool:
+    """Undo remove_word (status 'learning' or 'known', as it was)."""
+    return bool(conn.execute(text("""UPDATE lecture.user_word SET status = :s
+        WHERE user_id = :u AND lemma_id = :l AND status = 'ignored'"""), {"u": user_id, "l": lemma_id, "s": status}).rowcount)
+
+
 def _result(conn: Connection, item, correct: bool, hint: str | None, state: dict | None = None,
             left: int | None = None, already: bool = False) -> dict:
     full = item.expected.get("full")

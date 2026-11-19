@@ -52,6 +52,9 @@ const fr = {
   bagEmpty: "Ton sac est vide. Touche les mots que tu ne connais pas en lisant !",
   bagCount: (n: number) => `${n} mots`,
   inGold: "en or",
+  remove: "Retirer de mon sac",
+  removed: (w: string) => `« ${w} » est retiré de ton sac.`,
+  undo: "Annuler",
   lookedUp: (n: number) => `Cherché ${n} fois`,
   bagSections: {
     mastered: ["✨ Maîtrisés", "Tu les retiens depuis plus d’un mois."],
@@ -109,6 +112,9 @@ const en: Strings = {
   bagEmpty: "Your bag is empty. Tap the words you don’t know while you read!",
   bagCount: (n: number) => `${n} words`,
   inGold: "gold",
+  remove: "Remove from my bag",
+  removed: (w: string) => `“${w}” was removed from your bag.`,
+  undo: "Undo",
   lookedUp: (n: number) => `Looked up ${n} times`,
   bagSections: {
     mastered: ["✨ Mastered", "You’ve remembered them for over a month."],

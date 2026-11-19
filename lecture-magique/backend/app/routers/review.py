@@ -40,6 +40,26 @@ def answer_item(item_id: int, body: AnswerIn, user: User = Depends(current_user)
 GROUPS = ("new", "learning", "mastered", "known")
 
 
+@router.delete("/words/{lemma_id}")
+def remove_word(lemma_id: int, user: User = Depends(current_user), conn: Connection = Depends(get_conn)):
+    """Remove a word tapped by mistake from her own bag (undo: POST /words/{lemma_id}/restore)."""
+    if not review.remove_word(conn, user.id, lemma_id):
+        raise HTTPException(404, "Mot introuvable dans ton sac")
+    return {"removed": lemma_id}
+
+
+class RestoreIn(BaseModel):
+    status: Literal["learning", "known"] = "learning"
+
+
+@router.post("/words/{lemma_id}/restore")
+def restore_word(lemma_id: int, body: RestoreIn | None = None, user: User = Depends(current_user),
+                 conn: Connection = Depends(get_conn)):
+    if not review.restore_word(conn, user.id, lemma_id, (body or RestoreIn()).status):
+        raise HTTPException(404, "Mot introuvable")
+    return {"restored": lemma_id}
+
+
 @router.get("/words")
 def word_bag(group: str | None = None, lang: Lang | None = None, user: User = Depends(current_user),
              conn: Connection = Depends(get_conn)):
