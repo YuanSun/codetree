@@ -1,4 +1,4 @@
-"""French tokenizer that keeps exact character offsets.
+"""French / English tokenizer that keeps exact character offsets.
 
 Joining text[start:end] of every token plus the untouched gaps between them gives back
 the original paragraph character for character (the reader rebuilds it that way).
@@ -8,6 +8,8 @@ the original paragraph character for character (the reader rebuilds it that way)
 - Hyphenated words stay whole (peut-être, porte-coton); inverted pronouns are split off
   (dit-il -> dit + -il, hurle-t-il -> hurle + -t-il, est-ce -> est + -ce).
 - Numbers and punctuation are tokens with is_word=False.
+- English (lang="en"): words with an apostrophe stay whole (don't, it's, Schubert's); the article
+  importer splits a possessive 's off when the whole word is not in the dictionary (split_possessive).
 """
 import re
 from dataclasses import dataclass
@@ -69,16 +71,17 @@ def _split_word(w: str, start: int) -> list[Tok]:
     return out + tail
 
 
-def tokenize(text: str) -> list[Tok]:
+def tokenize(text: str, lang: str = "fr") -> list[Tok]:
     toks: list[Tok] = []
+    split = _split_word if lang == "fr" else (lambda w, s: [Tok(w, s, s + len(w), True)])
     for m in TOKEN_RE.finditer(text):
         if m.group("word"):
             w, s = m.group(), m.start()
-            if w[-1] in APOS and _norm(w[:-1]) not in ELISION:  # closing quote, not elision
-                toks.extend(_split_word(w[:-1], s))
+            if w[-1] in APOS and (lang != "fr" or _norm(w[:-1]) not in ELISION):  # closing quote / players'
+                toks.extend(split(w[:-1], s))
                 toks.append(Tok(w[-1], m.end() - 1, m.end(), False))
             else:
-                toks.extend(_split_word(w, s))
+                toks.extend(split(w, s))
         else:
             toks.append(Tok(m.group(), m.start(), m.end(), False))
     return toks
@@ -90,3 +93,11 @@ def split_hyphenated(t: Tok) -> list[Tok]:
     for m in re.finditer(r"[^-]+|-", t.surface):
         out.append(Tok(m.group(), t.start + m.start(), t.start + m.end(), m.group() != "-"))
     return out
+
+
+def split_possessive(t: Tok) -> list[Tok] | None:
+    """English fallback: "Schubert's" -> "Schubert" + "'s" (not a word). None if there is no 's."""
+    if len(t.surface) > 2 and t.surface[-2] in APOS and t.surface[-1] in "sS":
+        cut = len(t.surface) - 2
+        return [Tok(t.surface[:cut], t.start, t.start + cut, True), Tok(t.surface[cut:], t.start + cut, t.end, False)]
+    return None

@@ -6,9 +6,10 @@
     uv run python -m importer.article rematch [<slug>]    # after importing Wiktionary: re-match in place
     uv run python -m importer.article list
 
-Pipeline per paragraph: tokenize (exact offsets) -> spaCy fr_core_news_sm lemma + POS ->
-match lecture.lemma (lemma+POS, then word_form, then lemma alone) -> token rows, with
-sense_id = first Petit Robert sense of the lemma (phase 2 picks the sense with a model).
+Pipeline per paragraph: tokenize (exact offsets) -> spaCy lemma + POS (fr_core_news_sm, or
+en_core_web_sm for a pack with "lang": "en") -> match lecture.lemma of that language (lemma+POS,
+then word_form, then lemma alone) -> token rows, with sense_id = first sense of the lemma (Petit
+Robert for French, Wiktionary for English; phase 2 picks the sense with a model).
 Unmatched words get needs_review=true and are listed in the report.
 
 Re-importing the same slug replaces its chapters while it has no lookup history; once
@@ -26,7 +27,7 @@ from sqlalchemy import Connection, text
 from app.config import ROOT, settings
 from app.db import get_engine
 
-from .tokenize import Tok, split_hyphenated, tokenize
+from .tokenize import Tok, split_hyphenated, split_possessive, tokenize
 
 ELIDED = {"l": "le", "d": "de", "j": "je", "m": "me", "t": "te", "s": "se", "n": "ne", "c": "ce", "ç": "ce",
           "qu": "que", "jusqu": "jusque", "lorsqu": "lorsque", "puisqu": "puisque", "quoiqu": "quoique"}
@@ -52,35 +53,47 @@ _SUFFIXES = [("eaux", "eau"), ("aux", "al"), ("euses", "eux"), ("euse", "eux"), 
              ("es", ""), ("es", "e"), ("s", ""), ("x", ""), ("e", "")]
 
 
-def guess_lemmas(s: str) -> list[str]:
-    return [s[: -len(suf)] + rep for suf, rep in _SUFFIXES if s.endswith(suf) and len(s) - len(suf) >= 2]
+_SUFFIXES_EN = [("ies", "y"), ("ied", "y"), ("ier", "y"), ("iest", "y"), ("ves", "f"), ("es", ""), ("s", ""),
+                ("ed", ""), ("ed", "e"), ("ing", ""), ("ing", "e"), ("er", ""), ("est", ""), ("ly", "")]
+
+
+def guess_lemmas(s: str, lang: str = "fr") -> list[str]:
+    sufs = _SUFFIXES if lang == "fr" else _SUFFIXES_EN
+    return [s[: -len(suf)] + rep for suf, rep in sufs if s.endswith(suf) and len(s) - len(suf) >= 2]
 
 
 class Lexicon:
-    """Whole dictionary index in memory (~85k lemmas): fast enough and simple."""
+    """Whole dictionary of one language in memory (French ~130k lemmas, English ~700k): simple and fast."""
 
-    def __init__(self, conn: Connection):
-        self.by_lemma: dict[str, list[tuple[int, str, int]]] = {}
+    def __init__(self, conn: Connection, lang: str = "fr"):
+        self.lang = lang
+        self.by_lemma: dict[str, list[tuple[int, str, int, bool]]] = {}
         self.pos: dict[int, str] = {}
-        for lid, lemma, pos, hom in conn.execute(text("SELECT id, lemma, pos, homograph FROM lecture.lemma")):
-            self.by_lemma.setdefault(lemma.lower(), []).append((lid, pos, hom))
+        for lid, lemma, pos, hom in conn.execute(text(
+                "SELECT id, lemma, pos, homograph FROM lecture.lemma WHERE lang = :lang"), {"lang": lang}):
+            # English: skip acronyms in the index ("ALICE", "NO"): they would capture ordinary words
+            if lang == "en" and len(lemma) > 1 and lemma.isupper():
+                continue
+            self.by_lemma.setdefault(lemma.lower(), []).append((lid, pos, hom, lemma != lemma.lower()))
             self.pos[lid] = pos
         for v in self.by_lemma.values():
-            v.sort(key=lambda r: r[2])
+            v.sort(key=lambda r: (r[3], r[2]))  # lowercase entry first ("a" before "A"), then homograph order
         self.forms: dict[str, list[int]] = {}
-        for form, lid in conn.execute(text("SELECT form, lemma_id FROM lecture.word_form")):
+        for form, lid in conn.execute(text("""SELECT f.form, f.lemma_id FROM lecture.word_form f
+                JOIN lecture.lemma l ON l.id = f.lemma_id WHERE l.lang = :lang"""), {"lang": lang}):
             self.forms.setdefault(form.lower(), []).append(lid)
-        # First Petit Robert sense; for words Robert lacks, the first Wiktionary (English) gloss.
+        # First Petit Robert sense; for words Robert lacks (and English words), the first Wiktionary gloss.
         self.first_sense: dict[int, int] = dict(conn.execute(text(
-            "SELECT DISTINCT ON (lemma_id) lemma_id, id FROM lecture.sense "
-            "WHERE source IN ('petit_robert', 'wiktionary_en') "
-            "ORDER BY lemma_id, (source = 'petit_robert') DESC, seq")).all())
+            "SELECT DISTINCT ON (s.lemma_id) s.lemma_id, s.id FROM lecture.sense s "
+            "JOIN lecture.lemma l ON l.id = s.lemma_id "
+            "WHERE s.source IN ('petit_robert', 'wiktionary_en') AND l.lang = :lang "
+            "ORDER BY s.lemma_id, (s.source = 'petit_robert') DESC, s.seq"), {"lang": lang}).all())
 
-    def _pick(self, rows: list[tuple[int, str, int]], upos: str | None) -> int | None:
+    def _pick(self, rows: list[tuple[int, str, int, bool]], upos: str | None) -> int | None:
         if not rows:
             return None
         for want in (upos, UPOS_EQUIV.get(upos or "")):
-            for lid, pos, _ in rows:
+            for lid, pos, *_ in rows:
                 if want and pos == want:
                     return lid
         return rows[0][0]
@@ -88,12 +101,13 @@ class Lexicon:
     def match(self, surface: str, lemma: str, upos: str) -> Match:
         s = surface.lower().replace("’", "'")
         lem = lemma.lower().replace("’", "'")
-        if s.endswith("'") and s[:-1] in ELIDED:
+        if self.lang == "fr" and s.endswith("'") and s[:-1] in ELIDED:
             lem = ELIDED[s[:-1]]
-        if s.startswith("-"):  # inverted pronoun: -il, -t-il, -ce
+        if self.lang == "fr" and s.startswith("-"):  # inverted pronoun: -il, -t-il, -ce
             s = lem = s.lstrip("-").removeprefix("t-")
         lid, how = None, ""
-        exact = [r for r in self.by_lemma.get(lem, []) if r[1] in (upos, UPOS_EQUIV.get(upos))]
+        rows = self.by_lemma.get(lem, [])
+        exact = [r for r in rows if r[1] == upos] or [r for r in rows if r[1] == UPOS_EQUIV.get(upos)]
         verb_forms = [i for i in self.forms.get(s, []) if self.pos.get(i) == "VERB"] if upos in ("VERB", "AUX") else []
         if exact:
             lid, how = exact[0][0], "lemma+pos"
@@ -113,7 +127,7 @@ class Lexicon:
         elif lem in self.forms:
             lid, how = self.forms[lem][0], "word_form(lemma)"
         else:
-            for cand in guess_lemmas(s):
+            for cand in guess_lemmas(s, self.lang):
                 if cand in self.by_lemma:
                     lid, how = self._pick(self.by_lemma[cand], upos), "heuristic"
                     break
@@ -123,23 +137,23 @@ class Lexicon:
         return Match(lid, self.first_sense.get(lid) if lid else None, how)
 
 
-_nlp = None
+SPACY_MODELS = {"fr": "fr_core_news_sm", "en": "en_core_web_sm"}
+_nlp: dict = {}
 
 
-def nlp():
-    global _nlp
-    if _nlp is None:
+def nlp(lang: str = "fr"):
+    if lang not in _nlp:
         import spacy
 
-        _nlp = spacy.load("fr_core_news_sm", disable=["ner", "parser"])
-    return _nlp
+        _nlp[lang] = spacy.load(SPACY_MODELS[lang], disable=["ner", "parser"])
+    return _nlp[lang]
 
 
 class SpacyParagraph:
     """spaCy analysis of one paragraph, looked up by our token spans."""
 
-    def __init__(self, text_: str):
-        self.spans = [(t.idx, t.idx + len(t.text), t.lemma_, t.pos_, str(t.morph)) for t in nlp()(text_)]
+    def __init__(self, text_: str, lang: str = "fr"):
+        self.spans = [(t.idx, t.idx + len(t.text), t.lemma_, t.pos_, str(t.morph)) for t in nlp(lang)(text_)]
 
     def for_token(self, t: Tok) -> tuple[str, str, str]:
         """(lemma, upos, morph) of the spaCy token that matches our token's span."""
@@ -159,14 +173,20 @@ NO_MATCH = Match(None, None, "")
 
 def analyse(text_: str, lex: Lexicon) -> list[tuple[Tok, Match, str, str, str]]:
     """Tokens of one paragraph with their dictionary match and spaCy (lemma, upos, morph)."""
-    sp = SpacyParagraph(text_)
+    sp = SpacyParagraph(text_, lex.lang)
     out = []
-    for t in tokenize(text_):
+    for t in tokenize(text_, lex.lang):
         if not t.is_word:
             out.append((t, NO_MATCH, "", "", ""))
             continue
         lemma, pos, morph = sp.for_token(t)
         m = lex.match(t.surface, lemma, pos)
+        parts = split_possessive(t) if lex.lang == "en" and m.lemma_id is None else None
+        if parts:  # "Schubert's" -> "Schubert" + "'s"
+            pl, pp, pm = sp.for_token(parts[0])
+            out.append((parts[0], lex.match(parts[0].surface, pl, pp), pl, pp, pm))
+            out.append((parts[1], NO_MATCH, "", "", ""))
+            continue
         if m.lemma_id is None and "-" in t.surface and not t.surface.startswith("-"):
             for p in split_hyphenated(t):
                 if not p.is_word:
@@ -180,7 +200,11 @@ def analyse(text_: str, lex: Lexicon) -> list[tuple[Tok, Match, str, str, str]]:
 
 
 def import_pack(conn: Connection, pack: dict, lex: Lexicon | None = None) -> dict:
-    lex = lex or Lexicon(conn)
+    lang = pack.get("lang", "fr")
+    if lang not in SPACY_MODELS:
+        raise ImportRefused(f"lang must be one of {sorted(SPACY_MODELS)}, not {lang!r}")
+    if lex is None or lex.lang != lang:
+        lex = Lexicon(conn, lang)
     slug = pack["slug"]
     existing = conn.execute(text("SELECT id FROM lecture.article WHERE slug = :s"), {"s": slug}).scalar()
     if existing:
@@ -192,14 +216,15 @@ def import_pack(conn: Connection, pack: dict, lex: Lexicon | None = None) -> dic
                                 f"import it under a new slug instead")
         conn.execute(text("DELETE FROM lecture.question WHERE article_id = :a"), {"a": existing})
         conn.execute(text("DELETE FROM lecture.chapter WHERE article_id = :a"), {"a": existing})
-        conn.execute(text("""UPDATE lecture.article SET title=:t, week_of=:w, level=:l, source_note=:n, status='draft'
-            WHERE id=:a"""), {"a": existing, "t": pack["title"], "w": pack["week_of"], "l": pack.get("level"),
-                               "n": pack.get("source_note")})
+        conn.execute(text("""UPDATE lecture.article SET title=:t, week_of=:w, level=:l, source_note=:n, status='draft',
+            lang=:lang WHERE id=:a"""), {"a": existing, "t": pack["title"], "w": pack["week_of"], "l": pack.get("level"),
+                                         "n": pack.get("source_note"), "lang": lang})
         article_id = existing
     else:
-        article_id = conn.execute(text("""INSERT INTO lecture.article (slug, title, week_of, level, source_note)
-            VALUES (:s, :t, :w, :l, :n) RETURNING id"""), {"s": slug, "t": pack["title"], "w": pack["week_of"],
-                                                          "l": pack.get("level"), "n": pack.get("source_note")}).scalar()
+        article_id = conn.execute(text("""INSERT INTO lecture.article (slug, title, week_of, level, source_note, lang)
+            VALUES (:s, :t, :w, :l, :n, :lang) RETURNING id"""), {"s": slug, "t": pack["title"], "w": pack["week_of"],
+                                                                 "l": pack.get("level"), "n": pack.get("source_note"),
+                                                                 "lang": lang}).scalar()
 
     words = matched = propn = 0
     unmatched: Counter = Counter()
@@ -245,7 +270,7 @@ def import_pack(conn: Connection, pack: dict, lex: Lexicon | None = None) -> dic
     coverage = matched / words if words else 1.0
     no_propn = matched / (words - propn) if words - propn else 1.0
     return {
-        "article_id": article_id, "slug": slug, "status": "draft",
+        "article_id": article_id, "slug": slug, "lang": lang, "status": "draft",
         "words": words, "matched": matched, "coverage": round(coverage, 4),
         "coverage_without_proper_nouns": round(no_propn, 4),
         "match_kinds": dict(hows),
@@ -258,16 +283,18 @@ def import_pack(conn: Connection, pack: dict, lex: Lexicon | None = None) -> dic
 def rematch(conn: Connection, slug: str, lex: Lexicon | None = None) -> dict:
     """Re-run spaCy + dictionary matching on an imported article without touching its token ids
     (so lookups already recorded stay attached). Use after importing Wiktionary or a new dictionary."""
-    lex = lex or Lexicon(conn)
-    art = conn.execute(text("SELECT id FROM lecture.article WHERE slug = :s"), {"s": slug}).scalar()
-    if not art:
+    row = conn.execute(text("SELECT id, lang FROM lecture.article WHERE slug = :s"), {"s": slug}).first()
+    if not row:
         raise SystemExit(f"no article with slug {slug!r}")
+    art = row.id
+    if lex is None or lex.lang != row.lang:
+        lex = Lexicon(conn, row.lang)
     words = matched = changed = 0
     unmatched: Counter = Counter()
     paras = conn.execute(text("""SELECT p.id, p.text FROM lecture.paragraph p JOIN lecture.chapter c ON c.id = p.chapter_id
         WHERE c.article_id = :a ORDER BY c.seq, p.seq"""), {"a": art}).all()
     for pid, ptext in paras:
-        sp = SpacyParagraph(ptext)
+        sp = SpacyParagraph(ptext, lex.lang)
         updates = []
         for tid, surface, s, e, old_lemma in conn.execute(text("""SELECT id, surface, char_start, char_end, lemma_id
                 FROM lecture.token WHERE paragraph_id = :p AND is_word ORDER BY seq"""), {"p": pid}):
@@ -283,7 +310,7 @@ def rematch(conn: Connection, slug: str, lex: Lexicon | None = None) -> dict:
         if updates:
             conn.execute(text("""UPDATE lecture.token SET lemma_id = :l, sense_id = :sn, morph = :m, needs_review = :r
                 WHERE id = :id"""), updates)
-    return {"slug": slug, "words": words, "matched": matched, "coverage": round(matched / words, 4) if words else 1.0,
+    return {"slug": slug, "lexicon": lex, "words": words, "matched": matched, "coverage": round(matched / words, 4) if words else 1.0,
             "lemma_changed": changed,
             "unmatched": [{"surface": s, "spacy_lemma": l, "upos": p, "count": n}
                           for (s, l, p), n in unmatched.most_common()]}
@@ -322,10 +349,12 @@ def main(argv: list[str] | None = None) -> None:
                 print(f"  {u['count']:>3}  {u['surface']}  (spaCy: {u['spacy_lemma']} {u['upos']})")
             print(f"publish with: python -m importer.article publish {rep['slug']}")
         elif a.cmd == "rematch":
-            slugs = [a.slug] if a.slug else list(conn.execute(text("SELECT slug FROM lecture.article ORDER BY id")).scalars())
-            lex = Lexicon(conn)
+            slugs = [a.slug] if a.slug else list(conn.execute(text(
+                "SELECT slug FROM lecture.article ORDER BY lang, id")).scalars())
+            lex = None
             for slug in slugs:
                 rep = rematch(conn, slug, lex)
+                lex = rep.pop("lexicon")
                 print(f"{slug}: coverage {rep['coverage']:.1%}, {rep['lemma_changed']} words now point to a "
                       f"different entry, {len(rep['unmatched'])} distinct unmatched")
         elif a.cmd == "publish":
@@ -333,8 +362,9 @@ def main(argv: list[str] | None = None) -> None:
         elif a.cmd == "unpublish":
             set_status(conn, a.slug, "draft"); print(f"{a.slug}: draft")
         else:
-            for r in conn.execute(text("SELECT slug, status, week_of, title FROM lecture.article ORDER BY week_of DESC")):
-                print(f"{r.week_of}  {r.status:<9}  {r.slug}  {r.title}")
+            for r in conn.execute(text(
+                    "SELECT slug, lang, status, week_of, title FROM lecture.article ORDER BY week_of DESC")):
+                print(f"{r.week_of}  {r.lang}  {r.status:<9}  {r.slug}  {r.title}")
 
 
 if __name__ == "__main__":

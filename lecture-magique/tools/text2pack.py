@@ -3,11 +3,12 @@
     python tools/text2pack.py content/book.txt content/book.questions.json -o content/book.pack.json
 
 Text format:
-    @title ...            metadata lines (@title, @slug, @week_of, @source_note, @level)
+    @title ...            metadata lines (@title, @slug, @week_of, @source_note, @level, @lang)
+    @lang en              English text (default fr)
     ## 1 Chapter title    starts a chapter (the number is the chapter seq)
     blank-line separated paragraphs
 
-Typography: straight apostrophes become ’ and the spaces before ! ? ; : » and after « become
+Typography: straight apostrophes become ’. French only: the spaces before ! ? ; : » and after « become
 narrow no-break spaces (U+202F), so "!" never wraps alone onto the next line.
 
 The questions file is {"chapters": {"1": {"kind": "open", "prompt": ..., "rubric": {...}}},
@@ -23,9 +24,11 @@ from pathlib import Path
 NNBSP = " "
 
 
-def typography(s: str) -> str:
+def typography(s: str, lang: str = "fr") -> str:
     s = re.sub(r"\s+", " ", s).strip()
     s = s.replace("'", "’")
+    if lang != "fr":
+        return s
     s = re.sub(r" ([!?;:»])", NNBSP + r"\1", s)
     s = re.sub(r"« ", "«" + NNBSP, s)
     return s
@@ -38,8 +41,11 @@ def parse(text: str) -> dict:
 
     def flush():
         if para and chapters:
-            chapters[-1]["paragraphs"].append(typography(" ".join(para)))
+            chapters[-1]["paragraphs"].append(typography(" ".join(para), lang()))
         para.clear()
+
+    def lang() -> str:
+        return meta.get("lang", "fr")
 
     for line in text.splitlines():
         if line.startswith("@"):
@@ -50,7 +56,7 @@ def parse(text: str) -> dict:
             m = re.match(r"##\s+(\d+)\s+(.*)", line)
             if not m:
                 sys.exit(f"bad chapter line: {line}")
-            chapters.append({"seq": int(m.group(1)), "title": typography(m.group(2)), "paragraphs": []})
+            chapters.append({"seq": int(m.group(1)), "title": typography(m.group(2), lang()), "paragraphs": []})
         elif not line.strip():
             flush()
         else:
@@ -76,6 +82,7 @@ def main() -> None:
     pack = {
         "slug": a.slug or meta.get("slug"),
         "title": meta["title"],
+        "lang": meta.get("lang", "fr"),
         "week_of": a.week_of or meta.get("week_of"),
         "source_note": meta.get("source_note") or meta.get("author"),
         "level": meta.get("level"),
