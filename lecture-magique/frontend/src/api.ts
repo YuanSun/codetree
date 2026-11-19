@@ -34,11 +34,15 @@ export type Conjugation = {
 };
 export type WordState = { status: string; familiarity: number; lookups: number; exposures: number };
 
+/** A picture shown after paragraph `after` (0 = top of the chapter). */
+export type Illustration = { id: number; after: number; width: number; height: number; caption: string | null };
+
 export type ChapterData = {
   article: { id: number; slug: string; title: string; status: string; lang: Lang };
   chapter: { id: number; seq: number; title: string | null };
   chapters: { seq: number; title: string | null }[];
   paragraphs: { id: number; seq: number; text: string; tokens: TokenTuple[] }[];
+  illustrations?: Illustration[];
   lemmas: Record<string, Lemma>;
   senses: Record<string, Sense>;
   words: Record<string, WordState>;
