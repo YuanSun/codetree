@@ -102,7 +102,8 @@ def get_chapter(article_id: int, seq: int, user: User = Depends(current_user), c
     words = {r.lemma_id: {"status": r.status, "familiarity": r.familiarity, "lookups": r.lookup_count,
                           "exposures": r.exposure_count}
              for r in conn.execute(text("""SELECT lemma_id, status, familiarity, lookup_count, exposure_count
-                 FROM lecture.user_word WHERE user_id = :u AND lemma_id = ANY(:ids)"""),
+                 FROM lecture.user_word WHERE user_id = :u AND lemma_id = ANY(:ids)
+                 AND status <> 'ignored'"""),
                                    {"u": user.id, "ids": lemma_ids})}
     q = conn.execute(text("SELECT prompt FROM lecture.question WHERE chapter_id = :c ORDER BY seq LIMIT 1"),
                      {"c": ch.id}).scalar()

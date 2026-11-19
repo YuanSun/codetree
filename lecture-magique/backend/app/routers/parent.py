@@ -86,7 +86,7 @@ def build_report(conn: Connection, kid, weeks: int, lang: str = "fr") -> dict:
     bag = conn.execute(text(f"""SELECT
             count(*) FILTER (WHERE status = 'learning' AND familiarity = 0) AS new,
             count(*) FILTER (WHERE status = 'learning' AND familiarity BETWEEN 1 AND 4) AS learning,
-            count(*) FILTER (WHERE familiarity = 5) AS mastered,
+            count(*) FILTER (WHERE status = 'learning' AND familiarity = 5) AS mastered,
             count(*) FILTER (WHERE status = 'known') AS known,
             count(*) FILTER (WHERE status = 'learning' AND due_at < now() + interval '7 days') AS due_soon
         FROM lecture.user_word WHERE user_id = :k AND {lemma_in}"""), p).one()
