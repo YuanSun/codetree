@@ -272,6 +272,26 @@ an English word bag, and the same switch in Suivi / Mes progrès. The dictionary
 
    Expect coverage around 94% (99% without proper nouns): only names (Schubert, Liszt, …) stay unmatched.
 
+## Pictures in the books
+
+Pictures sit in the git-ignored `content/images/<book>/` folder (JPEG or PNG, at most 1.5 MB each) and are placed
+with `@image` lines in the book's `.txt` (see `tools/text2pack.py`):
+
+```
+@image images/piege-glace/ch1-plage.jpg | optional caption
+```
+
+A picture goes after the paragraphs above its line (on top of the chapter if it comes right after `## …`).
+Rebuild the pack with `text2pack`, then import as usual: the import stores the pictures in the database with the text.
+
+A book Grace has already started (taps recorded) can't be re-imported, so swap only its pictures:
+
+```bash
+uv run python -m importer.article images ../content/mega-trouille.pack.json
+```
+
+It refuses if the text in the pack no longer matches the imported text (picture positions would be wrong).
+
 ## Serve it from the family gateway (optional)
 
 The family gateway (`hosting/`, Caddy on port 12999) can run Lecture Magique together with the other family sites.

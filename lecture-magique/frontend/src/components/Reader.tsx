@@ -30,13 +30,14 @@ const Paragraph = memo(function Paragraph({ seq, text, tokens, seen, active, und
   return <p data-seq={seq} className={text.startsWith("–") ? "dialogue" : undefined}>{out}</p>;
 });
 
-/** A picture between paragraphs: width/height reserve its place before it loads; a tap shows it full screen. */
+/** A picture between paragraphs: width/height reserve its place before it loads; small web pictures are not
+ * blown up past 1.5×; a tap shows it full screen. */
 function Figure({ pic, onOpen }: { pic: Illustration; onOpen: (p: Illustration) => void }) {
   return (
     <figure className="pic">
       <button className="pic-btn" onClick={() => onOpen(pic)} aria-label={pic.caption ?? "Image"}>
         <img src={`api/illustrations/${pic.id}`} width={pic.width} height={pic.height} alt={pic.caption ?? ""}
-             loading="lazy" decoding="async" />
+             loading="lazy" decoding="async" style={{ maxWidth: Math.round(pic.width * 1.5) }} />
       </button>
       {pic.caption && <figcaption>{pic.caption}</figcaption>}
     </figure>

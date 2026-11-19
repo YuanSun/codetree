@@ -75,6 +75,7 @@ Schema additions (all additive; flagged here because CLAUDE.md asks to raise dat
 | `sense.seq` + unique `(lemma_id, source, seq)` | lets the dictionary import be an idempotent upsert, and fixes sense order |
 | `lookup_event.client_event_id` (unique UUID) + `received_at` | a batch the tablet retries is stored once; `created_at` is the tap time |
 | `reading_day` table (migration 0003) | reading seconds per child, book and day, for the weekly minutes chart (`reading_progress.seconds_read` keeps the per-book total) |
+| `illustration` table (migration 0005) | pictures between paragraphs (`after_seq`, 0 = top of chapter), stored as `bytea` so a pack import brings them; served by `GET /api/illustrations/{id}` to whoever may read the chapter |
 | `lang` on `lemma`, `article`, `quiz` (migration 0004); lemma key `(lang, lemma, pos, homograph)`, quiz key `(user_id, week_of, lang)` | English reading in the same tables: the French and English dictionaries never mix, one défi per language per week |
 | `token.morph` (migration 0002) | spaCy grammar of each occurrence (*Tense=Pres, Person=3…*), so the card shows the tense of the word in its sentence |
 
