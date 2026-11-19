@@ -153,7 +153,7 @@ class LemmaIndex:
     def __init__(self, conn: Connection):
         self.rows: dict[tuple[str, str], list[tuple[int, int, str | None]]] = {}
         for lid, lemma, pos, hom, gender in conn.execute(
-                text("SELECT id, lemma, pos, homograph, gender FROM lecture.lemma")):
+                text("SELECT id, lemma, pos, homograph, gender FROM lecture.lemma WHERE lang = 'fr'")):
             self.rows.setdefault((lemma.lower(), pos), []).append((lid, hom, gender))
 
     def find_or_create(self, conn: Connection, word: str, upos: str, e: dict, stats: dict) -> list[int]:
@@ -163,8 +163,8 @@ class LemmaIndex:
                 return []
             ipa = next((s["ipa"].strip("/[]") for s in e.get("sounds") or [] if s.get("ipa")), None)
             lid = conn.execute(text("""
-                INSERT INTO lecture.lemma (lemma, pos, homograph, gender, ipa) VALUES (:l, :p, 0, :g, :i)
-                ON CONFLICT (lemma, pos, homograph) DO UPDATE SET lemma = EXCLUDED.lemma RETURNING id"""),
+                INSERT INTO lecture.lemma (lang, lemma, pos, homograph, gender, ipa) VALUES ('fr', :l, :p, 0, :g, :i)
+                ON CONFLICT (lang, lemma, pos, homograph) DO UPDATE SET lemma = EXCLUDED.lemma RETURNING id"""),
                 {"l": word, "p": upos, "g": entry_gender(e) if upos == "NOUN" else None, "i": ipa}).scalar_one()
             self.rows[key] = [(lid, 0, None)]
             stats["lemmas_created"] += 1

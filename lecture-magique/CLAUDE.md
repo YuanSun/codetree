@@ -11,6 +11,7 @@
 - 前端：React + Vite + TypeScript，构建产物由 FastAPI 作为静态文件提供（单进程）。
 - 设备：iPad（Safari）+ 学校发的 Chromebook（Chrome）。只在家里内网用，**http，不做 PWA / service worker**（service worker 只能在 HTTPS 下注册）。
 - 词典：法语释义用 Petit Robert 2007（`tools/ld2.py` + `tools/robert_extract.py` 已能解析，85,062 条）。英文释义用 Wiktionary（wiktextract 数据，第二期接入）。
+- 英文阅读（已加，Ryan 同意）：同一套表加 `lang` 列（`lemma` / `article` / `quiz`），英文词典是英文 Wiktionary（`importer/wiktionary_en.py`），每周法语、英语各一个 défi。
 - 部署：Mac Studio，launchd 开机自启，监听内网端口（默认 8090）。
 
 ## 版权与数据（硬性规则）

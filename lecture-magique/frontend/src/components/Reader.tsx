@@ -4,6 +4,7 @@ import { go } from "../App";
 import { usePref, ThemePref } from "../prefs";
 import { lookupQueue, uuid4 } from "../queue";
 import { speak } from "../speech";
+import { strings } from "../i18n";
 import ThemeButton from "./ThemeButton";
 import WordCard, { CardInfo, Rating } from "./WordCard";
 
@@ -179,7 +180,10 @@ export default function Reader({ articleId, seq, theme }: {
     const onKey = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement) return;
       if (e.key === "Escape") closeCard("unknown");
-      else if (e.key === " " && cardState.current) { e.preventDefault(); speak(cardState.current.surface); }
+      else if (e.key === " " && cardState.current) {
+        e.preventDefault();
+        speak(cardState.current.surface, 0.85, data?.article.lang);
+      }
       else if (!cardState.current && data) {
         if (e.key === "ArrowRight" && seq < data.chapters.length) go(`/lire/${articleId}/${seq + 1}`);
         if (e.key === "ArrowLeft" && seq > 1) go(`/lire/${articleId}/${seq - 1}`);
@@ -208,20 +212,22 @@ export default function Reader({ articleId, seq, theme }: {
   if (error) return <main className="reader"><p className="error">{error}</p><button className="btn" onClick={() => go("/")}>← Bibliothèque</button></main>;
   if (!data) return <div className="splash">📖</div>;
 
+  const lang = data.article.lang ?? "fr";
+  const t = strings(lang);
   const total = data.chapters.length;
   const alreadyDone = data.progress?.chapters_done.includes(seq);
 
   return (
-    <div className="reader" ref={rootRef} onClick={onClick}>
+    <div className="reader" ref={rootRef} onClick={onClick} lang={lang}>
       <header className="reader-bar">
-        <button className="btn ghost small" onClick={() => go("/")}>← Bibliothèque</button>
+        <button className="btn ghost small" onClick={() => go("/")}>{t.library}</button>
         <div className="reader-title">
           <span className="rt-book">{data.article.title}</span>
-          <span className="rt-ch">Chapitre {seq} / {total}</span>
+          <span className="rt-ch">{t.chapter} {seq} / {total}</span>
         </div>
         <div className="topbar-actions">
           <button className={`btn ghost icon${underline ? " on" : ""}`} onClick={() => setUnderline(!underline)}
-                  title="Souligner les mots déjà cherchés" aria-label="Souligner les mots déjà cherchés">
+                  title={t.underline} aria-label={t.underline}>
             <span className="u-icon">a͟b</span>
           </button>
           <ThemeButton theme={theme} />
@@ -229,7 +235,7 @@ export default function Reader({ articleId, seq, theme }: {
       </header>
 
       <article className="page">
-        {data.article.status === "draft" && <p className="draft-note">Brouillon — visible seulement par les parents</p>}
+        {data.article.status === "draft" && <p className="draft-note">{t.draft}</p>}
         <h1 className="chapter-title"><span className="ch-num">{seq}</span> {data.chapter.title}</h1>
         <div className="text" ref={textRef}>
           {data.paragraphs.map((p) => (
@@ -241,31 +247,31 @@ export default function Reader({ articleId, seq, theme }: {
         <footer className="chapter-end">
           {data.question && (
             <div className="card think">
-              <div className="think-title">💭 À toi de réfléchir</div>
+              <div className="think-title">{t.think}</div>
               <p>{data.question}</p>
-              <p className="muted small">Relis bien la question : qu’est-ce qu’elle demande exactement ?</p>
+              <p className="muted small">{t.thinkNote}</p>
             </div>
           )}
           {done ? (
             <div className="card bravo">
               <div className="bravo-pop">{done.finished ? "🏆" : "⭐"}</div>
-              <p>{done.finished ? "Bravo, tu as fini toute l’histoire !" : "Chapitre terminé, bravo !"}</p>
+              <p>{done.finished ? t.bookDone : t.chapterDone}</p>
               {done.next ? (
                 <button className="btn primary" onClick={() => go(`/lire/${articleId}/${done.next}`)}>
-                  Chapitre {done.next} →
+                  {t.chapter} {done.next} →
                 </button>
               ) : (
-                <button className="btn primary" onClick={() => go("/")}>Retour à la bibliothèque</button>
+                <button className="btn primary" onClick={() => go("/")}>{t.backToLibrary}</button>
               )}
             </div>
           ) : (
             <button className="btn primary big" onClick={complete} disabled={completing}>
-              {alreadyDone ? "J’ai relu ce chapitre ✓" : "J’ai fini ce chapitre ✓"}
+              {alreadyDone ? t.rereadChapter : t.finishChapter}
             </button>
           )}
           <nav className="ch-nav">
-            {seq > 1 ? <button className="btn ghost" onClick={() => go(`/lire/${articleId}/${seq - 1}`)}>← Chapitre {seq - 1}</button> : <span />}
-            {seq < total && <button className="btn ghost" onClick={() => go(`/lire/${articleId}/${seq + 1}`)}>Chapitre {seq + 1} →</button>}
+            {seq > 1 ? <button className="btn ghost" onClick={() => go(`/lire/${articleId}/${seq - 1}`)}>← {t.chapter} {seq - 1}</button> : <span />}
+            {seq < total && <button className="btn ghost" onClick={() => go(`/lire/${articleId}/${seq + 1}`)}>{t.chapter} {seq + 1} →</button>}
           </nav>
         </footer>
       </article>
@@ -273,7 +279,7 @@ export default function Reader({ articleId, seq, theme }: {
       {card && (
         <>
           {card.sheet && <div className="sheet-backdrop" />}
-          <WordCard ref={cardRef} info={card} senses={data.senses} style={card.style} sheet={card.sheet}
+          <WordCard ref={cardRef} info={card} senses={data.senses} style={card.style} sheet={card.sheet} lang={lang}
                     onRate={(r) => closeCard(r)} />
         </>
       )}

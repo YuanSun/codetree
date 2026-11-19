@@ -10,6 +10,10 @@ Signals -> FSRS rating
   A retry of a wrongly answered word (same défi, other question type) is logged only.
 - "seen but not tapped" (exposure) is not fed to FSRS: the signal is too weak.
 
+One défi per language per week (lecture.quiz.lang): French words in the French défi, English words
+in the "Weekly challenge". For English words the "meaning" and "definition" questions both use the
+Wiktionary definition (there is no Petit Robert).
+
 Familiarity shown to the child (0-5) comes from FSRS stability once the word has been in a défi:
 <2 d -> 1, <7 d -> 2, <14 d -> 3, <30 d -> 4, >=30 d -> 5 (gold). Initial thresholds, to be tuned on her data.
 """
@@ -166,12 +170,14 @@ def _sentence(conn: Connection, token_id: int | None):
 
 
 def _lemma_info(conn: Connection, lemma_id: int, sense_id: int | None = None) -> dict:
-    l = conn.execute(text("SELECT id, lemma, pos FROM lecture.lemma WHERE id = :l"), {"l": lemma_id}).one()
+    l = conn.execute(text("SELECT id, lemma, pos, lang FROM lecture.lemma WHERE id = :l"), {"l": lemma_id}).one()
     definition = conn.execute(text("""SELECT definition_fr FROM lecture.sense WHERE lemma_id = :l AND source = 'petit_robert'
         AND definition_fr IS NOT NULL ORDER BY (id = :s) DESC, seq LIMIT 1"""), {"l": lemma_id, "s": sense_id or 0}).scalar()
     gloss = conn.execute(text("""SELECT gloss_en FROM lecture.sense WHERE lemma_id = :l AND source = 'wiktionary_en'
-        ORDER BY seq LIMIT 1"""), {"l": lemma_id}).scalar()
-    return {"id": l.id, "lemma": l.lemma, "pos": l.pos, "definition": definition, "gloss": gloss}
+        ORDER BY (id = :s) DESC, seq LIMIT 1"""), {"l": lemma_id, "s": sense_id or 0}).scalar()
+    if l.lang == "en":
+        definition = gloss  # an English word's definition is its Wiktionary gloss
+    return {"id": l.id, "lemma": l.lemma, "pos": l.pos, "lang": l.lang, "definition": definition, "gloss": gloss}
 
 
 def _distractors(conn: Connection, user_id: int, target: dict, field: str, n: int = 3) -> list[str]:
@@ -184,16 +190,20 @@ def _distractors(conn: Connection, user_id: int, target: dict, field: str, n: in
     if field == "surface":
         queries.append(("""SELECT DISTINCT lower(t.surface) FROM lecture.user_word w JOIN lecture.lemma l ON l.id = w.lemma_id
              JOIN lecture.token t ON t.id = w.first_token_id
-             WHERE w.user_id = :u AND l.pos = :p AND l.id <> :id""", {"u": user_id}))
+             WHERE w.user_id = :u AND l.pos = :p AND l.id <> :id AND l.lang = :lang""", {"u": user_id}))
+    # English: other words from the English books (the full dictionary is ~700k words, many obscure).
+    in_dict = ("l.id IN (SELECT lemma_id FROM lecture.sense WHERE source = 'petit_robert')" if target["lang"] == "fr"
+               else "l.id IN (SELECT lemma_id FROM lecture.token WHERE lemma_id IS NOT NULL)")
     for q, params in queries + [
         (f"""SELECT DISTINCT {col} FROM lecture.user_word w JOIN lecture.lemma l ON l.id = w.lemma_id {src}
-             WHERE w.user_id = :u AND l.pos = :p AND l.id <> :id""", {"u": user_id}),
-        (f"""SELECT {col} FROM lecture.lemma l {src} WHERE l.pos = :p AND l.id <> :id
-             AND l.id IN (SELECT lemma_id FROM lecture.sense WHERE source = 'petit_robert')
+             WHERE w.user_id = :u AND l.pos = :p AND l.id <> :id AND l.lang = :lang""", {"u": user_id}),
+        (f"""SELECT {col} FROM lecture.lemma l {src} WHERE l.pos = :p AND l.id <> :id AND l.lang = :lang
+             AND {in_dict} ORDER BY random() LIMIT 40""", {}),
+        (f"""SELECT {col} FROM lecture.lemma l {src} WHERE l.id <> :id AND l.lang = :lang AND {in_dict}
              ORDER BY random() LIMIT 40""", {}),
-        (f"""SELECT {col} FROM lecture.lemma l {src} WHERE l.id <> :id ORDER BY random() LIMIT 40""", {}),
     ]:
-        vals = [v for (v,) in conn.execute(text(q), {"p": target["pos"], "id": target["id"], **params}) if v]
+        vals = [v for (v,) in conn.execute(text(q), {"p": target["pos"], "id": target["id"], "lang": target["lang"],
+                                                     **params}) if v]
         random.shuffle(vals)
         for v in vals:
             if _norm(v) != _norm(target.get(field) or "") and _norm(v) not in {_norm(x) for x in out} and len(v) < 120:
@@ -247,35 +257,38 @@ def kind_for(fam: int, i: int) -> str:
     return "cloze" if fam <= 2 else "definition" if fam == 3 else "dictation"
 
 
-def pick_words(conn: Connection, user_id: int) -> list:
-    first_ever = not conn.execute(text("SELECT 1 FROM lecture.quiz WHERE user_id = :u LIMIT 1"), {"u": user_id}).first()
+def pick_words(conn: Connection, user_id: int, lang: str = "fr") -> list:
+    first_ever = not conn.execute(text("SELECT 1 FROM lecture.quiz WHERE user_id = :u AND lang = :lang LIMIT 1"),
+                                  {"u": user_id, "lang": lang}).first()
     quizzed = """EXISTS (SELECT 1 FROM lecture.review_log r WHERE r.user_id = w.user_id
                  AND r.lemma_id = w.lemma_id AND r.source = 'quiz')"""
+    in_lang = "w.lemma_id IN (SELECT id FROM lecture.lemma WHERE lang = :lang)"
     due = conn.execute(text(f"""SELECT w.* FROM lecture.user_word w
-        WHERE w.user_id = :u AND w.status = 'learning' AND w.due_at < :horizon AND {quizzed}
+        WHERE w.user_id = :u AND w.status = 'learning' AND w.due_at < :horizon AND {quizzed} AND {in_lang}
         ORDER BY w.lapses DESC, w.due_at LIMIT :n"""),
                        # anything due before next Monday's défi is reviewed now (the next chance is a week away)
-                       {"u": user_id, "horizon": now() + timedelta(days=7), "n": QUIZ_SIZE}).all()
+                       {"u": user_id, "horizon": now() + timedelta(days=7), "n": QUIZ_SIZE, "lang": lang}).all()
     room = QUIZ_SIZE - len(due)
     new_cap = min(room, QUIZ_SIZE if first_ever else MAX_NEW)
     new = conn.execute(text(f"""SELECT w.* FROM lecture.user_word w
-        WHERE w.user_id = :u AND w.status = 'learning' AND NOT {quizzed}
-        ORDER BY w.lookup_count DESC, w.first_seen_at LIMIT :n"""), {"u": user_id, "n": new_cap}).all() if new_cap > 0 else []
+        WHERE w.user_id = :u AND w.status = 'learning' AND NOT {quizzed} AND {in_lang}
+        ORDER BY w.lookup_count DESC, w.first_seen_at LIMIT :n"""),
+                       {"u": user_id, "n": new_cap, "lang": lang}).all() if new_cap > 0 else []
     return list(due) + list(new)
 
 
-def get_or_create_quiz(conn: Connection, user_id: int) -> int | None:
+def get_or_create_quiz(conn: Connection, user_id: int, lang: str = "fr") -> int | None:
     week = monday()
-    qid = conn.execute(text("SELECT id FROM lecture.quiz WHERE user_id = :u AND week_of = :w"),
-                       {"u": user_id, "w": week}).scalar()
+    qid = conn.execute(text("SELECT id FROM lecture.quiz WHERE user_id = :u AND week_of = :w AND lang = :lang"),
+                       {"u": user_id, "w": week, "lang": lang}).scalar()
     if qid:
         return qid
     ensure_fsrs(conn, user_id)
-    words = pick_words(conn, user_id)
+    words = pick_words(conn, user_id, lang)
     if not words:
         return None
-    qid = conn.execute(text("INSERT INTO lecture.quiz (user_id, week_of) VALUES (:u, :w) RETURNING id"),
-                       {"u": user_id, "w": week}).scalar()
+    qid = conn.execute(text("INSERT INTO lecture.quiz (user_id, week_of, lang) VALUES (:u, :w, :lang) RETURNING id"),
+                       {"u": user_id, "w": week, "lang": lang}).scalar()
     random.shuffle(words)
     for seq, w in enumerate(words, start=1):
         kind, prompt, expected = build_item(conn, user_id, w, kind_for(w.familiarity, seq))
@@ -286,16 +299,16 @@ def get_or_create_quiz(conn: Connection, user_id: int) -> int | None:
     return qid
 
 
-def check(item_type: str, expected: dict, response: str) -> tuple[bool, str | None]:
+def check(item_type: str, expected: dict, response: str, lang: str = "fr") -> tuple[bool, str | None]:
     """(correct, hint). Dictation must match exactly (accents included); case and apostrophe style do not matter."""
     ok = _norm(response) == _norm(expected["answer"])
     if not ok and item_type == "dictation" and _strip_accents(_norm(response)) == _strip_accents(_norm(expected["answer"])):
-        return False, "Presque ! Attention aux accents."
+        return False, "Presque ! Attention aux accents." if lang == "fr" else "Almost! Check the accents."
     return ok, None
 
 
 def answer(conn: Connection, user_id: int, item_id: int, response: str, response_ms: int | None) -> dict | None:
-    item = conn.execute(text("""SELECT i.*, q.user_id, q.id AS qid FROM lecture.quiz_item i
+    item = conn.execute(text("""SELECT i.*, q.user_id, q.id AS qid, q.lang FROM lecture.quiz_item i
         JOIN lecture.quiz q ON q.id = i.quiz_id WHERE i.id = :i AND q.user_id = :u FOR UPDATE OF i"""),
                         {"i": item_id, "u": user_id}).first()
     if not item:
@@ -303,7 +316,7 @@ def answer(conn: Connection, user_id: int, item_id: int, response: str, response
     retry = bool(item.prompt.get("retry"))
     if item.answered_at is not None:  # double tap / resent request: same result, no second rating
         return _result(conn, item, item.correct, None, already=True)
-    correct, hint = check(item.item_type, item.expected, response)
+    correct, hint = check(item.item_type, item.expected, response, item.lang)
     at = now()
     conn.execute(text("""UPDATE lecture.quiz_item SET response = CAST(:r AS jsonb), correct = :c, response_ms = :ms,
         answered_at = :at WHERE id = :i"""),
@@ -358,7 +371,7 @@ def _result(conn: Connection, item, correct: bool, hint: str | None, state: dict
 
 
 def quiz_view(conn: Connection, quiz_id: int) -> dict:
-    q = conn.execute(text("SELECT id, week_of, status FROM lecture.quiz WHERE id = :q"), {"q": quiz_id}).one()
+    q = conn.execute(text("SELECT id, week_of, status, lang FROM lecture.quiz WHERE id = :q"), {"q": quiz_id}).one()
     items = conn.execute(text("""SELECT i.id, i.seq, i.item_type, i.prompt, i.correct, i.answered_at, i.lemma_id,
             l.lemma, w.familiarity
         FROM lecture.quiz_item i JOIN lecture.lemma l ON l.id = i.lemma_id
@@ -367,7 +380,7 @@ def quiz_view(conn: Connection, quiz_id: int) -> dict:
         WHERE i.quiz_id = :q ORDER BY i.seq"""), {"q": quiz_id}).all()
     first = [i for i in items if not i.prompt.get("retry")]
     return {
-        "id": q.id, "week_of": q.week_of.isoformat(), "status": q.status,
+        "id": q.id, "week_of": q.week_of.isoformat(), "status": q.status, "lang": q.lang,
         "items": [{"id": i.id, "seq": i.seq, "type": i.item_type, "prompt": i.prompt,
                    "answered": i.answered_at is not None, "correct": i.correct} for i in items],
         "summary": {

@@ -19,7 +19,7 @@ def visible_statuses(user: User) -> tuple[str, ...]:
 
 
 def _article(conn: Connection, user: User, article_id: int):
-    row = conn.execute(text("SELECT id, slug, title, status FROM lecture.article WHERE id = :a AND status = ANY(:s)"),
+    row = conn.execute(text("SELECT id, slug, title, status, lang FROM lecture.article WHERE id = :a AND status = ANY(:s)"),
                        {"a": article_id, "s": list(visible_statuses(user))}).first()
     if not row:
         raise HTTPException(404, "Article introuvable")
@@ -29,7 +29,7 @@ def _article(conn: Connection, user: User, article_id: int):
 @router.get("/articles")
 def list_articles(user: User = Depends(current_user), conn: Connection = Depends(get_conn)):
     rows = conn.execute(text("""
-        SELECT a.id, a.slug, a.title, a.week_of, a.status, a.source_note,
+        SELECT a.id, a.slug, a.title, a.week_of, a.status, a.source_note, a.lang,
                (SELECT count(*) FROM lecture.chapter c WHERE c.article_id = a.id) AS chapter_count,
                p.last_chapter, p.chapters_done, p.seconds_read, p.finished_at
         FROM lecture.article a
@@ -38,7 +38,7 @@ def list_articles(user: User = Depends(current_user), conn: Connection = Depends
         ORDER BY a.week_of DESC, a.id DESC"""), {"u": user.id, "s": list(visible_statuses(user))}).all()
     return [{
         "id": r.id, "slug": r.slug, "title": r.title, "week_of": r.week_of.isoformat(), "status": r.status,
-        "source_note": r.source_note, "chapter_count": r.chapter_count,
+        "source_note": r.source_note, "chapter_count": r.chapter_count, "lang": r.lang,
         "progress": None if r.last_chapter is None else {
             "last_chapter": r.last_chapter, "chapters_done": sorted(r.chapters_done),
             "seconds_read": r.seconds_read, "finished": r.finished_at is not None},
@@ -73,18 +73,26 @@ def get_chapter(article_id: int, seq: int, user: User = Depends(current_user), c
               for r in conn.execute(text("SELECT id, lemma, pos, gender, ipa FROM lecture.lemma WHERE id = ANY(:ids)"),
                                     {"ids": lemma_ids})}
     senses = {}
+    # Main senses: Petit Robert for French books, Wiktionary definitions for English books.
+    main_source = "petit_robert" if art.lang == "fr" else "wiktionary_en"
     for s in conn.execute(text("""
-            SELECT id, lemma_id, sense_key, definition_fr, raw->'examples' AS examples,
+            SELECT id, lemma_id, sense_key, coalesce(definition_fr, gloss_en) AS definition, raw->'examples' AS examples,
                    row_number() OVER (PARTITION BY lemma_id ORDER BY seq) AS n
-            FROM lecture.sense WHERE lemma_id = ANY(:ids) AND source = 'petit_robert' ORDER BY lemma_id, seq"""),
-            {"ids": lemma_ids}):
+            FROM lecture.sense WHERE lemma_id = ANY(:ids) AND source = :src ORDER BY lemma_id, seq"""),
+            {"ids": lemma_ids, "src": main_source}):
         if s.id not in chosen and s.n > OTHER_SENSES_SHOWN:
             continue
         lemmas[s.lemma_id]["senses"].append(s.id)
-        senses[s.id] = {"key": s.sense_key, "def": s.definition_fr,
+        senses[s.id] = {"key": s.sense_key, "def": s.definition,
                         "ex": (s.examples or [])[:EXAMPLES_SHOWN]}
-    # English glosses from Wiktionary: shown on the card only when Petit Robert has no entry.
-    for s in conn.execute(text("""
+    if art.lang == "en":
+        # Inflected forms for the card: "run · runs · ran · run · running", "child · children".
+        for lid, form, tags in conn.execute(text("""SELECT lemma_id, form, tags FROM lecture.word_form
+                WHERE lemma_id = ANY(:ids) ORDER BY lemma_id, form"""), {"ids": lemma_ids}):
+            for code in tags or []:
+                lemmas[lid].setdefault("forms", {}).setdefault(code, []).append(form)  # strewed, strewn
+    # English glosses of French words (Wiktionary): shown on the card only when Petit Robert has no entry.
+    for s in [] if art.lang != "fr" else conn.execute(text("""
             SELECT id, lemma_id, gloss_en, seq FROM lecture.sense
             WHERE lemma_id = ANY(:ids) AND source = 'wiktionary_en' AND seq < 2 ORDER BY lemma_id, seq"""),
             {"ids": lemma_ids}):
@@ -101,7 +109,7 @@ def get_chapter(article_id: int, seq: int, user: User = Depends(current_user), c
     prog = conn.execute(text("SELECT last_chapter, last_paragraph, chapters_done FROM lecture.reading_progress "
                              "WHERE user_id = :u AND article_id = :a"), {"u": user.id, "a": article_id}).first()
     return {
-        "article": {"id": art.id, "slug": art.slug, "title": art.title, "status": art.status},
+        "article": {"id": art.id, "slug": art.slug, "title": art.title, "status": art.status, "lang": art.lang},
         "chapter": {"id": ch.id, "seq": ch.seq, "title": ch.title},
         "chapters": [{"seq": c.seq, "title": c.title} for c in chapters],
         "paragraphs": [{"id": p.id, "seq": p.seq, "text": p.text, "tokens": by_para.get(p.id, [])} for p in paras],

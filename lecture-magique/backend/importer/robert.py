@@ -3,7 +3,7 @@
     uv run python -m importer.robert                      # reads $ROBERT_LD2_PATH
     uv run python -m importer.robert --jsonl robert.jsonl # or a robert_extract.py output
 
-Idempotent: lemmas are upserted on (lemma, pos, homograph), senses on (lemma_id, source, seq).
+Idempotent: lemmas are upserted on (lang='fr', lemma, pos, homograph), senses on (lemma_id, source, seq).
 Senses that disappear on re-import are deleted (tokens pointing at them are re-pointed first).
 The dictionary is commercial content: never commit the .ld2, the JSONL or anything exported from it.
 """
@@ -29,7 +29,8 @@ BATCH = 1000
 
 LEMMA = Table("lemma", MetaData(schema="lecture"),
               Column("id", Integer, primary_key=True), Column("lemma", Text), Column("pos", Text),
-              Column("homograph", SmallInteger), Column("gender", Text), Column("ipa", Text))
+              Column("homograph", SmallInteger), Column("gender", Text), Column("ipa", Text),
+              Column("lang", Text))
 
 
 def iter_ld2(path: str) -> Iterator[dict]:
@@ -80,11 +81,11 @@ def write(conn: Connection, lemmas: dict) -> dict:
     n_senses = n_forms = 0
     for i in range(0, len(keys), BATCH):
         chunk = keys[i:i + BATCH]
-        rows = [{"lemma": k[0], "pos": k[1], "homograph": k[2], "gender": lemmas[k]["gender"],
+        rows = [{"lang": "fr", "lemma": k[0], "pos": k[1], "homograph": k[2], "gender": lemmas[k]["gender"],
                  "ipa": lemmas[k]["ipa"]} for k in chunk]
         stmt = pg_insert(LEMMA).values(rows)
         stmt = stmt.on_conflict_do_update(
-            index_elements=[LEMMA.c.lemma, LEMMA.c.pos, LEMMA.c.homograph],
+            index_elements=[LEMMA.c.lang, LEMMA.c.lemma, LEMMA.c.pos, LEMMA.c.homograph],
             set_={"gender": stmt.excluded.gender, "ipa": stmt.excluded.ipa},
         ).returning(LEMMA.c.id, LEMMA.c.lemma, LEMMA.c.pos, LEMMA.c.homograph)
         ids = {(r.lemma, r.pos, r.homograph): r.id for r in conn.execute(stmt)}

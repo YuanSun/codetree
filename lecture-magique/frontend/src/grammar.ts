@@ -46,3 +46,27 @@ export function tenseLabel(morph: string | null): string | null {
   const who = f.Mood === "Imp" ? null : PRONOUN[`${f.Person ?? ""}${f.Number ?? ""}`];
   return who ? `${TENSE_FR[key]} · ${who}` : TENSE_FR[key];
 }
+
+/** English: "past tense", "present · he/she/it", "past participle", "-ing form", "base form". */
+export function tenseLabelEn(morph: string | null): string | null {
+  const f = parseMorph(morph);
+  if (f.VerbForm === "Inf") return "base form";
+  if (f.VerbForm === "Ger" || (f.VerbForm === "Part" && f.Tense === "Pres")) return "-ing form";
+  if (f.VerbForm === "Part") return "past participle";
+  if (f.VerbForm !== "Fin") return null;
+  if (f.Tense === "Past") return "past tense";
+  if (f.Tense === "Pres") return f.Person === "3" && f.Number === "Sing" ? "present · he/she/it" : "present";
+  return null;
+}
+
+/** English inflected forms to show under the word, in a fixed order: [label, form]. */
+export function formsEn(pos: string, lemma: string, forms: Record<string, string[]> | undefined): [string, string][] {
+  if (!forms) return [];
+  const order: [string, string][] = pos === "VERB" || pos === "AUX"
+    ? [["he/she", "3s"], ["past", "past"], ["past participle", "pp"], ["-ing", "ing"]]
+    : pos === "NOUN" ? [["plural", "pl"]]
+    : pos === "ADJ" || pos === "ADV" ? [["comparative", "cmp"], ["superlative", "sup"]] : [];
+  return order
+    .map(([label, code]) => [label, (forms[code] ?? []).filter((f) => f !== lemma).join(" / ")] as [string, string])
+    .filter(([, f]) => f);
+}

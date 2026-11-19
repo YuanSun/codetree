@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { api, ArticleCard, Me } from "../api";
 import { go } from "../App";
-import { ThemePref } from "../prefs";
+import { LANGS, Lang } from "../i18n";
+import { ThemePref, usePref } from "../prefs";
 import ThemeButton from "./ThemeButton";
 
 function Ring({ done, total }: { done: number; total: number }) {
@@ -28,12 +29,16 @@ export default function Shelf({ me, onLogout, theme }: {
 }) {
   const [items, setItems] = useState<ArticleCard[] | null>(null);
   const [error, setError] = useState("");
+  const [lang, setLang] = usePref<Lang>("lm.lang", "fr");
 
   useEffect(() => {
     api.articles().then(setItems, (e) => setError(e.message));
   }, []);
 
-  const newest = items?.[0]?.week_of;
+  const shown = items?.filter((a) => (a.lang ?? "fr") === lang);
+  const newest = shown?.[0]?.week_of;
+  const en = lang === "en";
+  const sfx = en ? "/en" : "";
 
   return (
     <main className="shelf">
@@ -44,12 +49,23 @@ export default function Shelf({ me, onLogout, theme }: {
           <button className="btn ghost small" onClick={onLogout}>Sortir</button>
         </div>
       </header>
+      <div className="lang-switch" role="tablist" aria-label="Langue / Language">
+        {LANGS.map((l) => (
+          <button key={l.lang} role="tab" aria-selected={lang === l.lang} className={`chip big${lang === l.lang ? " on" : ""}`}
+                  onClick={() => setLang(l.lang)}>
+            {l.label}
+            {items && <span className="count">{items.filter((a) => (a.lang ?? "fr") === l.lang).length}</span>}
+          </button>
+        ))}
+      </div>
       <div className="quick">
-        <button className="card quick-btn defi" onClick={() => go("/defi")}>
-          <span className="qi">⭐</span><span><b>Défi de la semaine</b><br /><span className="small muted">Revois tes mots</span></span>
+        <button className="card quick-btn defi" onClick={() => go(`/defi${sfx}`)}>
+          <span className="qi">⭐</span><span><b>{en ? "Weekly challenge" : "Défi de la semaine"}</b><br />
+            <span className="small muted">{en ? "Practise your English words" : "Revois tes mots"}</span></span>
         </button>
-        <button className="card quick-btn bag" onClick={() => go("/mots")}>
-          <span className="qi">👜</span><span><b>Mon sac à mots</b><br /><span className="small muted">Tous les mots que tu as cherchés</span></span>
+        <button className="card quick-btn bag" onClick={() => go(`/mots${sfx}`)}>
+          <span className="qi">👜</span><span><b>{en ? "My word bag" : "Mon sac à mots"}</b><br />
+            <span className="small muted">{en ? "All the English words you looked up" : "Tous les mots que tu as cherchés"}</span></span>
         </button>
         {me.role === "student" && (
           <button className="card quick-btn suivi" onClick={() => go("/progres")}>
@@ -62,11 +78,11 @@ export default function Shelf({ me, onLogout, theme }: {
           </button>
         )}
       </div>
-      <h2 className="shelf-title">Ma bibliothèque</h2>
+      <h2 className="shelf-title">{en ? "My English library" : "Ma bibliothèque"}</h2>
       {error && <p className="error">{error}</p>}
-      {items && items.length === 0 && <p className="muted">Pas encore de lecture ici. Bientôt !</p>}
+      {shown && shown.length === 0 && <p className="muted">{en ? "Nothing to read here yet. Soon!" : "Pas encore de lecture ici. Bientôt !"}</p>}
       <div className="cards">
-        {items?.map((a) => {
+        {shown?.map((a) => {
           const done = a.progress?.chapters_done.length ?? 0;
           const start = a.progress && !a.progress.finished ? a.progress.last_chapter : 1;
           return (
@@ -75,13 +91,16 @@ export default function Shelf({ me, onLogout, theme }: {
               <div className="book-cover">📚</div>
               <div className="book-body">
                 <div className="badges">
-                  {a.week_of === newest && !a.progress && <span className="badge new">Nouveau</span>}
-                  {a.status === "draft" && <span className="badge draft">Brouillon</span>}
+                  {a.week_of === newest && !a.progress && <span className="badge new">{en ? "New" : "Nouveau"}</span>}
+                  {a.status === "draft" && <span className="badge draft">{en ? "Draft" : "Brouillon"}</span>}
                 </div>
                 <h3>{a.title}</h3>
                 {a.source_note && <p className="muted small">{a.source_note}</p>}
                 <p className="small">
-                  {a.progress?.finished ? "Terminé ! 🎉" : a.progress ? `Reprendre au chapitre ${start}` : `${a.chapter_count} chapitres`}
+                  {en
+                    ? (a.progress?.finished ? "Finished! 🎉" : a.progress ? `Continue at chapter ${start}`
+                      : a.chapter_count === 1 ? "1 part" : `${a.chapter_count} chapters`)
+                    : (a.progress?.finished ? "Terminé ! 🎉" : a.progress ? `Reprendre au chapitre ${start}` : `${a.chapter_count} chapitres`)}
                 </p>
               </div>
               <Ring done={done} total={a.chapter_count} />
