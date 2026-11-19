@@ -199,6 +199,7 @@ button { font: inherit; color: inherit; }
 .wc-other-list li { margin-bottom: 4px; }
 .wc-tense { margin-top: 3px; font-size: 0.9rem; font-weight: 700; color: var(--sky); }
 .wc-en { margin: 10px 0 0; }
+.en-btn { justify-self: start; margin-top: 8px; color: var(--sky); }
 .en-tag { font-size: 0.7rem; font-weight: 800; background: var(--sky-l); color: var(--sky); border-radius: 6px; padding: 1px 6px; }
 .wc-conj { margin-top: 4px; }
 .conj { margin-top: 6px; }

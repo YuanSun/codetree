@@ -29,6 +29,7 @@ export default function WordBag({ theme, lang = "fr" }: { theme: [ThemePref, (t:
   const [open, setOpen] = useState<number | null>(null);
   const [error, setError] = useState("");
   const [removed, setRemoved] = useState<BagWord | null>(null);
+  const [showEn, setShowEn] = useState<number | null>(null);
 
   // A word tapped by mistake: out of the bag (and of the défi) at once, with an undo while the note shows.
   const remove = async (w: BagWord) => {
@@ -84,6 +85,15 @@ export default function WordBag({ theme, lang = "fr" }: { theme: [ThemePref, (t:
                   {open === w.lemma_id && (
                     <span className="wcard-more">
                       {w.definition && <span className="wcard-def">{w.definition}</span>}
+                      {w.definition && w.gloss && lang === "fr" && (showEn === w.lemma_id ? (
+                        <span className="wcard-def"><span className="en-tag">EN</span> {w.gloss}</span>
+                      ) : (
+                        <span role="button" tabIndex={0} className="btn ghost small en-btn"
+                              onClick={(e) => { e.stopPropagation(); setShowEn(w.lemma_id); }}
+                              onKeyDown={(e) => { if (e.key === "Enter") { e.stopPropagation(); setShowEn(w.lemma_id); } }}>
+                          🇬🇧 In English
+                        </span>
+                      ))}
                       {!w.definition && w.gloss && (
                         <span className="wcard-def">{lang === "fr" && <span className="en-tag">EN</span>} {w.gloss}</span>
                       )}
