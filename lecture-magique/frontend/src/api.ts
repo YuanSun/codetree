@@ -1,4 +1,5 @@
 // Thin JSON client for the FastAPI backend (same origin, cookie session).
+import type { Lang } from "./i18n";
 
 export type Me = { id: number; username: string; display_name: string; role: string; settings: Record<string, unknown> };
 
@@ -10,14 +11,17 @@ export type ArticleCard = {
   status: "draft" | "published" | "archived";
   source_note: string | null;
   chapter_count: number;
+  lang: Lang;
   progress: null | { last_chapter: number; chapters_done: number[]; seconds_read: number; finished: boolean };
 };
 
 // [token_id, char_start, char_end, lemma_id, sense_id, morph (verb forms only, e.g. "Mood=Ind|…|Tense=Pres")]
 export type TokenTuple = [number, number, number, number | null, number | null, string | null];
 
-// en: English glosses from Wiktionary (shown when Petit Robert has no entry)
-export type Lemma = { lemma: string; pos: string; gender: string | null; ipa: string | null; senses: number[]; en: string[] };
+// en: English glosses of a French word from Wiktionary (shown when Petit Robert has no entry)
+// forms (English words): inflected forms by code: 3s, past, pp, ing, pl, cmp, sup
+export type Lemma = { lemma: string; pos: string; gender: string | null; ipa: string | null; senses: number[]; en: string[];
+                      forms?: Record<string, string[]> };
 export type Sense = { key: string | null; def: string | null; ex: string[]; en?: string };
 
 export type Conjugation = {
@@ -31,7 +35,7 @@ export type Conjugation = {
 export type WordState = { status: string; familiarity: number; lookups: number; exposures: number };
 
 export type ChapterData = {
-  article: { id: number; slug: string; title: string; status: string };
+  article: { id: number; slug: string; title: string; status: string; lang: Lang };
   chapter: { id: number; seq: number; title: string | null };
   chapters: { seq: number; title: string | null }[];
   paragraphs: { id: number; seq: number; text: string; tokens: TokenTuple[] }[];
@@ -52,7 +56,7 @@ export type QuizItem = {
   correct: boolean | null;
 };
 export type Quiz = {
-  id: number; week_of: string; status: "open" | "done"; items: QuizItem[];
+  id: number; week_of: string; status: "open" | "done"; lang: Lang; items: QuizItem[];
   summary: { total: number; correct: number; gold: string[]; practice: string[] };
 };
 export type AnswerResult = {
@@ -60,13 +64,14 @@ export type AnswerResult = {
   left: number; already: boolean;
 };
 export type BagWord = {
-  lemma_id: number; lemma: string; pos: string; gender: string | null; ipa: string | null;
+  lemma_id: number; lemma: string; pos: string; gender: string | null; ipa: string | null; lang: Lang;
   group: "new" | "learning" | "mastered" | "known"; familiarity: number; lookups: number; due: string | null;
   definition: string | null; gloss: string | null; sentence: string | null; surface: string | null;
 };
 
 export type ChildReport = {
   child: { id: number; display_name: string };
+  lang: Lang;
   bag: { new: number; learning: number; mastered: number; known: number; due_soon: number };
   weeks: {
     week: string; taps: number; words: number; unknown: number; active_days: number; minutes: number;
@@ -119,13 +124,14 @@ export const api = {
   complete: (chapterId: number, openedAt: string) =>
     call<{ next_seq: number | null; exposures: number; finished: boolean; chapters_done: number[] }>(
       "POST", `/chapters/${chapterId}/complete`, { opened_at: openedAt }),
-  quiz: () => call<{ quiz: Quiz | null; message?: string }>("GET", "/quiz/current"),
+  quiz: (lang: Lang) => call<{ quiz: Quiz | null; message?: string }>("GET", `/quiz/current?lang=${lang}`),
   answer: (itemId: number, response: string, responseMs: number) =>
     call<AnswerResult>("POST", `/quiz/items/${itemId}/answer`, { response, response_ms: responseMs }),
-  words: () => call<BagWord[]>("GET", "/words"),
+  words: (lang: Lang) => call<BagWord[]>("GET", `/words?lang=${lang}`),
   children: () => call<{ id: number; username: string; display_name: string }[]>("GET", "/parent/children"),
-  myReport: (weeks = 8) => call<ChildReport>("GET", `/me/report?weeks=${weeks}`),
-  report: (childId: number, weeks = 8) => call<ChildReport>("GET", `/parent/children/${childId}/report?weeks=${weeks}`),
+  myReport: (lang: Lang, weeks = 8) => call<ChildReport>("GET", `/me/report?weeks=${weeks}&lang=${lang}`),
+  report: (childId: number, lang: Lang, weeks = 8) =>
+    call<ChildReport>("GET", `/parent/children/${childId}/report?weeks=${weeks}&lang=${lang}`),
   conjugation: (lemmaId: number) => call<Conjugation>("GET", `/lemmas/${lemmaId}/conjugation`),
   lookups: (events: LookupEvent[], keepalive = false) =>
     call<{ accepted: string[]; duplicate: string[]; rejected: string[] }>("POST", "/lookups", { events }, keepalive),

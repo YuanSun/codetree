@@ -140,7 +140,7 @@ def test_english_chapter_api(both):
     d = g.get(f"/api/articles/{both['en']['article_id']}/chapters/1").json()
     assert d["article"]["lang"] == "en"
     run = next(l for l in d["lemmas"].values() if l["lemma"] == "run")
-    assert run["forms"]["past"] == "ran" and run["senses"]
+    assert run["forms"]["past"] == ["ran"] and run["senses"]
     s = d["senses"][str(run["senses"][0])]
     assert s["def"] and s["key"] is None
 
@@ -182,3 +182,23 @@ def test_defi_bag_and_report_per_language(both):
     assert g.get("/api/quiz/current?lang=de").status_code == 422
     # leo has tapped nothing
     assert login(both, "leo").get("/api/quiz/current?lang=en").json()["quiz"] is None
+
+
+def test_spelling_variants_get_the_main_definitions(db):
+    entries = [
+        {"word": "color", "pos": "noun", "lang_code": "en", "senses": [{"glosses": ["The spectral composition of visible light."]}]},
+        {"word": "colour", "pos": "noun", "lang_code": "en",
+         "senses": [{"glosses": ["Commonwealth and Ireland standard spelling of color."]}]},
+        {"word": "brand new", "pos": "adj", "lang_code": "en", "senses": [{"glosses": ["Utterly new, as new as possible."]}]},
+        {"word": "brand-new", "pos": "adj", "lang_code": "en",
+         "senses": [{"glosses": ["Alternative form of brand new."], "tags": ["alt-of", "alternative"],
+                     "alt_of": [{"word": "brand new"}]}]},
+    ]
+    with db.begin() as c:
+        stats = import_entries(c, entries)
+        assert stats["variants"] == 2
+        defs = dict(c.execute(text("""SELECT l.lemma, s.gloss_en FROM lecture.sense s JOIN lecture.lemma l ON l.id = s.lemma_id
+            WHERE l.lang = 'en' AND s.seq = 0""")).all())
+        assert defs == {"color": "The spectral composition of visible light.",
+                        "colour": "The spectral composition of visible light.",
+                        "brand-new": "Utterly new, as new as possible."}

@@ -238,6 +238,40 @@ cd backend && uv run python -m importer.wiktionary && uv run python -m importer.
 The site is also on the family gateway at `http://<mac>:12999/lecture/` once the hosting gateway is restarted
 (`hosting/run.sh`; check the config first with `caddy validate --config hosting/Caddyfile`).
 
+## English reading (optional, once)
+
+English texts sit next to the French books: a **🇫🇷 Français / 🇬🇧 English** switch on the bookshelf, an English
+word card (definition, examples, forms such as *strew · strewed · strewn*), a separate English *Weekly challenge*,
+an English word bag, and the same switch in Suivi / Mes progrès. The dictionary is English Wiktionary
+(kaikki.org, CC BY-SA), about 550,000 words.
+
+1. After `git pull`, run `deploy/deploy.sh`: it installs the English spaCy model and applies migration 0004
+   (a `lang` column; existing French data is untouched).
+2. Import the English dictionary. It downloads ~530 MB and takes about 3 to 5 minutes; it adds ~350 MB to Postgres:
+
+   ```bash
+   cd backend && uv run python -m importer.wiktionary_en
+   ```
+
+   It ends with a line like `{"entries": 1499161, "lemmas": 552948, ...}`. Running it again later updates in place.
+   If the download is slow, download
+   `https://kaikki.org/dictionary/English/kaikki.org-dictionary-English.jsonl.gz` once and pass the file path instead.
+3. Import and publish an English text exactly like a French one. The text file has an `@lang en` line:
+
+   ```bash
+   python3 tools/text2pack.py content/maene-vinoly.txt content/maene-vinoly.questions.json -o content/maene-vinoly.pack.json
+   ```
+
+   ```bash
+   cd backend && uv run python -m importer.article import ../content/maene-vinoly.pack.json
+   ```
+
+   ```bash
+   uv run python -m importer.article publish 2026-w47-maene-vinoly-piano
+   ```
+
+   Expect coverage around 94% (99% without proper nouns): only names (Schubert, Liszt, …) stay unmatched.
+
 ## Serve it from the family gateway (optional)
 
 The family gateway (`hosting/`, Caddy on port 12999) can run Lecture Magique together with the other family sites.

@@ -11,6 +11,9 @@ Kept: nouns, verbs, adjectives, adverbs and the small closed classes (pronouns, 
 Left out: proper names, phrases with spaces, and senses tagged obsolete / archaic / rare / vulgar /
 offensive / derogatory (a lemma with only such senses is skipped).
 
+Spelling variants ("colour": "Commonwealth … spelling of color"; "brand-new": "Alternative form of brand
+new") get the definitions of the main entry, including two-word entries such as "brand new".
+
 Re-runnable: lemmas are upserted on (lang, lemma, pos, homograph), senses on (lemma_id, source, seq),
 extra senses from an earlier import are removed. Several Wiktionary entries for the same word and part
 of speech (different etymologies: "bank") are merged into one lemma.
@@ -84,6 +87,29 @@ def clean_example(s: str) -> str | None:
     return s
 
 
+ALT_RE = re.compile(r"^(?:[\w ,'()-]+ )?(?:spelling|form) of ([\w' -]+?)\.?$")
+MULTI_POS = {"NOUN", "VERB", "ADJ", "ADV"}
+
+
+def alt_target(e: dict) -> str | None:
+    """'brand new' for brand-new, 'color' for colour: when every sense only points to another spelling."""
+    targets = set()
+    for s in e.get("senses") or []:
+        tags = set(s.get("tags") or [])
+        if s.get("form_of") or "form-of" in tags or tags & BAD_SENSE:
+            continue
+        alt = [a.get("word") for a in s.get("alt_of") or [] if a.get("word")]
+        g = (s.get("glosses") or [""])[-1].strip()
+        m = ALT_RE.match(g) if "spelling of" in g or g.lower().startswith("alternative form of") else None
+        if alt:
+            targets.add(alt[0].strip())
+        elif m:
+            targets.add(m.group(1).strip())
+        else:
+            return None  # has a real definition of its own
+    return targets.pop() if len(targets) == 1 else None
+
+
 def entry_senses(e: dict) -> list[dict]:
     out, seen = [], set()
     for s in e.get("senses") or []:
@@ -118,7 +144,9 @@ class Importer:
         self.n_senses: dict[int, int] = {}                  # lemma id -> senses written
         self.pending: dict[tuple[str, str], dict] = {}      # waiting to be written
         self.forms: dict[tuple[str, str, str], set[str]] = {}  # (form, word, upos) -> codes
-        self.stats = {"entries": 0, "lemmas": 0, "senses": 0, "forms": 0, "form_of": 0}
+        self.alts: dict[tuple[str, str], str] = {}           # (word, upos) -> main spelling
+        self.multi: dict[tuple[str, str], list[dict]] = {}   # senses of "brand new"-like entries (not lemmas)
+        self.stats = {"entries": 0, "lemmas": 0, "senses": 0, "forms": 0, "form_of": 0, "variants": 0}
 
     def add(self, e: dict) -> None:
         self.stats["entries"] += 1
@@ -126,6 +154,11 @@ class Importer:
             return
         upos = POS.get(e.get("pos") or "")
         word = (e.get("word") or "").strip()
+        if upos in MULTI_POS and " " in word and len(word) <= 40:  # possible target of a spelling variant
+            senses = entry_senses(e)[:3]
+            if senses:
+                self.multi.setdefault((word, upos), senses)
+            return
         if not upos or not usable(word):
             return
         # inflected-form entries: "ran" (verb) = simple past of run
@@ -140,6 +173,9 @@ class Importer:
         if not senses:
             return
         key = (word, upos)
+        target = alt_target(e)
+        if target and target.lower() != word.lower():
+            self.alts.setdefault(key, target)
         item = self.pending.get(key)
         if item is None:
             item = self.pending[key] = {"ipa": entry_ipa(e), "senses": []}
@@ -186,8 +222,41 @@ class Importer:
                 self.stats["senses"] += len(srows)
         self.pending.clear()
 
+    def _resolve_variants(self) -> None:
+        """Replace "Alternative form of X" with X's definitions (X from the database or from self.multi)."""
+        rows = []
+        for (word, upos), target in self.alts.items():
+            lid = self.ids.get((word, upos))
+            if lid is None:
+                continue
+            tid = self.ids.get((target, upos)) or self.ids.get((target.lower(), upos))
+            if tid:
+                n = self.conn.execute(text("""
+                    INSERT INTO lecture.sense (lemma_id, source, seq, gloss_en, raw)
+                    SELECT :lid, source, seq, gloss_en, raw FROM lecture.sense
+                    WHERE lemma_id = :tid AND source = 'wiktionary_en'
+                    ON CONFLICT (lemma_id, source, seq) DO UPDATE SET gloss_en = EXCLUDED.gloss_en, raw = EXCLUDED.raw"""),
+                    {"lid": lid, "tid": tid}).rowcount
+                if n:
+                    self.n_senses[lid] = n
+                    self.stats["variants"] += 1
+            elif (target, upos) in self.multi:
+                senses = self.multi[(target, upos)]
+                rows += [{"lid": lid, "seq": i, "g": s["gloss"], "raw": json.dumps({"examples": s["examples"]},
+                                                                                     ensure_ascii=False)}
+                         for i, s in enumerate(senses)]
+                self.n_senses[lid] = len(senses)
+                self.stats["variants"] += 1
+        for i in range(0, len(rows), BATCH):
+            self.conn.execute(text("""
+                INSERT INTO lecture.sense (lemma_id, source, seq, gloss_en, raw)
+                VALUES (:lid, 'wiktionary_en', :seq, :g, CAST(:raw AS jsonb))
+                ON CONFLICT (lemma_id, source, seq) DO UPDATE SET gloss_en = EXCLUDED.gloss_en, raw = EXCLUDED.raw"""),
+                rows[i:i + BATCH])
+
     def finish(self) -> dict:
         self.flush()
+        self._resolve_variants()
         # Senses left over from an earlier, longer import: unlink tokens, then delete.
         keep = [{"lid": lid, "n": n} for lid, n in self.n_senses.items()]
         for i in range(0, len(keep), BATCH * 5):

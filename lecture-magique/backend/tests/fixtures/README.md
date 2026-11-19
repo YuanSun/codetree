@@ -6,5 +6,8 @@
   and published at [kaikki.org](https://kaikki.org/dictionary/French/), trimmed to the fields the importer
   reads. Wiktionary content is licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) (and GFDL);
   the authors are the Wiktionary contributors.
+- `wiktionary_en_sample.jsonl`: ~380 English entries (the words of an *Alice's Adventures in Wonderland* passage and
+  their inflected forms) from the same source ([kaikki.org English](https://kaikki.org/dictionary/English/)),
+  trimmed the same way; CC BY-SA 4.0, Wiktionary contributors. The *Alice* text (Lewis Carroll, 1865) is public domain.
 
 No Petit Robert content is ever used here (commercial dictionary; see CLAUDE.md).

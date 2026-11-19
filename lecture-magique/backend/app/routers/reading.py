@@ -90,7 +90,7 @@ def get_chapter(article_id: int, seq: int, user: User = Depends(current_user), c
         for lid, form, tags in conn.execute(text("""SELECT lemma_id, form, tags FROM lecture.word_form
                 WHERE lemma_id = ANY(:ids) ORDER BY lemma_id, form"""), {"ids": lemma_ids}):
             for code in tags or []:
-                lemmas[lid].setdefault("forms", {}).setdefault(code, form)
+                lemmas[lid].setdefault("forms", {}).setdefault(code, []).append(form)  # strewed, strewn
     # English glosses of French words (Wiktionary): shown on the card only when Petit Robert has no entry.
     for s in [] if art.lang != "fr" else conn.execute(text("""
             SELECT id, lemma_id, gloss_en, seq FROM lecture.sense

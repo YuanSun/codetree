@@ -9,6 +9,9 @@ the tense of each verb on the card, FSRS scheduling, the Monday *Défi de la sem
 Children get **📊 Mes progrès** (their own data only). Parents get a **📊 Suivi** page (log in with a `parent` account): minutes read and words looked up per week,
 défi scores, the hardest words with the sentence where she met them, and books in progress. The same data is
 available in the terminal: `psql -d postgres -v kid=grace -f tools/progress.sql`.
+**English reading:** English texts next to the French books (bookshelf switch 🇫🇷 / 🇬🇧), English word card from
+English Wiktionary, a separate English weekly challenge and word bag, Suivi / Mes progrès per language. Setup:
+[SETUP.md → English reading](SETUP.md#english-reading-optional-once).
 **Not yet:** model-chosen senses, phase 3 (open answers, writing).
 
 ## How the weekly défi works
@@ -72,6 +75,7 @@ Schema additions (all additive; flagged here because CLAUDE.md asks to raise dat
 | `sense.seq` + unique `(lemma_id, source, seq)` | lets the dictionary import be an idempotent upsert, and fixes sense order |
 | `lookup_event.client_event_id` (unique UUID) + `received_at` | a batch the tablet retries is stored once; `created_at` is the tap time |
 | `reading_day` table (migration 0003) | reading seconds per child, book and day, for the weekly minutes chart (`reading_progress.seconds_read` keeps the per-book total) |
+| `lang` on `lemma`, `article`, `quiz` (migration 0004); lemma key `(lang, lemma, pos, homograph)`, quiz key `(user_id, week_of, lang)` | English reading in the same tables: the French and English dictionaries never mix, one défi per language per week |
 | `token.morph` (migration 0002) | spaCy grammar of each occurrence (*Tense=Pres, Person=3…*), so the card shows the tense of the word in its sentence |
 
 Other choices:
@@ -93,6 +97,12 @@ Other choices:
   `source='wiktionary_en'`. Verbs/nouns/adjectives missing from Petit Robert get a lemma row. When spaCy tags a word
   as a verb, the matcher prefers verb forms, so *demande* → **demander** rather than the noun.
   `importer.article rematch` re-matches already-imported books in place (token ids, hence lookups, are kept).
+- English (`importer.wiktionary_en`): lemmas with `lang='en'`, up to 6 definitions per word in `sense.gloss_en`
+  (source `wiktionary_en`) with short examples, inflected forms in `word_form` with codes `3s`, `past`, `pp`,
+  `ing`, `pl`, `cmp`, `sup`. Proper names, multi-word phrases and obsolete / rare / vulgar senses are left out;
+  spelling variants (*colour*, *brand-new*) get the main entry's definitions. English packs (`"lang": "en"`) use
+  `en_core_web_sm`; words with an apostrophe stay whole (*don't*, *it's*) and a possessive *'s* is split off when the
+  whole word is not in the dictionary. Acronyms are not matched to ordinary words (*no* ≠ NO).
 - `focus_words` in a pack are reported but not stored yet (no table for them until the phase 2 quiz).
 
 ## Not verified here

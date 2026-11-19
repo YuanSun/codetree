@@ -1,6 +1,7 @@
 import { CSSProperties, forwardRef, useState } from "react";
 import { Lemma, Sense, WordState } from "../api";
-import { parseMorph, tenseKey, tenseLabel } from "../grammar";
+import { formsEn, parseMorph, tenseKey, tenseLabel, tenseLabelEn } from "../grammar";
+import { Lang, strings } from "../i18n";
 import { canSpeak, speak } from "../speech";
 import ConjugationTable from "./ConjugationTable";
 
@@ -21,7 +22,14 @@ export type CardInfo = {
   word: WordState | null;
 };
 
-function posLabel(l: Lemma) {
+const POS_EN: Record<string, string> = {
+  VERB: "verb", AUX: "verb", NOUN: "noun", PROPN: "name", ADJ: "adjective", ADV: "adverb", ADP: "preposition",
+  PRON: "pronoun", DET: "determiner", CCONJ: "conjunction", SCONJ: "conjunction", INTJ: "interjection", NUM: "number",
+  PART: "", X: "",
+};
+
+function posLabel(l: Lemma, lang: Lang) {
+  if (lang === "en") return POS_EN[l.pos] ?? "";
   const p = POS_FR[l.pos] ?? "";
   if (l.pos === "NOUN" && l.gender) return `n. ${l.gender}.`;
   return p;
@@ -33,18 +41,22 @@ type Props = {
   style: CSSProperties;
   sheet: boolean;
   onRate: (r: Rating) => void;
+  lang?: Lang;
 };
 
-const WordCard = forwardRef<HTMLDivElement, Props>(function WordCard({ info, senses, style, sheet, onRate }, ref) {
+const WordCard = forwardRef<HTMLDivElement, Props>(function WordCard({ info, senses, style, sheet, onRate, lang = "fr" }, ref) {
   const [showOthers, setShowOthers] = useState(false);
   const [showConj, setShowConj] = useState(false);
   const { lemma } = info;
   const chosen = info.senseId ? senses[info.senseId] : lemma?.senses.length ? senses[lemma.senses[0]] : undefined;
   const others = lemma ? lemma.senses.filter((id) => id !== info.senseId && senses[id]) : [];
   const isVerb = lemma?.pos === "VERB" || lemma?.pos === "AUX";
-  const tense = isVerb ? tenseLabel(info.morph) : null;
-  // English (Wiktionary) only when Petit Robert has nothing for this word.
-  const english = chosen?.def ? null : chosen?.en ?? lemma?.en[0] ?? null;
+  const en = lang === "en";
+  const t = strings(lang);
+  const tense = isVerb ? (en ? tenseLabelEn(info.morph) : tenseLabel(info.morph)) : null;
+  // English gloss of a French word (Wiktionary) only when Petit Robert has nothing for it.
+  const english = en || chosen?.def ? null : chosen?.en ?? lemma?.en[0] ?? null;
+  const forms = en && lemma ? formsEn(lemma.pos, lemma.lemma, lemma.forms) : [];
 
   return (
     <div ref={ref} className={`word-card${sheet ? " sheet" : ""}`} style={style} role="dialog" aria-label={info.surface}>
@@ -54,15 +66,20 @@ const WordCard = forwardRef<HTMLDivElement, Props>(function WordCard({ info, sen
           {lemma && (
             <div className="wc-lemma">
               {lemma.lemma.toLowerCase() !== info.surface.toLowerCase() && <>→ <b>{lemma.lemma}</b> </>}
-              <span className="wc-pos">{posLabel(lemma)}</span>
-              {lemma.ipa && <span className="wc-ipa"> [{lemma.ipa}]</span>}
+              <span className="wc-pos">{posLabel(lemma, lang)}</span>
+              {lemma.ipa && <span className="wc-ipa"> {en ? `/${lemma.ipa}/` : `[${lemma.ipa}]`}</span>}
             </div>
           )}
           {tense && <div className="wc-tense">{tense}</div>}
+          {forms.length > 0 && (
+            <div className="wc-forms">
+              {forms.map(([label, f], i) => <span key={label}>{i > 0 && " · "}{label} <b>{f}</b></span>)}
+            </div>
+          )}
         </div>
         {canSpeak() && (
-          <button className="btn icon speak" aria-label="Écouter (espace)" title="Écouter (espace)"
-                  onClick={() => speak(info.surface)}>🔊</button>
+          <button className="btn icon speak" aria-label={t.listen} title={t.listen}
+                  onClick={() => speak(info.surface, 0.85, lang)}>🔊</button>
         )}
       </div>
 
@@ -77,10 +94,10 @@ const WordCard = forwardRef<HTMLDivElement, Props>(function WordCard({ info, sen
       ) : english ? (
         <p className="wc-en"><span className="en-tag">EN</span> {english}</p>
       ) : (
-        <p className="muted small">Ce mot n’est pas encore dans le dictionnaire. On le note quand même !</p>
+        <p className="muted small">{t.notInDict}</p>
       )}
 
-      {isVerb && info.lemmaId && (
+      {isVerb && info.lemmaId && !en && (
         <div className="wc-conj">
           <button className="link" onClick={() => setShowConj(!showConj)}>
             {showConj ? "Masquer la conjugaison" : "Conjugaison"}
@@ -95,7 +112,7 @@ const WordCard = forwardRef<HTMLDivElement, Props>(function WordCard({ info, sen
       {others.length > 0 && (
         <div className="wc-others">
           <button className="link" onClick={() => setShowOthers(!showOthers)}>
-            {showOthers ? "Masquer" : `Autres sens (${others.length})`}
+            {showOthers ? t.hide : t.otherSenses(others.length)}
           </button>
           {showOthers && (
             <ol className="wc-other-list">
@@ -110,13 +127,14 @@ const WordCard = forwardRef<HTMLDivElement, Props>(function WordCard({ info, sen
       )}
 
       {info.word && info.word.lookups > 0 && (
-        <p className="wc-seen">Déjà cherché {info.word.lookups} fois — il est dans ton sac à mots 👜</p>
+        <p className="wc-seen">{t.seen(info.word.lookups)}</p>
       )}
+      {en && chosen?.def && <p className="wc-credit">Wiktionary (CC BY-SA)</p>}
 
       <div className="wc-rate">
-        <button className="btn rate r-unknown" onClick={() => onRate("unknown")}>Je ne connais pas</button>
-        <button className="btn rate r-vague" onClick={() => onRate("vague")}>Ça me dit quelque chose</button>
-        <button className="btn rate r-known" onClick={() => onRate("known")}>En fait, je connais</button>
+        <button className="btn rate r-unknown" onClick={() => onRate("unknown")}>{t.rateUnknown}</button>
+        <button className="btn rate r-vague" onClick={() => onRate("vague")}>{t.rateVague}</button>
+        <button className="btn rate r-known" onClick={() => onRate("known")}>{t.rateKnown}</button>
       </div>
     </div>
   );

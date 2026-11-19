@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { api, ChildReport } from "../api";
 import { go } from "../App";
-import { ThemePref } from "../prefs";
+import { ThemePref, usePref } from "../prefs";
+import { LANGS, Lang } from "../i18n";
 import BarChart from "./BarChart";
 import ThemeButton from "./ThemeButton";
 
@@ -32,16 +33,17 @@ export default function Suivi({ theme, self = false }: { theme: [ThemePref, (t: 
   const [kid, setKid] = useState<number | null>(null);
   const [rep, setRep] = useState<ChildReport | null>(null);
   const [error, setError] = useState("");
+  const [lang, setLang] = usePref<Lang>("lm.lang", "fr");
 
   useEffect(() => {
-    if (self) { api.myReport(8).then(setRep, (e) => setError(e.message)); return; }
+    if (self) return;
     api.children().then((k) => { setKids(k); if (k.length) setKid(k[0].id); }, (e) => setError(e.message));
   }, [self]);
   useEffect(() => {
-    if (self || kid === null) return;
+    if (!self && kid === null) return;
     setRep(null);
-    api.report(kid, 8).then(setRep, (e) => setError(e.message));
-  }, [kid, self]);
+    (self ? api.myReport(lang, 8) : api.report(kid!, lang, 8)).then(setRep, (e) => setError(e.message));
+  }, [kid, self, lang]);
 
   const thisWeek = rep ? rep.weeks[rep.weeks.length - 1] : undefined;
   const lastDefi = rep ? [...rep.weeks].reverse().find((w) => w.defi && w.defi.answered > 0) : undefined;
@@ -62,6 +64,12 @@ export default function Suivi({ theme, self = false }: { theme: [ThemePref, (t: 
           ))}
         </div>
       )}
+      <div className="lang-switch" role="tablist" aria-label="Langue">
+        {LANGS.map((l) => (
+          <button key={l.lang} role="tab" aria-selected={lang === l.lang} className={`chip${lang === l.lang ? " on" : ""}`}
+                  onClick={() => setLang(l.lang)}>{l.label}</button>
+        ))}
+      </div>
       {!rep && (self || kid !== null) && !error && <p className="muted">…</p>}
       {rep && thisWeek && (
         <>
@@ -101,7 +109,7 @@ export default function Suivi({ theme, self = false }: { theme: [ThemePref, (t: 
               <div key={h.lemma} className="card hard">
                 <div className="hard-head">
                   <span className="wcard-word">{h.lemma}</span>
-                  {h.gloss && <span className="muted small">{h.gloss}</span>}
+                  {h.gloss && lang === "fr" && <span className="muted small">{h.gloss}</span>}
                 </div>
                 <div className="hard-badges">
                   {h.errors > 0 && <span className="pill bad">{h.errors} erreur{h.errors > 1 ? "s" : ""} au défi</span>}
@@ -109,7 +117,7 @@ export default function Suivi({ theme, self = false }: { theme: [ThemePref, (t: 
                   <span className="pill">cherché {h.lookups} fois</span>
                   <span className="pill">niveau {h.familiarity}/5</span>
                 </div>
-                {h.definition && <p className="hard-def">{h.definition}</p>}
+                {(h.definition ?? (lang === "en" ? h.gloss : null)) && <p className="hard-def">{h.definition ?? h.gloss}</p>}
                 {h.sentence && <p className="wcard-sent">« <Highlight sentence={h.sentence} surface={h.surface} /> »</p>}
               </div>
             ))}

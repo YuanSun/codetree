@@ -220,7 +220,7 @@ button { font: inherit; color: inherit; }
 .page-title { flex: 1; text-align: center; font-size: 1.25rem; color: var(--ink); margin: 8px 0; }
 
 /* ---------- défi ---------- */
-.defi, .bag { max-width: 720px; margin: 0 auto; padding: 16px 16px 48px; }
+main.defi, main.bag { max-width: 720px; margin: 0 auto; padding: 16px 16px 48px; }
 .progress { height: 10px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 10px 0 16px; }
 .progress .bar { height: 100%; background: var(--mint); border-radius: 99px; transition: width .3s; }
 .q-card { padding: 22px 20px; display: grid; gap: 12px; }
@@ -284,7 +284,7 @@ button { font: inherit; color: inherit; }
 
 /* ---------- suivi (parents) ---------- */
 .quick-btn.suivi { background: linear-gradient(135deg, var(--sky-l), var(--card)); }
-.suivi { max-width: 960px; margin: 0 auto; padding: 16px 16px 48px; }
+main.suivi { max-width: 960px; margin: 0 auto; padding: 16px 16px 48px; }
 .suivi-name { color: var(--ink); margin: 10px 0; }
 .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 .tile { padding: 14px 16px; }
@@ -337,3 +337,12 @@ button { font: inherit; color: inherit; }
   .reader-bar .btn.small::before { content: "←"; font-size: 1.3rem; }
 }
 @media (prefers-reduced-motion: reduce) { .bravo-pop { animation: none; } }
+
+/* Language switch on the bookshelf (French / English books) */
+.lang-switch { display: flex; gap: 8px; margin: 4px 0 14px; flex-wrap: wrap; }
+.chip.big { font-size: 1rem; padding: 0.5em 1.1em; display: inline-flex; align-items: center; gap: 8px; }
+.chip .count { background: rgba(0, 0, 0, 0.12); border-radius: 999px; padding: 0 0.55em; font-size: 0.8rem; }
+.chip.on .count { background: rgba(255, 255, 255, 0.28); }
+.wc-forms { margin-top: 4px; font-size: 0.9rem; color: var(--muted); }
+.wc-forms b { color: var(--ink); font-weight: 600; }
+.wc-credit { margin: 8px 0 0; font-size: 0.72rem; color: var(--muted); }
