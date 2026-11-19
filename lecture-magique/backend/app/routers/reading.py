@@ -1,7 +1,7 @@
 """Bookshelf, chapters and reading progress. user_id always comes from the session."""
 from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from pydantic import BaseModel, Field
 from sqlalchemy import Connection, text
 
@@ -106,6 +106,8 @@ def get_chapter(article_id: int, seq: int, user: User = Depends(current_user), c
                                    {"u": user.id, "ids": lemma_ids})}
     q = conn.execute(text("SELECT prompt FROM lecture.question WHERE chapter_id = :c ORDER BY seq LIMIT 1"),
                      {"c": ch.id}).scalar()
+    pics = conn.execute(text("""SELECT id, after_seq, width, height, caption FROM lecture.illustration
+        WHERE chapter_id = :c ORDER BY after_seq"""), {"c": ch.id}).all()
     prog = conn.execute(text("SELECT last_chapter, last_paragraph, chapters_done FROM lecture.reading_progress "
                              "WHERE user_id = :u AND article_id = :a"), {"u": user.id, "a": article_id}).first()
     return {
@@ -113,6 +115,8 @@ def get_chapter(article_id: int, seq: int, user: User = Depends(current_user), c
         "chapter": {"id": ch.id, "seq": ch.seq, "title": ch.title},
         "chapters": [{"seq": c.seq, "title": c.title} for c in chapters],
         "paragraphs": [{"id": p.id, "seq": p.seq, "text": p.text, "tokens": by_para.get(p.id, [])} for p in paras],
+        "illustrations": [{"id": i.id, "after": i.after_seq, "width": i.width, "height": i.height, "caption": i.caption}
+                          for i in pics],
         "lemmas": lemmas,
         "senses": senses,
         "words": words,
@@ -120,6 +124,19 @@ def get_chapter(article_id: int, seq: int, user: User = Depends(current_user), c
         "progress": {"last_chapter": prog.last_chapter, "last_paragraph": prog.last_paragraph,
                      "chapters_done": sorted(prog.chapters_done)} if prog else None,
     }
+
+
+@router.get("/illustrations/{illustration_id}")
+def get_illustration(illustration_id: int, user: User = Depends(current_user), conn: Connection = Depends(get_conn)):
+    """A picture of a chapter, for whoever may read that chapter. Ids are new on every import, so the
+    browser can keep it for good."""
+    row = conn.execute(text("""SELECT i.mime, i.data FROM lecture.illustration i
+        JOIN lecture.chapter c ON c.id = i.chapter_id JOIN lecture.article a ON a.id = c.article_id
+        WHERE i.id = :i AND a.status = ANY(:s)"""), {"i": illustration_id, "s": list(visible_statuses(user))}).first()
+    if not row:
+        raise HTTPException(404, "Image introuvable")
+    return Response(bytes(row.data), media_type=row.mime,
+                    headers={"Cache-Control": "private, max-age=31536000, immutable"})
 
 
 class ProgressIn(BaseModel):

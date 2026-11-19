@@ -1,6 +1,7 @@
 """Import an "article pack" JSON (docs/DESIGN.md, 内容管线) as a draft, then publish it.
 
     uv run python -m importer.article import path/to/pack.json   # -> status draft + coverage report
+    uv run python -m importer.article images path/to/pack.json   # replace only the pictures (keeps lookups)
     uv run python -m importer.article publish <slug>
     uv run python -m importer.article unpublish <slug>
     uv run python -m importer.article rematch [<slug>]    # after importing Wiktionary: re-match in place
@@ -14,6 +15,7 @@ Unmatched words get needs_review=true and are listed in the report.
 
 Re-importing the same slug replaces its chapters while it has no lookup history; once
 someone has tapped words in it the import refuses, so the lookup log never loses its tokens.
+Pictures (importer/images.py) are stored with the text; `images` swaps them on any article.
 """
 import argparse
 import json
@@ -27,6 +29,7 @@ from sqlalchemy import Connection, text
 from app.config import ROOT, settings
 from app.db import get_engine
 
+from . import images
 from .tokenize import Tok, split_hyphenated, split_possessive, tokenize
 
 ELIDED = {"l": "le", "d": "de", "j": "je", "m": "me", "t": "te", "s": "se", "n": "ne", "c": "ce", "ç": "ce",
@@ -199,7 +202,8 @@ def analyse(text_: str, lex: Lexicon) -> list[tuple[Tok, Match, str, str, str]]:
     return out
 
 
-def import_pack(conn: Connection, pack: dict, lex: Lexicon | None = None) -> dict:
+def import_pack(conn: Connection, pack: dict, lex: Lexicon | None = None, base: Path | None = None) -> dict:
+    """base: the pack file's folder, where the paths of its pictures start."""
     lang = pack.get("lang", "fr")
     if lang not in SPACY_MODELS:
         raise ImportRefused(f"lang must be one of {sorted(SPACY_MODELS)}, not {lang!r}")
@@ -267,12 +271,14 @@ def import_pack(conn: Connection, pack: dict, lex: Lexicon | None = None) -> dic
                      {"a": article_id, "s": qseq, "k": q.get("kind", "writing"), "p": q["prompt"],
                       "m": q.get("model_answer"), "r": json.dumps(q.get("rubric"), ensure_ascii=False)})
 
+    n_images = images.store(conn, article_id, pack, base)
     coverage = matched / words if words else 1.0
     no_propn = matched / (words - propn) if words - propn else 1.0
     return {
         "article_id": article_id, "slug": slug, "lang": lang, "status": "draft",
         "words": words, "matched": matched, "coverage": round(coverage, 4),
         "coverage_without_proper_nouns": round(no_propn, 4),
+        "images": n_images,
         "match_kinds": dict(hows),
         "unmatched": [{"surface": s, "spacy_lemma": l, "upos": p, "count": n}
                       for (s, l, p), n in unmatched.most_common()],
@@ -316,6 +322,20 @@ def rematch(conn: Connection, slug: str, lex: Lexicon | None = None) -> dict:
                           for (s, l, p), n in unmatched.most_common()]}
 
 
+def replace_images(conn: Connection, pack: dict, base: Path | None) -> int:
+    """Pictures only, for an article already imported (and maybe read): its text must not have changed."""
+    art = conn.execute(text("SELECT id FROM lecture.article WHERE slug = :s"), {"s": pack["slug"]}).scalar()
+    if not art:
+        raise ImportRefused(f"no article with slug {pack['slug']!r}: import it first")
+    have = dict(conn.execute(text("""SELECT c.seq, count(p.id) FROM lecture.chapter c
+        LEFT JOIN lecture.paragraph p ON p.chapter_id = c.id WHERE c.article_id = :a GROUP BY c.seq"""), {"a": art}).all())
+    want = {ch["seq"]: len(ch["paragraphs"]) for ch in pack["chapters"]}
+    if have != want:
+        raise ImportRefused(f"{pack['slug']}: the pack's chapters/paragraphs differ from the imported text, "
+                            f"so picture positions would be wrong (imported {have}, pack {want})")
+    return images.store(conn, art, pack, base)
+
+
 def set_status(conn: Connection, slug: str, status: str) -> None:
     n = conn.execute(text("UPDATE lecture.article SET status = :st WHERE slug = :s"), {"st": status, "s": slug}).rowcount
     if not n:
@@ -326,6 +346,8 @@ def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("import"); p.add_argument("pack")
+    p = sub.add_parser("images", help="replace an imported article's pictures with the pack's (text untouched)")
+    p.add_argument("pack")
     p = sub.add_parser("rematch", help="re-match words of an imported article in place (keeps lookups)")
     p.add_argument("slug", nargs="?", help="omit to rematch every article")
     p = sub.add_parser("publish"); p.add_argument("slug")
@@ -336,18 +358,25 @@ def main(argv: list[str] | None = None) -> None:
         if a.cmd == "import":
             pack = json.loads(Path(a.pack).read_text(encoding="utf-8"))
             try:
-                rep = import_pack(conn, pack)
-            except ImportRefused as e:
+                rep = import_pack(conn, pack, base=Path(a.pack).parent)
+            except (ImportRefused, images.ImageRefused) as e:
                 sys.exit(str(e))
             REPORT_DIR.mkdir(exist_ok=True)
             out = REPORT_DIR / f"{rep['slug']}.json"
             out.write_text(json.dumps(rep, ensure_ascii=False, indent=2), encoding="utf-8")
             print(f"{rep['slug']}: draft, {rep['words']} words, coverage {rep['coverage']:.1%} "
                   f"({rep['coverage_without_proper_nouns']:.1%} without proper nouns), "
-                  f"{len(rep['unmatched'])} distinct unmatched -> {out}")
+                  f"{len(rep['unmatched'])} distinct unmatched, {rep['images']} pictures -> {out}")
             for u in rep["unmatched"][:40]:
                 print(f"  {u['count']:>3}  {u['surface']}  (spaCy: {u['spacy_lemma']} {u['upos']})")
             print(f"publish with: python -m importer.article publish {rep['slug']}")
+        elif a.cmd == "images":
+            pack = json.loads(Path(a.pack).read_text(encoding="utf-8"))
+            try:
+                n = replace_images(conn, pack, Path(a.pack).parent)
+            except (ImportRefused, images.ImageRefused) as e:
+                sys.exit(str(e))
+            print(f"{pack['slug']}: {n} pictures")
         elif a.cmd == "rematch":
             slugs = [a.slug] if a.slug else list(conn.execute(text(
                 "SELECT slug FROM lecture.article ORDER BY lang, id")).scalars())

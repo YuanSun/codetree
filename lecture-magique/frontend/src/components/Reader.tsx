@@ -1,5 +1,5 @@
-import { CSSProperties, memo, MouseEvent, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { api, ChapterData, TokenTuple, WordState } from "../api";
+import { CSSProperties, Fragment, memo, MouseEvent, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { api, ChapterData, Illustration, TokenTuple, WordState } from "../api";
 import { go } from "../App";
 import { usePref, ThemePref } from "../prefs";
 import { lookupQueue, uuid4 } from "../queue";
@@ -12,8 +12,9 @@ const IDLE_MS = 120_000; // reading time stops counting after 2 minutes without 
 const REPORT_MS = 30_000;
 
 /** One paragraph: the original text with each word wrapped in <span data-t>. Gaps are copied verbatim. */
-const Paragraph = memo(function Paragraph({ text, tokens, seen, active, underline }: {
-  text: string; tokens: TokenTuple[]; seen: Record<string, WordState>; active: number | null; underline: boolean;
+const Paragraph = memo(function Paragraph({ seq, text, tokens, seen, active, underline }: {
+  seq: number; text: string; tokens: TokenTuple[]; seen: Record<string, WordState>; active: number | null;
+  underline: boolean;
 }) {
   const out: (string | JSX.Element)[] = [];
   let pos = 0;
@@ -26,8 +27,24 @@ const Paragraph = memo(function Paragraph({ text, tokens, seen, active, underlin
     pos = e;
   }
   if (pos < text.length) out.push(text.slice(pos));
-  return <p className={text.startsWith("–") ? "dialogue" : undefined}>{out}</p>;
+  return <p data-seq={seq} className={text.startsWith("–") ? "dialogue" : undefined}>{out}</p>;
 });
+
+/** A picture between paragraphs: width/height reserve its place before it loads; small web pictures are not
+ * blown up past 1.5×; a tap shows it full screen. */
+function Figure({ pic, onOpen }: { pic: Illustration; onOpen: (p: Illustration) => void }) {
+  return (
+    <figure className="pic">
+      <button className="pic-btn" onClick={() => onOpen(pic)} aria-label={pic.caption ?? "Image"}>
+        <img src={`api/illustrations/${pic.id}`} width={pic.width} height={pic.height} alt={pic.caption ?? ""}
+             loading="lazy" decoding="async" style={{ maxWidth: Math.round(pic.width * 1.5) }} />
+      </button>
+      {pic.caption && <figcaption>{pic.caption}</figcaption>}
+    </figure>
+  );
+}
+
+const paragraphsOf = (el: HTMLElement | null) => el?.querySelectorAll<HTMLElement>("p[data-seq]");
 
 type Open = CardInfo & { openedAt: number; style: CSSProperties; sheet: boolean };
 
@@ -38,6 +55,7 @@ export default function Reader({ articleId, seq, theme }: {
   const [error, setError] = useState("");
   const [words, setWords] = useState<Record<string, WordState>>({});
   const [card, setCard] = useState<Open | null>(null);
+  const [bigPic, setBigPic] = useState<Illustration | null>(null);
   const [underline, setUnderline] = usePref("lm.underline", true);
   const [done, setDone] = useState<null | { next: number | null; finished: boolean }>(null);
   const [completing, setCompleting] = useState(false);
@@ -68,7 +86,7 @@ export default function Reader({ articleId, seq, theme }: {
   useLayoutEffect(() => {
     if (!data?.progress || data.progress.last_chapter !== seq) return;
     const want = data.progress.last_paragraph;
-    if (want > 1) textRef.current?.children[want - 1]?.scrollIntoView({ block: "start" });
+    if (want > 1) paragraphsOf(textRef.current)?.[want - 1]?.scrollIntoView({ block: "start" });
   }, [data, seq]);
 
   // ---- reading time + position -------------------------------------------------------------
@@ -86,10 +104,10 @@ export default function Reader({ articleId, seq, theme }: {
     const bump = () => { lastActive.current = Date.now(); };
     const onScroll = () => {
       bump();
-      const ps = textRef.current?.children;
+      const ps = paragraphsOf(textRef.current);
       if (!ps) return;
       for (let i = 0; i < ps.length; i++) {
-        if ((ps[i] as HTMLElement).getBoundingClientRect().bottom > 90) { currentPara.current = i + 1; break; }
+        if (ps[i].getBoundingClientRect().bottom > 90) { currentPara.current = i + 1; break; }
       }
     };
     const onVis = () => {
@@ -179,7 +197,7 @@ export default function Reader({ articleId, seq, theme }: {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement) return;
-      if (e.key === "Escape") closeCard("unknown");
+      if (e.key === "Escape") { closeCard("unknown"); setBigPic(null); }
       else if (e.key === " " && cardState.current) {
         e.preventDefault();
         speak(cardState.current.surface, 0.85, data?.article.lang);
@@ -216,6 +234,7 @@ export default function Reader({ articleId, seq, theme }: {
   const t = strings(lang);
   const total = data.chapters.length;
   const alreadyDone = data.progress?.chapters_done.includes(seq);
+  const pics = new Map((data.illustrations ?? []).map((i) => [i.after, i]));
 
   return (
     <div className="reader" ref={rootRef} onClick={onClick} lang={lang}>
@@ -238,9 +257,13 @@ export default function Reader({ articleId, seq, theme }: {
         {data.article.status === "draft" && <p className="draft-note">{t.draft}</p>}
         <h1 className="chapter-title"><span className="ch-num">{seq}</span> {data.chapter.title}</h1>
         <div className="text" ref={textRef}>
+          {pics.get(0) && <Figure pic={pics.get(0)!} onOpen={setBigPic} />}
           {data.paragraphs.map((p) => (
-            <Paragraph key={p.id} text={p.text} tokens={p.tokens} seen={words}
-                       active={card?.tokenId ?? null} underline={underline} />
+            <Fragment key={p.id}>
+              <Paragraph seq={p.seq} text={p.text} tokens={p.tokens} seen={words}
+                         active={card?.tokenId ?? null} underline={underline} />
+              {pics.get(p.seq) && <Figure pic={pics.get(p.seq)!} onOpen={setBigPic} />}
+            </Fragment>
           ))}
         </div>
 
@@ -275,6 +298,12 @@ export default function Reader({ articleId, seq, theme }: {
           </nav>
         </footer>
       </article>
+
+      {bigPic && (
+        <div className="pic-full" role="dialog" aria-label={bigPic.caption ?? "Image"} onClick={() => setBigPic(null)}>
+          <img src={`api/illustrations/${bigPic.id}`} alt={bigPic.caption ?? ""} />
+        </div>
+      )}
 
       {card && (
         <>

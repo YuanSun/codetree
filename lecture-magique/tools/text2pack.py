@@ -7,6 +7,8 @@ Text format:
     @lang en              English text (default fr)
     ## 1 Chapter title    starts a chapter (the number is the chapter seq)
     blank-line separated paragraphs
+    @image images/book/ch1.jpg | caption    inside a chapter: a picture after the paragraphs above it
+                                            (path relative to the pack file; the caption is optional)
 
 Typography: straight apostrophes become ’. French only: the spaces before ! ? ; : » and after « become
 narrow no-break spaces (U+202F), so "!" never wraps alone onto the next line.
@@ -48,7 +50,15 @@ def parse(text: str) -> dict:
         return meta.get("lang", "fr")
 
     for line in text.splitlines():
-        if line.startswith("@"):
+        if line.startswith("@image "):
+            flush()
+            if not chapters:
+                sys.exit(f"@image before the first chapter: {line}")
+            file, _, caption = line[len("@image "):].partition("|")
+            ch = chapters[-1]
+            ch.setdefault("images", []).append({"after": len(ch["paragraphs"]), "file": file.strip(),
+                                                "caption": typography(caption, lang()) or None})
+        elif line.startswith("@"):
             k, _, v = line[1:].partition(" ")
             meta[k] = v.strip()
         elif line.startswith("## "):
@@ -96,7 +106,8 @@ def main() -> None:
     Path(a.out).write_text(json.dumps(pack, ensure_ascii=False, indent=2), encoding="utf-8")
     words = sum(len(p.split()) for c in pack["chapters"] for p in c["paragraphs"])
     print(f"{a.out}: {len(pack['chapters'])} chapters, "
-          f"{sum(len(c['paragraphs']) for c in pack['chapters'])} paragraphs, ~{words} words")
+          f"{sum(len(c['paragraphs']) for c in pack['chapters'])} paragraphs, ~{words} words, "
+          f"{sum(len(c.get('images', [])) for c in pack['chapters'])} pictures")
     for c in pack["chapters"]:
         n = sum(len(p.split()) for p in c["paragraphs"])
         print(f"  {c['seq']}. {c['title']}: ~{n} words (~{n / 120:.0f} min at 120 words/min)")
