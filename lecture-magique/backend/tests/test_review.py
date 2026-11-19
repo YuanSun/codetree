@@ -229,3 +229,13 @@ def test_removing_every_word_of_the_defi_resets_it(world):
     assert g.get("/api/words").json() == []
     with world["db"].connect() as c:
         assert c.execute(text("SELECT count(*) FROM lecture.quiz WHERE id = :q"), {"q": first}).scalar() == 0
+
+
+def test_french_card_carries_english_help_next_to_the_definition(world):
+    """The card shows the Robert definition and keeps the English gloss for its "In English" button."""
+    g = login(world, "grace")
+    aid = g.get("/api/articles").json()[0]["id"]
+    d = g.get(f"/api/articles/{aid}/chapters/1").json()
+    maison = next(l for l in d["lemmas"].values() if l["lemma"] == "maison")
+    assert maison["en"] == ["house"]
+    assert d["senses"][str(maison["senses"][0])]["def"]  # the French definition is still there, first

@@ -1,4 +1,4 @@
-import { CSSProperties, forwardRef, useState } from "react";
+import { CSSProperties, forwardRef, useEffect, useState } from "react";
 import { Lemma, Sense, WordState } from "../api";
 import { formsEn, parseMorph, tenseKey, tenseLabel, tenseLabelEn } from "../grammar";
 import { Lang, strings } from "../i18n";
@@ -47,6 +47,7 @@ type Props = {
 const WordCard = forwardRef<HTMLDivElement, Props>(function WordCard({ info, senses, style, sheet, onRate, lang = "fr" }, ref) {
   const [showOthers, setShowOthers] = useState(false);
   const [showConj, setShowConj] = useState(false);
+  const [showEn, setShowEn] = useState(false);
   const { lemma } = info;
   const chosen = info.senseId ? senses[info.senseId] : lemma?.senses.length ? senses[lemma.senses[0]] : undefined;
   const others = lemma ? lemma.senses.filter((id) => id !== info.senseId && senses[id]) : [];
@@ -54,8 +55,11 @@ const WordCard = forwardRef<HTMLDivElement, Props>(function WordCard({ info, sen
   const en = lang === "en";
   const t = strings(lang);
   const tense = isVerb ? (en ? tenseLabelEn(info.morph) : tenseLabel(info.morph)) : null;
-  // English gloss of a French word (Wiktionary) only when Petit Robert has nothing for it.
+  // English gloss of a French word (Wiktionary): in place of the definition when Petit Robert has nothing,
+  // otherwise behind an "In English" button, so she reads the French first.
   const english = en || chosen?.def ? null : chosen?.en ?? lemma?.en[0] ?? null;
+  const englishHelp = !en && chosen?.def && lemma?.en.length ? lemma.en[0] : null;
+  useEffect(() => setShowEn(false), [info.surface, info.lemmaId]);
   const forms = en && lemma ? formsEn(lemma.pos, lemma.lemma, lemma.forms) : [];
 
   return (
@@ -90,6 +94,11 @@ const WordCard = forwardRef<HTMLDivElement, Props>(function WordCard({ info, sen
           {chosen.ex.length > 0 && (
             <ul className="wc-ex">{chosen.ex.slice(0, 3).map((e, i) => <li key={i}>{e}</li>)}</ul>
           )}
+          {englishHelp && (showEn ? (
+            <p className="wc-en"><span className="en-tag">EN</span> {englishHelp}</p>
+          ) : (
+            <button className="btn ghost small en-btn" onClick={() => setShowEn(true)}>🇬🇧 In English</button>
+          ))}
         </div>
       ) : english ? (
         <p className="wc-en"><span className="en-tag">EN</span> {english}</p>
