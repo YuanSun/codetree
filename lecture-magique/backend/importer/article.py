@@ -218,6 +218,11 @@ def import_pack(conn: Connection, pack: dict, lex: Lexicon | None = None, base: 
         if used:
             raise ImportRefused(f"{slug}: {used} lookups already point at this article's tokens; "
                                 f"import it under a new slug instead")
+        answered = conn.execute(text("""SELECT count(*) FROM lecture.answer a JOIN lecture.question q ON q.id = a.question_id
+            WHERE q.article_id = :a"""), {"a": existing}).scalar()
+        if answered:
+            raise ImportRefused(f"{slug}: {answered} answers already point at this article's questions; "
+                                f"use `questions` to update its questions, or import it under a new slug")
         conn.execute(text("DELETE FROM lecture.question WHERE article_id = :a"), {"a": existing})
         conn.execute(text("DELETE FROM lecture.chapter WHERE article_id = :a"), {"a": existing})
         conn.execute(text("""UPDATE lecture.article SET title=:t, week_of=:w, level=:l, source_note=:n, status='draft',
@@ -336,6 +341,50 @@ def replace_images(conn: Connection, pack: dict, base: Path | None) -> int:
     return images.store(conn, art, pack, base)
 
 
+def replace_questions(conn: Connection, pack: dict) -> dict:
+    """Questions only, for an article already imported (and maybe read and answered): its chapters stay.
+    A question is the same one when its chapter and prompt are unchanged: it is updated in place (answers stay
+    attached). Old questions nobody answered are deleted; answered ones are kept but retired (hidden from the
+    questions page, still listed with their answers for parents)."""
+    art = conn.execute(text("SELECT id FROM lecture.article WHERE slug = :s"), {"s": pack["slug"]}).scalar()
+    if not art:
+        raise ImportRefused(f"no article with slug {pack['slug']!r}: import it first")
+    chapters = dict(conn.execute(text("SELECT seq, id FROM lecture.chapter WHERE article_id = :a"), {"a": art}).all())
+    wanted = []
+    for ch in pack["chapters"]:
+        if ch.get("question"):
+            if ch["seq"] not in chapters:
+                raise ImportRefused(f"{pack['slug']}: chapter {ch['seq']} is not in the imported article")
+            wanted.append((chapters[ch["seq"]], ch["question"], "open"))
+    wanted += [(None, q, "writing") for q in pack.get("questions", [])]
+    existing = {(r.chapter_id, r.prompt): r for r in conn.execute(text("""
+        SELECT q.id, q.chapter_id, q.prompt, EXISTS (SELECT 1 FROM lecture.answer a WHERE a.question_id = q.id) AS answered
+        FROM lecture.question q WHERE q.article_id = :a"""), {"a": art})}
+    kept, added = set(), 0
+    for seq, (chapter_id, q, default_kind) in enumerate(wanted, start=1):
+        row = {"a": art, "c": chapter_id, "s": seq, "k": q.get("kind", default_kind), "p": q["prompt"],
+               "m": q.get("model_answer"), "r": json.dumps(q.get("rubric"), ensure_ascii=False)}
+        old = existing.get((chapter_id, q["prompt"]))
+        if old:
+            kept.add(old.id)
+            conn.execute(text("""UPDATE lecture.question SET seq = :s, kind = :k, model_answer = :m,
+                rubric = CAST(:r AS jsonb) WHERE id = :id"""), {**row, "id": old.id})
+        else:
+            added += 1
+            conn.execute(text("""INSERT INTO lecture.question (article_id, chapter_id, seq, kind, prompt, model_answer, rubric)
+                VALUES (:a, :c, :s, :k, :p, :m, CAST(:r AS jsonb))"""), row)
+    gone = [r for r in existing.values() if r.id not in kept]
+    retired = [r.id for r in gone if r.answered]
+    if retired:
+        conn.execute(text("""UPDATE lecture.question SET seq = 1000 + seq,
+            rubric = coalesce(rubric, '{}'::jsonb) || '{"retired": true}'::jsonb WHERE id = ANY(:ids)"""), {"ids": retired})
+    deleted = [r.id for r in gone if not r.answered]
+    if deleted:
+        conn.execute(text("DELETE FROM lecture.question WHERE id = ANY(:ids)"), {"ids": deleted})
+    return {"questions": len(wanted), "updated": len(kept), "added": added, "retired": len(retired),
+            "deleted": len(deleted)}
+
+
 def set_status(conn: Connection, slug: str, status: str) -> None:
     n = conn.execute(text("UPDATE lecture.article SET status = :st WHERE slug = :s"), {"st": status, "s": slug}).rowcount
     if not n:
@@ -347,6 +396,8 @@ def main(argv: list[str] | None = None) -> None:
     sub = ap.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("import"); p.add_argument("pack")
     p = sub.add_parser("images", help="replace an imported article's pictures with the pack's (text untouched)")
+    p.add_argument("pack")
+    p = sub.add_parser("questions", help="replace an imported article's questions with the pack's (text untouched)")
     p.add_argument("pack")
     p = sub.add_parser("rematch", help="re-match words of an imported article in place (keeps lookups)")
     p.add_argument("slug", nargs="?", help="omit to rematch every article")
@@ -377,6 +428,14 @@ def main(argv: list[str] | None = None) -> None:
             except (ImportRefused, images.ImageRefused) as e:
                 sys.exit(str(e))
             print(f"{pack['slug']}: {n} pictures")
+        elif a.cmd == "questions":
+            pack = json.loads(Path(a.pack).read_text(encoding="utf-8"))
+            try:
+                rep = replace_questions(conn, pack)
+            except ImportRefused as e:
+                sys.exit(str(e))
+            print(f"{pack['slug']}: {rep['questions']} questions ({rep['updated']} unchanged or updated, "
+                  f"{rep['added']} new, {rep['deleted']} removed, {rep['retired']} retired because answered)")
         elif a.cmd == "rematch":
             slugs = [a.slug] if a.slug else list(conn.execute(text(
                 "SELECT slug FROM lecture.article ORDER BY lang, id")).scalars())
