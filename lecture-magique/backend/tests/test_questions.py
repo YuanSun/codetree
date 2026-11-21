@@ -117,3 +117,52 @@ def test_replace_questions_keeps_answers(world):
     papa = login(world, "ryan")
     bodies = {r["body"] for r in papa.get(f"/api/parent/children/{kid_id(world, 'grace')}/answers").json()}
     assert bodies == {"On ne sait rien de lui.", "Mystérieux."}
+
+
+def test_grading_export_and_import(world):
+    aid = world["aid"]
+    with world["db"].begin() as c:
+        set_status(c, PACK["slug"], "published")
+    g = login(world, "grace")
+    qs = g.get(f"/api/articles/{aid}/questions").json()["questions"]
+    g.post(f"/api/questions/{qs[0]['id']}/answer", json={"body": "Il est mystérieux."})
+    g.post(f"/api/questions/{qs[1]['id']}/answer", json={"body": "Ça veut dire mystérieux."})
+    papa = login(world, "ryan")
+    kid = kid_id(world, "grace")
+
+    assert g.get(f"/api/parent/children/{kid}/grading-export").status_code == 403
+    exp = papa.get(f"/api/parent/children/{kid}/grading-export").json()
+    assert exp["format"] == "lecture-magique-grading/1" and "grace" in exp["instructions"]
+    items = {x["question"]: x for x in exp["answers"]}
+    assert len(items) == 2
+    chap, vocab = items[qs[0]["prompt"]], items[qs[1]["prompt"]]
+    assert chap["points"] == 2 and chap["chapter"] == 1  # chapter questions default to 2 points
+    assert vocab["points"] == 2 and vocab["must_answer"] == "mystérieux" and vocab["answer"] == "Ça veut dire mystérieux."
+
+    # bad batches change nothing
+    for bad in ([{"answer_id": vocab["answer_id"], "score": 2.5, "feedback": "x"}],
+                [{"answer_id": vocab["answer_id"], "score": 1.25, "feedback": "x"}],
+                [{"answer_id": 999999, "score": 1, "feedback": "x"}],
+                [{"answer_id": vocab["answer_id"], "score": 1}, {"answer_id": vocab["answer_id"], "score": 1}]):
+        assert papa.post("/api/parent/grades", json={"grades": bad}).status_code == 422
+    assert g.post("/api/parent/grades", json={"grades": [{"answer_id": vocab["answer_id"], "score": 1}]}).status_code == 403
+
+    r = papa.post("/api/parent/grades", json={"grades": [
+        {"answer_id": vocab["answer_id"], "score": 2, "feedback": "Bravo, c’est le bon sens."},
+        {"answer_id": chap["answer_id"], "score": 0.5, "feedback": "Explique pourquoi."}]})
+    assert r.json() == {"graded": 2}
+
+    # the child sees her grade; a new version keeps showing the old grade, marked as not for this version
+    qs = g.get(f"/api/articles/{aid}/questions").json()["questions"]
+    assert qs[1]["grade"] == {"score": 2.0, "points": 2.0, "feedback": "Bravo, c’est le bon sens.", "for_latest": True}
+    g.post(f"/api/questions/{qs[0]['id']}/answer", json={"body": "On ne sait rien de lui : il est mystérieux."})
+    qs = g.get(f"/api/articles/{aid}/questions").json()["questions"]
+    assert qs[0]["grade"]["score"] == 0.5 and qs[0]["grade"]["for_latest"] is False
+
+    # the next export has only the new, ungraded version; regrade=true has every latest answer
+    exp = papa.get(f"/api/parent/children/{kid}/grading-export").json()["answers"]
+    assert [x["answer"] for x in exp] == ["On ne sait rien de lui : il est mystérieux."]
+    assert len(papa.get(f"/api/parent/children/{kid}/grading-export?regrade=true").json()["answers"]) == 2
+    rows = {r["prompt"]: r for r in papa.get(f"/api/parent/children/{kid}/answers").json()}
+    assert rows[qs[1]["prompt"]]["grade"] == {"score": 2.0, "points": 2.0, "feedback": "Bravo, c’est le bon sens.", "by": "claude"}
+    assert rows[qs[0]["prompt"]]["grade"] is None
