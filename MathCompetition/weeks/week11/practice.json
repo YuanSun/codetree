@@ -1,0 +1,1421 @@
+{
+  "eyebrow": "Week 11 · Practice",
+  "title": "Views & Surface Area — Practice",
+  "intro": "Every question from the slides (Together and Your turn), with a hands-on lab after you solve each one. Do them on paper first, then check here.",
+  "groups": [
+    {
+      "id": "views",
+      "label": "Views",
+      "emoji": "🔭",
+      "color": "#3b82f6"
+    },
+    {
+      "id": "surface",
+      "label": "Surface area",
+      "emoji": "📦",
+      "color": "#10b981"
+    },
+    {
+      "id": "scaling",
+      "label": "Scaling & volume",
+      "emoji": "🔬",
+      "color": "#f59e0b"
+    }
+  ],
+  "questions": [
+    {
+      "id": "v01",
+      "skill": "views",
+      "difficulty": "easy",
+      "source": "Class slides — Views · Together 1",
+      "skillLabel": "Stack plan",
+      "title": "Views of a Stack — how many cubes?",
+      "text": "The **stack plan** is the view from above, with a number in every square. The number tells you how many cubes are stacked there — **including the cubes you cannot see in the picture**. How many cubes are in this stack?",
+      "figure": {
+        "type": "stack",
+        "plan": [
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ]
+        ],
+        "table": true
+      },
+      "explorer": {
+        "type": "stackbuilder",
+        "mode": "views",
+        "plan": [
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ]
+        ],
+        "rows": 3,
+        "cols": 3,
+        "max": 4
+      },
+      "choices": [
+        "7",
+        "9",
+        "11",
+        "13"
+      ],
+      "answer": 2,
+      "hints": [
+        "Look at the numbers in the stack plan. What does the **3** in the middle square tell you?",
+        "A square marked 2 holds 2 cubes, a square marked 0 holds none. So add up the nine numbers.",
+        "2 + 1 + 0 + 1 + 3 + 1 + 0 + 2 + 1 = ?"
+      ],
+      "traps": {
+        "0": "7 counts the **squares that have cubes** (7 stacks). But a stack marked 3 is three cubes, not one.",
+        "1": "9 counts all nine squares of the 3 × 3 base. The numbers say how **tall** each square is — add them, don’t count the squares.",
+        "3": "13 comes from adding the squares of the front view and the right view (6 + 7). A view only shows the **tallest** stack in each line of sight, so its squares are not a cube count."
+      },
+      "solution": [
+        "Every number is a stack height, so add them all: 2 + 1 + 0 + 1 + 3 + 1 + 0 + 2 + 1 = **11**.",
+        "Check layer by layer from the bottom: the bottom layer has 7 cubes, the middle layer 3, the top layer 1 → 7 + 3 + 1 = **11**."
+      ],
+      "idea": "The stack plan tells the true height of every square — add the numbers."
+    },
+    {
+      "id": "v02",
+      "skill": "views",
+      "difficulty": "medium",
+      "source": "Class slides — Views · Together 1",
+      "skillLabel": "Front & right view",
+      "title": "Views of a Stack — draw the views",
+      "text": "Use the same stack plan. Which pair of pictures shows its **FRONT** view and its **RIGHT** view? (In the right view the **front row is on the left**.)",
+      "figure": {
+        "type": "stack",
+        "plan": [
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ]
+        ],
+        "table": true,
+        "iso": false
+      },
+      "explorer": {
+        "type": "stackbuilder",
+        "mode": "views",
+        "plan": [
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ]
+        ],
+        "rows": 3,
+        "cols": 3,
+        "max": 4
+      },
+      "choices": [
+        "<svg viewBox=\"0 0 104 55\" width=\"104\" height=\"55\" style=\"max-width:100%\" role=\"img\" aria-label=\"front view 1, 3, 2 and right view 2, 3, 2\"><g><rect x=\"1\" y=\"27\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"27\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"14\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"1\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"27\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"14\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></g><g transform=\"translate(63,0)\"><rect x=\"1\" y=\"27\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"14\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"27\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"14\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"1\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"27\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"14\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></g><text x=\"20.5\" y=\"53\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"800\" fill=\"#1d2150\" font-family=\"Nunito,sans-serif\">FRONT</text><text x=\"83.5\" y=\"53\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"800\" fill=\"#1d2150\" font-family=\"Nunito,sans-serif\">RIGHT</text></svg>",
+        "<svg viewBox=\"0 0 104 55\" width=\"104\" height=\"55\" style=\"max-width:100%\" role=\"img\" aria-label=\"front view 2, 3, 1 and right view 2, 3, 2\"><g><rect x=\"1\" y=\"27\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"14\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"27\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"14\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"1\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"27\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></g><g transform=\"translate(63,0)\"><rect x=\"1\" y=\"27\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"14\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"27\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"14\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"1\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"27\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"14\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></g><text x=\"20.5\" y=\"53\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"800\" fill=\"#1d2150\" font-family=\"Nunito,sans-serif\">FRONT</text><text x=\"83.5\" y=\"53\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"800\" fill=\"#1d2150\" font-family=\"Nunito,sans-serif\">RIGHT</text></svg>",
+        "<svg viewBox=\"0 0 104 55\" width=\"104\" height=\"55\" style=\"max-width:100%\" role=\"img\" aria-label=\"front view 2, 3, 2 and right view 2, 3, 1\"><g><rect x=\"1\" y=\"27\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"14\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"27\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"14\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"1\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"27\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"14\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></g><g transform=\"translate(63,0)\"><rect x=\"1\" y=\"27\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"14\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"27\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"14\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"1\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"27\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></g><text x=\"20.5\" y=\"53\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"800\" fill=\"#1d2150\" font-family=\"Nunito,sans-serif\">FRONT</text><text x=\"83.5\" y=\"53\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"800\" fill=\"#1d2150\" font-family=\"Nunito,sans-serif\">RIGHT</text></svg>",
+        "<svg viewBox=\"0 0 104 55\" width=\"104\" height=\"55\" style=\"max-width:100%\" role=\"img\" aria-label=\"front view 0, 2, 1 and right view 2, 3, 2\"><g><rect x=\"14\" y=\"27\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"14\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"27\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></g><g transform=\"translate(63,0)\"><rect x=\"1\" y=\"27\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"14\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"27\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"14\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"1\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"27\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"14\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></g><text x=\"20.5\" y=\"53\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"800\" fill=\"#1d2150\" font-family=\"Nunito,sans-serif\">FRONT</text><text x=\"83.5\" y=\"53\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"800\" fill=\"#1d2150\" font-family=\"Nunito,sans-serif\">RIGHT</text></svg>"
+      ],
+      "answer": 1,
+      "hints": [
+        "A view shows the **tallest stack** in each line of sight. For the front view, look at one **column** of the plan at a time.",
+        "Front view, left to right: column 1 (2, 1, 0) → 2, column 2 (1, 3, 2) → 3, column 3 (0, 1, 1) → 1.",
+        "Right view: look at one **row** at a time, starting with the **front** row (0 2 1 → 2), then the middle row (1 3 1 → 3), then the back row (2 1 0 → 2)."
+      ],
+      "traps": {
+        "0": "This front view is a mirror image (1, 3, 2). The front view starts with the **left** column of the plan — that column’s tallest stack is 2.",
+        "2": "You swapped the two views. The **front** view is made from the **columns** of the plan (2, 3, 1); the **right** view is made from its **rows** (2, 3, 2).",
+        "3": "That front view copies just the **front row** (0 2 1). The front view looks along every row, so each column shows its tallest stack — the 2 in the back row counts too."
+      },
+      "solution": [
+        "Front view = tallest stack of each column, left to right: **2, 3, 1**.",
+        "Right view = tallest stack of each row, front row first: **2, 3, 2**.",
+        "The pair with front 2-3-1 and right 2-3-2 is the answer."
+      ],
+      "idea": "Front view: columns, left to right. Right view: rows, front row on the left."
+    },
+    {
+      "id": "v03",
+      "skill": "views",
+      "difficulty": "easy",
+      "source": "Class slides — Views · Together 2",
+      "skillLabel": "Hidden cubes",
+      "title": "Counting a Staircase",
+      "text": "This staircase is built from identical cubes. How many cubes does it use? (Remember the cubes you cannot see.)",
+      "figure": {
+        "type": "stack",
+        "plan": [
+          [
+            3,
+            3,
+            3
+          ],
+          [
+            2,
+            2,
+            2
+          ],
+          [
+            1,
+            1,
+            1
+          ]
+        ],
+        "u": 26
+      },
+      "explorer": {
+        "type": "layers",
+        "plan": [
+          [
+            3,
+            3,
+            3
+          ],
+          [
+            2,
+            2,
+            2
+          ],
+          [
+            1,
+            1,
+            1
+          ]
+        ],
+        "u": 26
+      },
+      "choices": [
+        "9",
+        "12",
+        "18",
+        "27"
+      ],
+      "answer": 2,
+      "hints": [
+        "Look at the picture from the side. Under each cube on a high step there are more cubes holding it up.",
+        "Count **layer by layer, from the bottom up**. How many cubes are in the bottom layer?",
+        "Bottom layer: 3 × 3 = 9. Second layer: two rows of 3. Top layer: one row of 3."
+      ],
+      "traps": {
+        "0": "9 counts only the **top faces** you can see (3 on each step). Under each one there are more cubes.",
+        "1": "12 is the number of cubes you can **see** in the picture. The rest are hidden behind and under the higher steps — they are still part of the staircase.",
+        "3": "27 would fill a whole 3 × 3 × 3 cube. But the front steps are lower, so there are empty spaces above them."
+      },
+      "solution": [
+        "Count layer by layer from the bottom: bottom layer 3 × 3 = **9**, second layer 2 rows × 3 = **6**, top layer 1 row × 3 = **3**.",
+        "9 + 6 + 3 = **18**.",
+        "Shortcut: three rows with 1, 2 and 3 cubes in each column: (1 + 2 + 3) × 3 = 18."
+      ],
+      "idea": "Count layer by layer from the bottom up — hidden cubes count too."
+    },
+    {
+      "id": "v04",
+      "skill": "views",
+      "difficulty": "medium",
+      "source": "Class slides — Views · Your turn 1",
+      "skillLabel": "Most cubes",
+      "title": "What Is the Most Cubes?",
+      "text": "A stack stands on a **3 × 3 base**. Its front view and right view are shown (in the right view the front row is on the left). What is the **largest** number of cubes the stack could contain?",
+      "figure": {
+        "type": "viewpair",
+        "front": [
+          3,
+          1,
+          2
+        ],
+        "right": [
+          2,
+          3,
+          1
+        ]
+      },
+      "explorer": {
+        "type": "stackbuilder",
+        "mode": "ceiling",
+        "rows": 3,
+        "cols": 3,
+        "max": 3,
+        "target": {
+          "front": [
+            3,
+            1,
+            2
+          ],
+          "right": [
+            2,
+            3,
+            1
+          ]
+        }
+      },
+      "choices": [
+        "6",
+        "12",
+        "14",
+        "27"
+      ],
+      "answer": 2,
+      "hints": [
+        "To get the **most** cubes, fill every square as high as **both** views allow.",
+        "A square in column 1 and the front row: the front view allows 3, the right view allows 2. Use the smaller number.",
+        "Row by row, front row first: 2 + 1 + 2, then 3 + 1 + 2, then 1 + 1 + 1."
+      ],
+      "traps": {
+        "0": "6 is the **fewest** cubes that still show these views. This question asks for the largest.",
+        "1": "12 adds the squares of the two views (6 + 6). A view is not a pile of separate cubes — one cube can show up in both views.",
+        "3": "27 would fill the whole 3 × 3 × 3 box. But column 2 of the front view is only 1 tall, and the back row of the right view is only 1 tall."
+      },
+      "solution": [
+        "Each square can be only as tall as **both** views allow: the smaller of its column height and its row height.",
+        "Front row (right view says 2): min(3,2) + min(1,2) + min(2,2) = 2 + 1 + 2 = **5**.",
+        "Middle row (3): 3 + 1 + 2 = **6**.  Back row (1): 1 + 1 + 1 = **3**.",
+        "5 + 6 + 3 = **14**."
+      ],
+      "idea": "Views set a ceiling. Most cubes: fill every square as high as BOTH views allow."
+    },
+    {
+      "id": "v05",
+      "skill": "views",
+      "difficulty": "easy",
+      "source": "Class slides — Views · Your turn 2 (a)",
+      "skillLabel": "Hidden cubes",
+      "title": "Staircase Corner — (a) how many cubes?",
+      "text": "(a) How many cubes make this stack?",
+      "figure": {
+        "type": "stack",
+        "plan": [
+          [
+            3,
+            2,
+            1
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            1,
+            0,
+            0
+          ]
+        ],
+        "u": 30
+      },
+      "explorer": {
+        "type": "layers",
+        "plan": [
+          [
+            3,
+            2,
+            1
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            1,
+            0,
+            0
+          ]
+        ],
+        "u": 30
+      },
+      "choices": [
+        "6",
+        "8",
+        "10",
+        "12"
+      ],
+      "answer": 2,
+      "hints": [
+        "Some cubes are hidden under the taller stacks. Count **layer by layer from the bottom**.",
+        "The bottom layer is a triangle of cubes: 3 + 2 + 1.",
+        "Bottom layer 6, middle layer 3, top layer 1."
+      ],
+      "traps": {
+        "0": "6 counts the cubes you can **see** (one top each). The taller stacks have cubes hidden underneath them."
+      },
+      "solution": [
+        "Bottom layer: 3 + 2 + 1 = **6** cubes.",
+        "Middle layer: 2 + 1 = **3** cubes.",
+        "Top layer: **1** cube.",
+        "6 + 3 + 1 = **10**."
+      ],
+      "idea": "Count layer by layer, from the bottom up."
+    },
+    {
+      "id": "v06",
+      "skill": "views",
+      "difficulty": "medium",
+      "source": "Class slides — Views · Your turn 2 (b)",
+      "skillLabel": "Front & right view",
+      "title": "Staircase Corner — (b) draw the views",
+      "text": "(b) Which pair of pictures shows the **front view** and the **right view** of this stack? (In the right view the front row is on the left.)",
+      "figure": {
+        "type": "stack",
+        "plan": [
+          [
+            3,
+            2,
+            1
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            1,
+            0,
+            0
+          ]
+        ],
+        "u": 30
+      },
+      "explorer": {
+        "type": "stackbuilder",
+        "mode": "views",
+        "plan": [
+          [
+            3,
+            2,
+            1
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            1,
+            0,
+            0
+          ]
+        ],
+        "rows": 3,
+        "cols": 3,
+        "max": 4
+      },
+      "choices": [
+        "<svg viewBox=\"0 0 104 55\" width=\"104\" height=\"55\" style=\"max-width:100%\" role=\"img\" aria-label=\"front view 1, 2, 3 and right view 3, 2, 1\"><g><rect x=\"1\" y=\"27\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"27\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"14\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"27\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"14\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"1\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></g><g transform=\"translate(63,0)\"><rect x=\"1\" y=\"27\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"14\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"1\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"27\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"14\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"27\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></g><text x=\"20.5\" y=\"53\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"800\" fill=\"#1d2150\" font-family=\"Nunito,sans-serif\">FRONT</text><text x=\"83.5\" y=\"53\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"800\" fill=\"#1d2150\" font-family=\"Nunito,sans-serif\">RIGHT</text></svg>",
+        "<svg viewBox=\"0 0 104 55\" width=\"104\" height=\"55\" style=\"max-width:100%\" role=\"img\" aria-label=\"front view 3, 2, 1 and right view 3, 2, 1\"><g><rect x=\"1\" y=\"27\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"14\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"1\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"27\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"14\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"27\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></g><g transform=\"translate(63,0)\"><rect x=\"1\" y=\"27\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"14\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"1\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"27\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"14\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"27\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></g><text x=\"20.5\" y=\"53\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"800\" fill=\"#1d2150\" font-family=\"Nunito,sans-serif\">FRONT</text><text x=\"83.5\" y=\"53\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"800\" fill=\"#1d2150\" font-family=\"Nunito,sans-serif\">RIGHT</text></svg>",
+        "<svg viewBox=\"0 0 104 55\" width=\"104\" height=\"55\" style=\"max-width:100%\" role=\"img\" aria-label=\"front view 3, 2, 1 and right view 1, 2, 3\"><g><rect x=\"1\" y=\"27\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"14\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"1\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"27\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"14\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"27\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></g><g transform=\"translate(63,0)\"><rect x=\"1\" y=\"27\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"27\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"14\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"27\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"14\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"1\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></g><text x=\"20.5\" y=\"53\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"800\" fill=\"#1d2150\" font-family=\"Nunito,sans-serif\">FRONT</text><text x=\"83.5\" y=\"53\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"800\" fill=\"#1d2150\" font-family=\"Nunito,sans-serif\">RIGHT</text></svg>",
+        "<svg viewBox=\"0 0 104 55\" width=\"104\" height=\"55\" style=\"max-width:100%\" role=\"img\" aria-label=\"front view 1, 2, 3 and right view 1, 2, 3\"><g><rect x=\"1\" y=\"27\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"27\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"14\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"27\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"14\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"1\" width=\"13\" height=\"13\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></g><g transform=\"translate(63,0)\"><rect x=\"1\" y=\"27\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"27\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"14\" y=\"14\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"27\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"14\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"27\" y=\"1\" width=\"13\" height=\"13\" fill=\"#98aedb\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></g><text x=\"20.5\" y=\"53\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"800\" fill=\"#1d2150\" font-family=\"Nunito,sans-serif\">FRONT</text><text x=\"83.5\" y=\"53\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"800\" fill=\"#1d2150\" font-family=\"Nunito,sans-serif\">RIGHT</text></svg>"
+      ],
+      "answer": 2,
+      "hints": [
+        "The tall stack (3 cubes) is at the back-left corner. Where does that show up in the front view?",
+        "Front view, left to right: the left column is the tallest (3), then 2, then 1.",
+        "In the **right** view the **front** row is on the left, and the front row is only 1 tall."
+      ],
+      "traps": {
+        "0": "Both views are mirrored. The front view starts at the **left** of the stack, where the tallest column is; the right view starts at the **front**, where it is lowest.",
+        "1": "The front view is right, but in the **right** view the front row goes on the left — and the front row is the lowest (1).",
+        "3": "The right view is right, but the front view starts with the **left** column, which is the tallest (3)."
+      },
+      "solution": [
+        "Front view (columns, left to right): **3, 2, 1**.",
+        "Right view (rows, front row first): **1, 2, 3**."
+      ],
+      "idea": "Front view: columns, left to right. Right view: rows, front row on the left."
+    },
+    {
+      "id": "v07",
+      "skill": "views",
+      "difficulty": "easy",
+      "source": "Kangaroo 2014, Grade 7–8 — Q7",
+      "skillLabel": "Fill the cube",
+      "title": "George’s Cross",
+      "text": "George built the shape shown using seven unit cubes. How many such cubes does he have to add to make a cube with edges of length 3?",
+      "figure": {
+        "type": "stack",
+        "voxels": [
+          [
+            1,
+            1,
+            1
+          ],
+          [
+            0,
+            1,
+            1
+          ],
+          [
+            2,
+            1,
+            1
+          ],
+          [
+            1,
+            0,
+            1
+          ],
+          [
+            1,
+            2,
+            1
+          ],
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            1,
+            1,
+            2
+          ]
+        ],
+        "plan": [
+          [
+            0
+          ]
+        ],
+        "u": 36
+      },
+      "explorer": {
+        "type": "cross"
+      },
+      "choices": [
+        "12",
+        "14",
+        "16",
+        "18",
+        "20"
+      ],
+      "answer": 4,
+      "hints": [
+        "How many unit cubes make a cube with edges of length 3? Think about layers.",
+        "Each layer is 3 × 3 = 9 cubes, and there are 3 layers.",
+        "27 − 7 = ?"
+      ],
+      "traps": {
+        "1": "14 is 7 + 7 — doubling what George already has. The finished cube is **3 × 3 × 3**, which has more cubes than that."
+      },
+      "solution": [
+        "A cube with edges of length 3 is made of 3 × 3 × 3 = **27** unit cubes.",
+        "George has 7, so he needs 27 − 7 = **20** more.",
+        "Check by layers: the top layer has 1 cube (needs 8 more), the middle layer has 5 (needs 4 more), the bottom layer has 1 (needs 8 more): 8 + 4 + 8 = 20."
+      ],
+      "idea": "Fill the big cube: total − what you already have."
+    },
+    {
+      "id": "v08",
+      "skill": "views",
+      "difficulty": "medium",
+      "source": "CJMC (Gray Jay) 2020 — Q4",
+      "skillLabel": "Which side?",
+      "title": "Sam on the Circle",
+      "text": "A teacher puts a square table next to a shaded circle drawn on the floor. She divides the table into nine squares numbered 1 to 9 (see the picture). She then stacks equal cubes on the squares: **2** cubes on square 8, **3** on square 2, **1** on square 6 and **4** on square 1. Sam stands on the shaded circle **facing the cubes** and draws what he sees. Which diagram is it?",
+      "figure": {
+        "type": "tablemap",
+        "grid": [
+          [
+            1,
+            2,
+            3
+          ],
+          [
+            4,
+            5,
+            6
+          ],
+          [
+            7,
+            8,
+            9
+          ]
+        ],
+        "side": "right",
+        "backFront": false
+      },
+      "explorer": {
+        "type": "viewer",
+        "grid": [
+          [
+            4,
+            3,
+            0
+          ],
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            2,
+            0
+          ]
+        ],
+        "nums": [
+          [
+            1,
+            2,
+            3
+          ],
+          [
+            4,
+            5,
+            6
+          ],
+          [
+            7,
+            8,
+            9
+          ]
+        ],
+        "side": "right",
+        "backFront": false
+      },
+      "choices": [
+        "<svg viewBox=\"0 0 50 66\" width=\"50\" height=\"66\" style=\"max-width:100%\" role=\"img\" aria-label=\"view with column heights 4, 1, 2\"><rect x=\"1\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"17\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"1\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"17\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"33\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"33\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></svg>",
+        "<svg viewBox=\"0 0 50 66\" width=\"50\" height=\"66\" style=\"max-width:100%\" role=\"img\" aria-label=\"view with column heights 2, 1, 4\"><rect x=\"1\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"17\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"33\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"33\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"33\" y=\"17\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"33\" y=\"1\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></svg>",
+        "<svg viewBox=\"0 0 50 66\" width=\"50\" height=\"66\" style=\"max-width:100%\" role=\"img\" aria-label=\"view with column heights 4, 3, 1\"><rect x=\"1\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"17\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"1\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"17\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"17\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"17\" y=\"17\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"33\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></svg>",
+        "<svg viewBox=\"0 0 50 66\" width=\"50\" height=\"66\" style=\"max-width:100%\" role=\"img\" aria-label=\"view with column heights 1, 3, 4\"><rect x=\"1\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"17\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"17\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"17\" y=\"17\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"33\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"33\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"33\" y=\"17\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"33\" y=\"1\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></svg>"
+      ],
+      "answer": 1,
+      "hints": [
+        "Sam looks at the table from its **right** side. Each column of his drawing is one **row** of the table — the tallest stack in that row.",
+        "When you face the table from the right, your **left hand** points to the bottom row (7 8 9). So that row is on the left of his drawing.",
+        "Bottom row: tallest is 2. Middle row: tallest is 1. Top row: tallest is 4. Which picture goes 2, 1, 4 from left to right?"
+      ],
+      "traps": {
+        "0": "This is what you would see from the **left** side of the table (the opposite side). Sam stands on the right, looking left, so his left hand points to the **bottom** row.",
+        "2": "This lists the stacks on squares 1, 2 and 6 (4, 3, 1) as if each were its own column. Sam’s three columns are the three **rows** of the table, each showing its tallest stack."
+      },
+      "solution": [
+        "Sam stands on the right of the table, facing left. His **left hand points to the bottom of the table**.",
+        "Bottom row (7 8 9): tallest stack is 2 (square 8). Middle row (4 5 6): tallest is 1 (square 6). Top row (1 2 3): tallest is 4 (square 1; the 3 on square 2 is hidden behind it).",
+        "Left to right: **2, 1, 4** → the second picture."
+      ],
+      "idea": "Stand where he stands: each line of sight shows its tallest stack; left and right depend on which way you face."
+    },
+    {
+      "id": "v09",
+      "skill": "views",
+      "difficulty": "medium",
+      "source": "Kangaroo 2013, Grade 7–8 — Q20",
+      "skillLabel": "Which side?",
+      "title": "John’s Building",
+      "text": "John has made a building of cubes standing on a 4 × 4 grid. The table shows the number of cubes standing on each cell (the **back** row is at the top, the **front** row at the bottom). When John looks from the **back**, what does he see?",
+      "figure": {
+        "type": "stack",
+        "plan": [
+          [
+            4,
+            2,
+            3,
+            2
+          ],
+          [
+            3,
+            3,
+            1,
+            2
+          ],
+          [
+            2,
+            1,
+            3,
+            1
+          ],
+          [
+            1,
+            2,
+            1,
+            2
+          ]
+        ],
+        "table": true,
+        "iso": false
+      },
+      "explorer": {
+        "type": "viewer",
+        "grid": [
+          [
+            4,
+            2,
+            3,
+            2
+          ],
+          [
+            3,
+            3,
+            1,
+            2
+          ],
+          [
+            2,
+            1,
+            3,
+            1
+          ],
+          [
+            1,
+            2,
+            1,
+            2
+          ]
+        ],
+        "side": "back"
+      },
+      "choices": [
+        "<svg viewBox=\"0 0 66 66\" width=\"66\" height=\"66\" style=\"max-width:100%\" role=\"img\" aria-label=\"view with column heights 2, 1, 2, 1\"><rect x=\"1\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"17\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"33\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"33\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"49\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></svg>",
+        "<svg viewBox=\"0 0 66 66\" width=\"66\" height=\"66\" style=\"max-width:100%\" role=\"img\" aria-label=\"view with column heights 4, 3, 3, 2\"><rect x=\"1\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"17\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"1\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"17\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"17\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"17\" y=\"17\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"33\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"33\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"33\" y=\"17\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"49\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"49\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></svg>",
+        "<svg viewBox=\"0 0 66 66\" width=\"66\" height=\"66\" style=\"max-width:100%\" role=\"img\" aria-label=\"view with column heights 2, 3, 3, 4\"><rect x=\"1\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"17\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"17\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"17\" y=\"17\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"33\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"33\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"33\" y=\"17\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"49\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"49\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"49\" y=\"17\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"49\" y=\"1\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></svg>",
+        "<svg viewBox=\"0 0 66 66\" width=\"66\" height=\"66\" style=\"max-width:100%\" role=\"img\" aria-label=\"view with column heights 4, 2, 3, 2\"><rect x=\"1\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"17\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"1\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"17\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"17\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"33\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"33\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"33\" y=\"17\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"49\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"49\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></svg>",
+        "<svg viewBox=\"0 0 66 66\" width=\"66\" height=\"66\" style=\"max-width:100%\" role=\"img\" aria-label=\"view with column heights 2, 3, 2, 4\"><rect x=\"1\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"1\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"17\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"17\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"17\" y=\"17\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"33\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"33\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"49\" y=\"49\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"49\" y=\"33\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"49\" y=\"17\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/><rect x=\"49\" y=\"1\" width=\"16\" height=\"16\" fill=\"#c8d5f0\" stroke=\"#1d2150\" stroke-width=\"1.5\"/></svg>"
+      ],
+      "answer": 2,
+      "hints": [
+        "Each column of the view shows the tallest stack in **one column** of the table.",
+        "Tallest stack of each table column, left to right: 4, 3, 3, 2. That is the view from the **front**.",
+        "John is at the **back**, so left and right swap. Read your list from the other end."
+      ],
+      "traps": {
+        "0": "This is only the **front row** (1 2 1 2), flipped. Each column of the view must show the tallest stack in the **whole column** of the table.",
+        "1": "This is the view from the **front** (left column first). John is at the back, so left and right swap.",
+        "3": "This copies just the **back row** (4 2 3 2). Each column of the view shows the tallest stack of the whole table column, not just the nearest cell."
+      },
+      "solution": [
+        "Tallest stack in each column of the table: column 1 → 4, column 2 → 3, column 3 → 3, column 4 → 2.",
+        "From the front you would see 4, 3, 3, 2 (left to right).",
+        "From the back, left and right swap: **2, 3, 3, 4**."
+      ],
+      "idea": "Tallest stack per column — then flip left and right when you stand at the back."
+    },
+    {
+      "id": "v10",
+      "skill": "views",
+      "difficulty": "medium-hard",
+      "source": "Kangaroo 2020, Grade 7–8 — Q19",
+      "skillLabel": "Most cubes",
+      "title": "Irene’s City",
+      "text": "Irene made a “city” with identical wooden cubes. One diagram shows the view from above the city (shaded squares have cubes) and the other the view from one of the sides. **It is not known from which side** the side view was taken. What is the largest number of cubes that Irene could have used?",
+      "figure": {
+        "type": "topside",
+        "mask": [
+          "#.#.",
+          "#..#",
+          "..##",
+          "##.#"
+        ],
+        "side": [
+          2,
+          4,
+          1,
+          3
+        ],
+        "figureOnly": true
+      },
+      "explorer": {
+        "type": "topside",
+        "mask": [
+          "#.#.",
+          "#..#",
+          "..##",
+          "##.#"
+        ],
+        "side": [
+          2,
+          4,
+          1,
+          3
+        ]
+      },
+      "choices": [
+        "25",
+        "24",
+        "23",
+        "22",
+        "21"
+      ],
+      "answer": 1,
+      "hints": [
+        "The side view could have been taken from any of the **four edges** of the top view. Try each one.",
+        "From each edge, the side view gives a height to every line of sight. To get the most cubes, make **every** shaded square as tall as its line allows.",
+        "Count the shaded squares in each column (3, 1, 2, 3) and in each row (2, 2, 2, 3), then pair them with the heights 2, 4, 1, 3 in both orders."
+      ],
+      "traps": {
+        "0": "25 is not possible: the four edges give 21, 22, 23 and 24 cubes. Try them all and take the largest.",
+        "2": "23 is the total when the side view is taken from the **left** edge — a real possibility, but not the largest.",
+        "3": "22 is the total when the side view is taken from the **right** edge — real, but not the largest.",
+        "4": "21 is what you get if the side view is read from the **bottom** edge in the order given. Other edges give more — try them all."
+      },
+      "solution": [
+        "Shaded squares per column (left to right): 3, 1, 2, 3. Per row (top to bottom): 2, 2, 2, 3. Side view heights: 2, 4, 1, 3.",
+        "From the bottom edge (heights match the columns in order): 3×2 + 1×4 + 2×1 + 3×3 = 21. From the top edge (reversed): 3×3 + 1×1 + 2×4 + 3×2 = **24**.",
+        "From the left edge (match the rows in order): 2×2 + 2×4 + 2×1 + 3×3 = 23. From the right edge (reversed): 2×3 + 2×1 + 2×4 + 3×2 = 22.",
+        "The largest possible is **24**."
+      ],
+      "idea": "When one fact is unknown, try every possibility and keep the best."
+    },
+    {
+      "id": "s01",
+      "skill": "surface",
+      "difficulty": "easy",
+      "source": "Class slides — Surface Area · Together 1",
+      "skillLabel": "Box",
+      "title": "Surface Area of a Box",
+      "text": "Find the surface area of this rectangular box (5 cm long, 3 cm wide, 4 cm high).",
+      "figure": {
+        "type": "box",
+        "l": 5,
+        "w": 3,
+        "h": 4,
+        "u": 24
+      },
+      "explorer": {
+        "type": "boxsa",
+        "l": 5,
+        "w": 3,
+        "h": 4
+      },
+      "choices": [
+        "47 cm²",
+        "60 cm²",
+        "94 cm²",
+        "188 cm²"
+      ],
+      "answer": 2,
+      "hints": [
+        "A box has 6 faces in 3 matching pairs: top & bottom, front & back, left & right.",
+        "Find the area of one face from each pair, then **double** each.",
+        "Top: 5 × 3 = 15. Front: 5 × 4 = 20. Side: 3 × 4 = 12. SA = 2 × (15 + 20 + 12)."
+      ],
+      "traps": {
+        "0": "47 is half the answer: it adds only **one** face from each pair. Every face has a partner on the opposite side — double it.",
+        "1": "60 is the **volume** (5 × 3 × 4, in cm³). Surface area is the total area of the six faces, in cm²."
+      },
+      "solution": [
+        "Top & bottom: 2 × (5 × 3) = 30.",
+        "Front & back: 2 × (5 × 4) = 40.",
+        "Left & right: 2 × (3 × 4) = 24.",
+        "30 + 40 + 24 = **94 cm²**. (Formula: 2(lw + lh + wh).)"
+      ],
+      "idea": "Find each pair of faces — then double."
+    },
+    {
+      "id": "s02",
+      "skill": "surface",
+      "difficulty": "medium",
+      "source": "Class slides — Surface Area · Together 2",
+      "skillLabel": "Glued cubes",
+      "title": "Glued Cubes",
+      "text": "Five cubes with edge 1 cm are glued together as shown (four in a 2 × 2 square, one more on top of the back cube). What is the surface area of the solid?",
+      "figure": {
+        "type": "stack",
+        "plan": [
+          [
+            2,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "u": 34
+      },
+      "explorer": {
+        "type": "stackbuilder",
+        "mode": "glue",
+        "rows": 3,
+        "cols": 3,
+        "max": 3,
+        "plan": [
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "presets": [
+          {
+            "label": "This solid (5 cubes)",
+            "plan": [
+              [
+                2,
+                1,
+                0
+              ],
+              [
+                1,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "label": "3 in a row",
+            "plan": [
+              [
+                1,
+                1,
+                1
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "label": "An L of 3",
+            "plan": [
+              [
+                1,
+                1,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          }
+        ]
+      },
+      "choices": [
+        "10 cm²",
+        "20 cm²",
+        "25 cm²",
+        "30 cm²"
+      ],
+      "answer": 1,
+      "hints": [
+        "Five separate cubes would have 5 × 6 = 30 faces. Gluing hides some of them.",
+        "Every glued joint hides **2** faces — one on each cube. How many joints are there?",
+        "Joints: 4 in the bottom 2 × 2 square, plus 1 where the top cube sits."
+      ],
+      "traps": {
+        "0": "10 counts only the faces you can **see** in the picture. Faces at the back, underneath and on the hidden sides count too.",
+        "2": "25 treats each joint as hiding **one** face. A joint touches two cubes, so it hides **two** faces.",
+        "3": "30 is 5 × 6 — it ignores the glue completely."
+      },
+      "solution": [
+        "5 cubes × 6 faces = **30** faces.",
+        "Glued joints: 4 around the 2 × 2 base + 1 under the top cube = **5**.",
+        "Each joint hides 2 faces: 30 − 2 × 5 = **20 cm²**.",
+        "Check by counting: top 4 + bottom 4 + front 3 + back 3 + left 3 + right 3 = 20 ✅"
+      ],
+      "idea": "SA = 6n − 2 × (joints). Hidden faces do not count."
+    },
+    {
+      "id": "s03",
+      "skill": "surface",
+      "difficulty": "easy",
+      "source": "Class slides — Surface Area · Your turn 1",
+      "skillLabel": "Cube",
+      "title": "From Volume to Surface Area",
+      "text": "A cube has volume **125 cm³**. What is its surface area?",
+      "figure": {
+        "type": "box",
+        "l": 5,
+        "w": 5,
+        "h": 5,
+        "u": 20,
+        "labels": false
+      },
+      "explorer": {
+        "type": "scale",
+        "k": 5
+      },
+      "choices": [
+        "25 cm²",
+        "30 cm²",
+        "125 cm²",
+        "150 cm²"
+      ],
+      "answer": 3,
+      "hints": [
+        "For a cube, volume = edge × edge × edge. Which number gives 125 when you multiply it by itself three times?",
+        "The edge is 5 cm.",
+        "A cube has 6 identical square faces: SA = 6 × edge²."
+      ],
+      "traps": {
+        "0": "25 is the area of **one** face (5 × 5). A cube has six faces.",
+        "1": "30 is 6 × 5 — the edge was not squared. Each face is 5 × 5 = 25 cm².",
+        "2": "125 is the **volume** (in cm³). Surface area is the area of the six faces (in cm²)."
+      },
+      "solution": [
+        "5 × 5 × 5 = 125, so the edge is **5 cm**.",
+        "One face: 5 × 5 = 25 cm².",
+        "Six faces: 6 × 25 = **150 cm²**."
+      ],
+      "idea": "Cube: V = s³ and SA = 6s². Find the edge first."
+    },
+    {
+      "id": "s04",
+      "skill": "surface",
+      "difficulty": "medium",
+      "source": "Class slides — Surface Area · Your turn 2",
+      "skillLabel": "Glued cubes",
+      "title": "Cubes in a Row",
+      "text": "Three cubes with edge **2 cm** are glued face to face in a row. What is the surface area of the solid?",
+      "figure": {
+        "type": "stack",
+        "plan": [
+          [
+            1,
+            1,
+            1
+          ]
+        ],
+        "voxels": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            2,
+            0
+          ]
+        ],
+        "u": 36,
+        "caption": "each cube: edge 2 cm"
+      },
+      "explorer": {
+        "type": "stackbuilder",
+        "mode": "glue",
+        "rows": 3,
+        "cols": 3,
+        "max": 3,
+        "plan": [
+          [
+            1,
+            1,
+            1
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "extra": "Here the cubes have edge 1 and the row has surface area 14. Make every edge **2 times longer** → every area is **2² = 4 times** bigger: 14 × 4 = 56."
+      },
+      "choices": [
+        "48 cm²",
+        "56 cm²",
+        "64 cm²",
+        "72 cm²"
+      ],
+      "answer": 1,
+      "hints": [
+        "One cube with edge 2 cm has surface area 6 × 2 × 2 = 24 cm². Three separate cubes: 72 cm². Now take away the hidden faces.",
+        "There are **2** glued joints. Each joint hides **2** faces of 2 × 2 = 4 cm².",
+        "72 − 2 × 2 × 4 = ?"
+      ],
+      "traps": {
+        "0": "48 forgets the two **end** squares: the long sides give 4 × (2 × 6) = 48, but the two ends add 2 × 4 = 8 more.",
+        "2": "64 treats each joint as hiding only **one** face (72 − 2 × 4). A joint hides **two** faces, one on each cube.",
+        "3": "72 ignores the glue: 3 × 24 counts the hidden faces too."
+      },
+      "solution": [
+        "Separate cubes: 3 × 24 = 72 cm².",
+        "Joints: 2. Each hides 2 faces of 4 cm² → 2 × 2 × 4 = 16 cm² hidden.",
+        "72 − 16 = **56 cm²**.",
+        "Check: the row is a 2 × 2 × 6 box: 2(2×2 + 2×6 + 2×6) = 2 × 28 = 56 ✅"
+      ],
+      "idea": "Count every face, then take away the hidden ones (2 per joint)."
+    },
+    {
+      "id": "s05",
+      "skill": "surface",
+      "difficulty": "easy",
+      "source": "Gauss 2018, Grade 7 — Q12",
+      "skillLabel": "Box",
+      "title": "A 1 × 2 × 2 Prism",
+      "text": "What is the surface area of a 1 cm by 2 cm by 2 cm rectangular prism?",
+      "figure": {
+        "type": "box",
+        "l": 2,
+        "w": 2,
+        "h": 1,
+        "u": 36
+      },
+      "explorer": {
+        "type": "boxsa",
+        "l": 2,
+        "w": 2,
+        "h": 1
+      },
+      "choices": [
+        "10 cm²",
+        "20 cm²",
+        "12 cm²",
+        "24 cm²",
+        "16 cm²"
+      ],
+      "answer": 4,
+      "hints": [
+        "Find the three pairs of faces. Two of the dimensions are 2 and one is 1.",
+        "Top & bottom are 2 × 2 squares. The four sides are 1 × 2 rectangles.",
+        "2 × 4 + 4 × 2 = ?"
+      ],
+      "traps": {
+        "3": "24 treats it like a 2 × 2 × 2 cube (6 faces of 4 cm²). The height is only 1 cm, so four of the faces are 1 × 2 = 2 cm²."
+      },
+      "solution": [
+        "Top & bottom: 2 × (2 × 2) = 8.",
+        "Front & back: 2 × (2 × 1) = 4.  Left & right: 2 × (2 × 1) = 4.",
+        "8 + 4 + 4 = **16 cm²**."
+      ],
+      "idea": "Find each pair of faces — then double."
+    },
+    {
+      "id": "s06",
+      "skill": "scaling",
+      "difficulty": "medium",
+      "source": "Gauss 2018, Grade 8 — Q18",
+      "skillLabel": "Volume scaling",
+      "title": "Stretching a Prism",
+      "text": "The volume of a rectangular prism is 30 cm³. The length of the prism is doubled, the width is tripled, and the height is divided by four. The volume of the new prism is",
+      "explorer": {
+        "type": "stretch",
+        "dims": [
+          5,
+          3,
+          2
+        ]
+      },
+      "choices": [
+        "31 cm³",
+        "120 cm³",
+        "60 cm³",
+        "90 cm³",
+        "45 cm³"
+      ],
+      "answer": 4,
+      "hints": [
+        "Volume = length × width × height. If each side is changed, the volume is changed by all three factors multiplied together.",
+        "Doubling the length → × 2. Tripling the width → × 3. Dividing the height by four → × ¼.",
+        "2 × 3 × ¼ = 1.5. So the new volume is 30 × 1.5."
+      ],
+      "traps": {
+        "1": "120 = 30 × 4. But dividing the height by four makes the volume **smaller** in that direction, so the factor is ¼, not 4.",
+        "2": "60 only uses the doubling (× 2). The width is tripled and the height is divided by four as well.",
+        "3": "90 only uses the tripling (× 3). The length is doubled and the height is divided by four as well."
+      },
+      "solution": [
+        "Volume = l × w × h, so the new volume = old volume × 2 × 3 × ¼.",
+        "2 × 3 × ¼ = 6 ÷ 4 = 1.5.",
+        "30 × 1.5 = **45 cm³**."
+      ],
+      "idea": "Scaling: every side change multiplies the volume. Multiply the factors, then multiply the old volume."
+    },
+    {
+      "id": "s07",
+      "skill": "scaling",
+      "difficulty": "medium",
+      "source": "Kangaroo 2013, Grade 5–6 — Q17",
+      "skillLabel": "Faces",
+      "title": "Cutting the Corners",
+      "text": "From a wooden cube with side 3 cm we cut out at the corner a little cube with side 1 cm (see picture). What is the number of **faces** of the solid after cutting out such a small cube at **each corner** of the big cube?",
+      "figure": {
+        "type": "stack",
+        "plan": [
+          [
+            0
+          ]
+        ],
+        "voxels": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            2
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            1
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            2,
+            0
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            2
+          ],
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            1
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            1,
+            1,
+            1
+          ],
+          [
+            1,
+            1,
+            2
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            1
+          ],
+          [
+            1,
+            2,
+            2
+          ],
+          [
+            2,
+            0,
+            0
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            2
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            1
+          ],
+          [
+            2,
+            1,
+            2
+          ],
+          [
+            2,
+            2,
+            0
+          ],
+          [
+            2,
+            2,
+            1
+          ]
+        ],
+        "u": 40,
+        "caption": "one corner cut out"
+      },
+      "explorer": {
+        "type": "cutcorner"
+      },
+      "choices": [
+        "16",
+        "20",
+        "24",
+        "30",
+        "36"
+      ],
+      "answer": 3,
+      "hints": [
+        "The cube starts with 6 faces. What happens to each of those faces when a corner is cut off?",
+        "Each original face just gets notched — it is still **one** face. But each cut also makes **3 new** little faces inside the notch.",
+        "8 corners × 3 new faces, plus the 6 original faces."
+      ],
+      "traps": {
+        "2": "24 counts only the **new** faces (8 × 3). The 6 original faces are still there — notched, but still one face each."
+      },
+      "solution": [
+        "A cube has **6** faces. After the cuts, each of them still counts as one face (with notches in its corners).",
+        "Each cut-out corner adds **3** new faces (the three little squares of the notch).",
+        "8 corners × 3 = 24 new faces.",
+        "6 + 24 = **30**."
+      ],
+      "idea": "Count the old faces that survive, then add the new ones."
+    },
+    {
+      "id": "s08",
+      "skill": "scaling",
+      "difficulty": "medium-hard",
+      "source": "Gauss 2023, Grade 7 — Q18",
+      "skillLabel": "Tilting",
+      "title": "Tilting the Water Box",
+      "text": "A closed rectangular prism with height 8 cm is standing on a face with dimensions 2 cm by 5 cm. The prism contains water with a depth of 6 cm. When the prism is tipped so that it stands on the face with the **greatest area**, the depth of the water is",
+      "figure": {
+        "type": "box",
+        "l": 5,
+        "w": 2,
+        "h": 8,
+        "u": 20,
+        "water": 6,
+        "labels": true
+      },
+      "explorer": {
+        "type": "tilt",
+        "dims": [
+          2,
+          5,
+          8
+        ],
+        "depth": 6
+      },
+      "choices": [
+        "0.75 cm",
+        "1 cm",
+        "1.25 cm",
+        "1.5 cm",
+        "1.75 cm"
+      ],
+      "answer": 3,
+      "hints": [
+        "Tilting a closed box does not change the **volume of water** inside. Find that volume first.",
+        "The faces of the box: 2 × 5, 2 × 8 and 5 × 8. Which has the greatest area?",
+        "Depth = water volume ÷ area of the face it stands on."
+      ],
+      "traps": {
+        "0": "0.75 is 6 ÷ 8: scaling the old depth by the height. But it is the **volume** of water that stays the same, not the depth."
+      },
+      "solution": [
+        "Water volume = 2 × 5 × 6 = **60 cm³** (it does not change when the box is tipped).",
+        "The three faces have areas 2 × 5 = 10, 2 × 8 = 16 and 5 × 8 = 40. The greatest is **40 cm²**.",
+        "Depth = 60 ÷ 40 = **1.5 cm**."
+      ],
+      "idea": "Water volume stays the same: depth = volume ÷ base area."
+    }
+  ]
+}

@@ -89,4 +89,5 @@ For a full past paper (CJMC / Gauss) use a unit like `weeks/cjmc2021-exam2/` wit
 - Don't use `str.format` on templates that contain JS braces (use token `.replace`). `weekctl new` round-trip test exists for this.
 - Slide contest problems often give no concrete numbers ("original price unknown") — teach the *pick an easy number* trick, then note the answer is the same.
 - Progress lives in `localStorage` key `mc.progress.v1` (`weeks[weekId][pageSlug][itemId]`); items count as done when `done` is set.
+- Geometry weeks: build one small drawing toolkit in `figures.js` (see `weeks/week11/figures.js`: isometric `isoSvg`, `isoBox`, flat `viewSvg`) and share it between the lesson (`<script src="figures.js">` before `lesson.js`) and the quiz; check every drawing against the slide at high resolution, and compute counts (hidden cubes, min/max) independently, brute-forcing small cases.
 - Original PDFs go in `weeks/weekNN/source/` (git-ignored). Credit CEMC / The Learning Lab in `week.json` → `credit`.

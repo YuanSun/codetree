@@ -1,0 +1,39 @@
+{
+  "number": 11,
+  "title": "Views & Surface Area",
+  "tagline": "Seeing the cubes you cannot see — and counting the faces you can. Read the tallest stack in every line of sight, then add every face and take away the hidden ones.",
+  "level": "G6–G7 · Contest Prep",
+  "emoji": "🧊",
+  "skills": [
+    "Reading views",
+    "Counting cubes",
+    "Surface area",
+    "Scaling & volume"
+  ],
+  "credit": "Based on The Learning Lab · Views & Surface Area (G6–G7 contest prep, Instructor: Sam Cai, MSc). Contest questions from Kangaroo (2013, 2014, 2020), CJMC Gray Jay 2020 and Gauss (2018, 2023) — used here for personal study.",
+  "pages": [
+    {
+      "slug": "lesson",
+      "type": "html",
+      "file": "lesson.html",
+      "title": "The Quest",
+      "emoji": "🧊",
+      "desc": "Build stacks, read their views, count hidden cubes, then box surfaces, glued cubes, scaling and tilting — play with each idea, then solve step by step.",
+      "tasks": 10,
+      "scripts": [
+        "figures.js"
+      ]
+    },
+    {
+      "slug": "practice",
+      "type": "quiz",
+      "file": "practice.json",
+      "scripts": [
+        "figures.js"
+      ],
+      "title": "Practice",
+      "emoji": "📝",
+      "desc": "Every question from the slides — Together and Your turn — with a hands-on lab after each one. Do them on paper first, then check here."
+    }
+  ]
+}
