@@ -292,6 +292,25 @@ uv run python -m importer.article images ../content/mega-trouille.pack.json
 
 It refuses if the text in the pack no longer matches the imported text (picture positions would be wrong).
 
+## Comprehension questions
+
+Each book's questions are in the git-ignored `content/<book>.questions.json` (chapter questions + the end-of-reading
+set). After changing them, rebuild the pack and refresh only the questions. This works on a book Grace has already
+read or answered:
+
+```bash
+python3 tools/text2pack.py content/pepite.txt content/pepite.questions.json -o content/pepite.pack.json
+cd backend && uv run python -m importer.article questions ../content/pepite.pack.json
+```
+
+A question whose chapter and wording are unchanged keeps its answers. Old questions nobody answered are removed.
+Answered ones are hidden from the questions page, but her answers stay in Suivi.
+
+To have her answers marked: open **Suivi** as a parent → **📝 Correction par Claude** → **Télécharger** (or
+**Copier**). Give the file to Claude in a conversation, with "mark these" as the only instruction; the file already
+holds the marking rules. Paste Claude's JSON reply into the box and press **Enregistrer les notes**. Only answers not
+marked yet are exported, so you can do this whenever she has written a few.
+
 ## Serve it from the family gateway (optional)
 
 The family gateway (`hosting/`, Caddy on port 12999) can run Lecture Magique together with the other family sites.

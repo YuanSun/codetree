@@ -31,6 +31,11 @@ def list_articles(user: User = Depends(current_user), conn: Connection = Depends
     rows = conn.execute(text("""
         SELECT a.id, a.slug, a.title, a.week_of, a.status, a.source_note, a.lang,
                (SELECT count(*) FROM lecture.chapter c WHERE c.article_id = a.id) AS chapter_count,
+               (SELECT count(*) FROM lecture.question q WHERE q.article_id = a.id
+                  AND NOT coalesce((q.rubric->>'retired')::boolean, false)) AS question_count,
+               (SELECT count(DISTINCT q.id) FROM lecture.question q JOIN lecture.answer an ON an.question_id = q.id
+                  WHERE q.article_id = a.id AND an.user_id = :u
+                  AND NOT coalesce((q.rubric->>'retired')::boolean, false)) AS answered_count,
                p.last_chapter, p.chapters_done, p.seconds_read, p.finished_at
         FROM lecture.article a
         LEFT JOIN lecture.reading_progress p ON p.article_id = a.id AND p.user_id = :u
@@ -39,6 +44,7 @@ def list_articles(user: User = Depends(current_user), conn: Connection = Depends
     return [{
         "id": r.id, "slug": r.slug, "title": r.title, "week_of": r.week_of.isoformat(), "status": r.status,
         "source_note": r.source_note, "chapter_count": r.chapter_count, "lang": r.lang,
+        "questions": {"total": r.question_count, "answered": r.answered_count},
         "progress": None if r.last_chapter is None else {
             "last_chapter": r.last_chapter, "chapters_done": sorted(r.chapters_done),
             "seconds_read": r.seconds_read, "finished": r.finished_at is not None},

@@ -284,7 +284,10 @@ export default function Reader({ articleId, seq, theme }: {
                   {t.chapter} {done.next} →
                 </button>
               ) : (
-                <button className="btn primary" onClick={() => go("/")}>{t.backToLibrary}</button>
+                <div className="bravo-actions">
+                  <button className="btn primary" onClick={() => go(`/questions/${articleId}`)}>{t.qGo}</button>
+                  <button className="btn ghost" onClick={() => go("/")}>{t.backToLibrary}</button>
+                </div>
               )}
             </div>
           ) : (
