@@ -166,3 +166,42 @@ def test_grading_export_and_import(world):
     rows = {r["prompt"]: r for r in papa.get(f"/api/parent/children/{kid}/answers").json()}
     assert rows[qs[1]["prompt"]]["grade"] == {"score": 2.0, "points": 2.0, "feedback": "Bravo, c’est le bon sens.", "by": "claude"}
     assert rows[qs[0]["prompt"]]["grade"] is None
+
+
+def test_closed_questions_are_marked_at_once(world):
+    pack = world["pack"]
+    pack["questions"] = [
+        {"kind": "choice", "prompt": "Vrai ou faux ? Phileas Fogg est bavard.", "model_answer": "Faux : il parle peu.",
+         "rubric": {"skill": "Vrai ou faux", "points": 1, "choices": ["Vrai", "Faux"], "correct": 1}},
+        {"kind": "choice", "prompt": "Où habite-t-il ?", "model_answer": "Saville-row.",
+         "rubric": {"points": 1, "choices": ["Londres, Saville-row", "Paris", "Bombay"], "correct": 0}},
+    ] + pack["questions"]
+    for bad in ({"choices": ["Vrai"], "correct": 0}, {"choices": ["Vrai", "Faux"], "correct": 2},
+                {"choices": ["Vrai", "Vrai"], "correct": 0}, {"choices": ["A", "B"]}):
+        broken = copy.deepcopy(pack)
+        broken["questions"][0]["rubric"] = bad
+        with pytest.raises(ImportRefused, match="choice"), world["db"].begin() as c:
+            replace_questions(c, broken)
+    with world["db"].begin() as c:
+        replace_questions(c, pack)
+        set_status(c, PACK["slug"], "published")
+    g = login(world, "grace")
+    aid = world["aid"]
+    qs = [q for q in g.get(f"/api/articles/{aid}/questions").json()["questions"] if q["kind"] == "choice"]
+    tf, where = qs
+    assert tf["choices"] == ["Vrai", "Faux"] and tf["key"] is None  # options yes, the right one not yet
+
+    assert g.post(f"/api/questions/{tf['id']}/answer", json={"body": "Peut-être"}).status_code == 422
+    r = g.post(f"/api/questions/{tf['id']}/answer", json={"body": "Vrai"}).json()
+    assert r["grade"]["score"] == 0 and r["key"]["correct"] == "Faux" and r["key"]["model_answer"] == "Faux : il parle peu."
+    assert g.post(f"/api/questions/{tf['id']}/answer", json={"body": "Faux"}).status_code == 409  # one try
+    assert g.post(f"/api/questions/{where['id']}/answer", json={"body": "Londres, Saville-row"}).json()["grade"]["score"] == 1
+
+    qs = {q["id"]: q for q in g.get(f"/api/articles/{aid}/questions").json()["questions"]}
+    assert qs[tf["id"]]["grade"]["score"] == 0 and qs[where["id"]]["grade"] == \
+        {"score": 1.0, "points": 1.0, "feedback": None, "for_latest": True}
+    papa = login(world, "ryan")
+    kid = kid_id(world, "grace")
+    assert papa.get(f"/api/parent/children/{kid}/grading-export?regrade=true").json()["answers"] == []  # never sent to Claude
+    rows = {r["prompt"]: r for r in papa.get(f"/api/parent/children/{kid}/answers").json()}
+    assert rows[tf["prompt"]]["grade"]["by"] == "auto" and rows[tf["prompt"]]["choices"] == ["Vrai", "Faux"]

@@ -75,9 +75,12 @@ export type BagWord = {
 };
 
 /** Model answer and rubric of a question: sent only once the child has answered it. */
-export type AnswerKey = { model_answer: string | null; must_answer: string | null; avoid: string | null };
+export type AnswerKey = { model_answer: string | null; must_answer: string | null; avoid: string | null;
+  correct?: string /* closed questions: the right option */ };
 export type Question = {
   id: number; kind: "open" | "choice" | "writing"; prompt: string;
+  /** closed questions (multiple choice, vrai/faux): the options; one try, marked at once */
+  choices: string[] | null;
   chapter: null | { seq: number; title: string | null };
   skill: string | null; points: number | null;
   answer: null | { body: string; submitted_at: string };
@@ -87,7 +90,7 @@ export type Question = {
 };
 export type ChildAnswer = AnswerKey & {
   question_id: number; article: { id: number; title: string; lang: Lang }; chapter_seq: number | null;
-  kind: string; prompt: string; skill: string | null; points: number | null;
+  kind: string; prompt: string; choices: string[] | null; skill: string | null; points: number | null;
   answer_id: number; body: string; submitted_at: string; versions: number;
   grade: null | { score: number; points: number; feedback: string | null; by: string | null };
 };
@@ -161,9 +164,11 @@ export const api = {
   report: (childId: number, lang: Lang, weeks = 8) =>
     call<ChildReport>("GET", `/parent/children/${childId}/report?weeks=${weeks}&lang=${lang}`),
   questions: (articleId: number) =>
-    call<{ article: { id: number; title: string; lang: Lang }; questions: Question[] }>("GET", `/articles/${articleId}/questions`),
+    call<{ article: { id: number; title: string; lang: Lang }; chapters: { seq: number; title: string | null }[];
+           questions: Question[] }>("GET", `/articles/${articleId}/questions`),
   saveAnswer: (questionId: number, body: string) =>
-    call<{ answer: { body: string; submitted_at: string }; key: AnswerKey }>("POST", `/questions/${questionId}/answer`, { body }),
+    call<{ answer: { body: string; submitted_at: string }; key: AnswerKey; grade: Question["grade"] }>(
+      "POST", `/questions/${questionId}/answer`, { body }),
   gradingExport: (childId: number, regrade = false) =>
     call<GradingExport>("GET", `/parent/children/${childId}/grading-export${regrade ? "?regrade=true" : ""}`),
   importGrades: (grades: Grade[]) => call<{ graded: number }>("POST", "/parent/grades", { grades }),

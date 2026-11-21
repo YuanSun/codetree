@@ -45,7 +45,9 @@ dictionary → create accounts → import and publish the book → bookmark it o
 1. Transcribe or paste the text into `content/<name>.txt` (format in `tools/text2pack.py`; `## n Titre` starts a
    chapter, blank lines separate paragraphs) and write `content/<name>.questions.json`: one question per chapter
    (`chapters`) and the end-of-reading set (`questions`, each with `model_answer` and a `rubric` of
-   `skill`, `points`, `must_answer`, `avoid`).
+   `skill`, `points`, `must_answer`, `avoid`). A closed question is
+   `{"kind": "choice", "prompt": "Vrai ou faux ? …", "model_answer": "why", "rubric": {"points": 1,
+   "choices": ["Vrai", "Faux"], "correct": 1}}`; the importer refuses one without valid options.
 2. `python3 tools/text2pack.py content/<name>.txt content/<name>.questions.json -o content/<name>.pack.json`
 3. `cd backend && uv run python -m importer.article import ../content/<name>.pack.json`. It prints coverage and the
    unmatched words (full report in `import-reports/`), and the article is a **draft**.
@@ -104,6 +106,11 @@ Other choices:
   versions stay. The model answer and “a good answer includes / be careful not to” are sent only once she has saved
   her own answer, behind “Voir une réponse possible”. Parents see her latest answers next to the model answers in
   Suivi. Points and the skill label live in `question.rubric` (`points`, `skill`), so no schema change.
+- Closed questions (`"kind": "choice"`): multiple choice or vrai/faux, with `rubric.choices` (the options) and
+  `rubric.correct` (the right one's index); `model_answer` is the explanation shown afterwards. One try, marked at
+  once (`graded_by = 'auto'`), never sent to Claude. They come before the open questions, as an easier warm-up.
+- While answering, “📖 Relire le chapitre n” (or “Ouvrir le texte”) opens the chapter text on the same page: a
+  second column on a wide screen, pinned above the questions on a narrow one, with tabs to change chapter.
 - Marking by Claude (Suivi → “📝 Correction par Claude”): download or copy the latest unmarked answers
   (`GET /parent/children/{id}/grading-export`, `?regrade=true` for all) with each rubric and marking instructions
   that ask for JSON back; paste Claude's reply (fences and surrounding text are fine) to store `answer.score`,
