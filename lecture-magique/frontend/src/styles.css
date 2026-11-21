@@ -386,3 +386,12 @@ main.questions { max-width: 760px; margin: 0 auto; padding: 16px 16px 48px; }
 .ans-card p { margin: 0; }
 .ans-body { font-family: var(--read); line-height: 1.6; padding: 8px 12px; border-radius: 10px; background: var(--sun-l); white-space: pre-line; }
 .ans-model { font-family: var(--read); line-height: 1.6; color: var(--muted); }
+.cq-grade { padding: 10px 14px; border-radius: 12px; background: var(--sky-l); color: var(--ink); }
+.cq-grade p { margin: 4px 0 0; line-height: 1.5; }
+.cq-grade.old { opacity: 0.8; }
+.pill.good { background: var(--mint-l); color: var(--mint); }
+.grading { padding: 14px 16px; margin-bottom: 14px; display: grid; gap: 8px; border-left: 6px solid var(--sky); }
+.grading-steps { margin: 0; padding-left: 1.3em; color: var(--muted); }
+.grading-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.ans-feedback { margin: 0; padding: 6px 10px; border-radius: 10px; background: var(--sky-l); color: var(--ink); }
+.ans-prompt { white-space: pre-line; }

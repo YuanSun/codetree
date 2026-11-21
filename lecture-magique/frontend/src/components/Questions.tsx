@@ -52,7 +52,7 @@ function QuestionCard({ q, n, lang, articleId, onSaved }: {
     try {
       const r = await api.saveAnswer(q.id, text);
       writeDraft(q.id, null);
-      onSaved({ ...q, answer: r.answer, key: r.key });
+      onSaved({ ...q, answer: r.answer, key: r.key, grade: q.grade && { ...q.grade, for_latest: false } });
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -87,6 +87,13 @@ function QuestionCard({ q, n, lang, articleId, onSaved }: {
         )}
       </div>
       {error && <p className="error">{error}</p>}
+      {q.grade && (
+        <div className={`cq-grade${q.grade.for_latest ? "" : " old"}`}>
+          <b>{t.qGrade(q.grade.score, q.grade.points)}</b>
+          {q.grade.feedback && <p>{q.grade.feedback}</p>}
+          {!q.grade.for_latest && <p className="small muted">{t.qGradeOld}</p>}
+        </div>
+      )}
       {q.key && (
         <div>
           <button className="btn ghost small" onClick={() => setShowKey(!showKey)}>{showKey ? t.qHideKey : t.qShowKey}</button>

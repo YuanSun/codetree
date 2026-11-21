@@ -104,6 +104,12 @@ Other choices:
   versions stay. The model answer and “a good answer includes / be careful not to” are sent only once she has saved
   her own answer, behind “Voir une réponse possible”. Parents see her latest answers next to the model answers in
   Suivi. Points and the skill label live in `question.rubric` (`points`, `skill`), so no schema change.
+- Marking by Claude (Suivi → “📝 Correction par Claude”): download or copy the latest unmarked answers
+  (`GET /parent/children/{id}/grading-export`, `?regrade=true` for all) with each rubric and marking instructions
+  that ask for JSON back; paste Claude's reply (fences and surrounding text are fine) to store `answer.score`,
+  `feedback` and `graded_by` (`POST /parent/grades`, all or nothing, scores in half points up to the question's
+  points; chapter questions count 2). Grace sees “📝 Note” and the comment under the question; after she rewrites an
+  answer the old comment stays, marked as for her previous version, and the new version goes out in the next export.
 - Wiktionary (`importer.wiktionary`, kaikki.org extract, CC BY-SA) supplies conjugation tables and inflected forms
   as `word_form` rows with codes like `ind.pres.3s`, plus English glosses as `sense` rows with
   `source='wiktionary_en'`. Verbs/nouns/adjectives missing from Petit Robert get a lemma row. When spaCy tags a word

@@ -82,12 +82,17 @@ export type Question = {
   skill: string | null; points: number | null;
   answer: null | { body: string; submitted_at: string };
   key: AnswerKey | null;
+  /** Latest mark (by Claude or a parent); for_latest=false: it was for an earlier version of her answer. */
+  grade: null | { score: number; points: number; feedback: string | null; for_latest: boolean };
 };
 export type ChildAnswer = AnswerKey & {
   question_id: number; article: { id: number; title: string; lang: Lang }; chapter_seq: number | null;
   kind: string; prompt: string; skill: string | null; points: number | null;
-  body: string; submitted_at: string; versions: number;
+  answer_id: number; body: string; submitted_at: string; versions: number;
+  grade: null | { score: number; points: number; feedback: string | null; by: string | null };
 };
+export type Grade = { answer_id: number; score: number; feedback: string };
+export type GradingExport = { format: string; child: string; instructions: string; answers: unknown[] };
 
 export type ChildReport = {
   child: { id: number; display_name: string };
@@ -159,6 +164,9 @@ export const api = {
     call<{ article: { id: number; title: string; lang: Lang }; questions: Question[] }>("GET", `/articles/${articleId}/questions`),
   saveAnswer: (questionId: number, body: string) =>
     call<{ answer: { body: string; submitted_at: string }; key: AnswerKey }>("POST", `/questions/${questionId}/answer`, { body }),
+  gradingExport: (childId: number, regrade = false) =>
+    call<GradingExport>("GET", `/parent/children/${childId}/grading-export${regrade ? "?regrade=true" : ""}`),
+  importGrades: (grades: Grade[]) => call<{ graded: number }>("POST", "/parent/grades", { grades }),
   childAnswers: (childId: number) => call<ChildAnswer[]>("GET", `/parent/children/${childId}/answers`),
   conjugation: (lemmaId: number) => call<Conjugation>("GET", `/lemmas/${lemmaId}/conjugation`),
   lookups: (events: LookupEvent[], keepalive = false) =>

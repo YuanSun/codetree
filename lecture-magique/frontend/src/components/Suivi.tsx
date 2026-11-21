@@ -4,6 +4,7 @@ import { go } from "../App";
 import { ThemePref, usePref } from "../prefs";
 import { LANGS, Lang } from "../i18n";
 import BarChart from "./BarChart";
+import GradingPanel from "./GradingPanel";
 import ThemeButton from "./ThemeButton";
 
 const short = (iso: string) => {
@@ -45,12 +46,15 @@ export default function Suivi({ theme, self = false }: { theme: [ThemePref, (t: 
     setRep(null);
     (self ? api.myReport(lang, 8) : api.report(kid!, lang, 8)).then(setRep, (e) => setError(e.message));
   }, [kid, self, lang]);
-  useEffect(() => {
+  const loadAnswers = () => {
     if (self || kid === null) return;
-    setAnswers(null);
     api.childAnswers(kid).then(setAnswers, (e) => setError(e.message));
-  }, [kid, self]);
+  };
+  useEffect(() => { setAnswers(null); loadAnswers(); }, [kid, self]); // eslint-disable-line react-hooks/exhaustive-deps
   const shownAnswers = answers?.filter((a) => a.article.lang === lang) ?? [];
+  const graded = shownAnswers.filter((a) => a.grade);
+  const total = graded.reduce((n, a) => n + a.grade!.score, 0);
+  const outOf = graded.reduce((n, a) => n + a.grade!.points, 0);
 
   const thisWeek = rep ? rep.weeks[rep.weeks.length - 1] : undefined;
   const lastDefi = rep ? [...rep.weeks].reverse().find((w) => w.defi && w.defi.answered > 0) : undefined;
@@ -134,7 +138,9 @@ export default function Suivi({ theme, self = false }: { theme: [ThemePref, (t: 
             <>
               <h2 className="bag-title">Réponses aux questions de compréhension</h2>
               <p className="muted small">Dernière version de chaque réponse, la plus récente en premier, avec la réponse
-                modèle pour comparer.</p>
+                modèle pour comparer.{graded.length > 0 && ` ${graded.length} réponse(s) corrigée(s) : ${total.toLocaleString("fr")} / ${outOf} points
+                (${Math.round((100 * total) / Math.max(1, outOf))} %).`}</p>
+              {kid !== null && <GradingPanel kid={kid} name={rep.child.display_name} onImported={loadAnswers} />}
               {answers && shownAnswers.length === 0 && <p className="muted">Pas encore de réponse.</p>}
               {shownAnswers.map((a) => (
                 <div key={a.question_id} className="card ans-card">
@@ -142,12 +148,15 @@ export default function Suivi({ theme, self = false }: { theme: [ThemePref, (t: 
                     <span className="pill">{a.article.title} · {a.chapter_seq ? `chapitre ${a.chapter_seq}` : "fin"}</span>
                     {a.skill && <span className="pill">{a.skill}</span>}
                     {a.points && <span className="pill">{a.points} pt{a.points > 1 ? "s" : ""}</span>}
+                    {a.grade ? <span className="pill good">{a.grade.score} / {a.grade.points}{a.grade.by === "claude" ? " · Claude" : ""}</span>
+                      : <span className="pill">pas encore corrigée</span>}
                     <span className="small muted">{short(a.submitted_at.slice(0, 10))}{a.versions > 1 ? ` · ${a.versions} versions` : ""}</span>
                   </div>
-                  <p><b>{a.prompt}</b></p>
+                  <p className="ans-prompt"><b>{a.prompt}</b></p>
                   <p className="ans-body">{a.body}</p>
                   {a.model_answer && <p className="ans-model small">Réponse modèle : {a.model_answer}</p>}
                   {a.must_answer && <p className="small muted">Doit contenir : {a.must_answer}</p>}
+                  {a.grade?.feedback && <p className="ans-feedback small">💬 {a.grade.feedback}</p>}
                 </div>
               ))}
             </>
