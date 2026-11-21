@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, ArticleCard, Me } from "../api";
 import { go } from "../App";
-import { LANGS, Lang } from "../i18n";
+import { LANGS, Lang, strings } from "../i18n";
 import { ThemePref, usePref } from "../prefs";
 import ThemeButton from "./ThemeButton";
 
@@ -86,7 +86,8 @@ export default function Shelf({ me, onLogout, theme }: {
           const done = a.progress?.chapters_done.length ?? 0;
           const start = a.progress && !a.progress.finished ? a.progress.last_chapter : 1;
           return (
-            <button key={a.id} className="card book" style={{ ["--h" as string]: hue(a.slug) }}
+            <div key={a.id} className="book-wrap">
+            <button className="card book" style={{ ["--h" as string]: hue(a.slug) }}
                     onClick={() => go(`/lire/${a.id}/${start}`)}>
               <div className="book-cover">📚</div>
               <div className="book-body">
@@ -105,6 +106,13 @@ export default function Shelf({ me, onLogout, theme }: {
               </div>
               <Ring done={done} total={a.chapter_count} />
             </button>
+            {a.questions && a.questions.total > 0 && (a.progress || a.questions.answered > 0) && (
+              <button className={`chip q-chip${a.questions.answered === a.questions.total ? " on" : ""}`}
+                      onClick={() => go(`/questions/${a.id}`)}>
+                {strings(a.lang).qShelf(a.questions.answered, a.questions.total)}
+              </button>
+            )}
+            </div>
           );
         })}
       </div>

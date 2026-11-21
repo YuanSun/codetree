@@ -71,6 +71,7 @@ def test_questions_answers_and_key(world):
     qs = g.get(f"/api/articles/{aid}/questions").json()["questions"]
     assert qs[1]["answer"]["body"] == "Mystérieux, secret." and qs[1]["key"]["model_answer"] == "Mystérieux."
     assert qs[0]["key"] is None
+    assert g.get("/api/articles").json()[0]["questions"] == {"total": 3, "answered": 1}
 
     # another child sees none of Grace's answers
     lea = login(world, "lea")

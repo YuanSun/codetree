@@ -358,3 +358,31 @@ main.suivi { max-width: 960px; margin: 0 auto; padding: 16px 16px 48px; }
 .wc-forms { margin-top: 4px; font-size: 0.9rem; color: var(--muted); }
 .wc-forms b { color: var(--ink); font-weight: 600; }
 .wc-credit { margin: 8px 0 0; font-size: 0.72rem; color: var(--muted); }
+
+/* ---------- comprehension questions (end of a reading) ---------- */
+main.questions { max-width: 760px; margin: 0 auto; padding: 16px 16px 48px; }
+.cq-book { text-align: center; font-family: var(--read); font-style: italic; color: var(--ink); margin: 0 0 8px; }
+.cq-progress { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; margin: 8px 0 4px; }
+.cq-card { padding: 18px 20px; display: grid; gap: 10px; margin-bottom: 16px; border-left: 6px solid var(--sun); }
+.cq-card.answered { border-left-color: var(--mint); }
+.cq-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.cq-num { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 800;
+  background: var(--ink); color: var(--paper); }
+.cq-prompt { margin: 0; font-family: var(--read); font-size: 1.15rem; line-height: 1.6; color: var(--text); white-space: pre-line; }
+.cq-answer { width: 100%; min-height: 4.5em; resize: vertical; font-family: var(--read); font-size: 1.1rem; line-height: 1.6;
+  padding: 10px 12px; border-radius: 12px; border: 2px solid var(--line); background: var(--paper); color: var(--text); }
+.cq-answer:focus { outline: none; border-color: var(--grape); }
+.cq-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.cq-actions .grow { flex: 1; }
+.cq-saved { color: var(--mint); font-weight: 700; }
+.cq-key { margin-top: 6px; padding: 12px 14px; border-radius: 12px; background: var(--mint-l); }
+.cq-key p { margin: 4px 0; }
+.cq-model { font-family: var(--read); font-size: 1.05rem; line-height: 1.6; color: var(--ink); }
+.book-wrap { display: grid; gap: 6px; }
+.q-chip { justify-self: end; margin-right: 8px; }
+.bravo-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+/* parents: a child's answers */
+.ans-card { padding: 14px 16px; margin-bottom: 12px; display: grid; gap: 6px; }
+.ans-card p { margin: 0; }
+.ans-body { font-family: var(--read); line-height: 1.6; padding: 8px 12px; border-radius: 10px; background: var(--sun-l); white-space: pre-line; }
+.ans-model { font-family: var(--read); line-height: 1.6; color: var(--muted); }

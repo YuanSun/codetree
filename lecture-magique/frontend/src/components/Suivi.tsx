@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, ChildReport } from "../api";
+import { api, ChildAnswer, ChildReport } from "../api";
 import { go } from "../App";
 import { ThemePref, usePref } from "../prefs";
 import { LANGS, Lang } from "../i18n";
@@ -34,6 +34,7 @@ export default function Suivi({ theme, self = false }: { theme: [ThemePref, (t: 
   const [rep, setRep] = useState<ChildReport | null>(null);
   const [error, setError] = useState("");
   const [lang, setLang] = usePref<Lang>("lm.lang", "fr");
+  const [answers, setAnswers] = useState<ChildAnswer[] | null>(null);
 
   useEffect(() => {
     if (self) return;
@@ -44,6 +45,12 @@ export default function Suivi({ theme, self = false }: { theme: [ThemePref, (t: 
     setRep(null);
     (self ? api.myReport(lang, 8) : api.report(kid!, lang, 8)).then(setRep, (e) => setError(e.message));
   }, [kid, self, lang]);
+  useEffect(() => {
+    if (self || kid === null) return;
+    setAnswers(null);
+    api.childAnswers(kid).then(setAnswers, (e) => setError(e.message));
+  }, [kid, self]);
+  const shownAnswers = answers?.filter((a) => a.article.lang === lang) ?? [];
 
   const thisWeek = rep ? rep.weeks[rep.weeks.length - 1] : undefined;
   const lastDefi = rep ? [...rep.weeks].reverse().find((w) => w.defi && w.defi.answered > 0) : undefined;
@@ -122,6 +129,29 @@ export default function Suivi({ theme, self = false }: { theme: [ThemePref, (t: 
               </div>
             ))}
           </div>
+
+          {!self && (
+            <>
+              <h2 className="bag-title">Réponses aux questions de compréhension</h2>
+              <p className="muted small">Dernière version de chaque réponse, la plus récente en premier, avec la réponse
+                modèle pour comparer.</p>
+              {answers && shownAnswers.length === 0 && <p className="muted">Pas encore de réponse.</p>}
+              {shownAnswers.map((a) => (
+                <div key={a.question_id} className="card ans-card">
+                  <div className="hard-badges">
+                    <span className="pill">{a.article.title} · {a.chapter_seq ? `chapitre ${a.chapter_seq}` : "fin"}</span>
+                    {a.skill && <span className="pill">{a.skill}</span>}
+                    {a.points && <span className="pill">{a.points} pt{a.points > 1 ? "s" : ""}</span>}
+                    <span className="small muted">{short(a.submitted_at.slice(0, 10))}{a.versions > 1 ? ` · ${a.versions} versions` : ""}</span>
+                  </div>
+                  <p><b>{a.prompt}</b></p>
+                  <p className="ans-body">{a.body}</p>
+                  {a.model_answer && <p className="ans-model small">Réponse modèle : {a.model_answer}</p>}
+                  {a.must_answer && <p className="small muted">Doit contenir : {a.must_answer}</p>}
+                </div>
+              ))}
+            </>
+          )}
 
           <h2 className="bag-title">Lectures</h2>
           {rep.books.length === 0 && <p className="muted">Pas encore de lecture.</p>}

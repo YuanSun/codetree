@@ -12,6 +12,7 @@ export type ArticleCard = {
   source_note: string | null;
   chapter_count: number;
   lang: Lang;
+  questions?: { total: number; answered: number };
   progress: null | { last_chapter: number; chapters_done: number[]; seconds_read: number; finished: boolean };
 };
 
@@ -71,6 +72,21 @@ export type BagWord = {
   lemma_id: number; lemma: string; pos: string; gender: string | null; ipa: string | null; lang: Lang;
   group: "new" | "learning" | "mastered" | "known"; familiarity: number; lookups: number; due: string | null;
   definition: string | null; gloss: string | null; sentence: string | null; surface: string | null;
+};
+
+/** Model answer and rubric of a question: sent only once the child has answered it. */
+export type AnswerKey = { model_answer: string | null; must_answer: string | null; avoid: string | null };
+export type Question = {
+  id: number; kind: "open" | "choice" | "writing"; prompt: string;
+  chapter: null | { seq: number; title: string | null };
+  skill: string | null; points: number | null;
+  answer: null | { body: string; submitted_at: string };
+  key: AnswerKey | null;
+};
+export type ChildAnswer = AnswerKey & {
+  question_id: number; article: { id: number; title: string; lang: Lang }; chapter_seq: number | null;
+  kind: string; prompt: string; skill: string | null; points: number | null;
+  body: string; submitted_at: string; versions: number;
 };
 
 export type ChildReport = {
@@ -139,6 +155,11 @@ export const api = {
   myReport: (lang: Lang, weeks = 8) => call<ChildReport>("GET", `/me/report?weeks=${weeks}&lang=${lang}`),
   report: (childId: number, lang: Lang, weeks = 8) =>
     call<ChildReport>("GET", `/parent/children/${childId}/report?weeks=${weeks}&lang=${lang}`),
+  questions: (articleId: number) =>
+    call<{ article: { id: number; title: string; lang: Lang }; questions: Question[] }>("GET", `/articles/${articleId}/questions`),
+  saveAnswer: (questionId: number, body: string) =>
+    call<{ answer: { body: string; submitted_at: string }; key: AnswerKey }>("POST", `/questions/${questionId}/answer`, { body }),
+  childAnswers: (childId: number) => call<ChildAnswer[]>("GET", `/parent/children/${childId}/answers`),
   conjugation: (lemmaId: number) => call<Conjugation>("GET", `/lemmas/${lemmaId}/conjugation`),
   lookups: (events: LookupEvent[], keepalive = false) =>
     call<{ accepted: string[]; duplicate: string[]; rejected: string[] }>("POST", "/lookups", { events }, keepalive),

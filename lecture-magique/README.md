@@ -43,7 +43,9 @@ dictionary → create accounts → import and publish the book → bookmark it o
 ## Every week: a new article
 
 1. Transcribe or paste the text into `content/<name>.txt` (format in `tools/text2pack.py`; `## n Titre` starts a
-   chapter, blank lines separate paragraphs) and write `content/<name>.questions.json`.
+   chapter, blank lines separate paragraphs) and write `content/<name>.questions.json`: one question per chapter
+   (`chapters`) and the end-of-reading set (`questions`, each with `model_answer` and a `rubric` of
+   `skill`, `points`, `must_answer`, `avoid`).
 2. `python3 tools/text2pack.py content/<name>.txt content/<name>.questions.json -o content/<name>.pack.json`
 3. `cd backend && uv run python -m importer.article import ../content/<name>.pack.json`. It prints coverage and the
    unmatched words (full report in `import-reports/`), and the article is a **draft**.
@@ -95,7 +97,13 @@ Other choices:
   the chapter was opened.
 - The card also offers “Autres sens” (collapsed): until phase 2 picks the sense per sentence, the first Robert sense
   is often not the one in the text (the `entamer` case).
-- Chapter-end question is shown as something to think about only; answers are phase 3.
+- Comprehension questions (`#/questions/<id>`, from the last chapter's “Répondre aux questions” button or the
+  “❓ Questions n/m” chip on the shelf): the chapter questions plus an end-of-reading set (vocabulary in context,
+  figurative language, negation, character + evidence, order of events, inference across chapters, a writing
+  question), aimed at Grace's reading weak points. Answers go to `lecture.answer`, one row per save, so earlier
+  versions stay. The model answer and “a good answer includes / be careful not to” are sent only once she has saved
+  her own answer, behind “Voir une réponse possible”. Parents see her latest answers next to the model answers in
+  Suivi. Points and the skill label live in `question.rubric` (`points`, `skill`), so no schema change.
 - Wiktionary (`importer.wiktionary`, kaikki.org extract, CC BY-SA) supplies conjugation tables and inflected forms
   as `word_form` rows with codes like `ind.pres.3s`, plus English glosses as `sense` rows with
   `source='wiktionary_en'`. Verbs/nouns/adjectives missing from Petit Robert get a lemma row. When spaCy tags a word
