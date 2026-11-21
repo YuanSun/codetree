@@ -253,7 +253,7 @@
           if (ok) solved(false); else if (input.value.trim() === '') { input.focus(); } else { input.select(); miss(); }
         };
         input.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
-        controls.append(input, s.unit ? h('span', { class: 'muted' }, s.unit) : null, h('button', { class: 'btn small', onclick: go }, 'Check'));
+        controls.append(input, ...(s.unit ? [h('span', { class: 'muted' }, s.unit)] : []), h('button', { class: 'btn small', onclick: go }, 'Check'));
       }
       return {
         el,

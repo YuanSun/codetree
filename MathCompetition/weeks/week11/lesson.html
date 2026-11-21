@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Week 11 · The Quest</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/lesson-common.css">
+  <link rel="stylesheet" href="lesson.css">
+</head>
+<body data-page="lesson" data-week="week11" data-page-slug="lesson" data-week-title="Week 11">
+<div id="mc-nav"></div>
+<main class="wrap">
+
+  <section class="hero-quest">
+    <div class="floaters" aria-hidden="true">
+      <span style="left:5%;top:14%;font-size:54px">🧊</span><span style="left:90%;top:18%;font-size:46px;animation-delay:-2s">📦</span>
+      <span style="left:18%;top:70%;font-size:60px;animation-delay:-4s">🔭</span><span style="left:78%;top:62%;font-size:52px;animation-delay:-1s">💧</span>
+    </div>
+    <div class="eyebrow">Week 11 · The Quest</div>
+    <h1>Views &amp; <span class="one">Surface Area</span></h1>
+    <p>Seeing the cubes you cannot see — and counting the faces you can. Two big ideas for 3D problems: <b>read the tallest stack in every line of sight</b>, and <b>add every face, then take away the hidden ones</b>.</p>
+    <div class="four">
+      <a class="skill sk-rates" href="#views"><i>🔭</i><b>Views</b><span>Top, front and right. <u>Hidden</u> cubes.</span></a>
+      <a class="skill sk-ratio" href="#surface"><i>📦</i><b>Surface area &amp; volume</b><span>Boxes, glued cubes, <u>scaling</u>, water.</span></a>
+    </div>
+    <a class="btn warm start" href="#views">▶ Start the quest</a>
+  </section>
+
+  <section class="level sk-rates" id="views">
+    <div class="world-banner" data-bg="🔭"><div class="big">🔭</div><div><div class="eyebrow">World 1</div><h2>Views</h2><p><b>Part 1.</b> Top, front and right views · hidden cubes · most and fewest cubes.</p></div></div>
+    <div class="big-idea"><span>⚡</span><div>A view shows the tallest stack in each line of sight.<small>STACK PLAN = look straight down, every square shows how many cubes are stacked there. FRONT view = look from the front: each column shows its tallest stack. RIGHT view = look from the right: each column shows the tallest stack in that row (the front row is on the left). Cubes behind a taller stack stay hidden.</small></div></div>
+    <div class="lab">
+      <div class="lab-title">🏗️ Explore · Build a stack</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Press <b>+</b> and <b>−</b> in the stack plan to build. Watch the <b>FRONT</b> and <b>RIGHT</b> views change — and the counter that tells you how many cubes are <b>hidden</b>. Try the <b>X-ray</b> button!</div></div>
+      <div id="build-lab"></div>
+    </div>
+    <div class="lab">
+      <div class="lab-title">✏️ Your turn · Draw the views</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">This is the <b>Together 1</b> stack plan. The plan gives the <b>true height</b> of every square, including cubes you cannot see in the picture. Tap squares to draw each view, then count all the cubes.</div></div>
+      </div>
+    <div class="mission" style="--c:var(--ratio)">
+      <div class="mission-top"><span class="src">📜 Slides · Views · Together 1</span><span class="tag easy">Easy</span></div>
+      <p class="ask">🧱 Stack plan back row <b>2 1 0</b>, middle <b>1 3 1</b>, front <b>0 2 1</b>. Draw the FRONT view and the RIGHT view. How many cubes in all?</p>
+      <details><summary>Show the exact wording</summary><div class="orig">The stack plan gives the true height of every square, including cubes you cannot see in the picture. Draw the FRONT view and the RIGHT view. How many cubes are there in all?</div></details>
+      <div id="plan-fig"></div><div class="w11-split"><div id="draw-front"></div><div id="draw-right"></div></div><div id="plan-steps"></div>
+    </div>
+    <div class="big-idea"><span>⚡</span><div>Count layer by layer, from the bottom up.<small>Hidden cubes count too! Slide through the layers and watch each one add up.</small></div></div>
+    <div class="lab">
+      <div class="lab-title">🪜 Explore · Layers of a staircase</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Slide the number of <b>layers</b>. The gold layer is the one you are counting. How many cubes does each layer need?</div></div>
+      <div id="layers-lab"></div>
+    </div>
+    <div class="mission" style="--c:var(--ratio)">
+      <div class="mission-top"><span class="src">📜 Slides · Views · Together 2</span><span class="tag easy">Easy</span></div>
+      <p class="ask">🪜 A staircase built from identical cubes: three steps, each three cubes wide, 1 high at the front, 2 in the middle, 3 at the back. How many cubes does it use? <b>Remember the cubes you cannot see.</b></p>
+      <details><summary>Show the exact wording</summary><div class="orig">This staircase is built from identical cubes. How many cubes does it use? (Remember the cubes you cannot see.)</div></details>
+      <div id="layers-steps"></div>
+    </div>
+    <div class="big-idea"><span>⚡</span><div>Views set a ceiling, not an exact count.<small>Different stacks can have the same front and right views. Most cubes: fill every square as high as BOTH views allow. Fewest cubes: add only what the views force.</small></div></div>
+    <div class="lab">
+      <div class="lab-title">⚖️ Explore · Same views, different stacks</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">The front view and the right view are both a 2 × 2 square. Build <b>any</b> stack on the 2 × 2 base that matches — then find the <b>most</b> and the <b>fewest</b> cubes. (The buttons show them if you get stuck.)</div></div>
+      <div id="ceil-lab"></div><div id="ceil-steps"></div>
+    </div>
+    <div class="big-idea"><span>⚡</span><div>Stand where you stand: which way you face decides left and right.<small>Each line of sight shows its tallest stack. From the back, left and right swap. From the right, the FRONT row is on your left.</small></div></div>
+    <div class="lab">
+      <div class="lab-title">🚶 Explore · Walk around the table</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Press the buttons to stand on each side of the table. Which row or column is on the <b>left</b> of your picture each time?</div></div>
+      <div id="viewer-lab"></div>
+    </div>
+    <div class="mission" style="--c:var(--ratio)">
+      <div class="mission-top"><span class="src">📜 CJMC (Gray Jay) 2020 · Q4</span><span class="tag medium">Medium</span></div>
+      <p class="ask">🧍 A table of 9 squares (1–9) with cubes: 2 on square 8, 3 on square 2, 1 on square 6, 4 on square 1. Sam stands on the grey circle to the <b>right</b> of the table, facing it. What does he draw?</p>
+      <details><summary>Show the exact wording</summary><div class="orig">A teacher puts a square table next to a shaded circle drawn on the floor. She then divides the table surface into nine squares and numbers the squares… Two cubes on square number 8. Three cubes on square number 2. One cube on square number 6. Four cubes on square number 1. The teacher then asks Sam, a student, to stand on the shaded circle facing the cubes and asks him to draw what he sees. Which one of the following diagrams represents what Sam draws? <div class="opts"><span>(A) 4-1-2</span><span>(B) 2-1-4</span><span>(C) 4-3-1</span><span>(D) 1-3-4</span></div></div></details>
+      <div id="viewer-fig"></div><div class="w11-split"><div id="viewer-map"></div><div id="viewer-draw"></div></div><div id="viewer-steps"></div>
+    </div>
+    <div class="big-idea"><span>⚡</span><div>Fill the big shape, then subtract.<small>A 3 × 3 × 3 cube has three layers of 9. Count what is missing, layer by layer.</small></div></div>
+    <div class="lab">
+      <div class="lab-title">➕ Explore · Fill the cube</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">George’s cross uses 7 cubes. Press the layer buttons to add the missing cubes (gold) until you have a full 3 × 3 × 3 cube.</div></div>
+      <div id="cross-lab"></div>
+    </div>
+    <div class="mission" style="--c:var(--ratio)">
+      <div class="mission-top"><span class="src">📜 Kangaroo 2014, Grade 7–8 · Q7</span><span class="tag easy">Easy</span></div>
+      <p class="ask">➕ George built a plus-shaped solid from <b>7</b> unit cubes. How many more cubes does he need to make a cube with edges of length 3?</p>
+      <details><summary>Show the exact wording</summary><div class="orig">George built the shape shown using seven unit cubes. How many such cubes does he have to add to make a cube with edges of length 3? <div class="opts"><span>(A) 12</span><span>(B) 14</span><span>(C) 16</span><span>(D) 18</span><span>(E) 20</span></div></div></details>
+      <div id="cross-steps"></div>
+    </div>
+  </section>
+
+  <section class="level sk-ratio" id="surface">
+    <div class="world-banner" data-bg="📦"><div class="big">📦</div><div><div class="eyebrow">World 2</div><h2>Surface area &amp; volume</h2><p><b>Part 2.</b> Boxes and glued cubes · scaling · volume.</p></div></div>
+    <div class="big-idea"><span>⚡</span><div>Add every face, then take away the hidden ones.<small>A box has 6 faces in 3 matching pairs: top &amp; bottom, front &amp; back, left &amp; right. SA = 2(l×w + l×h + w×h). A cube with edge s: SA = 6 × s². Surface area uses square units (cm²); volume = l × w × h uses cubic units (cm³).</small></div></div>
+    <div class="lab">
+      <div class="lab-title">📦 Explore · The box and its faces</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Slide the sides of the box. See the three <b>pairs</b> of faces and how they add up. Switch on the <b>1 cm squares</b> to count them.</div></div>
+      <div id="box-lab"></div>
+    </div>
+    <div class="mission" style="--c:var(--percent)">
+      <div class="mission-top"><span class="src">📜 Slides · Surface Area · Together 1</span><span class="tag easy">Easy</span></div>
+      <p class="ask">📦 A rectangular box is <b>5 cm</b> long, <b>3 cm</b> wide and <b>4 cm</b> high. Find its surface area.</p>
+      <details><summary>Show the exact wording</summary><div class="orig">Find the surface area of this rectangular box. (Edges 5 cm, 3 cm and 4 cm.)</div></details>
+      <div id="box-steps"></div>
+    </div>
+    <div class="mission" style="--c:var(--percent)">
+      <div class="mission-top"><span class="src">📜 Gauss 2018, Grade 7 · Q12</span><span class="tag easy">Easy</span></div>
+      <p class="ask">📦 What is the surface area of a <b>1 cm by 2 cm by 2 cm</b> rectangular prism?</p>
+      <details><summary>Show the exact wording</summary><div class="orig">What is the surface area of a 1 cm by 2 cm by 2 cm rectangular prism? <div class="opts"><span>(A) 10 cm²</span><span>(B) 20 cm²</span><span>(C) 12 cm²</span><span>(D) 24 cm²</span><span>(E) 16 cm²</span></div></div></details>
+      <div id="prism-steps"></div>
+    </div>
+    <div class="big-idea"><span>⚡</span><div>Every glued joint hides 2 faces.<small>n unit cubes have 6n faces in all. SA = 6n − 2 × (joints). Hidden faces do not count.</small></div></div>
+    <div class="lab">
+      <div class="lab-title">🧩 Explore · Glue cubes together</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Build a solid. See how many faces the cubes have in total, how many <b>joints</b> hide faces, and the surface area that is left. Try the presets!</div></div>
+      <div id="glue-lab"></div>
+    </div>
+    <div class="mission" style="--c:var(--percent)">
+      <div class="mission-top"><span class="src">📜 Slides · Surface Area · Together 2</span><span class="tag medium">Medium</span></div>
+      <p class="ask">🧩 Five cubes with edge 1 cm are glued as shown: four in a 2 × 2 square, one on top of the back cube. What is the surface area of the solid?</p>
+      <details><summary>Show the exact wording</summary><div class="orig">Five cubes with edge 1 cm are glued together as shown. What is the surface area of the solid?</div></details>
+      <div id="glue-steps"></div>
+    </div>
+    <div class="big-idea"><span>⚡</span><div>Make every edge k times longer: lengths × k, surface area × k², volume × k³.<small>Edge 1: SA 6, V 1. Edge 2: SA 24, V 8. Edge 3: SA 54, V 27.</small></div></div>
+    <div class="lab">
+      <div class="lab-title">🔍 Explore · Grow a cube</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Slide the edge of the cube. Compare the surface area and the volume with the edge-1 cube.</div></div>
+      <div id="scale-lab"></div>
+    </div>
+    <div class="lab">
+      <div class="lab-title">↔️ Explore · Stretch a box</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Start with a 5 × 3 × 2 box (volume 30). Choose a factor for each side — what happens to the volume?</div></div>
+      <div id="stretch-lab"></div>
+    </div>
+    <div class="mission" style="--c:var(--percent)">
+      <div class="mission-top"><span class="src">📜 Gauss 2018, Grade 8 · Q18</span><span class="tag medium">Medium</span></div>
+      <p class="ask">↔️ A rectangular prism has volume <b>30 cm³</b>. Its length is <b>doubled</b>, its width is <b>tripled</b>, and its height is <b>divided by four</b>. What is the new volume?</p>
+      <details><summary>Show the exact wording</summary><div class="orig">The volume of a rectangular prism is 30 cm³. The length of the prism is doubled, the width is tripled, and the height is divided by four. The volume of the new prism is <div class="opts"><span>(A) 31 cm³</span><span>(B) 120 cm³</span><span>(C) 60 cm³</span><span>(D) 90 cm³</span><span>(E) 45 cm³</span></div></div></details>
+      <div id="scale-steps"></div>
+    </div>
+    <div class="big-idea"><span>⚡</span><div>Tilting a closed box does not change the volume of water inside.<small>Water volume = base area × depth. Change the base, and the depth changes to keep the volume the same.</small></div></div>
+    <div class="lab">
+      <div class="lab-title">💧 Explore · Tilt the water box</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">A closed 4 × 5 × 10 box stands on its 4 × 5 face with water <b>6</b> deep. Tip it onto another face — watch the depth.</div></div>
+      <div id="tilt-lab"></div><div id="tilt-steps"></div>
+    </div>
+  </section>
+
+  <section class="level" id="finale">
+    <div class="finale">
+      <div class="eyebrow" style="color:var(--gold)">The point to land</div>
+      <h2>Every 3D problem becomes easy once you break it into <u>flat pieces</u> you can count.</h2>
+      <ul class="finale-list">
+        <li style="--c:#8fbaff"><b>Views</b> → the tallest stack in each line of sight</li>
+        <li style="--c:#7ee8c0"><b>Surface area</b> → every face, minus the hidden ones</li>
+        <li style="--c:#ffd08a"><b>Scaling</b> → length × k, area × k², volume × k³</li>
+      </ul>
+      <div class="row"><a class="btn warm" href="practice">📝 Do the Your-turn questions in Practice</a></div>
+    </div>
+  </section>
+</main>
+
+<script src="/static/js/core.js"></script>
+<script src="figures.js"></script>
+<script src="lesson.js"></script>
+</body>
+</html>

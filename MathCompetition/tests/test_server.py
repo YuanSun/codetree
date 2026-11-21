@@ -105,10 +105,27 @@ class ServerTests(unittest.TestCase):
             with self.subTest(path=path):
                 self.assertEqual(self.get(path)[0], 200)
         _, home, _ = self.get("/")
-        order = [home.index(f'/week/{i}/"') for i in ("week10", "cjmc2024", "week09", "cjmc2021-exam2", "week08", "week07")]
+        order = [home.index(f'/week/{i}/"') for i in ("week11", "week10", "cjmc2024", "week09", "cjmc2021-exam2", "week08", "week07")]
         self.assertEqual(order, sorted(order))                         # week 10, 9.5 exam, week 9, the 8.5 exam, week 8, week 7
         self.assertIn("Exam 2", home)
         self.assertIn("Exam 3", home)
+
+    def test_week11_pages_and_key(self):
+        for path in ("/week/week11/", "/week/week11/lesson", "/week/week11/practice", "/week/week11/figures.js", "/week/week11/lesson.js"):
+            with self.subTest(path=path):
+                self.assertEqual(self.get(path)[0], 200)
+        data = json.loads((ROOT / "weeks" / "week11" / "practice.json").read_text(encoding="utf-8"))
+        qs = data["questions"]
+        self.assertEqual(len(qs), 18)                                   # every slide problem (T1 and Your-turn-2 are split into count + views)
+        picked = {q["id"]: q["choices"][q["answer"]] for q in qs}
+        for qid, want in {"v01": "11", "v03": "18", "v04": "14", "v05": "10", "v07": "20", "v10": "24", "s01": "94 cm²", "s02": "20 cm²", "s03": "150 cm²",
+                          "s04": "56 cm²", "s05": "16 cm²", "s06": "45 cm³", "s07": "30", "s08": "1.5 cm"}.items():
+            self.assertEqual(picked[qid], want, qid)
+        self.assertEqual([q["answer"] for q in qs if q["id"] in ("v08", "v09")], [1, 2])   # B and C (contest keys)
+        _, lesson, _ = self.get("/week/week11/lesson")
+        self.assertEqual(lesson.count('id="'), len(set(re.findall(r'id="([^"]+)"', lesson))))
+        for mount in ("plan-steps", "layers-steps", "ceil-steps", "viewer-steps", "cross-steps", "box-steps", "prism-steps", "glue-steps", "scale-steps", "tilt-steps"):
+            self.assertIn(f'id="{mount}"', lesson)
 
     def test_week10_pages_and_homework(self):
         for path in ("/week/week10/", "/week/week10/lesson", "/week/week10/homework", "/week/week10/figures.js", "/week/week10/lesson.js", "/week/week10/lesson.css"):
@@ -252,7 +269,7 @@ class BasePathTests(unittest.TestCase):
         self.assertIn('src="/math/static/js/exam.js"', body)
         self.assertIn('src="/math/week/cjmc2021-exam2/figures.js"', body)
         self.assertIn('src="/math/week/cjmc2024/figures.js"', self.get("/week/cjmc2024/exam")[1])
-        for path in ("/week/week10/lesson", "/week/week10/homework"):
+        for path in ("/week/week10/lesson", "/week/week10/homework", "/week/week11/lesson", "/week/week11/practice"):
             self.assertNotRegex(self.get(path)[1], r'(?:href|src)="/(?!math/|/)', "unprefixed absolute link")
 
     def test_study_links_are_prefixed(self):
