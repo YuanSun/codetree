@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { api, AnswerKey, Question } from "../api";
+import { api, AnswerKey, ChapterData, Question } from "../api";
 import { go } from "../App";
 import { Lang, strings } from "../i18n";
 import { ThemePref } from "../prefs";
@@ -17,6 +17,11 @@ const writeDraft = (id: number, v: string | null) => {
   } catch { /* private mode: no draft */ }
 };
 
+// Two columns (questions | text) from this width; below it the text is pinned on top of the questions.
+const WIDE = "(min-width: 900px)";
+
+type Chapter = { seq: number; title: string | null };
+
 function KeyBox({ k, lang }: { k: AnswerKey; lang: Lang }) {
   const t = strings(lang);
   return (
@@ -29,8 +34,105 @@ function KeyBox({ k, lang }: { k: AnswerKey; lang: Lang }) {
   );
 }
 
-function QuestionCard({ q, n, lang, articleId, onSaved }: {
-  q: Question; n: number; lang: Lang; articleId: number; onSaved: (q: Question) => void;
+/** The chapter text, read-only, next to (or above) the questions: so she can look for evidence without leaving them. */
+function TextPane({ articleId, seq, chapters, lang, onSeq, onClose }: {
+  articleId: number; seq: number; chapters: Chapter[]; lang: Lang; onSeq: (n: number) => void; onClose: () => void;
+}) {
+  const t = strings(lang);
+  const cache = useRef(new Map<number, ChapterData>());
+  const [data, setData] = useState<ChapterData | null>(cache.current.get(seq) ?? null);
+  const [error, setError] = useState("");
+  const body = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setError("");
+    const hit = cache.current.get(seq);
+    if (hit) setData(hit);
+    else {
+      setData(null);
+      api.chapter(articleId, seq).then((d) => { cache.current.set(seq, d); setData(d); }, (e) => setError(e.message));
+    }
+    body.current?.scrollTo({ top: 0 });
+  }, [articleId, seq]);
+
+  return (
+    <aside className="card cq-pane" aria-label={`${t.chapter} ${seq}`} lang={lang}>
+      <div className="cq-pane-head">
+        <div className="cq-pane-tabs" role="tablist">
+          {chapters.map((c) => (
+            <button key={c.seq} role="tab" aria-selected={c.seq === seq} className={`chip${c.seq === seq ? " on" : ""}`}
+                    title={c.title ?? undefined} onClick={() => onSeq(c.seq)}>{c.seq}</button>
+          ))}
+        </div>
+        <button className="btn ghost small" onClick={onClose} aria-label={t.qCloseText}>✕</button>
+      </div>
+      <div className="cq-pane-body" ref={body}>
+        <h3 className="cq-pane-title">{t.chapter} {seq}{data?.chapter.title ? ` · ${data.chapter.title}` : ""}</h3>
+        {error && <p className="error">{error}</p>}
+        {!data && !error && <p className="muted">…</p>}
+        {data?.paragraphs.map((p) => <p key={p.id}>{p.text}</p>)}
+      </div>
+    </aside>
+  );
+}
+
+function ChoiceCard({ q, lang, onSaved }: { q: Question; lang: Lang; onSaved: (q: Question) => void }) {
+  const t = strings(lang);
+  const [picked, setPicked] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const done = q.answer !== null;
+  const chosen = q.answer?.body ?? picked;
+  const right = q.key?.correct;
+
+  const check = async () => {
+    if (!picked) return;
+    setSaving(true);
+    setError("");
+    try {
+      const r = await api.saveAnswer(q.id, picked);
+      onSaved({ ...q, answer: r.answer, key: r.key, grade: r.grade });
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <>
+      <div className={`cq-choices${q.choices!.length === 2 ? " two" : ""}`} role="radiogroup">
+        {q.choices!.map((c, i) => {
+          const cls = done ? (c === right ? " right" : c === chosen ? " wrong" : " off") : c === picked ? " picked" : "";
+          return (
+            <button key={c} role="radio" aria-checked={c === chosen} className={`cq-choice${cls}`} disabled={done}
+                    onClick={() => setPicked(c)}>
+              {q.choices!.length > 2 && <span className="cq-letter">{"ABCDEFG"[i]}</span>}
+              <span>{c}</span>
+            </button>
+          );
+        })}
+      </div>
+      {!done && (
+        <div className="cq-actions">
+          <span className="grow" />
+          <button className="btn primary" disabled={!picked || saving} onClick={check}>{saving ? t.qSaving : t.qCheck}</button>
+        </div>
+      )}
+      {error && <p className="error">{error}</p>}
+      {done && q.grade && (
+        <div className={`cq-grade${q.grade.score > 0 ? " good" : " bad"}`}>
+          <b>{q.grade.score > 0 ? t.qRight : t.qWrong}</b> <span className="small">({q.grade.score} / {q.grade.points})</span>
+          {q.grade.score === 0 && right && <p><b>{t.qRightIs}</b> {right}</p>}
+          {q.key?.model_answer && <p>{q.key.model_answer}</p>}
+        </div>
+      )}
+    </>
+  );
+}
+
+function QuestionCard({ q, n, lang, onSaved, onText }: {
+  q: Question; n: number; lang: Lang; onSaved: (q: Question) => void; onText: (seq: number | null, qid: number) => void;
 }) {
   const t = strings(lang);
   const [text, setText] = useState(() => readDraft(q.id) ?? q.answer?.body ?? "");
@@ -38,6 +140,7 @@ function QuestionCard({ q, n, lang, articleId, onSaved }: {
   const [error, setError] = useState("");
   const [showKey, setShowKey] = useState(false);
   const box = useRef<HTMLTextAreaElement>(null);
+  const closed = q.kind === "choice" && !!q.choices;
 
   // grow with the answer instead of scrolling inside a small box
   useEffect(() => {
@@ -60,6 +163,12 @@ function QuestionCard({ q, n, lang, articleId, onSaved }: {
     }
   };
 
+  const textButton = (
+    <button className="btn ghost small" onClick={() => onText(q.chapter?.seq ?? null, q.id)}>
+      {q.chapter ? `📖 ${t.qReread(q.chapter.seq)}` : t.qOpenText}
+    </button>
+  );
+
   return (
     <section className={`card cq-card${q.answer ? " answered" : ""}`} id={`q${q.id}`}>
       <div className="cq-head">
@@ -69,87 +178,121 @@ function QuestionCard({ q, n, lang, articleId, onSaved }: {
         {q.points && <span className="pill">{t.qPoints(q.points)}</span>}
       </div>
       <p className="cq-prompt">{q.prompt}</p>
-      <textarea ref={box} className="cq-answer" value={text} placeholder={t.qPlaceholder} rows={q.kind === "writing" ? 6 : 3}
-                lang={lang} spellCheck={false}
-                onChange={(e) => { setText(e.target.value); writeDraft(q.id, e.target.value); }} />
-      <div className="cq-actions">
-        {q.chapter && (
-          <button className="btn ghost small" onClick={() => go(`/lire/${articleId}/${q.chapter!.seq}`)}>
-            📖 {t.qReread(q.chapter.seq)}
-          </button>
-        )}
-        <span className="grow" />
-        {q.answer && !changed && <span className="cq-saved small">{t.qSaved}</span>}
-        {(!q.answer || changed) && (
-          <button className="btn primary" disabled={saving || !text.trim()} onClick={save}>
-            {saving ? t.qSaving : q.answer ? t.qUpdate : t.qSave}
-          </button>
-        )}
-      </div>
-      {error && <p className="error">{error}</p>}
-      {q.grade && (
-        <div className={`cq-grade${q.grade.for_latest ? "" : " old"}`}>
-          <b>{t.qGrade(q.grade.score, q.grade.points)}</b>
-          {q.grade.feedback && <p>{q.grade.feedback}</p>}
-          {!q.grade.for_latest && <p className="small muted">{t.qGradeOld}</p>}
-        </div>
-      )}
-      {q.key && (
-        <div>
-          <button className="btn ghost small" onClick={() => setShowKey(!showKey)}>{showKey ? t.qHideKey : t.qShowKey}</button>
-          {showKey && <KeyBox k={q.key} lang={lang} />}
-        </div>
+      {closed ? (
+        <>
+          <ChoiceCard q={q} lang={lang} onSaved={onSaved} />
+          {!q.answer && <div className="cq-actions">{textButton}</div>}
+        </>
+      ) : (
+        <>
+          <textarea ref={box} className="cq-answer" value={text} placeholder={t.qPlaceholder} rows={q.kind === "writing" ? 6 : 3}
+                    lang={lang} spellCheck={false}
+                    onChange={(e) => { setText(e.target.value); writeDraft(q.id, e.target.value); }} />
+          <div className="cq-actions">
+            {textButton}
+            <span className="grow" />
+            {q.answer && !changed && <span className="cq-saved small">{t.qSaved}</span>}
+            {(!q.answer || changed) && (
+              <button className="btn primary" disabled={saving || !text.trim()} onClick={save}>
+                {saving ? t.qSaving : q.answer ? t.qUpdate : t.qSave}
+              </button>
+            )}
+          </div>
+          {error && <p className="error">{error}</p>}
+          {q.grade && (
+            <div className={`cq-grade${q.grade.for_latest ? "" : " old"}`}>
+              <b>{t.qGrade(q.grade.score, q.grade.points)}</b>
+              {q.grade.feedback && <p>{q.grade.feedback}</p>}
+              {!q.grade.for_latest && <p className="small muted">{t.qGradeOld}</p>}
+            </div>
+          )}
+          {q.key && (
+            <div>
+              <button className="btn ghost small" onClick={() => setShowKey(!showKey)}>{showKey ? t.qHideKey : t.qShowKey}</button>
+              {showKey && <KeyBox k={q.key} lang={lang} />}
+            </div>
+          )}
+        </>
       )}
     </section>
   );
 }
 
-/** End-of-reading comprehension: the chapter questions and the questions about the whole text. Answers are saved;
- *  a possible answer (with what a good answer must contain) can be opened once she has written her own. */
+/** End-of-reading comprehension: the chapter questions, then closed questions (multiple choice, vrai/faux, marked at
+ *  once), then open questions about the whole text. The text can be opened beside the questions to look for evidence. */
 export default function Questions({ articleId, theme }: { articleId: number; theme: [ThemePref, (t: ThemePref) => void, boolean] }) {
-  const [data, setData] = useState<{ title: string; lang: Lang; questions: Question[] } | null>(null);
+  const [data, setData] = useState<{ title: string; lang: Lang; chapters: Chapter[]; questions: Question[] } | null>(null);
   const [error, setError] = useState("");
+  const [pane, setPane] = useState<number | null>(null);
 
   useEffect(() => {
-    api.questions(articleId).then((r) => setData({ title: r.article.title, lang: r.article.lang, questions: r.questions }),
-      (e) => setError(e.message));
+    api.questions(articleId).then((r) => setData({ title: r.article.title, lang: r.article.lang, chapters: r.chapters,
+                                                   questions: r.questions }), (e) => setError(e.message));
   }, [articleId]);
 
   const lang = data?.lang ?? "fr";
   const t = strings(lang);
   const qs = data?.questions ?? [];
   const byChapter = qs.filter((q) => q.chapter);
-  const whole = qs.filter((q) => !q.chapter);
+  const closed = qs.filter((q) => !q.chapter && q.kind === "choice");
+  const open = qs.filter((q) => !q.chapter && q.kind !== "choice");
   const answered = qs.filter((q) => q.answer).length;
   const saved = (nq: Question) => setData((d) => d && { ...d, questions: d.questions.map((q) => (q.id === nq.id ? nq : q)) });
 
+  // Open the text at a chapter (end questions: keep the chapter already open), then bring the question back into
+  // view: below the pinned text on a narrow screen, at the top of its column on a wide one.
+  const openText = (seq: number | null, qid?: number) => {
+    setPane((cur) => seq ?? cur ?? 1);
+    if (qid === undefined) return;
+    window.setTimeout(() => {
+      const el = document.getElementById(`q${qid}`);
+      const paneEl = document.querySelector(".cq-pane") as HTMLElement | null;
+      if (!el) return;
+      const offset = window.matchMedia(WIDE).matches || !paneEl ? 12 : paneEl.offsetHeight + 12;
+      window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - offset, behavior: "smooth" });
+    }, 60);
+  };
+
+  let n = 0;
+  const card = (q: Question) => <QuestionCard key={q.id} q={q} n={++n} lang={lang} onSaved={saved} onText={openText} />;
+
   return (
-    <main className="questions" lang={lang}>
+    <main className={`questions${pane !== null ? " with-pane" : ""}`} lang={lang}>
       <header className="topbar">
         <button className="btn ghost small" onClick={() => go("/")}>{t.library}</button>
         <ThemeButton theme={theme} />
       </header>
       {error && <p className="error">{error}</p>}
-      {data && (
-        <>
-          <h1 className="page-title">{t.qTitle}</h1>
-          <p className="cq-book">{data.title}</p>
-          {qs.length === 0 ? <p className="muted">{t.qEmpty}</p> : (
-            <>
-              <p className="muted">{t.qIntro}</p>
-              <div className="cq-progress">
-                <div className="progress small-bar"><div className="bar" style={{ width: `${(100 * answered) / qs.length}%` }} /></div>
-                <span className="small">{answered === qs.length ? t.qAllDone : t.qProgress(answered, qs.length)}</span>
-              </div>
-            </>
-          )}
-          {byChapter.length > 0 && <h2 className="bag-title">{t.qByChapter}</h2>}
-          {byChapter.map((q, i) => <QuestionCard key={q.id} q={q} n={i + 1} lang={lang} articleId={articleId} onSaved={saved} />)}
-          {whole.length > 0 && <h2 className="bag-title">{t.qWhole}</h2>}
-          {whole.map((q, i) => <QuestionCard key={q.id} q={q} n={byChapter.length + i + 1} lang={lang} articleId={articleId} onSaved={saved} />)}
-        </>
-      )}
       {!data && !error && <p className="muted">…</p>}
+      {data && (
+        <div className="cq-layout">
+          {pane !== null && (
+            <TextPane articleId={articleId} seq={pane} chapters={data.chapters} lang={lang} onSeq={setPane}
+                      onClose={() => setPane(null)} />
+          )}
+          <div className="cq-list">
+            <h1 className="page-title">{t.qTitle}</h1>
+            <p className="cq-book">{data.title}</p>
+            {qs.length === 0 ? <p className="muted">{t.qEmpty}</p> : (
+              <>
+                <p className="muted">{t.qIntro}</p>
+                <div className="cq-progress">
+                  <div className="progress small-bar"><div className="bar" style={{ width: `${(100 * answered) / qs.length}%` }} /></div>
+                  <span className="small">{answered === qs.length ? t.qAllDone : t.qProgress(answered, qs.length)}</span>
+                </div>
+                {pane === null && <button className="btn ghost small" onClick={() => openText(null)}>{t.qShowText}</button>}
+              </>
+            )}
+            {byChapter.length > 0 && <h2 className="bag-title">{t.qByChapter}</h2>}
+            {byChapter.map(card)}
+            {closed.length > 0 && <h2 className="bag-title">{t.qClosed}</h2>}
+            {closed.length > 0 && <p className="small muted">{t.qClosedNote}</p>}
+            {closed.map(card)}
+            {open.length > 0 && <h2 className="bag-title">{byChapter.length || closed.length ? t.qOpen : t.qWhole}</h2>}
+            {open.map(card)}
+          </div>
+        </div>
+      )}
     </main>
   );
 }

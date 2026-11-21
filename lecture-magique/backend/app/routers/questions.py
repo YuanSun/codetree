@@ -4,7 +4,11 @@ the child's written answers, and the parents' view of them.
 A child sees a question's model answer and rubric only after she has saved an answer to it.
 Every save is a new `answer` row (her history stays); the latest one is the current answer.
 A question whose rubric says {"retired": true} was replaced in a newer pack but has answers, so it was kept:
-it no longer appears in the questions page, only in the parents' list of answers."""
+it no longer appears in the questions page, only in the parents' list of answers.
+
+Closed questions (kind "choice": multiple choice or vrai/faux) keep their options in rubric.choices and the right
+one's index in rubric.correct. The options are sent with the question, the right answer only after she has
+answered. She gets one try: it is marked at once (graded_by "auto") and never goes to the Claude export."""
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy import Connection, text
@@ -24,7 +28,14 @@ def points_of(rubric) -> float:
 
 def _key(r) -> dict:
     rub = r.rubric or {}
-    return {"model_answer": r.model_answer, "must_answer": rub.get("must_answer"), "avoid": rub.get("avoid")}
+    key = {"model_answer": r.model_answer, "must_answer": rub.get("must_answer"), "avoid": rub.get("avoid")}
+    if r.kind == "choice":
+        key["correct"] = rub["choices"][rub["correct"]]
+    return key
+
+
+def _choices(r) -> list[str] | None:
+    return (r.rubric or {}).get("choices") if r.kind == "choice" else None
 
 
 @router.get("/articles/{article_id}/questions")
@@ -42,10 +53,13 @@ def list_questions(article_id: int, user: User = Depends(current_user), conn: Co
                            ORDER BY submitted_at DESC, id DESC LIMIT 1) g ON true
         WHERE q.article_id = :a AND {NOT_RETIRED}
         ORDER BY c.seq IS NULL, c.seq, q.seq"""), {"a": article_id, "u": user.id}).all()
+    chapters = conn.execute(text("SELECT seq, title FROM lecture.chapter WHERE article_id = :a ORDER BY seq"),
+                            {"a": article_id}).all()
     return {
         "article": {"id": art.id, "title": art.title, "lang": art.lang},
+        "chapters": [{"seq": c.seq, "title": c.title} for c in chapters],
         "questions": [{
-            "id": r.id, "kind": r.kind, "prompt": r.prompt,
+            "id": r.id, "kind": r.kind, "prompt": r.prompt, "choices": _choices(r),
             "chapter": None if r.chapter_seq is None else {"seq": r.chapter_seq, "title": r.chapter_title},
             "skill": (r.rubric or {}).get("skill"), "points": (r.rubric or {}).get("points"),
             "answer": None if r.body is None else {"body": r.body, "submitted_at": r.submitted_at.isoformat()},
@@ -63,7 +77,7 @@ class AnswerIn(BaseModel):
 
 @router.post("/questions/{question_id}/answer")
 def save_answer(question_id: int, a: AnswerIn, user: User = Depends(current_user), conn: Connection = Depends(get_conn)):
-    q = conn.execute(text(f"SELECT q.id, q.article_id, q.model_answer, q.rubric FROM lecture.question q "
+    q = conn.execute(text(f"SELECT q.id, q.kind, q.article_id, q.model_answer, q.rubric FROM lecture.question q "
                           f"WHERE q.id = :q AND {NOT_RETIRED}"), {"q": question_id}).first()
     if not q:
         raise HTTPException(404, "Question introuvable")
@@ -71,9 +85,24 @@ def save_answer(question_id: int, a: AnswerIn, user: User = Depends(current_user
     body = a.body.strip()
     if not body:
         raise HTTPException(422, "Réponse vide")
-    at = conn.execute(text("""INSERT INTO lecture.answer (user_id, question_id, body) VALUES (:u, :q, :b)
-        RETURNING submitted_at"""), {"u": user.id, "q": question_id, "b": body}).scalar()
-    return {"answer": {"body": body, "submitted_at": at.isoformat()}, "key": _key(q)}
+    if q.kind != "choice":
+        at = conn.execute(text("""INSERT INTO lecture.answer (user_id, question_id, body) VALUES (:u, :q, :b)
+            RETURNING submitted_at"""), {"u": user.id, "q": question_id, "b": body}).scalar()
+        return {"answer": {"body": body, "submitted_at": at.isoformat()}, "key": _key(q), "grade": None}
+    # closed question: one try, marked now
+    choices = q.rubric["choices"]
+    if body not in choices:
+        raise HTTPException(422, "Choisis une des réponses proposées")
+    if conn.execute(text("SELECT 1 FROM lecture.answer WHERE question_id = :q AND user_id = :u"),
+                    {"q": question_id, "u": user.id}).first():
+        raise HTTPException(409, "Tu as déjà répondu à cette question")
+    pts = points_of(q.rubric)
+    score = pts if choices.index(body) == q.rubric["correct"] else 0.0
+    at = conn.execute(text("""INSERT INTO lecture.answer (user_id, question_id, body, score, graded_by)
+        VALUES (:u, :q, :b, :s, 'auto') RETURNING submitted_at"""),
+                      {"u": user.id, "q": question_id, "b": body, "s": score}).scalar()
+    return {"answer": {"body": body, "submitted_at": at.isoformat()}, "key": _key(q),
+            "grade": {"score": score, "points": pts, "feedback": None, "for_latest": True}}
 
 
 @router.get("/parent/children/{child_id}/answers")
@@ -98,7 +127,7 @@ def child_answers(child_id: int, user: User = Depends(require_parent), conn: Con
         ORDER BY submitted_at DESC"""), {"k": child_id}).all()
     return [{
         "question_id": r.question_id, "article": {"id": r.article_id, "title": r.article_title, "lang": r.lang},
-        "chapter_seq": r.chapter_seq, "kind": r.kind, "prompt": r.prompt,
+        "chapter_seq": r.chapter_seq, "kind": r.kind, "prompt": r.prompt, "choices": _choices(r),
         "skill": (r.rubric or {}).get("skill"), "points": (r.rubric or {}).get("points"),
         "answer_id": r.answer_id, "body": r.body, "submitted_at": r.submitted_at.isoformat(), "versions": r.versions,
         "grade": None if r.score is None else {"score": float(r.score), "points": points_of(r.rubric),
@@ -152,7 +181,7 @@ def grading_export(child_id: int, regrade: bool = False, user: User = Depends(re
           JOIN lecture.question q ON q.id = a.question_id
           JOIN lecture.article art ON art.id = q.article_id
           LEFT JOIN lecture.chapter c ON c.id = q.chapter_id
-          WHERE a.user_id = :k AND {NOT_RETIRED}
+          WHERE a.user_id = :k AND {NOT_RETIRED} AND q.kind <> 'choice'
           ORDER BY a.question_id, a.submitted_at DESC, a.id DESC) x
         WHERE :regrade OR score IS NULL
         ORDER BY article_id, qseq"""), {"k": child_id, "regrade": regrade}).all()

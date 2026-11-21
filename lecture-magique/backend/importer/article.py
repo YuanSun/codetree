@@ -210,6 +210,7 @@ def import_pack(conn: Connection, pack: dict, lex: Lexicon | None = None, base: 
     if lex is None or lex.lang != lang:
         lex = Lexicon(conn, lang)
     slug = pack["slug"]
+    check_questions(pack)
     existing = conn.execute(text("SELECT id FROM lecture.article WHERE slug = :s"), {"s": slug}).scalar()
     if existing:
         used = conn.execute(text("""SELECT count(*) FROM lecture.lookup_event e JOIN lecture.token t ON t.id = e.token_id
@@ -341,11 +342,27 @@ def replace_images(conn: Connection, pack: dict, base: Path | None) -> int:
     return images.store(conn, art, pack, base)
 
 
+def check_questions(pack: dict) -> None:
+    """Closed questions need their options and the index of the right one."""
+    qs = [ch["question"] for ch in pack["chapters"] if ch.get("question")] + pack.get("questions", [])
+    for q in qs:
+        if q.get("kind") != "choice":
+            continue
+        rub = q.get("rubric") or {}
+        ch, ok = rub.get("choices"), rub.get("correct")
+        if (not isinstance(ch, list) or len(ch) < 2 or len(set(ch)) != len(ch)
+                or not all(isinstance(c, str) and c.strip() for c in ch)
+                or not isinstance(ok, int) or not 0 <= ok < len(ch)):
+            raise ImportRefused(f"{pack['slug']}: choice question {q['prompt'][:50]!r} needs rubric.choices "
+                                f"(2+ different options) and rubric.correct (the right one's index)")
+
+
 def replace_questions(conn: Connection, pack: dict) -> dict:
     """Questions only, for an article already imported (and maybe read and answered): its chapters stay.
     A question is the same one when its chapter and prompt are unchanged: it is updated in place (answers stay
     attached). Old questions nobody answered are deleted; answered ones are kept but retired (hidden from the
     questions page, still listed with their answers for parents)."""
+    check_questions(pack)
     art = conn.execute(text("SELECT id FROM lecture.article WHERE slug = :s"), {"s": pack["slug"]}).scalar()
     if not art:
         raise ImportRefused(f"no article with slug {pack['slug']!r}: import it first")

@@ -39,6 +39,8 @@ export default function Shelf({ me, onLogout, theme }: {
   const newest = shown?.[0]?.week_of;
   const en = lang === "en";
   const sfx = en ? "/en" : "";
+  // parents see every book's questions (to preview them); a child sees them once she has started the book
+  const parent = me.role === "parent" || me.role === "admin";
 
   return (
     <main className="shelf">
@@ -106,7 +108,7 @@ export default function Shelf({ me, onLogout, theme }: {
               </div>
               <Ring done={done} total={a.chapter_count} />
             </button>
-            {a.questions && a.questions.total > 0 && (a.progress || a.questions.answered > 0) && (
+            {a.questions && a.questions.total > 0 && (parent || a.progress || a.questions.answered > 0) && (
               <button className={`chip q-chip${a.questions.answered === a.questions.total ? " on" : ""}`}
                       onClick={() => go(`/questions/${a.id}`)}>
                 {strings(a.lang).qShelf(a.questions.answered, a.questions.total)}
