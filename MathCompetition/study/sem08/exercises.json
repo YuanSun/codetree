@@ -1,0 +1,1215 @@
+{
+  "eyebrow": "Sem 8 · Nombres relatifs & tout",
+  "title": "Class Sheet — Sem 8",
+  "intro": "Every exercise of the Sem-8 sheet: **negative numbers** (+ − × ÷), **powers** with brackets, comparing, **dates before Christ**, and the grammar of **tout** (déterminant, adverbe, pronom).",
+  "groups": [
+    {
+      "id": "rel",
+      "label": "Nombres relatifs",
+      "emoji": "➕",
+      "color": "#3b82f6"
+    },
+    {
+      "id": "pow",
+      "label": "Puissances",
+      "emoji": "🔺",
+      "color": "#8b5cf6"
+    },
+    {
+      "id": "time",
+      "label": "Chronologie",
+      "emoji": "🏛️",
+      "color": "#f59e0b"
+    },
+    {
+      "id": "tout1",
+      "label": "Tout (déterminant)",
+      "emoji": "🅰️",
+      "color": "#10b981"
+    },
+    {
+      "id": "tout2",
+      "label": "Tout (adverbe)",
+      "emoji": "🅱️",
+      "color": "#ec6f9a"
+    },
+    {
+      "id": "tout3",
+      "label": "Tout (pronom)",
+      "emoji": "🅾️",
+      "color": "#64748b"
+    }
+  ],
+  "questions": [
+    {
+      "id": "s8_01",
+      "skill": "rel",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-8 · Exercice 1 · 1",
+      "text": "**1)  4 − 7 =**",
+      "choices": [
+        "3",
+        "−3",
+        "11",
+        "−11"
+      ],
+      "answer": 1,
+      "hints": [
+        "Start at 4 on the number line and go 7 steps down (left).",
+        "4 − 4 = 0, then 3 more steps down.",
+        "You end below zero."
+      ],
+      "traps": {
+        "0": "The distance is 3, but you cross zero: the result is negative.",
+        "2": "4 + 7 adds. This is a subtraction.",
+        "3": "−11 would be −4 − 7. Here you start at +4."
+      },
+      "solution": [
+        "Start at 4, move 7 to the left: 4 → 0 takes 4 steps, 3 more steps go below zero.",
+        "4 − 7 = **−3**"
+      ],
+      "idea": "Subtracting a bigger number goes below zero."
+    },
+    {
+      "id": "s8_02",
+      "skill": "rel",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-8 · Exercice 1 · 2",
+      "text": "**2)  3 − 5 =**",
+      "choices": [
+        "2",
+        "8",
+        "−2",
+        "−8"
+      ],
+      "answer": 2,
+      "hints": [
+        "3 steps down reach 0, 2 more go below.",
+        "Smaller minus bigger → negative.",
+        "5 − 3 = 2, with a minus sign."
+      ],
+      "traps": {
+        "0": "Right size, wrong sign: you went past zero."
+      },
+      "solution": [
+        "3 − 5: bigger number is being subtracted, so the answer is negative.",
+        "5 − 3 = 2 → **−2**"
+      ],
+      "idea": "Smaller − bigger = negative."
+    },
+    {
+      "id": "s8_03",
+      "skill": "rel",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-8 · Exercice 1 · 3",
+      "text": "**3)  −2 + 4 =**",
+      "choices": [
+        "−6",
+        "−2",
+        "6",
+        "2"
+      ],
+      "answer": 3,
+      "hints": [
+        "Start at −2 and go 4 steps up (right).",
+        "2 steps reach zero, 2 more steps.",
+        "Positive wins: 4 > 2."
+      ],
+      "traps": {
+        "0": "−6 would be −2 − 4. Here you ADD 4.",
+        "1": "Adding 4 moves you right of zero: −2 + 4 is positive (4 is bigger than 2)."
+      },
+      "solution": [
+        "Start at −2, move 4 to the right: 2 steps to 0, 2 more steps → **2**."
+      ],
+      "idea": "Adding a positive moves right."
+    },
+    {
+      "id": "s8_04",
+      "skill": "rel",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-8 · Exercice 1 · 4",
+      "text": "**4)  −9 − 15 =**",
+      "choices": [
+        "−6",
+        "−24",
+        "6",
+        "24"
+      ],
+      "answer": 1,
+      "hints": [
+        "Start below zero and keep going down.",
+        "Same sign: add 9 + 15, keep the minus.",
+        "9 + 15 = 24"
+      ],
+      "traps": {
+        "0": "You subtracted 15 − 9. Both move you down, so add them.",
+        "3": "You are below zero: the answer is negative."
+      },
+      "solution": [
+        "Both numbers push you DOWN: −9, then 15 more steps down.",
+        "9 + 15 = 24 → **−24**"
+      ],
+      "idea": "Same sign: add the sizes, keep the sign."
+    },
+    {
+      "id": "s8_05",
+      "skill": "rel",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-8 · Exercice 1 · 5",
+      "text": "**5)  2 × −3 =**",
+      "choices": [
+        "6",
+        "−5",
+        "−6",
+        "−1"
+      ],
+      "answer": 2,
+      "hints": [
+        "Positive × negative: what sign?",
+        "Different signs → negative.",
+        "2 × 3 = 6, then the sign."
+      ],
+      "traps": {
+        "0": "Different signs give a NEGATIVE product.",
+        "1": "You added (2 + −3 = −1…). This is a multiplication."
+      },
+      "solution": [
+        "2 × 3 = 6",
+        "The signs are different (+ and −) → negative → **−6**"
+      ],
+      "idea": "Different signs → negative."
+    },
+    {
+      "id": "s8_06",
+      "skill": "rel",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-8 · Exercice 1 · 6",
+      "text": "**6)  −35 ÷ 7 =**",
+      "choices": [
+        "−28",
+        "5",
+        "−5",
+        "42"
+      ],
+      "answer": 2,
+      "hints": [
+        "Divide 35 by 7 first, then think about the sign.",
+        "Different signs → negative.",
+        "35 ÷ 7 = 5"
+      ],
+      "traps": {
+        "0": "−35 + 7 would give −28. Here you divide.",
+        "1": "Different signs give a negative result."
+      },
+      "solution": [
+        "35 ÷ 7 = 5",
+        "Different signs → negative → **−5**"
+      ],
+      "idea": "Same sign rules for × and ÷."
+    },
+    {
+      "id": "s8_07",
+      "skill": "rel",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-8 · Exercice 1 · 7",
+      "text": "**7)  −77 − 88 − 65 + −22 =**",
+      "choices": [
+        "−208",
+        "−252",
+        "−230",
+        "252"
+      ],
+      "answer": 1,
+      "hints": [
+        "Work from left to right, one step at a time.",
+        "−77 − 88 = −165, then −65 …",
+        "+ −22 means the same as − 22."
+      ],
+      "traps": {
+        "0": "You treated + −22 as + 22. Adding a negative is the same as subtracting.",
+        "2": "You stopped before the last number."
+      },
+      "solution": [
+        "−77 − 88 = −165",
+        "−165 − 65 = −230",
+        "−230 + (−22) = −230 − 22 = **−252**"
+      ],
+      "idea": "+ (−a) = − a."
+    },
+    {
+      "id": "s8_08",
+      "skill": "rel",
+      "difficulty": "hard",
+      "source": "Hu Education 190-Grace · Sem-8 · Exercice 1 · 8",
+      "text": "**8)  −12 × −8 + −15 − −10 =**",
+      "choices": [
+        "91",
+        "71",
+        "101",
+        "−109"
+      ],
+      "answer": 0,
+      "hints": [
+        "Multiplication first: −12 × −8.",
+        "−12 × −8 = 96. Then 96 + (−15) − (−10).",
+        "− − makes +."
+      ],
+      "traps": {
+        "1": "You subtracted 10. But 81 − (−10) = 81 + 10: minus a negative is a plus.",
+        "2": "+ −15 is − 15, not + 15."
+      },
+      "solution": [
+        "−12 × −8 = 96 (two negatives → positive)",
+        "96 + (−15) = 96 − 15 = 81",
+        "81 − (−10) = 81 + 10 = **91**"
+      ],
+      "idea": "Multiply first. Minus a negative = plus."
+    },
+    {
+      "id": "s8_09",
+      "skill": "pow",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-8 · Exercice 2 · 1",
+      "text": "**1)  (−2)⁵ =**",
+      "choices": [
+        "32",
+        "−32",
+        "−10",
+        "10"
+      ],
+      "answer": 1,
+      "hints": [
+        "(−2)⁵ = −2 × −2 × −2 × −2 × −2.",
+        "Count the negative factors: 5 (odd) → negative.",
+        "2⁵ = 32"
+      ],
+      "traps": {
+        "0": "Five negative factors: an ODD number, so the result is negative.",
+        "2": "−2 × 5 = −10 is multiplication. A power means repeated multiplication: 2 × 2 × 2 × 2 × 2."
+      },
+      "solution": [
+        "2⁵ = 32",
+        "5 negative factors (odd) → negative → **−32**"
+      ],
+      "idea": "Odd number of negatives → negative."
+    },
+    {
+      "id": "s8_10",
+      "skill": "pow",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-8 · Exercice 2 · 2",
+      "text": "**2)  −2⁵ =**",
+      "choices": [
+        "−32",
+        "32",
+        "−10",
+        "−7"
+      ],
+      "answer": 0,
+      "hints": [
+        "No brackets: only the 2 is raised to the power 5.",
+        "2⁵ = 32, then the minus sign.",
+        "It is −(2⁵)."
+      ],
+      "traps": {
+        "1": "The minus stays: −(2⁵) = −32.",
+        "2": "A power is repeated multiplication, not 2 × 5."
+      },
+      "solution": [
+        "No brackets → the minus is NOT part of the base.",
+        "−2⁵ = −(2 × 2 × 2 × 2 × 2) = **−32**",
+        "Same answer as (−2)⁵ here, because 5 is odd."
+      ],
+      "idea": "No brackets: the power acts on the number only."
+    },
+    {
+      "id": "s8_11",
+      "skill": "pow",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-8 · Exercice 2 · 3",
+      "text": "**3)  −(−33) =**",
+      "choices": [
+        "−33",
+        "33",
+        "0",
+        "−66"
+      ],
+      "answer": 1,
+      "hints": [
+        "A minus in front of a negative number flips it.",
+        "The opposite of −33 is …",
+        "minus minus = plus"
+      ],
+      "traps": {
+        "0": "Two minus signs cancel.",
+        "2": "That would be −33 + 33."
+      },
+      "solution": [
+        "−(−33) = +33 = **33**"
+      ],
+      "idea": "Minus a negative = plus."
+    },
+    {
+      "id": "s8_12",
+      "skill": "pow",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-8 · Exercice 2 · 4",
+      "text": "**4)  −(−(−12)) =**",
+      "choices": [
+        "12",
+        "0",
+        "−12",
+        "−24"
+      ],
+      "answer": 2,
+      "hints": [
+        "Work from the inside out.",
+        "−(−12) = 12. Then −(12).",
+        "Three minus signs: odd number → negative."
+      ],
+      "traps": {
+        "0": "Count the minus signs: three (odd) → negative."
+      },
+      "solution": [
+        "Inside: −(−12) = 12",
+        "Outside: −(12) = **−12**"
+      ],
+      "idea": "Odd number of minus signs → negative."
+    },
+    {
+      "id": "s8_13",
+      "skill": "pow",
+      "difficulty": "hard",
+      "source": "Hu Education 190-Grace · Sem-8 · Exercice 2 · 5",
+      "text": "**5)  (−15 + −2) × −3 + (−2)⁵ =**",
+      "choices": [
+        "83",
+        "−13",
+        "19",
+        "−83"
+      ],
+      "answer": 2,
+      "hints": [
+        "Brackets first: −15 + −2 = −17.",
+        "−17 × −3 = 51 and (−2)⁵ = −32.",
+        "51 + (−32)"
+      ],
+      "traps": {
+        "0": "(−2)⁵ is negative (5 negatives). 51 + 32 = 83 treats it as positive.",
+        "1": "Check the multiplication: −17 × −3 is positive (51), not negative."
+      },
+      "solution": [
+        "Brackets: −15 + −2 = −17",
+        "Multiply: −17 × −3 = 51",
+        "Power: (−2)⁵ = −32",
+        "51 + (−32) = **19**"
+      ],
+      "idea": "Order: brackets, powers, × ÷, then + −."
+    },
+    {
+      "id": "s8_14",
+      "skill": "pow",
+      "difficulty": "hard",
+      "source": "Hu Education 190-Grace · Sem-8 · Exercice 2 · 6",
+      "text": "**6)  −(−2)⁴ + −3² + (−5)² =**",
+      "choices": [
+        "18",
+        "0",
+        "−18",
+        "34"
+      ],
+      "answer": 1,
+      "hints": [
+        "Do each power first. (−2)⁴ has brackets: the base is −2.",
+        "(−2)⁴ = 16, so −(−2)⁴ = −16. And −3² = −9 (no brackets). And (−5)² = 25.",
+        "−16 − 9 + 25"
+      ],
+      "traps": {
+        "0": "−3² is −9, not +9: with no brackets only the 3 is squared, then the minus is applied.",
+        "2": "Check (−5)²: with brackets it is +25."
+      },
+      "solution": [
+        "(−2)⁴ = 16 → −(−2)⁴ = −16",
+        "−3² = −(3 × 3) = −9 (no brackets: only the 3 is squared)",
+        "(−5)² = 25",
+        "−16 + (−9) + 25 = **0**"
+      ],
+      "idea": "Brackets decide what is raised to the power."
+    },
+    {
+      "id": "s8_15",
+      "skill": "pow",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-8 · Exercice 3 a",
+      "text": "**Exercice 3 a)**  Inscrivez le signe <, = ou >  :  (−4)³  ___  −4³",
+      "choices": [
+        "<",
+        "=",
+        ">"
+      ],
+      "answer": 1,
+      "hints": [
+        "Work out each side separately.",
+        "(−4)³ = −64 and −4³ = −64.",
+        "Compare the two numbers on the number line."
+      ],
+      "traps": {
+        "0": "Compute each side: (−4)³ = −64 and −4³ = −(4 × 4 × 4) = −64.",
+        "2": "Compute each side: (−4)³ = −64 and −4³ = −(4 × 4 × 4) = −64."
+      },
+      "solution": [
+        "(−4)³ = −64",
+        "−4³ = −64",
+        "−64 = −64 → **=**"
+      ],
+      "idea": "Compute both sides, then compare."
+    },
+    {
+      "id": "s8_16",
+      "skill": "pow",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-8 · Exercice 3 b",
+      "text": "**Exercice 3 b)**  Inscrivez le signe <, = ou >  :  −7²  ___  (−7)²",
+      "choices": [
+        "<",
+        "=",
+        ">"
+      ],
+      "answer": 0,
+      "hints": [
+        "Work out each side separately.",
+        "−7² = −49 and (−7)² = 49.",
+        "Compare the two numbers on the number line."
+      ],
+      "traps": {
+        "1": "Compute each side: −7² = −49 (no brackets) and (−7)² = +49.",
+        "2": "Compute each side: −7² = −49 (no brackets) and (−7)² = +49."
+      },
+      "solution": [
+        "−7² = −49",
+        "(−7)² = 49",
+        "−49 < 49 → **<**"
+      ],
+      "idea": "Compute both sides, then compare."
+    },
+    {
+      "id": "s8_17",
+      "skill": "pow",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-8 · Exercice 3 c",
+      "text": "**Exercice 3 c)**  Inscrivez le signe <, = ou >  :  −(−3)³  ___  −3³",
+      "choices": [
+        "<",
+        "=",
+        ">"
+      ],
+      "answer": 2,
+      "hints": [
+        "Work out each side separately.",
+        "−(−3)³ = 27 and −3³ = −27.",
+        "Compare the two numbers on the number line."
+      ],
+      "traps": {
+        "0": "Compute each side: (−3)³ = −27 so −(−3)³ = +27, and −3³ = −27.",
+        "1": "Compute each side: (−3)³ = −27 so −(−3)³ = +27, and −3³ = −27."
+      },
+      "solution": [
+        "−(−3)³ = 27",
+        "−3³ = −27",
+        "27 > −27 → **>**"
+      ],
+      "idea": "Compute both sides, then compare."
+    },
+    {
+      "id": "s8_18",
+      "skill": "pow",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-8 · Exercice 3 d",
+      "text": "**Exercice 3 d)**  Inscrivez le signe <, = ou >  :  (−8)⁰  ___  −8⁰",
+      "choices": [
+        "<",
+        "=",
+        ">"
+      ],
+      "answer": 2,
+      "hints": [
+        "Work out each side separately.",
+        "(−8)⁰ = 1 and −8⁰ = −1.",
+        "Compare the two numbers on the number line."
+      ],
+      "traps": {
+        "0": "Anything (not zero) to the power 0 is 1: (−8)⁰ = 1, but −8⁰ = −(8⁰) = −1.",
+        "1": "Anything (not zero) to the power 0 is 1: (−8)⁰ = 1, but −8⁰ = −(8⁰) = −1."
+      },
+      "solution": [
+        "(−8)⁰ = 1",
+        "−8⁰ = −1",
+        "1 > −1 → **>**"
+      ],
+      "idea": "Compute both sides, then compare."
+    },
+    {
+      "id": "s8_19",
+      "skill": "time",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-8 · Exercice 4 · 1",
+      "text": "**Exercice 4 · 1)** Le chef gaulois Vercingétorix est né en **−72** (72 avant Jésus-Christ) et il vécut jusqu’en **−46**. Combien d’années a-t-il vécu ?",
+      "choices": [
+        "118",
+        "26",
+        "−26",
+        "72"
+      ],
+      "answer": 1,
+      "hints": [
+        "How long = end year − birth year.",
+        "−46 − (−72)",
+        "Minus a negative → plus: −46 + 72."
+      ],
+      "traps": {
+        "0": "72 + 46 adds the two years. But both are BC: the years get closer to zero, so you subtract: 72 − 46.",
+        "2": "A duration is never negative: end − start = −46 − (−72) = +26.",
+        "3": "72 is the birth year, not the number of years lived."
+      },
+      "solution": [
+        "Years lived = end − start = −46 − (−72)",
+        "= −46 + 72 = **26** years",
+        "On the timeline: from −72 up to −46 is 26 steps."
+      ],
+      "idea": "Duration = end − start (the minus a negative becomes a plus)."
+    },
+    {
+      "id": "s8_20",
+      "skill": "time",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-8 · Exercice 4 · 2",
+      "text": "**Exercice 4 · 2)** Le géomètre Euclide est né en **−323** et est décédé en **−283**. Quel âge avait-il à sa mort ?",
+      "choices": [
+        "606",
+        "−40",
+        "40",
+        "323"
+      ],
+      "answer": 2,
+      "hints": [
+        "Age at death = death year − birth year.",
+        "−283 − (−323)",
+        "−283 + 323"
+      ],
+      "traps": {
+        "0": "323 + 283 adds. Subtract the earlier year from the later one.",
+        "1": "An age is positive: −283 − (−323) = +40.",
+        "3": "323 is the birth year, not his age."
+      },
+      "solution": [
+        "Age = −283 − (−323)",
+        "= −283 + 323 = **40** years"
+      ],
+      "idea": "Duration = end − start."
+    },
+    {
+      "id": "s8_21",
+      "skill": "tout1",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-8 · Tout Ex 1 · 1.",
+      "text": "**Ex 1 · 1.**  Elle prend des cours de danse ………… les jours.",
+      "choices": [
+        "tout",
+        "tous",
+        "toute",
+        "toutes"
+      ],
+      "answer": 1,
+      "hints": [
+        "Look at the NOUN after the blank: *tout* is a déterminant and agrees with it in gender and number.",
+        "*jours* is masculine plural.",
+        "tous les jours"
+      ],
+      "traps": {
+        "3": "*jour* is masculine, so not *toutes*.",
+        "0": "*jours* is plural: *tout* is for singular."
+      },
+      "solution": [
+        "*jours* = masculine plural → **tous** les jours."
+      ],
+      "idea": "Tout: determiner → agrees with the noun · pronoun → agrees with what it stands for · adverb → only before a feminine adjective starting with a consonant / h aspiré."
+    },
+    {
+      "id": "s8_22",
+      "skill": "tout1",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-8 · Tout Ex 1 · 2.",
+      "text": "**Ex 1 · 2.**  Ils jouent au tennis ………… les semaines.",
+      "choices": [
+        "tout",
+        "tous",
+        "toute",
+        "toutes"
+      ],
+      "answer": 3,
+      "hints": [
+        "Look at the NOUN after the blank: *tout* is a déterminant and agrees with it in gender and number.",
+        "*semaines* is feminine plural.",
+        "toutes les semaines"
+      ],
+      "traps": {
+        "1": "*semaine* is feminine."
+      },
+      "solution": [
+        "*semaines* = feminine plural → **toutes** les semaines."
+      ],
+      "idea": "Tout: determiner → agrees with the noun · pronoun → agrees with what it stands for · adverb → only before a feminine adjective starting with a consonant / h aspiré."
+    },
+    {
+      "id": "s8_23",
+      "skill": "tout1",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-8 · Tout Ex 1 · 3.",
+      "text": "**Ex 1 · 3.**  ………… la classe a cours de français aujourd’hui ?",
+      "choices": [
+        "tout",
+        "tous",
+        "toute",
+        "toutes"
+      ],
+      "answer": 2,
+      "hints": [
+        "Look at the NOUN after the blank: *tout* is a déterminant and agrees with it in gender and number.",
+        "*classe* is feminine singular.",
+        "toute la classe"
+      ],
+      "traps": {
+        "0": "*classe* is feminine: *toute*.",
+        "3": "*la classe* is singular."
+      },
+      "solution": [
+        "*classe* = feminine singular → **toute** la classe."
+      ],
+      "idea": "Tout: determiner → agrees with the noun · pronoun → agrees with what it stands for · adverb → only before a feminine adjective starting with a consonant / h aspiré."
+    },
+    {
+      "id": "s8_24",
+      "skill": "tout1",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-8 · Tout Ex 1 · 4.",
+      "text": "**Ex 1 · 4.**  Elle est bavarde : elle parle ………… le temps.",
+      "choices": [
+        "tout",
+        "tous",
+        "toute",
+        "toutes"
+      ],
+      "answer": 0,
+      "hints": [
+        "Look at the NOUN after the blank: *tout* is a déterminant and agrees with it in gender and number.",
+        "*temps* is masculine singular.",
+        "tout le temps"
+      ],
+      "traps": {
+        "1": "*le temps* is singular."
+      },
+      "solution": [
+        "*le temps* = masculine singular → **tout** le temps."
+      ],
+      "idea": "Tout: determiner → agrees with the noun · pronoun → agrees with what it stands for · adverb → only before a feminine adjective starting with a consonant / h aspiré."
+    },
+    {
+      "id": "s8_25",
+      "skill": "tout1",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-8 · Tout Ex 1 · 5.",
+      "text": "**Ex 1 · 5.**  Dans cette classe, ………… le monde doit parler en anglais.",
+      "choices": [
+        "tout",
+        "tous",
+        "toute",
+        "toutes"
+      ],
+      "answer": 0,
+      "hints": [
+        "Look at the NOUN after the blank: *tout* is a déterminant and agrees with it in gender and number.",
+        "*le monde* is masculine singular (even though it means many people).",
+        "tout le monde"
+      ],
+      "traps": {
+        "1": "*tout le monde* is a fixed expression with *monde* singular."
+      },
+      "solution": [
+        "*le monde* = masculine singular → **tout** le monde."
+      ],
+      "idea": "Tout: determiner → agrees with the noun · pronoun → agrees with what it stands for · adverb → only before a feminine adjective starting with a consonant / h aspiré."
+    },
+    {
+      "id": "s8_26",
+      "skill": "tout1",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-8 · Tout Ex 1 · 6.",
+      "text": "**Ex 1 · 6.**  Nous travaillons ………… la journée.",
+      "choices": [
+        "tout",
+        "tous",
+        "toute",
+        "toutes"
+      ],
+      "answer": 2,
+      "hints": [
+        "Look at the NOUN after the blank: *tout* is a déterminant and agrees with it in gender and number.",
+        "*journée* is feminine singular.",
+        "toute la journée"
+      ],
+      "traps": {
+        "0": "*journée* is feminine."
+      },
+      "solution": [
+        "*la journée* = feminine singular → **toute** la journée."
+      ],
+      "idea": "Tout: determiner → agrees with the noun · pronoun → agrees with what it stands for · adverb → only before a feminine adjective starting with a consonant / h aspiré."
+    },
+    {
+      "id": "s8_27",
+      "skill": "tout1",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-8 · Tout Ex 1 · 7.",
+      "text": "**Ex 1 · 7.**  Vous allez faire ………… ces exercices à la maison.",
+      "choices": [
+        "tout",
+        "tous",
+        "toute",
+        "toutes"
+      ],
+      "answer": 1,
+      "hints": [
+        "Look at the NOUN after the blank: *tout* is a déterminant and agrees with it in gender and number.",
+        "*exercices* is masculine plural.",
+        "tous ces exercices"
+      ],
+      "traps": {
+        "3": "*exercice* is masculine."
+      },
+      "solution": [
+        "*exercices* = masculine plural → **tous** ces exercices."
+      ],
+      "idea": "Tout: determiner → agrees with the noun · pronoun → agrees with what it stands for · adverb → only before a feminine adjective starting with a consonant / h aspiré."
+    },
+    {
+      "id": "s8_28",
+      "skill": "tout1",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-8 · Tout Ex 1 · 8.",
+      "text": "**Ex 1 · 8.**  ………… les choses que tu apprends à l’école sont utiles.",
+      "choices": [
+        "tout",
+        "tous",
+        "toute",
+        "toutes"
+      ],
+      "answer": 3,
+      "hints": [
+        "Look at the NOUN after the blank: *tout* is a déterminant and agrees with it in gender and number.",
+        "*choses* is feminine plural.",
+        "toutes les choses"
+      ],
+      "traps": {
+        "1": "*chose* is feminine."
+      },
+      "solution": [
+        "*choses* = feminine plural → **toutes** les choses."
+      ],
+      "idea": "Tout: determiner → agrees with the noun · pronoun → agrees with what it stands for · adverb → only before a feminine adjective starting with a consonant / h aspiré."
+    },
+    {
+      "id": "s8_29",
+      "skill": "tout1",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-8 · Tout Ex 1 · 9.",
+      "text": "**Ex 1 · 9.**  Elle sait ………… ces leçons par cœur !",
+      "choices": [
+        "tout",
+        "tous",
+        "toute",
+        "toutes"
+      ],
+      "answer": 3,
+      "hints": [
+        "Look at the NOUN after the blank: *tout* is a déterminant and agrees with it in gender and number.",
+        "*leçons* is feminine plural.",
+        "toutes ces leçons"
+      ],
+      "traps": {
+        "1": "*leçon* is feminine."
+      },
+      "solution": [
+        "*leçons* = feminine plural → **toutes** ces leçons."
+      ],
+      "idea": "Tout: determiner → agrees with the noun · pronoun → agrees with what it stands for · adverb → only before a feminine adjective starting with a consonant / h aspiré."
+    },
+    {
+      "id": "s8_30",
+      "skill": "tout1",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-8 · Tout Ex 1 · 10.",
+      "text": "**Ex 1 · 10.**  Il faut finir ………… ce travail avant midi.",
+      "choices": [
+        "tout",
+        "tous",
+        "toute",
+        "toutes"
+      ],
+      "answer": 0,
+      "hints": [
+        "Look at the NOUN after the blank: *tout* is a déterminant and agrees with it in gender and number.",
+        "*travail* is masculine singular.",
+        "tout ce travail"
+      ],
+      "traps": {
+        "1": "*travail* is singular."
+      },
+      "solution": [
+        "*travail* = masculine singular → **tout** ce travail."
+      ],
+      "idea": "Tout: determiner → agrees with the noun · pronoun → agrees with what it stands for · adverb → only before a feminine adjective starting with a consonant / h aspiré."
+    },
+    {
+      "id": "s8_31",
+      "skill": "tout2",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-8 · Tout Ex 2 · 1.",
+      "text": "**Ex 2 · 1.**  Ils sont ………… émus !",
+      "choices": [
+        "tout",
+        "tous",
+        "toute",
+        "toutes"
+      ],
+      "answer": 0,
+      "hints": [
+        "Before an ADJECTIVE, *tout* is an adverb: invariable, except before a FEMININE adjective that starts with a consonne or an h aspiré — then it agrees (toute / toutes).",
+        "*émus* is masculine and starts with a vowel.",
+        "tout émus"
+      ],
+      "traps": {
+        "1": "An adverb before a masculine adjective is invariable, even if the subject is plural."
+      },
+      "solution": [
+        "*émus* is masculine (and starts with a vowel) → *tout* stays invariable: **tout** émus."
+      ],
+      "idea": "Tout: determiner → agrees with the noun · pronoun → agrees with what it stands for · adverb → only before a feminine adjective starting with a consonant / h aspiré."
+    },
+    {
+      "id": "s8_32",
+      "skill": "tout2",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-8 · Tout Ex 2 · 2.",
+      "text": "**Ex 2 · 2.**  Allez ………… droit et tournez à droite au premier feu rouge.",
+      "choices": [
+        "tout",
+        "tous",
+        "toute",
+        "toutes"
+      ],
+      "answer": 0,
+      "hints": [
+        "Before an ADJECTIVE, *tout* is an adverb: invariable, except before a FEMININE adjective that starts with a consonne or an h aspiré — then it agrees (toute / toutes).",
+        "*droit* is a masculine adjective used as an adverb.",
+        "tout droit"
+      ],
+      "traps": {
+        "2": "Nothing is feminine here."
+      },
+      "solution": [
+        "*droit* is masculine → invariable: **tout** droit."
+      ],
+      "idea": "Tout: determiner → agrees with the noun · pronoun → agrees with what it stands for · adverb → only before a feminine adjective starting with a consonant / h aspiré."
+    },
+    {
+      "id": "s8_33",
+      "skill": "tout2",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-8 · Tout Ex 2 · 3.",
+      "text": "**Ex 2 · 3.**  Sonia est ………… seule à la maison ce soir !",
+      "choices": [
+        "tout",
+        "tous",
+        "toute",
+        "toutes"
+      ],
+      "answer": 2,
+      "hints": [
+        "Before an ADJECTIVE, *tout* is an adverb: invariable, except before a FEMININE adjective that starts with a consonne or an h aspiré — then it agrees (toute / toutes).",
+        "*seule* is feminine and starts with the consonant s.",
+        "toute seule"
+      ],
+      "traps": {
+        "0": "The adjective is feminine and starts with a consonant: *tout* must agree.",
+        "3": "Sonia is one person: singular."
+      },
+      "solution": [
+        "*seule* is feminine and starts with a consonant → agrees: **toute** seule."
+      ],
+      "idea": "Tout: determiner → agrees with the noun · pronoun → agrees with what it stands for · adverb → only before a feminine adjective starting with a consonant / h aspiré."
+    },
+    {
+      "id": "s8_34",
+      "skill": "tout2",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-8 · Tout Ex 2 · 4.",
+      "text": "**Ex 2 · 4.**  Elles sont ………… contentes de venir !",
+      "choices": [
+        "tout",
+        "tous",
+        "toute",
+        "toutes"
+      ],
+      "answer": 3,
+      "hints": [
+        "Before an ADJECTIVE, *tout* is an adverb: invariable, except before a FEMININE adjective that starts with a consonne or an h aspiré — then it agrees (toute / toutes).",
+        "*contentes* is feminine plural and starts with a consonant.",
+        "toutes contentes"
+      ],
+      "traps": {
+        "0": "Feminine plural adjective with a consonant: *tout* agrees.",
+        "2": "The adjective is plural: *toutes*."
+      },
+      "solution": [
+        "*contentes* = feminine plural, consonant → agrees: **toutes** contentes."
+      ],
+      "idea": "Tout: determiner → agrees with the noun · pronoun → agrees with what it stands for · adverb → only before a feminine adjective starting with a consonant / h aspiré."
+    },
+    {
+      "id": "s8_35",
+      "skill": "tout2",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-8 · Tout Ex 2 · 5.",
+      "text": "**Ex 2 · 5.**  Son enfant est ………… mignon !",
+      "choices": [
+        "tout",
+        "tous",
+        "toute",
+        "toutes"
+      ],
+      "answer": 0,
+      "hints": [
+        "Before an ADJECTIVE, *tout* is an adverb: invariable, except before a FEMININE adjective that starts with a consonne or an h aspiré — then it agrees (toute / toutes).",
+        "*mignon* is masculine.",
+        "tout mignon"
+      ],
+      "traps": {
+        "2": "The adjective is masculine here."
+      },
+      "solution": [
+        "*mignon* is masculine → invariable: **tout** mignon."
+      ],
+      "idea": "Tout: determiner → agrees with the noun · pronoun → agrees with what it stands for · adverb → only before a feminine adjective starting with a consonant / h aspiré."
+    },
+    {
+      "id": "s8_36",
+      "skill": "tout2",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-8 · Tout Ex 2 · 6.",
+      "text": "**Ex 2 · 6.**  Elle a les yeux ………… bleus.",
+      "choices": [
+        "tout",
+        "tous",
+        "toute",
+        "toutes"
+      ],
+      "answer": 0,
+      "hints": [
+        "Before an ADJECTIVE, *tout* is an adverb: invariable, except before a FEMININE adjective that starts with a consonne or an h aspiré — then it agrees (toute / toutes).",
+        "*bleus* is masculine plural (les yeux).",
+        "tout bleus"
+      ],
+      "traps": {
+        "3": "*Elle* is feminine, but the adjective *bleus* describes *les yeux* (masculine).",
+        "1": "An adverb before a masculine adjective is invariable."
+      },
+      "solution": [
+        "*bleus* is masculine → invariable: **tout** bleus."
+      ],
+      "idea": "Tout: determiner → agrees with the noun · pronoun → agrees with what it stands for · adverb → only before a feminine adjective starting with a consonant / h aspiré."
+    },
+    {
+      "id": "s8_37",
+      "skill": "tout2",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-8 · Tout Ex 2 · 7.",
+      "text": "**Ex 2 · 7.**  Regardant de l’avion, les maisons sont ………… petites !",
+      "choices": [
+        "tout",
+        "tous",
+        "toute",
+        "toutes"
+      ],
+      "answer": 3,
+      "hints": [
+        "Before an ADJECTIVE, *tout* is an adverb: invariable, except before a FEMININE adjective that starts with a consonne or an h aspiré — then it agrees (toute / toutes).",
+        "*petites* is feminine plural and starts with a consonant.",
+        "toutes petites"
+      ],
+      "traps": {
+        "0": "Feminine plural adjective starting with a consonant: it agrees."
+      },
+      "solution": [
+        "*petites* = feminine plural, consonant → agrees: **toutes** petites."
+      ],
+      "idea": "Tout: determiner → agrees with the noun · pronoun → agrees with what it stands for · adverb → only before a feminine adjective starting with a consonant / h aspiré."
+    },
+    {
+      "id": "s8_38",
+      "skill": "tout2",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-8 · Tout Ex 2 · 8.",
+      "text": "**Ex 2 · 8.**  « J’en ai assez » est une expression ………… faite.",
+      "choices": [
+        "tout",
+        "tous",
+        "toute",
+        "toutes"
+      ],
+      "answer": 2,
+      "hints": [
+        "Before an ADJECTIVE, *tout* is an adverb: invariable, except before a FEMININE adjective that starts with a consonne or an h aspiré — then it agrees (toute / toutes).",
+        "*faite* is feminine singular and starts with a consonant.",
+        "toute faite"
+      ],
+      "traps": {
+        "0": "The adjective *faite* is feminine and starts with a consonant."
+      },
+      "solution": [
+        "*faite* = feminine singular, consonant → agrees: **toute** faite."
+      ],
+      "idea": "Tout: determiner → agrees with the noun · pronoun → agrees with what it stands for · adverb → only before a feminine adjective starting with a consonant / h aspiré."
+    },
+    {
+      "id": "s8_39",
+      "skill": "tout2",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-8 · Tout Ex 2 · 9.",
+      "text": "**Ex 2 · 9.**  Claire est ………… étonnée de son succès.",
+      "choices": [
+        "tout",
+        "tous",
+        "toute",
+        "toutes"
+      ],
+      "answer": 0,
+      "hints": [
+        "Before an ADJECTIVE, *tout* is an adverb: invariable, except before a FEMININE adjective that starts with a consonne or an h aspiré — then it agrees (toute / toutes).",
+        "*étonnée* is feminine but starts with a VOWEL.",
+        "tout étonnée"
+      ],
+      "traps": {
+        "2": "Before a vowel the adverb stays invariable (it would sound the same anyway: *tout-t…*)."
+      },
+      "solution": [
+        "*étonnée* is feminine but starts with a vowel → invariable: **tout** étonnée."
+      ],
+      "idea": "Tout: determiner → agrees with the noun · pronoun → agrees with what it stands for · adverb → only before a feminine adjective starting with a consonant / h aspiré."
+    },
+    {
+      "id": "s8_40",
+      "skill": "tout2",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-8 · Tout Ex 2 · 10.",
+      "text": "**Ex 2 · 10.**  Ces étudiantes sont ………… heureuses de leur résultat de l’examen !",
+      "choices": [
+        "tout",
+        "tous",
+        "toute",
+        "toutes"
+      ],
+      "answer": 0,
+      "hints": [
+        "Before an ADJECTIVE, *tout* is an adverb: invariable, except before a FEMININE adjective that starts with a consonne or an h aspiré — then it agrees (toute / toutes).",
+        "*heureuses* starts with a silent h (h muet): it counts as a vowel.",
+        "tout heureuses"
+      ],
+      "traps": {
+        "3": "Only h ASPIRÉ counts as a consonant. *heureuses* has an h muet."
+      },
+      "solution": [
+        "*heureuses* starts with an h muet = a vowel sound → invariable: **tout** heureuses."
+      ],
+      "idea": "Tout: determiner → agrees with the noun · pronoun → agrees with what it stands for · adverb → only before a feminine adjective starting with a consonant / h aspiré."
+    },
+    {
+      "id": "s8_41",
+      "skill": "tout3",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-8 · Tout Pronom 1.",
+      "text": "**Pronom 1.**  Ne t’inquiète pas pour les bagages, ………… suit. (sens collectif)",
+      "choices": [
+        "tout",
+        "tous",
+        "toute",
+        "toutes"
+      ],
+      "answer": 0,
+      "hints": [
+        "Before a VERB, *tout* is a pronoun. Collective meaning = singular.",
+        "It means “everything”.",
+        "tout suit"
+      ],
+      "traps": {
+        "1": "*Tous suivent* means “all the bags”, with the verb in the plural. Here the verb is *suit* (singular)."
+      },
+      "solution": [
+        "Collective sense (“everything follows”) → **tout** suit."
+      ],
+      "idea": "Tout: determiner → agrees with the noun · pronoun → agrees with what it stands for · adverb → only before a feminine adjective starting with a consonant / h aspiré."
+    },
+    {
+      "id": "s8_42",
+      "skill": "tout3",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-8 · Tout Pronom 2.",
+      "text": "**Pronom 2.**  Ne t’inquiète pas pour les valises, ………… suivent. (toutes les valises)",
+      "choices": [
+        "tout",
+        "tous",
+        "toute",
+        "toutes"
+      ],
+      "answer": 3,
+      "hints": [
+        "Before a verb → pronoun: it agrees with what it replaces.",
+        "*les valises* is feminine plural.",
+        "toutes suivent"
+      ],
+      "traps": {
+        "1": "*valises* is feminine."
+      },
+      "solution": [
+        "*toutes les valises* → feminine plural → **toutes** suivent."
+      ],
+      "idea": "Tout: determiner → agrees with the noun · pronoun → agrees with what it stands for · adverb → only before a feminine adjective starting with a consonant / h aspiré."
+    },
+    {
+      "id": "s8_43",
+      "skill": "tout3",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-8 · Tout Pronom 3.",
+      "text": "**Pronom 3.**  Ces livres sont ………… pour vous.",
+      "choices": [
+        "tout",
+        "tous",
+        "toute",
+        "toutes"
+      ],
+      "answer": 1,
+      "hints": [
+        "The pronoun agrees with *ces livres*.",
+        "*livres* is masculine plural.",
+        "tous pour vous"
+      ],
+      "traps": {
+        "3": "*livre* is masculine."
+      },
+      "solution": [
+        "*livres* = masculine plural → **tous** pour vous (the final s is pronounced)."
+      ],
+      "idea": "Tout: determiner → agrees with the noun · pronoun → agrees with what it stands for · adverb → only before a feminine adjective starting with a consonant / h aspiré."
+    }
+  ]
+}

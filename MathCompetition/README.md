@@ -55,6 +55,8 @@ link to each other. Behind the hosting gateway the study track lives at `/math/s
 | `study/sem05` | **Fractions** — a fraction *of* a fraction, brackets & dividing by a fraction, the farm problem. Quest + Class Sheet | Hu Education 190-Grace, Sem-5 sheet |
 | `study/sem06` | **PPCM & PGCD** — beep race, prime-factor bubbles, divide-down ladder, marble bags, fractions review. Quest + Class Sheet | Hu Education 190-Grace, Sem-6 sheet |
 | `study/sem0506` | **Parcours d'étude** — French study playground for both sheets: fractions, PPCM/PGCD, pronoms relatifs, subordonnées (14 exercises, animated steps, read-aloud). *Standalone page* | same sheets |
+| `study/sem07` | **PPCM, Means, Fractions & Clauses** — factor machine (PPCM/PGCD), level-the-bars means (missing numbers, weighted), fraction-of-a-fraction grid, clause detective + indicatif/subjonctif sorter. Quest (12 tasks) + Class Sheet (28 questions) | Hu Education 190-Grace, Sem-7 sheet |
+| `study/sem08` | **Negative Numbers, Powers & Tout** — number-line walker, sign machine, power parser (brackets), BC timeline, the *tout* machine (déterminant / pronom / adverbe). Quest (11 tasks) + Class Sheet (43 questions) | Hu Education 190-Grace, Sem-8 sheet |
 | `weeks/week09` | **Rates & Word Problems** — share-out machine, swap lab, compare-the-carts, vending detective. Quest + Homework (3 + 1 optional) | The Learning Lab, Homework Week 9 |
 | `weeks/week11` | **Views & Surface Area** — a 3D toolkit (isometric stacks, stack plan, front/right views, walk-around-the-table, layer counting, most/fewest cubes, box faces, glued cubes, scaling, tilting a water box). Quest (10 tasks) + Practice (all 18 slide problems, each with a lab) | The Learning Lab, Views & Surface Area (G6–G7) |
 | `weeks/week10` | **CJMC Prep: Blank or Guess?** — a guessing simulator (expected value: chance × points vs a blank), the 90-minute game plan, and Sam’s smart moves from the 2024 paper (count the gaps, test a choice, factorial chain, worst-case overlap, case-work probability, fractions of the side). Quest (9 tasks) + Homework (CJMC 2024 B04, B05, C02 + optional C05) | The Learning Lab, Week 10 CJMC Prep + Homework Week 10 |
@@ -73,7 +75,7 @@ MathCompetition/
 ├── server.py            # the web server (auto-discovers weeks)
 ├── weekctl.py           # `new` scaffolds a week, `check` validates content
 ├── static/              # shared CSS + JS engine (core.js: store, XP, guided steps, quiz)
-├── study/               # School Study track: study/sem05, sem06, sem0506 … (same layout as a week)
+├── study/               # School Study track: study/sem05 … sem08, sem0506 … (same layout as a week)
 ├── templates/layout.html
 ├── tests/               # python3 -m unittest discover -s tests
 └── weeks/

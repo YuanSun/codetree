@@ -1,0 +1,29 @@
+/* Sem 7 lesson — factor machine, mean bars, weighted blocks, fraction grid, clause detective, mood sorter */
+.chips2 { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; align-items: center; }
+.chips2 button { font: inherit; font-family: var(--head); font-weight: 600; border: 3px solid var(--line); background: #fff; border-radius: 14px; padding: 6px 12px; cursor: pointer; color: var(--navy); }
+.chips2 button.on { border-color: var(--navy-2); background: #e6e9ff; }
+.chips2 input[type=number] { width: 84px; font: inherit; font-weight: 800; font-size: 18px; border: 3px solid var(--line); border-radius: 12px; padding: 6px 8px; color: var(--navy); }
+.chart svg { width: 100%; display: block; background: #fff; border: 3px solid var(--line); border-radius: 14px; }
+.chart svg text { font-family: var(--head); font-weight: 600; }
+.ftable { border-collapse: collapse; margin: 10px 0; font-family: var(--head); font-size: 20px; }
+.ftable th { color: var(--muted); font: 800 13px "Nunito", sans-serif; padding: 2px 14px; }
+.ftable td { padding: 4px 14px; text-align: center; border-top: 2px dashed var(--line); min-width: 54px; }
+.ftable td.n { text-align: right; font-weight: 800; border-right: 3px solid var(--navy); }
+.ftable td .b { display: inline-block; color: #fff; border-radius: 10px; padding: 0 10px; min-width: 38px; background: var(--c, #64748b); }
+.ftable td .none { color: #c4c8e6; }
+.ftable tr.res td { border-top: 3px solid var(--navy); font-size: 22px; }
+.ftable tr.res.ppcm td.n { color: #6d28d9; } .ftable tr.res.pgcd td.n { color: #047857; }
+.mission .ask small { font-weight: 700; color: var(--muted); }
+.sorter { display: grid; gap: 14px; }
+.sorter-card { text-align: center; font-family: var(--head); font-weight: 600; font-size: clamp(18px, 3vw, 26px); color: var(--navy); background: linear-gradient(135deg, #fff, #f1eeff); border: 4px solid var(--line); border-radius: 26px; padding: 24px 18px; box-shadow: var(--shadow); min-height: 110px; display: grid; place-items: center; line-height: 1.4; }
+.sorter-card b { color: #4338ca; background: #e6e9ff; border-radius: 8px; padding: 0 6px; }
+.sorter-card.deal { animation: pop .35s; }
+.sorter-msg { min-height: 56px; text-align: center; font-weight: 800; font-size: 16px; display: grid; place-items: center; line-height: 1.4; }
+.sorter-msg.bad { color: var(--red); } .sorter-msg.ok { color: #0c7a47; }
+.sorter-btns { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.sorter-btns button { font: inherit; font-family: var(--head); font-weight: 600; font-size: 19px; color: #fff; border: 0; border-radius: 20px; padding: 12px 8px 10px; cursor: pointer; box-shadow: 0 6px 0 rgba(0, 0, 0, .22); }
+.sorter-btns button:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0, 0, 0, .22); }
+.sorter-btns small { display: block; font-family: "Nunito", sans-serif; font-weight: 800; font-size: 12px; opacity: .92; }
+.ref { margin-top: 12px; background: #f6f5ff; border-radius: 14px; padding: 8px 14px; }
+.ref summary { cursor: pointer; font-weight: 800; color: var(--navy); }
+.reflist h4 { margin: 10px 0 2px; color: var(--navy); } .reflist p { margin: 0; line-height: 1.6; font-weight: 700; }

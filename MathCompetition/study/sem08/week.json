@@ -1,0 +1,34 @@
+{
+  "number": 8,
+  "label": "Sem 8",
+  "title": "Negative Numbers, Powers & Tout",
+  "tagline": "Signs in + − × ÷, powers with brackets, comparing, dates before Christ — and the three lives of the word tout.",
+  "level": "School study · Hu Education",
+  "emoji": "➖",
+  "skills": [
+    "Negative numbers",
+    "Powers",
+    "Timeline",
+    "Tout"
+  ],
+  "credit": "Based on Hu Education · 190-Grace · Sem-8 class sheet (retyped for personal study).",
+  "pages": [
+    {
+      "slug": "lesson",
+      "type": "html",
+      "file": "lesson.html",
+      "title": "The Quest",
+      "emoji": "🗺️",
+      "desc": "Walk the number line, test the sign machine, parse powers, slide a timeline and tame tout — then solve the sheet step by step.",
+      "tasks": 11
+    },
+    {
+      "slug": "practice",
+      "type": "quiz",
+      "file": "exercises.json",
+      "title": "Class Sheet",
+      "emoji": "🏋️",
+      "desc": "43 questions: every exercise of the Sem-8 sheet, with hints, trap-spotting and full solutions."
+    }
+  ]
+}

@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sem 7 · The Quest</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/lesson-common.css">
+  <link rel="stylesheet" href="lesson.css">
+</head>
+<body data-page="lesson" data-track="study" data-week="sem07" data-page-slug="lesson" data-week-title="Sem 7">
+<div id="mc-nav"></div>
+<main class="wrap">
+
+  <section class="hero-quest">
+    <div class="floaters" aria-hidden="true"><span style="left:4%;top:14%;font-size:38px;animation-delay:-0s">PPCM</span><span style="left:90%;top:18%;font-size:46px;animation-delay:-2s">μ</span><span style="left:16%;top:70%;font-size:44px;animation-delay:-4s">[[3/4]]</span><span style="left:78%;top:62%;font-size:52px;animation-delay:-1s">que</span><span style="left:50%;top:6%;font-size:32px;animation-delay:-3s">PGCD</span></div>
+    <div class="eyebrow">Sem 7 · The Quest</div>
+    <h1>PPCM, <span class="one">means</span> &amp; clauses</h1>
+    <p>Four things from this week’s sheet: <b>prime factors</b> for PPCM / PGCD, <b>means</b> with missing numbers, <b>fractions of fractions</b>, and the <b>subordonnée circonstancielle</b>.</p>
+    <div class="four">
+      <a class="skill sk-mean" href="#ppcm"><i>🧬</i><b>PPCM &amp; PGCD</b><span>Prime bricks: <u>all</u> of them or only the <u>shared</u> ones.</span></a>
+      <a class="skill sk-percent" href="#moy"><i>📊</i><b>Means</b><span>Mean × how many = <u>total</u>.</span></a>
+      <a class="skill sk-ratio" href="#frac"><i>🍰</i><b>Fractions</b><span>A fraction <u>of</u> a fraction.</span></a>
+      <a class="skill sk-rates" href="#gram"><i>🔗</i><b>Subordonnées</b><span>Relative, complétive or <u>circonstancielle</u>?</span></a>
+    </div>
+    <a class="btn warm start" href="#ppcm">▶ Start the quest</a>
+  </section>
+
+  <section class="level sk-mean" id="ppcm">
+    <div class="world-banner" data-bg="🧬"><div class="big">🧬</div><div><div class="eyebrow">World 1</div><h2>PPCM &amp; PGCD</h2><p>Exercice 1 · <b>P</b>lus <b>P</b>etit <b>C</b>ommun <b>M</b>ultiple · <b>P</b>lus <b>G</b>rand <b>C</b>ommun <b>D</b>iviseur.</p></div></div>
+    <div class="big-idea"><span>⚡</span><div>PPCM = all the prime bricks · PGCD = only the shared ones.<small>Break every number into primes. Biggest power of each prime → PPCM. Only the primes they ALL have, smallest power → PGCD.</small></div></div>
+    <div class="lab">
+      <div class="lab-title">🧬 Explore · The factor machine</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Type up to <b>three numbers</b> (or press a preset from the sheet). See each number broken into <b>prime bricks</b>, then how the <b>PPCM</b> (biggest power of every prime) and the <b>PGCD</b> (smallest power, shared primes only) are built.</div></div>
+      <div id="factor-lab"></div>
+    </div>
+    <div class="mission" style="--c:var(--mean)">
+      <div class="mission-top"><span class="src">📜 Sem-7 · Exercice 1 (1a, 2a)</span><span class="tag easy">Easy</span></div>
+      <p class="ask">🔔🎒 Find <b>PPCM (12, 20)</b> and <b>PGCD (12, 20)</b> with the machine.</p>
+      <details><summary>Show the exact wording</summary><div class="orig">PPCM — Détermine le PPCM des nombres suivants : a) PPCM (12, 20) =   b) PPCM (14, 16) =   c) PPCM (10, 21, 30) =.<br>PGCD — Détermine le PGCD des nombres suivants : a) PGCD (12, 20) =   b) PGCD (48, 72) =   c) PGCD (12, 30, 42) =</div></details>
+      <div id="factor-steps"></div>
+    </div>
+    <div class="mission" style="--c:var(--mean)">
+      <div class="mission-top"><span class="src">📜 Sem-7 · Exercice 1 (1b, 1c, 2b, 2c)</span><span class="tag medium">Medium</span></div>
+      <p class="ask">🧮 Now the rest of the sheet: <b>PPCM (14, 16)</b>, <b>PPCM (10, 21, 30)</b>, <b>PGCD (48, 72)</b>, <b>PGCD (12, 30, 42)</b>. Use the machine to check yourself.</p>
+      <details><summary>Show the exact wording</summary><div class="orig">See Exercice 1, questions 1 b), 1 c), 2 b) and 2 c) above.</div></details>
+      <div id="three-steps"></div>
+    </div>
+    <div class="mission" style="--c:var(--mean)">
+      <div class="mission-top"><span class="src">📜 Sem-7 · Exercice 1 (3, 4)</span><span class="tag easy">Easy</span></div>
+      <p class="ask">👯 <b>PPCM (70, 42)</b> and <b>PGCD (70, 42)</b> — and a surprise about their product.</p>
+      <details><summary>Show the exact wording</summary><div class="orig">3) PPCM (70, 42)   4) PGCD (70, 42).</div></details>
+      <div id="pair-steps"></div>
+    </div>
+    <div class="mission" style="--c:var(--mean)">
+      <div class="mission-top"><span class="src">📜 Sem-7 · Exercice 1 (5)</span><span class="tag medium">Medium</span></div>
+      <p class="ask">🏖️ Jacob goes to the beach every <b>3</b> days, Nathan every <b>5</b> days, Juliette every <b>12</b> days. They meet today. When will they all meet <b>again</b>?</p>
+      <details><summary>Show the exact wording</summary><div class="orig">GCD et PPCM en contexte : Jacob, Nathan et Juliette se rencontrent à la plage aujourd’hui. Jacob va à la plage tous les 3 jours, Nathan s’y rend tous les 5 jours et Juliette s’y rend tous les 12 jours. Dans combien de jours se rencontreront-ils à nouveau à la plage ?</div></details>
+      <div id="beach-steps"></div>
+    </div>
+  </section>
+
+  <section class="level sk-percent" id="moy">
+    <div class="world-banner" data-bg="📊"><div class="big">📊</div><div><div class="eyebrow">World 2</div><h2>Means: simple &amp; weighted</h2><p>Exercice 2 A) · La moyenne arithmétique ou pondérée.</p></div></div>
+    <div class="big-idea"><span>⚡</span><div>Mean × how many = total.<small>A missing number is whatever is left when you take the numbers you know away from the TOTAL.</small></div></div>
+    <div class="lab">
+      <div class="lab-title">📊 Explore · Level the bars</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Each bar is a number. The <b>dashed line</b> is the mean you want. Slide the <b>gold</b> missing number (or numbers) until the mean line sits on the target. Use the buttons for the sheet’s cases.</div></div>
+      <div id="mean-lab"></div>
+    </div>
+    <div class="mission" style="--c:var(--percent)">
+      <div class="mission-top"><span class="src">📜 Sem-7 · Exercice 2 A) No 1 (a, b, e)</span><span class="tag easy">Easy</span></div>
+      <p class="ask">📊 a) The mean of <b>12, 16, 22 and ?</b> is <b>15</b>. b) The mean of <b>43, 51, 26 and ?</b> is <b>48</b>. e) Identical numbers add to <b>3 900</b> and their mean is <b>75</b> — how many are there?</p>
+      <details><summary>Show the exact wording</summary><div class="orig">No 1 — Dans chacun des cas suivants, détermine le ou les nombres manquants : a) La moyenne des nombres suivants est de 15 : 12, 16, 22 et ____ . b) La moyenne des nombres suivants est de 48 : 43, 51, 26 et ____ . e) La somme d’un ensemble de nombres identiques est 3 900 et leur moyenne est de 75. Quel est ce nombre ?</div></details>
+      <div id="mean-steps"></div>
+    </div>
+    <div class="mission" style="--c:var(--percent)">
+      <div class="mission-top"><span class="src">📜 Sem-7 · Exercice 2 A) No 1 (c, d)</span><span class="tag hard">Hard</span></div>
+      <p class="ask">🧩 Two missing numbers! c) mean <b>56</b>, the two missing are <b>equal</b>: 52, 61, 70, ?, ?. d) mean <b>75</b>, the two missing are <b>consecutive</b>: 73, 85, 90, 62, 84, ?, ?.</p>
+      <details><summary>Show the exact wording</summary><div class="orig">c) La moyenne est de 56 et les deux nombres manquants sont égaux : 52, 61, 70, ____ et ____ . d) La moyenne est de 75 et les deux nombres manquants sont consécutifs : 73, 85, 90, 62, 84, ____ et ____ .</div></details>
+      <div id="two-steps"></div>
+    </div>
+    <div class="big-idea"><span>⚡</span><div>Weighted mean: weight × value, add up, divide by the total weight.<small>Days that count more (13 rainy days) pull the mean harder than days that count less (7 snow days).</small></div></div>
+    <div class="lab">
+      <div class="lab-title">🌦️ Explore · Weighted means</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">The <b>width</b> of each block is how many days (or games), the <b>height</b> is the value. The mean line is the height that gives the <b>same total area</b>. Switch between the two stories.</div></div>
+      <div id="wmean-lab"></div>
+    </div>
+    <div class="mission" style="--c:var(--percent)">
+      <div class="mission-top"><span class="src">📜 Sem-7 · Exercice 2 A) No 2</span><span class="tag medium">Medium</span></div>
+      <p class="ask">🌡️ In March: <b>13</b> rainy days at <b>5 °C</b>, <b>7</b> snowy days at <b>0 °C</b>, <b>10</b> sunny days at <b>5.8 °C</b>. What was the mean temperature of March?</p>
+      <details><summary>Show the exact wording</summary><div class="orig">Au mois de mars, il y a eu 13 jours de pluie où la température moyenne fut de 5 °C, 7 jours où il est tombé de la neige et dont la température moyenne était de 0 °C et finalement 10 jours de gros soleil où la température a atteint 5,8 °C. Trouve la température moyenne du mois de mars.</div></details>
+      <div id="march-steps"></div>
+    </div>
+    <div class="mission" style="--c:var(--percent)">
+      <div class="mission-top"><span class="src">📜 Sem-7 · Exercice 2 A) No 3</span><span class="tag hard">Hard</span></div>
+      <p class="ask">🎮 After <b>18 games</b>, Julie-Anne’s mean is <b>4 960</b> points. She wants her mean to be <b>5 000</b>. How many points must she score in game 19?</p>
+      <details><summary>Show the exact wording</summary><div class="orig">Chaque jour, Julie-Anne s’amuse à un jeu vidéo portant sur des problèmes mathématiques. Après 18 parties, sa moyenne est de 4 960 points. Elle aimerait bien que sa moyenne passe à 5 000. Combien de points doit-elle obtenir à la prochaine partie ?</div></details>
+      <div id="game-steps"></div>
+    </div>
+  </section>
+
+  <section class="level sk-ratio" id="frac">
+    <div class="world-banner" data-bg="🍰"><div class="big">🍰</div><div><div class="eyebrow">World 3</div><h2>Fractions review</h2><p>Révision · multiply and add fractions in real situations.</p></div></div>
+    <div class="big-idea"><span>⚡</span><div>A fraction OF a fraction = multiply.<small>Two pieces in a row: “[[2/3]] of [[3/4]]”. Draw a grid: the overlap is the answer.</small></div></div>
+    <div class="lab">
+      <div class="lab-title">🍰 Explore · Fraction of a fraction</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Pick the first fraction (blue columns) and the second fraction (gold rows). The <b>overlap</b> is the product. How many pieces out of how many?</div></div>
+      <div id="cake-lab"></div>
+    </div>
+    <div class="mission" style="--c:var(--ratio)">
+      <div class="mission-top"><span class="src">📜 Sem-7 · Révision 2</span><span class="tag easy">Easy</span></div>
+      <p class="ask">🍰 Only <b>[[3/4]]</b> of a cake is left. You eat <b>[[2/3]] of what is left</b>. What fraction of the whole cake did you eat?</p>
+      <details><summary>Show the exact wording</summary><div class="orig">Sur la table de la cuisine, il ne reste que les [[3/4]] d’un gâteau. Tu décides de manger les [[2/3]] de ce qui reste de ce gâteau. Quelle fraction du gâteau auras-tu mangé ?</div></details>
+      <div id="cake-steps"></div>
+    </div>
+    <div class="mission" style="--c:var(--ratio)">
+      <div class="mission-top"><span class="src">📜 Sem-7 · Révision 1</span><span class="tag medium">Medium</span></div>
+      <p class="ask">🥤 4 friends drink <b>4 bottles of [[1/3]] L</b> of orange juice and <b>3 bottles of [[1/2]] L</b> of apple juice, sharing equally. How much does each friend drink?</p>
+      <details><summary>Show the exact wording</summary><div class="orig">Au retour d’une randonnée à bicyclette, 4 amis boivent à eux tous 4 bouteilles de [[1/3]] de litre de jus d’orange et 3 bouteilles de [[1/2]] litre de jus de pomme. Si les 4 amis boivent la même quantité de boisson, quelle est la quantité bue par chacun d’eux ? (démarche complète)</div></details>
+      <div id="juice-steps"></div>
+    </div>
+  </section>
+
+  <section class="level sk-rates" id="gram">
+    <div class="world-banner" data-bg="🔗"><div class="big">🔗</div><div><div class="eyebrow">World 4</div><h2>La subordonnée circonstancielle</h2><p>Grammar · which kind of proposition is it, and which mood follows the conjunction?</p></div></div>
+    <div class="big-idea"><span>⚡</span><div>Three kinds of subordinate clauses — three tests.<small><b>Relative</b> → describes a noun (qui, que, dont, duquel…). <b>Complétive</b> → can be replaced by <i>ça</i> (je crois que…). <b>Circonstancielle</b> → starts with a conjunction of time, purpose, cause… (la subordonnée circonstancielle).</small></div></div>
+    <div class="lab">
+      <div class="lab-title">🔍 Play · Clause detective</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Ten sentences from the sheet. The <b>bold</b> part is the clause. Which type is it? Use the three tests!</div></div>
+      <div id="clause-lab"></div>
+    </div>
+    <div class="lab">
+      <div class="lab-title">🎛️ Play · Indicatif or subjonctif?</div>
+      <div class="nova"><div class="face">🦊</div><div class="say">Each conjunction commands a <b>mood</b>. Sort 12 of them into <b>indicatif</b>, <b>subjonctif</b>, or <b>les deux</b> (the meaning decides).</div></div>
+      <div id="mood-lab"></div>
+      <details class="ref"><summary>📚 The full lists from the sheet</summary>
+        <div class="reflist">
+          <div><h4>Indicatif</h4><p>après que · aussi… que · aussitôt que · comme · de même que · depuis que · dès que · étant donné que · excepté si · même si · moins… que · parce que · pendant que · plus… que · puisque · quand · quand bien même · si · si… que · tant… que · tellement… que</p></div>
+          <div><h4>Subjonctif</h4><p>à condition que · afin que · à moins que · à supposer que · au lieu que · avant que · bien que · de crainte que · de façon à ce que · de manière à ce que · de peur que · en admettant que · en attendant que · encore que · jusqu’à ce que · malgré que · non (pas) que · où que (d’où que) · plutôt que · pour peu que · pour que · pourvu que · quel que · quelque… que · qui que · quoi que · quoique · sans que · si tant est que · soit que…, soit que · suffisamment pour que · supposé que</p></div>
+          <div><h4>Indicatif OU subjonctif</h4><p>de (telle) façon que · de (telle) manière que · de (telle) sorte que · en sorte que — <i>conséquence → indicatif · but à atteindre → subjonctif</i></p></div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section class="level" id="finale">
+    <div class="finale">
+      <div class="eyebrow" style="color:var(--gold)">The point to land</div>
+      <h2>Prime bricks, <u>total</u> = mean × count, “of” = ×, and a clause has a <u>job</u>.</h2>
+      <ul class="finale-list">
+        <li style="--c:#c9b5ff"><b>PPCM</b> → every prime, biggest power · PGCD → shared primes, smallest power</li>
+        <li style="--c:#ffd08a"><b>Mean</b> → mean × how many = total</li>
+        <li style="--c:#8fbaff"><b>Fractions</b> → “of” means multiply</li>
+        <li style="--c:#7ee8c0"><b>Clauses</b> → noun → relative · ça → complétive · conjunction → circonstancielle</li>
+      </ul>
+      <div class="row"><a class="btn warm" href="practice">🏋️ Go to the Class Sheet questions</a></div>
+    </div>
+  </section>
+</main>
+
+<script src="/static/js/core.js"></script>
+<script src="lesson.js"></script>
+</body>
+</html>
