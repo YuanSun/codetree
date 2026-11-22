@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { api, AnswerKey, ChapterData, Question } from "../api";
+import { api, AnswerKey, ChapterData, Evidence, Question } from "../api";
 import { go } from "../App";
 import { Lang, strings } from "../i18n";
 import { ThemePref } from "../prefs";
@@ -22,6 +22,23 @@ const WIDE = "(min-width: 900px)";
 
 type Chapter = { seq: number; title: string | null };
 
+// Finding a quote in a paragraph: spaces (incl. no-break ones), apostrophes and case don't count. Same rule as
+// importer.article.norm_quote. normChar keeps one UTF-16 unit per unit, so a position found in the normalized
+// paragraph is the same position in the original.
+const SAME: Record<string, string> = { "\u00a0": " ", "\u202f": " ", "\u2009": " ", "\u2019": "'", "\u2018": "'",
+  "\u02bc": "'", "\u201c": '"', "\u201d": '"' };
+const normChar = (c: string) => { const m = SAME[c] ?? c; const l = m.toLowerCase(); return l.length === 1 ? l : m; };
+const normText = (s: string) => s.split("").map(normChar).join("");
+
+/** [start, end) of the quote in the paragraph, or null. The paragraph's own spaces are single already. */
+export function findQuote(para: string, quote: string): [number, number] | null {
+  const q = normText(quote).replace(/\s+/g, " ").trim();
+  const i = q ? normText(para).indexOf(q) : -1;
+  return i < 0 ? null : [i, i + q.length];
+}
+
+export type Mark = { seq: number; quote: string };
+
 function KeyBox({ k, lang }: { k: AnswerKey; lang: Lang }) {
   const t = strings(lang);
   return (
@@ -34,9 +51,26 @@ function KeyBox({ k, lang }: { k: AnswerKey; lang: Lang }) {
   );
 }
 
+/** After she has answered: the passages that hold the answer; a tap opens the text there, highlighted. */
+function EvidenceLinks({ ev, lang, onGo }: { ev: Evidence[]; lang: Lang; onGo: (e: Evidence) => void }) {
+  const t = strings(lang);
+  const short = (q: string) => (q.length > 70 ? `${q.slice(0, 67).trimEnd()}…` : q);
+  return (
+    <div className="cq-evidence">
+      <p className="small muted">{t.qEvidence}</p>
+      {ev.map((e, i) => (
+        <button key={i} className="cq-ev" onClick={() => onGo(e)}>
+          <b>{t.qEvidenceGo(e.chapter)}</b> <span>« {short(e.quote)} »</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
 /** The chapter text, read-only, next to (or above) the questions: so she can look for evidence without leaving them. */
-function TextPane({ articleId, seq, chapters, lang, onSeq, onClose }: {
-  articleId: number; seq: number; chapters: Chapter[]; lang: Lang; onSeq: (n: number) => void; onClose: () => void;
+function TextPane({ articleId, seq, chapters, lang, mark, onSeq, onClose }: {
+  articleId: number; seq: number; chapters: Chapter[]; lang: Lang; mark: Mark | null;
+  onSeq: (n: number) => void; onClose: () => void;
 }) {
   const t = strings(lang);
   const cache = useRef(new Map<number, ChapterData>());
@@ -55,6 +89,22 @@ function TextPane({ articleId, seq, chapters, lang, onSeq, onClose }: {
     body.current?.scrollTo({ top: 0 });
   }, [articleId, seq]);
 
+  // bring the highlighted passage into the pane (only the pane scrolls: the question stays where it is)
+  const quote = mark && mark.seq === seq ? mark.quote : null;
+  useEffect(() => {
+    const b = body.current;
+    const m = b?.querySelector("mark");
+    if (!b || !m) return;
+    const top = m.getBoundingClientRect().top - b.getBoundingClientRect().top + b.scrollTop;
+    b.scrollTo({ top: Math.max(0, top - b.clientHeight / 4), behavior: "smooth" });
+  }, [data, quote]);
+
+  const para = (text: string) => {
+    const at = quote ? findQuote(text, quote) : null;
+    if (!at) return text;
+    return <>{text.slice(0, at[0])}<mark className="cq-mark">{text.slice(at[0], at[1])}</mark>{text.slice(at[1])}</>;
+  };
+
   return (
     <aside className="card cq-pane" aria-label={`${t.chapter} ${seq}`} lang={lang}>
       <div className="cq-pane-head">
@@ -70,7 +120,7 @@ function TextPane({ articleId, seq, chapters, lang, onSeq, onClose }: {
         <h3 className="cq-pane-title">{t.chapter} {seq}{data?.chapter.title ? ` · ${data.chapter.title}` : ""}</h3>
         {error && <p className="error">{error}</p>}
         {!data && !error && <p className="muted">…</p>}
-        {data?.paragraphs.map((p) => <p key={p.id}>{p.text}</p>)}
+        {data?.paragraphs.map((p) => <p key={p.id}>{para(p.text)}</p>)}
       </div>
     </aside>
   );
@@ -132,7 +182,8 @@ function ChoiceCard({ q, lang, onSaved }: { q: Question; lang: Lang; onSaved: (q
 }
 
 function QuestionCard({ q, n, lang, onSaved, onText }: {
-  q: Question; n: number; lang: Lang; onSaved: (q: Question) => void; onText: (seq: number | null, qid: number) => void;
+  q: Question; n: number; lang: Lang; onSaved: (q: Question) => void;
+  onText: (seq: number | null, qid: number, quote?: string) => void;
 }) {
   const t = strings(lang);
   const [text, setText] = useState(() => readDraft(q.id) ?? q.answer?.body ?? "");
@@ -214,6 +265,9 @@ function QuestionCard({ q, n, lang, onSaved, onText }: {
           )}
         </>
       )}
+      {q.answer && q.key?.evidence && q.key.evidence.length > 0 && (
+        <EvidenceLinks ev={q.key.evidence} lang={lang} onGo={(e) => onText(e.chapter, q.id, e.quote)} />
+      )}
     </section>
   );
 }
@@ -224,6 +278,7 @@ export default function Questions({ articleId, theme }: { articleId: number; the
   const [data, setData] = useState<{ title: string; lang: Lang; chapters: Chapter[]; questions: Question[] } | null>(null);
   const [error, setError] = useState("");
   const [pane, setPane] = useState<number | null>(null);
+  const [mark, setMark] = useState<Mark | null>(null);
 
   useEffect(() => {
     api.questions(articleId).then((r) => setData({ title: r.article.title, lang: r.article.lang, chapters: r.chapters,
@@ -241,8 +296,9 @@ export default function Questions({ articleId, theme }: { articleId: number; the
 
   // Open the text at a chapter (end questions: keep the chapter already open), then bring the question back into
   // view: below the pinned text on a narrow screen, at the top of its column on a wide one.
-  const openText = (seq: number | null, qid?: number) => {
+  const openText = (seq: number | null, qid?: number, quote?: string) => {
     setPane((cur) => seq ?? cur ?? 1);
+    setMark(seq !== null && quote ? { seq, quote } : null);
     if (qid === undefined) return;
     window.setTimeout(() => {
       const el = document.getElementById(`q${qid}`);
@@ -267,8 +323,8 @@ export default function Questions({ articleId, theme }: { articleId: number; the
       {data && (
         <div className="cq-layout">
           {pane !== null && (
-            <TextPane articleId={articleId} seq={pane} chapters={data.chapters} lang={lang} onSeq={setPane}
-                      onClose={() => setPane(null)} />
+            <TextPane articleId={articleId} seq={pane} chapters={data.chapters} lang={lang} mark={mark} onSeq={setPane}
+                      onClose={() => { setPane(null); setMark(null); }} />
           )}
           <div className="cq-list">
             <h1 className="page-title">{t.qTitle}</h1>

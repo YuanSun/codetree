@@ -19,7 +19,9 @@ def pack_with_end_questions() -> dict:
     pack["chapters"][0]["question"]["model_answer"] = "On ne sait rien de lui."
     pack["questions"] = [
         {"kind": "open", "prompt": "Que veut dire « énigmatique » ?", "model_answer": "Mystérieux.",
-         "rubric": {"skill": "Vocabulaire en contexte", "points": 2, "must_answer": "mystérieux", "avoid": "deviner"}},
+         "rubric": {"skill": "Vocabulaire en contexte", "points": 2, "must_answer": "mystérieux", "avoid": "deviner",
+                    # typographic apostrophe and spacing differ from the text on purpose: the match ignores them
+                    "evidence": [{"chapter": 1, "quote": "personnage énigmatique,  dont on ne savait rien"}]}},
         {"kind": "writing", "prompt": "Décris un personnage mystérieux que tu connais."},
     ]
     return pack
@@ -65,7 +67,8 @@ def test_questions_answers_and_key(world):
 
     r = g.post(f"/api/questions/{qs[1]['id']}/answer", json={"body": "  Ça veut dire mystérieux.  "})
     assert r.status_code == 200
-    assert r.json()["key"] == {"model_answer": "Mystérieux.", "must_answer": "mystérieux", "avoid": "deviner"}
+    assert r.json()["key"] == {"model_answer": "Mystérieux.", "must_answer": "mystérieux", "avoid": "deviner",
+                               "evidence": [{"chapter": 1, "quote": "personnage énigmatique,  dont on ne savait rien"}]}
     assert g.post(f"/api/questions/{qs[1]['id']}/answer", json={"body": "Mystérieux, secret."}).status_code == 200
     assert g.post(f"/api/questions/{qs[1]['id']}/answer", json={"body": "   "}).status_code == 422
     qs = g.get(f"/api/articles/{aid}/questions").json()["questions"]
@@ -138,6 +141,8 @@ def test_grading_export_and_import(world):
     chap, vocab = items[qs[0]["prompt"]], items[qs[1]["prompt"]]
     assert chap["points"] == 2 and chap["chapter"] == 1  # chapter questions default to 2 points
     assert vocab["points"] == 2 and vocab["must_answer"] == "mystérieux" and vocab["answer"] == "Ça veut dire mystérieux."
+    assert vocab["evidence"][0]["chapter"] == 1 and chap["evidence"] == []
+    assert '"evidence"' in exp["instructions"]
 
     # bad batches change nothing
     for bad in ([{"answer_id": vocab["answer_id"], "score": 2.5, "feedback": "x"}],
@@ -205,3 +210,20 @@ def test_closed_questions_are_marked_at_once(world):
     assert papa.get(f"/api/parent/children/{kid}/grading-export?regrade=true").json()["answers"] == []  # never sent to Claude
     rows = {r["prompt"]: r for r in papa.get(f"/api/parent/children/{kid}/answers").json()}
     assert rows[tf["prompt"]]["grade"]["by"] == "auto" and rows[tf["prompt"]]["choices"] == ["Vrai", "Faux"]
+
+
+def test_evidence_must_be_in_the_text(db):
+    """A quote must be found, within one paragraph, in the chapter it names (apostrophes, spaces, case ignored)."""
+    from importer.article import check_questions
+    ok = pack_with_end_questions()
+    ok["questions"][0]["rubric"]["evidence"].append({"chapter": 2, "quote": "N'EN DÉPLAISE À MONSIEUR"})
+    check_questions(ok)
+    for bad in ({"chapter": 2, "quote": "personnage énigmatique"},      # wrong chapter
+                {"chapter": 1, "quote": "attirer l'attention. À l'un"},  # spans two paragraphs
+                {"chapter": 1, "quote": "personnage […] rien"},          # not verbatim
+                {"chapter": 9, "quote": "Fogg"},                         # no such chapter
+                {"chapter": 1, "quote": "  "}):
+        pack = pack_with_end_questions()
+        pack["questions"][0]["rubric"]["evidence"] = [bad]
+        with pytest.raises(ImportRefused):
+            check_questions(pack)
