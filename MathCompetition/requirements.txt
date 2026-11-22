@@ -1,0 +1,3 @@
+# Only needed for child/parent profiles (see README). The site runs without them.
+psycopg[binary]>=3.2
+argon2-cffi>=23.1      # to check the argon2 passwords Lecture Magique stores

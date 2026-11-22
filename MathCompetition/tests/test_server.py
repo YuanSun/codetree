@@ -40,6 +40,19 @@ class ServerTests(unittest.TestCase):
         except urllib.error.HTTPError as e:
             return e.code, e.read().decode("utf-8", "replace"), e.headers
 
+    def test_week11_loads_the_shared_3d_viewer(self):
+        for path in ("/week/week11/lesson", "/week/week11/practice"):
+            with self.subTest(path=path):
+                status, body, _ = self.get(path)
+                self.assertEqual(status, 200)
+                self.assertLess(body.index("/static/js/view3d.js"), body.index("figures.js"))
+        status, body, _ = self.get("/static/js/view3d.js")
+        self.assertEqual(status, 200)
+        self.assertIn("MC.view3d", body)
+        # only files under /static/js/ may be named as a shared script
+        self.assertIn('src="/static/js/view3d.js"', server.script_tag(server.TRACKS["week"], {"id": "week11"}, "/static/js/view3d.js"))
+        self.assertIn("/week/week11/..", server.script_tag(server.TRACKS["week"], {"id": "week11"}, "../../etc/x"))
+
     def test_home_lists_weeks(self):
         status, body, _ = self.get("/")
         self.assertEqual(status, 200)

@@ -57,7 +57,8 @@ def check_week(folder: Path) -> list[str]:
             err(f"page '{slug}': file '{page.get('file')}' not found")
             continue
         for script in page.get("scripts", []):
-            if not (folder / script).is_file():
+            shared = script.startswith("/static/js/") and (ROOT / script.lstrip("/")).is_file()   # shared engine files
+            if not shared and not (folder / script).is_file():
                 err(f"page '{slug}': script '{script}' not found")
         if page.get("type") in ("quiz", "exam"):
             errs.extend(check_quiz(folder.name, slug, target))

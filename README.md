@@ -69,7 +69,7 @@ engine with hint ladders, "trap" explanations for wrong answers, stars, XP and s
 
 - **Location**: `MathCompetition/`
 - **Status**: Week 8 (Rates, Ratio, Percent & Mean) complete — 4 concept explorers + 14 labs, 14 exercise-bank + 3 boss questions, 6 homework + 1 optional; tested in headless Chromium
-- **Tech Stack**: Python 3 standard library (no dependencies), vanilla HTML/CSS/JS
+- **Tech Stack**: Python 3 standard library (optional `psycopg` + `argon2-cffi` for child/parent profiles, shared with Lecture Magique, in Postgres), vanilla HTML/CSS/JS
 
 See [MathCompetition/README.md](MathCompetition/README.md) for how to run it and add a week, and
 [MathCompetition/CLAUDE.md](MathCompetition/CLAUDE.md) for the authoring playbook used to convert each week's PDFs.

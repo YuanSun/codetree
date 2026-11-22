@@ -1,7 +1,7 @@
 /* Math Contest Lab — shared front-end toolkit (no dependencies).
  *
  *   MC.h / MC.fmt / MC.parseNum      small helpers
- *   MC.store                         progress in localStorage (per browser)
+ *   MC.store                         progress: the signed-in profile's (Postgres) or this browser's (localStorage)
  *   MC.award / MC.confetti / MC.toast / MC.badge   rewards
  *   MC.guided(root, cfg)             "you do each step" worked examples
  *   MC.quiz(root, data)              the practice / homework engine
@@ -69,20 +69,68 @@
   };
 
   /* -------------------------------------------------------------------- store */
-  const KEY = 'mc.progress.v1';
+  // Two homes for progress: a signed-in profile (Postgres, via the server) or just this browser (localStorage).
+  // /api/session.js runs before this file and says which one, plus the saved progress, so it is known synchronously.
+  const SESSION = (MC.session = window.MC_SESSION || { enabled: false, user: null, state: null });
+  const USER = SESSION.user;
+  const KEY = USER ? `mc.progress.v1.u${USER.id}` : 'mc.progress.v1';     // local copy: the only store when signed out, a backup when signed in
+  const OUTBOX = `mc.outbox.v1.u${USER ? USER.id : 0}`;                   // changes the server has not confirmed yet
   const blank = () => ({ xp: 0, weeks: {} });
-  const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || blank(); } catch (e) { return blank(); } };
-  let state = load();
-  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* private mode: progress just won't persist */ } };
+  const readJSON = (k) => { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } };
+  const writeJSON = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* private mode: nothing persists locally */ } };
+  let state = USER && SESSION.state ? Object.assign(blank(), SESSION.state) : (readJSON(KEY) || blank());
+  let outbox = (USER && readJSON(OUTBOX)) || { set: {}, del: {}, xp: null };
+
+  function applyOutbox() {            // changes made just before the last page change that never reached the server
+    for (const [k, v] of Object.entries(outbox.set)) { const [w, p, id] = k.split('|'); ((state.weeks[w] = state.weeks[w] || {})[p] = state.weeks[w][p] || {})[id] = v; }
+    for (const k of Object.keys(outbox.del)) { const [w, p, id] = k.split('|'); if (state.weeks[w] && state.weeks[w][p]) delete state.weeks[w][p][id]; }
+    if (outbox.xp != null) state.xp = Math.max(state.xp, outbox.xp);
+  }
+  let flushTimer = 0, flushing = false;
+  function flush(unload) {
+    clearTimeout(flushTimer);
+    const pending = Object.keys(outbox.set).length + Object.keys(outbox.del).length || outbox.xp != null;
+    if (!USER || flushing || !pending) return;
+    flushing = true;
+    const sent = JSON.parse(JSON.stringify(outbox));
+    const body = JSON.stringify({ set: Object.entries(sent.set).map(([k, v]) => [...k.split('|'), v]), del: Object.keys(sent.del).map((k) => k.split('|')), xp: sent.xp });
+    fetch(`${BASE}/api/progress`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body, keepalive: !!unload, credentials: 'same-origin' })
+      .then((r) => { if (!r.ok) throw new Error(r.status); })
+      .then(() => {   // drop only what was sent (newer changes made meanwhile stay queued)
+        for (const [k, v] of Object.entries(sent.set)) if (JSON.stringify(outbox.set[k]) === JSON.stringify(v)) delete outbox.set[k];
+        for (const k of Object.keys(sent.del)) delete outbox.del[k];
+        if (outbox.xp === sent.xp) outbox.xp = null;
+        writeJSON(OUTBOX, outbox); setSync('ok');
+      })
+      .catch(() => { setSync('offline'); flushTimer = setTimeout(flush, 15000); })   // keep it queued and try again
+      .finally(() => { flushing = false; });
+  }
+  function setSync(mode) { MC.sync = mode; const el = document.querySelector('.nav .who'); if (el) el.dataset.sync = mode; }
+  const save = (change) => {
+    writeJSON(KEY, state);
+    if (!USER || !change) return;
+    if (change.xp != null) outbox.xp = change.xp;
+    if (change.set) { outbox.set[change.set.key] = change.set.val; delete outbox.del[change.set.key]; }
+    if (change.del) { outbox.del[change.del] = 1; delete outbox.set[change.del]; }
+    writeJSON(OUTBOX, outbox);
+    clearTimeout(flushTimer); flushTimer = setTimeout(flush, 400);
+  };
+  if (USER) {
+    applyOutbox(); writeJSON(KEY, state);
+    addEventListener('pagehide', () => flush(true));
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(true); });
+    setTimeout(flush, 50);
+  }
+  const k3 = (w, p, id) => `${w}|${p}|${id}`;
 
   MC.store = {
     get: (w, p, id) => ((state.weeks[w] || {})[p] || {})[id] || null,
-    set(w, p, id, val) { (state.weeks[w] = state.weeks[w] || {}); (state.weeks[w][p] = state.weeks[w][p] || {}); state.weeks[w][p][id] = val; save(); },
-    del(w, p, id) { if (state.weeks[w] && state.weeks[w][p]) { delete state.weeks[w][p][id]; save(); } },
+    set(w, p, id, val) { (state.weeks[w] = state.weeks[w] || {}); (state.weeks[w][p] = state.weeks[w][p] || {}); state.weeks[w][p][id] = val; save({ set: { key: k3(w, p, id), val } }); },
+    del(w, p, id) { if (state.weeks[w] && state.weeks[w][p]) { delete state.weeks[w][p][id]; save({ del: k3(w, p, id) }); } },
     count: (w, p) => Object.values((state.weeks[w] || {})[p] || {}).filter((v) => v && v.done).length,
     countWeek: (w) => Object.keys(state.weeks[w] || {}).reduce((n, p) => n + MC.store.count(w, p), 0),
     xp: () => state.xp,
-    addXP(n) { state.xp += n; save(); renderNav(); },
+    addXP(n) { state.xp += n; save({ xp: state.xp }); renderNav(); },
   };
 
   const LEVELS = [[0, 'Rookie', '🌱'], [80, 'Explorer', '🧭'], [200, 'Problem Solver', '🧩'], [400, 'Contest Climber', '🧗'], [700, 'Gauss Hero', '🦸'], [1100, 'CJMC Champion', '🏆'],
@@ -155,11 +203,29 @@
         d.week ? h('span', { class: 'crumb' }, '› ', h('a', { href: `${BASE}/${study ? 'study' : 'week'}/${d.week}/` }, d.weekTitle || d.week)) : null,
         h('span', { class: 'spacer' }),
         skillList ? h('div', { class: 'skillbar', title: 'Skill badges' }, skillList.map((s) => h('span', { class: s.done ? 'done' : '', style: { '--c': s.color }, title: s.label }, s.emoji))) : null,
+        whoChip(),
         // contest level names (Gauss Hero…) make no sense for school study: show just the points there
         h('span', { class: 'xp', title: study ? 'Your points' : 'Your level' }, study ? '⭐ ' : `${icon} ${name} · `, h('b', {}, `${state.xp} XP`)),
         h('div', { class: 'nav-progress', style: { width: navPct + '%' } })));
   }
   MC.renderNav = renderNav;
+
+  /** Who is signed in (or a "Sign in" link). Hidden entirely when the server has no accounts set up. */
+  function whoChip() {
+    if (!SESSION.enabled) return null;
+    if (SESSION.dbDown) return h('span', { class: 'who warn', title: 'The account database is not reachable, so progress is only saved on this device' }, '⚠️ offline');
+    if (!USER) return h('a', { class: 'who signin', href: `${BASE}/login?next=${encodeURIComponent(location.pathname + location.search)}`, title: 'Sign in to keep your progress on every device' }, '🔑 Sign in');
+    const parent = USER.role === 'parent';
+    return h('span', { class: 'who', 'data-sync': MC.sync || 'ok' },
+      parent ? h('a', { href: `${BASE}/parent/`, title: 'Parent view' }, '👪') : null,
+      h('span', { class: 'who-name', title: parent ? 'Parent profile' : 'Your profile' }, `${parent ? '' : '🙂 '}${USER.name}`),
+      h('button', { type: 'button', class: 'who-out', title: 'Sign out', onclick: signOut }, '⎋'));
+  }
+  function signOut() {
+    flush(true);
+    fetch(`${BASE}/api/logout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}', credentials: 'same-origin' })
+      .finally(() => { location.href = `${BASE}/login`; });
+  }
 
   /* ------------------------------------------------- progress meters (home/hub) */
   function paintMeters() {
@@ -455,6 +521,12 @@
     renderNav();
     paintMeters();
     reveal();
+    // one gentle reminder per visit, so a child does not play a whole week signed out by accident
+    try {
+      if (SESSION.enabled && !USER && !SESSION.dbDown && document.body.dataset.page !== 'login' && !sessionStorage.getItem('mc.nudged')) {
+        sessionStorage.setItem('mc.nudged', '1'); setTimeout(() => MC.toast('🔑 Tap “Sign in” so your stars follow you everywhere'), 900);
+      }
+    } catch (e) { /* storage blocked: skip the reminder */ }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();

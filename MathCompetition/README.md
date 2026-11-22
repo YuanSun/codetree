@@ -4,9 +4,11 @@ Interactive, kid-friendly versions of the weekly math-contest prep materials (CJ
 Each week's slides and homework become a small website the child can *play with*: drag sliders, predict-then-check,
 build answers step by step, earn stars and badges — instead of reading slides or pressing "next".
 
-- **Server**: plain Python 3 standard library — **no `pip install`** needed.
-- **Front end**: vanilla HTML/CSS/JS (works offline, no build step).
-- **Progress** (XP, stars, badges) is saved in the browser (`localStorage`) — per device, nothing leaves the machine.
+- **Server**: plain Python 3 standard library — **no `pip install`** needed (only if you turn on profiles: `psycopg` + `argon2-cffi`).
+- **Front end**: vanilla HTML/CSS/JS (no build step).
+- **Progress** (XP, stars, badges): by default saved in the browser (`localStorage`, per device and per address).
+  With **profiles** switched on (below) it is saved in the family Postgres under each child's name, so it follows them
+  to every device, and parents get a view of how everyone is doing.
 
 ## Run it
 
@@ -22,6 +24,38 @@ python3 server.py --host 0.0.0.0   # then open http://<this-computer's-IP>:12998
 ```
 
 Weeks are discovered automatically on every request — add or edit a week and just refresh the browser.
+
+## Profiles: the same child and parent accounts as Lecture Magique (optional, Postgres)
+
+Sign-in uses the profiles **Lecture Magique already has** (`lecture.app_user`): same names, same passwords, one place to
+manage them. A Lecture *student* is a **child** here; *parent* and *admin* are **parents**. This app only adds the progress each
+child earns, in its own `mathlab` schema of the `postgres` database you already run (next to `family_budget` and `lecture`),
+with its own `mathlab_app` role. That role can read just five columns of `lecture.app_user` (id, username, display name,
+password hash, role) and nothing else of Lecture's.
+
+```bash
+pip install -r requirements.txt                    # psycopg + argon2-cffi, only for profiles
+psql -d postgres -v app_password="'pick-a-password'" -f db/init_role.sql     # once, as your Postgres admin: role + schema
+cp .env.example .env                               # fill in DATABASE_URL, DATABASE_ADMIN_URL, SESSION_SECRET
+python3 userctl.py migrate                         # progress tables + grants (re-run any time; also after Lecture's schema exists)
+python3 userctl.py list-users                      # who can sign in, and as what
+python3 server.py                                  # startup says: Accounts: on (Postgres, schema mathlab)
+```
+
+Create or change profiles with Lecture Magique's CLI (`cd lecture-magique/backend && uv run python -m app.cli create-user grace --role student`,
+`set-password`, `list-users`): a password changed there works here too, and signs that profile out of this site.
+Each site keeps its own login (you sign in once to each).
+
+- **Children** sign in at `/login` (the nav shows "🔑 Sign in"). Every star, XP point and finished task is saved to their
+  profile a moment after it happens, and loads on any device. If the database is unreachable the page keeps working, shows
+  "⚠", queues the changes in the browser and sends them when it can.
+- **Parents** also see a 👪 link to `/parent/`: each child's points, finished items and which questions needed 2+ hints or
+  3+ tries ("worth a look together"), by week. Parents can do the exercises too (their own progress); children can't open the parent view.
+- **First sign-in on a device that already has saved stars** asks whether to move them into the (empty) account. It never does so silently, because on a shared tablet they may belong to someone else.
+- **Without** `DATABASE_URL` + `SESSION_SECRET` + `psycopg` + `argon2-cffi` nothing changes: no sign-in link, progress stays in the browser.
+- The login cookie is signed, HttpOnly, 30 days. Only a display name and learning records are stored for a child.
+- Backup: `pg_dump -d postgres --schema=mathlab -Fc -f ~/Backups/mathlab-$(date +%F).dump`
+- To use another profiles table, set `USERS_TABLE=schema.table` (needs the columns above and argon2id password hashes).
 
 ## What a week contains (Week 8 as the example)
 
@@ -68,12 +102,25 @@ link to each other. Behind the hosting gateway the study track lives at `/math/s
 The Sem-5/6 Quests and Class Sheets keep the sheet's original French in the questions; help text is in English.
 Shared lesson styling lives in `static/css/lesson-common.css` (new lessons can link it instead of copying Week 8's CSS).
 
+## 3D viewer (`static/js/view3d.js`)
+
+Geometry weeks can show solids as a real 3D object that the child turns with a finger or mouse, like a product viewer:
+`MC.view3d(el, { voxels: [[a,b,z],…] })` or `{ boxes: [{ a, b, z }] }` (canvas, no libraries). Drag to turn it (it keeps gliding),
+pinch or ＋/－ to zoom, double-tap to reset, **front / right / top / corner** buttons fly to the standard views, and optional
+tools: x-ray, *pull the cubes apart*, and **tap faces to mark them** (surface area counted by hand, including the hidden bottom).
+Week 11 uses it in every stack and box lab through `showSolid()` in its `figures.js` (a "Flat picture / Turn it in 3D" switch
+on each drawing; the labs start in 3D, the question figures start flat). Load it from a page with
+`"scripts": ["/static/js/view3d.js", "figures.js"]` in `week.json` (or a `<script>` tag in a hand-built lesson).
+
 ## Layout
 
 ```
 MathCompetition/
 ├── server.py            # the web server (auto-discovers weeks)
 ├── weekctl.py           # `new` scaffolds a week, `check` validates content
+├── accounts.py          # optional profiles + saved progress in Postgres (psycopg)
+├── userctl.py           # migrate / list-users (profiles themselves come from Lecture Magique)
+├── db/                  # init_role.sql (once, admin), 0001_initial.sql (schema `mathlab`), grants.sql
 ├── static/              # shared CSS + JS engine (core.js: store, XP, guided steps, quiz)
 ├── study/               # School Study track: study/sem05 … sem08, sem0506 … (same layout as a week)
 ├── templates/layout.html
@@ -122,10 +169,17 @@ python3 -m unittest discover -s tests
 ```
 
 Covers routing, path-traversal protection, JSON embedding and the content checker (including a check that
-every week's answer keys are valid indices). The Week 8 answer keys were additionally verified independently by computing each problem.
+every week's answer keys are valid indices). The profile tests that need Postgres are skipped unless you give them a
+scratch database (the tests wipe the `mathlab` tables there and create a stand-in `lecture.app_user`, so its name must contain "test"):
+
+```bash
+createdb mathlab_test
+MATHLAB_TEST_URL=postgresql://you@localhost/mathlab_test python3 -m unittest discover -s tests
+```
+ The Week 8 answer keys were additionally verified independently by computing each problem.
 
 ## Notes
 
-- **Reset progress**: in the browser console run `localStorage.removeItem('mc.progress.v1')`.
+- **Reset progress** (not signed in): in the browser console run `localStorage.removeItem('mc.progress.v1')`. For a profile, delete its rows: `DELETE FROM mathlab.progress WHERE user_id = …`.
 - **Copyright**: the contest questions are © CEMC, University of Waterloo (CJMC & Gauss) and the slides are from The Learning Lab;
   they are retyped here for personal study. The original PDFs are git-ignored — keep this repo private if it holds more than the retyped text.
