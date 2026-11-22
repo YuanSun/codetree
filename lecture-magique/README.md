@@ -43,7 +43,7 @@ dictionary → create accounts → import and publish the book → bookmark it o
 ## Every week: a new article
 
 1. Give Claude the book (PDF, photos or text) and say "new book for Lecture Magique". The skill in
-   [`docs/skills/lecture-magique-weekly/SKILL.md`](docs/skills/lecture-magique-weekly/SKILL.md) tells it exactly what
+   [`.claude/skills/lecture-magique-weekly/SKILL.md`](.claude/skills/lecture-magique-weekly/SKILL.md) tells it exactly what
    to make: `content/<book>.txt`, the pictures in `content/images/<book>/`, and `content/<book>.questions.json`
    (one question per chapter, 6 closed questions, 8 open + 1 writing, each with `evidence` quotes from the text).
    It hands you one zip, `<book>-week.zip`.
@@ -64,8 +64,9 @@ The formats are in `tools/text2pack.py` (text) and the skill (questions). A clos
 "choices": ["Vrai", "Faux"], "correct": 1}}`. Evidence is `"evidence": [{"chapter": 4, "quote": "exact words"}]` in a
 question's `rubric`: copied from one paragraph of that chapter, no `[…]`.
 
-To add the skill to Claude: zip the `docs/skills/lecture-magique-weekly/` folder and upload it under claude.ai →
-Settings → Capabilities → Skills.
+Claude Code sessions on this repo load the skill automatically (it is in `.claude/skills/`). To use it in a claude.ai
+chat too, zip the `.claude/skills/lecture-magique-weekly/` folder and upload it under claude.ai → Settings →
+Capabilities → Skills. Edit it here; re-upload the zip after a change.
 
 The first book, *Méga trouille au château*, is already transcribed from the PDF scan as
 `content/mega-trouille.pack.json` (6 chapters, ~5,700 words, one reflection question per chapter + 5 whole-book
