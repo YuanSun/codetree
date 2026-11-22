@@ -1,11 +1,12 @@
 """Accounts and saved progress in Postgres (optional).
 
-Child and parent profiles, a signed login cookie, and the progress each child earns. Everything lives in
-the ``mathlab`` schema of the family Postgres, next to ``family_budget`` and ``lecture``.
+The family profiles are the ones Lecture Magique already has: people sign in against ``lecture.app_user``
+(same names, same passwords, roles student/parent/admin -> child/parent/parent), so there is one set of
+profiles to manage. What this app adds is the progress each child earns, in its own ``mathlab`` schema.
 
-Optional on purpose: without ``psycopg``, ``DATABASE_URL`` and ``SESSION_SECRET`` the server runs exactly as
-before and progress stays in each browser's localStorage. Only ``psycopg`` is a dependency; passwords use
-the standard library's scrypt and the cookie is an HMAC-signed token, so there is nothing else to install.
+Optional on purpose: without ``psycopg``, ``argon2-cffi``, ``DATABASE_URL`` and ``SESSION_SECRET`` the server
+runs exactly as before and progress stays in each browser's localStorage. The login cookie is an HMAC-signed
+token (standard library). Profiles are created with Lecture Magique's own CLI, never here.
 
 Settings come from the environment or ``MathCompetition/.env`` (see ``.env.example``).
 """
@@ -22,18 +23,27 @@ import time
 from http.cookies import SimpleCookie
 from pathlib import Path
 
-try:  # psycopg is the only optional dependency
+try:  # the optional dependencies (only needed for profiles)
     import psycopg
     from psycopg.types.json import Jsonb
 except ImportError:  # pragma: no cover - exercised by running without it
     psycopg = None
     Jsonb = None
+try:
+    from argon2 import PasswordHasher
+    from argon2.exceptions import InvalidHashError, VerificationError
+except ImportError:  # pragma: no cover
+    PasswordHasher = None
 
 ROOT = Path(__file__).resolve().parent
 COOKIE = "mc_session"
 SESSION_DAYS = 30
 MAX_FAILS, LOCK_SECONDS = 5, 300
-ROLES = ("child", "parent")
+# Where the family profiles live. Lecture Magique's table by default; any table with the columns
+# id, username, display_name, password_hash (argon2id) and role works (set USERS_TABLE).
+ROLE_MAP = {"student": "child", "child": "child", "parent": "parent", "admin": "parent"}
+CHILD_ROLES = ("student", "child")
+TABLE_RE = re.compile(r"^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*$")
 KEY_RE = re.compile(r"^[A-Za-z0-9_.-]{1,64}$")
 MAX_OPS = 500
 MAX_ITEM_BYTES = 4096
@@ -76,13 +86,20 @@ def secret() -> str:
     return os.environ.get("SESSION_SECRET", "").strip()
 
 
+def users_table() -> str:
+    t = os.environ.get("USERS_TABLE", "lecture.app_user").strip()
+    if not TABLE_RE.match(t):
+        raise RuntimeError("USERS_TABLE must look like schema.table")
+    return t
+
+
 def enabled() -> bool:
-    return bool(psycopg and database_url() and secret())
+    return bool(psycopg and PasswordHasher and database_url() and secret())
 
 
 def why_disabled() -> str:
-    if psycopg is None:
-        return "psycopg is not installed (pip install 'psycopg[binary]')"
+    if psycopg is None or PasswordHasher is None:
+        return "psycopg / argon2-cffi are not installed (pip install -r requirements.txt)"
     if not database_url():
         return "DATABASE_URL is not set"
     if not secret():
@@ -107,26 +124,18 @@ def _unb64(s: str) -> bytes:
     return base64.urlsafe_b64decode(s + "=" * (-len(s) % 4))
 
 
-def hash_password(password: str) -> str:
-    n, r, p = 2**14, 8, 1
-    salt = os.urandom(16)
-    dk = hashlib.scrypt(password.encode(), salt=salt, n=n, r=r, p=p, maxmem=64 * 1024 * 1024, dklen=32)
-    return f"scrypt${n}${r}${p}${_b64(salt)}${_b64(dk)}"
-
-
 def verify_password(stored: str, password: str) -> bool:
+    """Check a password against an argon2id hash made by Lecture Magique."""
+    if PasswordHasher is None:
+        return False
     try:
-        scheme, n, r, p, salt, want = stored.split("$")
-        if scheme != "scrypt":
-            return False
-        dk = hashlib.scrypt(password.encode(), salt=_unb64(salt), n=int(n), r=int(r), p=int(p),
-                            maxmem=64 * 1024 * 1024, dklen=32)
-        return hmac.compare_digest(dk, _unb64(want))
-    except (ValueError, TypeError):
+        return _hasher.verify(stored, password)
+    except (VerificationError, InvalidHashError):
         return False
 
 
-_DUMMY = hash_password("timing-equaliser")
+_hasher = PasswordHasher() if PasswordHasher else None
+_DUMMY = _hasher.hash("timing-equaliser") if _hasher else ""
 
 
 # ----------------------------------------------------------------------- cookie
@@ -190,7 +199,7 @@ class AuthError(Exception):
 
 
 def _user_dict(row) -> dict:
-    return {"id": row[0], "username": row[1], "name": row[2], "role": row[3]}
+    return {"id": row[0], "username": row[1], "name": row[2], "role": ROLE_MAP.get(row[3], "child")}
 
 
 def login(username: str, password: str) -> tuple[dict, str]:
@@ -200,7 +209,7 @@ def login(username: str, password: str) -> tuple[dict, str]:
     if wait:
         raise AuthError(429, f"Too many tries. Try again in {wait // 60 + 1} min.")
     with connect() as conn:
-        row = conn.execute("SELECT id, username, display_name, role, password_hash FROM mathlab.app_user "
+        row = conn.execute(f"SELECT id, username, display_name, role, password_hash FROM {users_table()} "
                            "WHERE username = %s", (username,)).fetchone()
     ok = verify_password(row[4], password or "") if row else (verify_password(_DUMMY, password or "") and False)
     if not ok:
@@ -225,7 +234,7 @@ def user_from_cookie(cookie_header: str | None) -> dict | None:
         return None
     uid, pv = parsed
     with connect() as conn:
-        row = conn.execute("SELECT id, username, display_name, role, password_hash FROM mathlab.app_user WHERE id = %s",
+        row = conn.execute(f"SELECT id, username, display_name, role, password_hash FROM {users_table()} WHERE id = %s",
                            (uid,)).fetchone()
     if not row or _pv(row[4]) != pv:
         return None
@@ -321,8 +330,9 @@ def is_empty(state: dict) -> bool:
 def children_overview() -> list[dict]:
     """Every child with points, items finished and when they last did anything."""
     with connect() as conn:
-        kids = conn.execute("SELECT u.id, u.username, u.display_name, COALESCE(p.xp, 0) FROM mathlab.app_user u "
-                            "LEFT JOIN mathlab.profile p ON p.user_id = u.id WHERE u.role = 'child' ORDER BY u.id").fetchall()
+        kids = conn.execute(f"SELECT u.id, u.username, u.display_name, COALESCE(p.xp, 0) FROM {users_table()} u "
+                            "LEFT JOIN mathlab.profile p ON p.user_id = u.id WHERE u.role = ANY(%s) ORDER BY u.id",
+                            (list(CHILD_ROLES),)).fetchall()
         stats = {}
         for uid, data, updated in conn.execute("SELECT user_id, data, updated_at FROM mathlab.progress"):
             s = stats.setdefault(uid, {"done": 0, "last": None, "stars": 0})
@@ -341,8 +351,8 @@ def children_overview() -> list[dict]:
 
 def child_detail(uid: int) -> dict | None:
     with connect() as conn:
-        row = conn.execute("SELECT id, username, display_name, role FROM mathlab.app_user WHERE id=%s AND role='child'",
-                           (uid,)).fetchone()
+        row = conn.execute(f"SELECT id, username, display_name, role FROM {users_table()} WHERE id=%s AND role = ANY(%s)",
+                           (uid, list(CHILD_ROLES))).fetchone()
         if not row:
             return None
         items = [{"unit": u, "page": p, "item": i, "data": d, "at": at.isoformat()} for u, p, i, d, at in conn.execute(
@@ -371,32 +381,12 @@ def migrate(url: str | None = None) -> list[str]:
             conn.execute(f.read_text(encoding="utf-8"))
             conn.execute("INSERT INTO mathlab.schema_migrations (version) VALUES (%s)", (f.name,))
             applied.append(f.name)
+        grants = ROOT / "db" / "grants.sql"          # idempotent: re-run every time so order of setup never matters
+        if grants.is_file():
+            conn.execute(grants.read_text(encoding="utf-8"))
     return applied
-
-
-def create_user(username: str, password: str, role: str, display_name: str | None = None) -> None:
-    username = username.strip().lower()
-    if role not in ROLES:
-        raise ValueError(f"role must be one of {ROLES}")
-    if not re.match(r"^[a-z0-9_.-]{2,32}$", username):
-        raise ValueError("username: 2–32 letters, digits, . _ -")
-    if len(password) < 6:
-        raise ValueError("password needs at least 6 characters")
-    with connect() as conn:
-        if conn.execute("SELECT 1 FROM mathlab.app_user WHERE username=%s", (username,)).fetchone():
-            raise ValueError(f"{username} already exists")
-        conn.execute("INSERT INTO mathlab.app_user (username, display_name, password_hash, role) VALUES (%s,%s,%s,%s)",
-                     (username, display_name or username.capitalize(), hash_password(password), role))
-
-
-def set_password(username: str, password: str) -> bool:
-    if len(password) < 6:
-        raise ValueError("password needs at least 6 characters")
-    with connect() as conn:
-        return conn.execute("UPDATE mathlab.app_user SET password_hash=%s WHERE username=%s",
-                            (hash_password(password), username.strip().lower())).rowcount > 0
 
 
 def list_users() -> list[tuple]:
     with connect() as conn:
-        return conn.execute("SELECT username, display_name, role, created_at FROM mathlab.app_user ORDER BY id").fetchall()
+        return conn.execute(f"SELECT username, display_name, role FROM {users_table()} ORDER BY id").fetchall()

@@ -64,8 +64,9 @@ That is acceptable for the academy and math lab on your home Wi-Fi, but not for 
 - The academy stores progress in each browser's `localStorage`, which is per device and per address, so changing the address
   you use starts progress afresh. MathCompetition does too **until you set up its child/parent profiles**
   ([MathCompetition/README.md](../MathCompetition/README.md#profiles-child-and-parent-accounts-optional-postgres)): then progress
-  is saved in Postgres under each profile and follows the child to every device and address. Its `.env` is read by the app
-  itself, and `psycopg` must be installed for the `python3` that `run.sh` starts.
+  is saved in Postgres under each profile and follows the child to every device and address. The profiles are the same
+  ones Lecture Magique uses (one set of names and passwords for both sites). Its `.env` is read by the app itself, and
+  `pip install -r MathCompetition/requirements.txt` must have been run for the `python3` that `run.sh` starts.
 
 ## 4. Start on login (macOS)
 

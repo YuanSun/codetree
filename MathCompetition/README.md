@@ -4,7 +4,7 @@ Interactive, kid-friendly versions of the weekly math-contest prep materials (CJ
 Each week's slides and homework become a small website the child can *play with*: drag sliders, predict-then-check,
 build answers step by step, earn stars and badges — instead of reading slides or pressing "next".
 
-- **Server**: plain Python 3 standard library — **no `pip install`** needed (only if you turn on profiles: `psycopg`).
+- **Server**: plain Python 3 standard library — **no `pip install`** needed (only if you turn on profiles: `psycopg` + `argon2-cffi`).
 - **Front end**: vanilla HTML/CSS/JS (no build step).
 - **Progress** (XP, stars, badges): by default saved in the browser (`localStorage`, per device and per address).
   With **profiles** switched on (below) it is saved in the family Postgres under each child's name, so it follows them
@@ -25,20 +25,26 @@ python3 server.py --host 0.0.0.0   # then open http://<this-computer's-IP>:12998
 
 Weeks are discovered automatically on every request — add or edit a week and just refresh the browser.
 
-## Profiles: child and parent accounts (optional, Postgres)
+## Profiles: the same child and parent accounts as Lecture Magique (optional, Postgres)
 
-Same idea as [Lecture Magique](../lecture-magique): the app gets its own schema (`mathlab`) and database role in the
-`postgres` database you already run, next to `family_budget` and `lecture`. No self sign-up — a parent creates the profiles.
+Sign-in uses the profiles **Lecture Magique already has** (`lecture.app_user`): same names, same passwords, one place to
+manage them. A Lecture *student* is a **child** here; *parent* and *admin* are **parents**. This app only adds the progress each
+child earns, in its own `mathlab` schema of the `postgres` database you already run (next to `family_budget` and `lecture`),
+with its own `mathlab_app` role. That role can read just five columns of `lecture.app_user` (id, username, display name,
+password hash, role) and nothing else of Lecture's.
 
 ```bash
-pip install 'psycopg[binary]'                      # the only dependency, and only for profiles
+pip install -r requirements.txt                    # psycopg + argon2-cffi, only for profiles
 psql -d postgres -v app_password="'pick-a-password'" -f db/init_role.sql     # once, as your Postgres admin: role + schema
 cp .env.example .env                               # fill in DATABASE_URL, DATABASE_ADMIN_URL, SESSION_SECRET
-python3 userctl.py migrate                         # creates the tables
-python3 userctl.py create-user grace --role child  --display-name Grace
-python3 userctl.py create-user mom   --role parent --display-name Mom
+python3 userctl.py migrate                         # progress tables + grants (re-run any time; also after Lecture's schema exists)
+python3 userctl.py list-users                      # who can sign in, and as what
 python3 server.py                                  # startup says: Accounts: on (Postgres, schema mathlab)
 ```
+
+Create or change profiles with Lecture Magique's CLI (`cd lecture-magique/backend && uv run python -m app.cli create-user grace --role student`,
+`set-password`, `list-users`): a password changed there works here too, and signs that profile out of this site.
+Each site keeps its own login (you sign in once to each).
 
 - **Children** sign in at `/login` (the nav shows "🔑 Sign in"). Every star, XP point and finished task is saved to their
   profile a moment after it happens, and loads on any device. If the database is unreachable the page keeps working, shows
@@ -46,9 +52,10 @@ python3 server.py                                  # startup says: Accounts: on 
 - **Parents** also see a 👪 link to `/parent/`: each child's points, finished items and which questions needed 2+ hints or
   3+ tries ("worth a look together"), by week. Parents can do the exercises too (their own progress); children can't open the parent view.
 - **First sign-in on a device that already has saved stars** asks whether to move them into the (empty) account. It never does so silently, because on a shared tablet they may belong to someone else.
-- **Without** `DATABASE_URL` + `SESSION_SECRET` + `psycopg` nothing changes: no sign-in link, progress stays in the browser.
-- `python3 userctl.py set-password grace` · `list-users`. Passwords are scrypt-hashed; the login cookie is signed, HttpOnly, 30 days, and changing a password signs that profile out everywhere. Only a display name and learning records are stored for a child: no age, school or e-mail.
+- **Without** `DATABASE_URL` + `SESSION_SECRET` + `psycopg` + `argon2-cffi` nothing changes: no sign-in link, progress stays in the browser.
+- The login cookie is signed, HttpOnly, 30 days. Only a display name and learning records are stored for a child.
 - Backup: `pg_dump -d postgres --schema=mathlab -Fc -f ~/Backups/mathlab-$(date +%F).dump`
+- To use another profiles table, set `USERS_TABLE=schema.table` (needs the columns above and argon2id password hashes).
 
 ## What a week contains (Week 8 as the example)
 
@@ -102,8 +109,8 @@ MathCompetition/
 ├── server.py            # the web server (auto-discovers weeks)
 ├── weekctl.py           # `new` scaffolds a week, `check` validates content
 ├── accounts.py          # optional profiles + saved progress in Postgres (psycopg)
-├── userctl.py           # migrate / create-user / set-password / list-users
-├── db/                  # init_role.sql (once, admin) and 0001_initial.sql (schema `mathlab`)
+├── userctl.py           # migrate / list-users (profiles themselves come from Lecture Magique)
+├── db/                  # init_role.sql (once, admin), 0001_initial.sql (schema `mathlab`), grants.sql
 ├── static/              # shared CSS + JS engine (core.js: store, XP, guided steps, quiz)
 ├── study/               # School Study track: study/sem05 … sem08, sem0506 … (same layout as a week)
 ├── templates/layout.html
@@ -153,7 +160,7 @@ python3 -m unittest discover -s tests
 
 Covers routing, path-traversal protection, JSON embedding and the content checker (including a check that
 every week's answer keys are valid indices). The profile tests that need Postgres are skipped unless you give them a
-scratch database (the tests wipe the `mathlab` tables there, so its name must contain "test"):
+scratch database (the tests wipe the `mathlab` tables there and create a stand-in `lecture.app_user`, so its name must contain "test"):
 
 ```bash
 createdb mathlab_test

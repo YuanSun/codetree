@@ -36,13 +36,25 @@ class PureTests(unittest.TestCase):
         os.environ.clear()
         os.environ.update(self._env)
 
-    def test_password_hash_roundtrip(self):
-        h = accounts.hash_password("correct horse")
-        self.assertTrue(h.startswith("scrypt$"))
+    @unittest.skipUnless(accounts.PasswordHasher, "argon2-cffi not installed")
+    def test_verifies_lecture_magique_argon2_hashes(self):
+        from argon2 import PasswordHasher
+        h = PasswordHasher().hash("correct horse")          # what Lecture Magique stores
         self.assertTrue(accounts.verify_password(h, "correct horse"))
         self.assertFalse(accounts.verify_password(h, "wrong"))
-        self.assertNotEqual(h, accounts.hash_password("correct horse"))   # salted
         self.assertFalse(accounts.verify_password("garbage", "x"))
+        self.assertFalse(accounts.verify_password("scrypt$1$2$3$a$b", "x"))
+
+    def test_role_mapping(self):
+        self.assertEqual({r: accounts.ROLE_MAP[r] for r in ("student", "parent", "admin")},
+                         {"student": "child", "parent": "parent", "admin": "parent"})
+
+    def test_users_table_must_look_like_schema_table(self):
+        os.environ["USERS_TABLE"] = "lecture.app_user; drop table x"
+        with self.assertRaises(RuntimeError):
+            accounts.users_table()
+        os.environ.pop("USERS_TABLE")
+        self.assertEqual(accounts.users_table(), "lecture.app_user")
 
     def test_token_roundtrip_and_tamper(self):
         t = accounts.make_token(7, "somehashvalue123456")
@@ -132,7 +144,7 @@ class DisabledServerTests(unittest.TestCase):
             self.assertLess(body.index("/api/session.js"), body.index("/static/js/core.js"), path)
 
 
-@unittest.skipUnless(accounts.psycopg and TEST_URL and "test" in urlparse(TEST_URL).path,
+@unittest.skipUnless(accounts.psycopg and accounts.PasswordHasher and TEST_URL and "test" in urlparse(TEST_URL).path,
                      "set MATHLAB_TEST_URL to a scratch database whose name contains 'test'")
 class DatabaseTests(unittest.TestCase):
     @classmethod
@@ -140,11 +152,17 @@ class DatabaseTests(unittest.TestCase):
         cls._env = dict(os.environ)
         os.environ.update(DATABASE_URL=TEST_URL, SESSION_SECRET="unit-test-secret")
         accounts.migrate(TEST_URL)
-        with accounts.connect(TEST_URL) as c:
-            c.execute("TRUNCATE mathlab.progress, mathlab.profile, mathlab.app_user RESTART IDENTITY CASCADE")
-        accounts.create_user("kid", "kidpass1", "child", "Kid")
-        accounts.create_user("kid2", "kidpass2", "child", "Kid Two")
-        accounts.create_user("mom", "mompass1", "parent", "Mom")
+        from argon2 import PasswordHasher
+        ph = PasswordHasher()
+        with accounts.connect(TEST_URL) as c:            # a stand-in for Lecture Magique's profiles table
+            c.execute("CREATE SCHEMA IF NOT EXISTS lecture")
+            c.execute("CREATE TABLE IF NOT EXISTS lecture.app_user (id bigserial PRIMARY KEY, username text UNIQUE NOT NULL, "
+                      "display_name text NOT NULL, password_hash text NOT NULL, role text NOT NULL, settings jsonb DEFAULT '{}')")
+            c.execute("TRUNCATE mathlab.progress, mathlab.profile, lecture.app_user RESTART IDENTITY CASCADE")
+            for name, pw, role, display in (("kid", "kidpass1", "student", "Kid"), ("kid2", "kidpass2", "student", "Kid Two"),
+                                            ("mom", "mompass1", "parent", "Mom"), ("boss", "bosspass1", "admin", "Boss")):
+                c.execute("INSERT INTO lecture.app_user (username, display_name, password_hash, role) VALUES (%s,%s,%s,%s)",
+                          (name, display, ph.hash(pw), role))
         cls.httpd = ThreadingHTTPServer(("127.0.0.1", 0), server.Handler)
         cls.base = f"http://127.0.0.1:{cls.httpd.server_address[1]}"
         threading.Thread(target=cls.httpd.serve_forever, daemon=True).start()
@@ -179,7 +197,7 @@ class DatabaseTests(unittest.TestCase):
         self.assertEqual(self.call("POST", "/api/login", b"username=kid", ctype="application/x-www-form-urlencoded")[0], 400)
         cookie, data = self.sign_in("Kid", "kidpass1")          # usernames are case-insensitive
         self.assertTrue(data["empty"])
-        self.assertEqual(data["user"]["role"], "child")
+        self.assertEqual(data["user"]["role"], "child")                  # Lecture's "student"
 
         # saving: set, delete, xp never goes down
         item = {"done": 1, "stars": 2, "hints": 3, "attempts": 4}
@@ -223,19 +241,26 @@ class DatabaseTests(unittest.TestCase):
         mom, data = self.sign_in("mom", "mompass1")
         _, overview, _ = self.call("GET", "/api/parent/overview", cookie=mom)
         names = {c["username"]: c for c in overview["children"]}
-        self.assertEqual(set(names), {"kid", "kid2"})                                        # children only, no parents
+        self.assertEqual(set(names), {"kid", "kid2"})                                        # students only, no parents/admin
         self.assertGreaterEqual(names["kid"]["done"], 1)
         _, detail, _ = self.call("GET", f"/api/parent/child/{names['kid']['id']}", cookie=mom)
         self.assertTrue(any(i["item"] == "ex09" for i in detail["items"]))
         parent_id = self.call("POST", "/api/login", {"username": "mom", "password": "mompass1"})[1]["user"]["id"]
         self.assertEqual(self.call("GET", f"/api/parent/child/{parent_id}", cookie=mom)[0], 404)   # not a child
 
+    def test_admin_counts_as_parent(self):
+        cookie, data = self.sign_in("boss", "bosspass1")
+        self.assertEqual(data["user"]["role"], "parent")
+        self.assertEqual(self.call("GET", "/api/parent/overview", cookie=cookie)[0], 200)
+
     def test_password_change_signs_out(self):
-        accounts.create_user("temp", "temppass1", "child")
-        cookie, _ = self.sign_in("temp", "temppass1")
+        from argon2 import PasswordHasher
+        cookie, _ = self.sign_in("kid2", "kidpass2")
         self.assertEqual(self.call("GET", "/api/progress", cookie=cookie)[0], 200)
-        accounts.set_password("temp", "temppass2")
+        with accounts.connect(TEST_URL) as c:     # a password change made in Lecture Magique signs out here too
+            c.execute("UPDATE lecture.app_user SET password_hash=%s WHERE username='kid2'", (PasswordHasher().hash("newpass22"),))
         self.assertEqual(self.call("GET", "/api/progress", cookie=cookie)[0], 401)
+        self.assertEqual(self.sign_in("kid2", "newpass22")[1]["user"]["username"], "kid2")
 
 
 if __name__ == "__main__":
