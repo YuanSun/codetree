@@ -75,7 +75,10 @@ export type BagWord = {
 };
 
 /** Model answer and rubric of a question: sent only once the child has answered it. */
+/** A passage of the book that holds the answer: words copied exactly from one paragraph of that chapter. */
+export type Evidence = { chapter: number; quote: string };
 export type AnswerKey = { model_answer: string | null; must_answer: string | null; avoid: string | null;
+  evidence?: Evidence[];
   correct?: string /* closed questions: the right option */ };
 export type Question = {
   id: number; kind: "open" | "choice" | "writing"; prompt: string;

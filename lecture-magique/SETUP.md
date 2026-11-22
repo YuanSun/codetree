@@ -303,8 +303,15 @@ python3 tools/text2pack.py content/pepite.txt content/pepite.questions.json -o c
 cd backend && uv run python -m importer.article questions ../content/pepite.pack.json
 ```
 
-A question whose chapter and wording are unchanged keeps its answers. Old questions nobody answered are removed.
+(`tools/weekly.sh <book>` does the same in one command.) A question whose chapter and wording are unchanged keeps its
+answers. Old questions nobody answered are removed.
 Answered ones are hidden from the questions page, but her answers stay in Suivi.
+
+Each question can name the passages that hold its answer, in its `rubric`:
+`"evidence": [{"chapter": 4, "quote": "exact words from one paragraph of chapter 4"}]`. After Grace answers, the
+question shows **📍 Où trouver la réponse dans le texte**; a tap opens the text beside the questions with the passage
+highlighted. The marking export sends the quotes too, so Claude checks her answer against the text. `text2pack` stops
+if a quote isn't found (spaces, apostrophes and case don't matter; `[…]` does).
 
 To have her answers marked: open **Suivi** as a parent → **📝 Correction par Claude** → **Télécharger** (or
 **Copier**). Give the file to Claude in a conversation, with "mark these" as the only instruction; the file already
@@ -337,7 +344,7 @@ After a `git pull`, `deploy/deploy.sh` keeps working the same way. To go back to
 | Stop / start | `launchctl bootout gui/$(id -u)/com.lecture-magique` / `deploy/deploy.sh --no-build` |
 | Logs | `tail -f ~/Library/Logs/lecture-magique.log` |
 | New password for Grace | `cd backend && uv run python -m app.cli set-password grace` |
-| Weekly article | see "Every week" in [README.md](README.md) |
+| Weekly article | `tools/weekly.sh ~/Downloads/<book>-week.zip` (see "Every week" in [README.md](README.md)) |
 | See Grace's progress | log in as your parent account → **📊 Suivi**, or `psql -d postgres -v kid=grace -f tools/progress.sql` |
 
 ## If something goes wrong

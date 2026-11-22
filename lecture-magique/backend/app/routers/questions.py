@@ -28,7 +28,8 @@ def points_of(rubric) -> float:
 
 def _key(r) -> dict:
     rub = r.rubric or {}
-    key = {"model_answer": r.model_answer, "must_answer": rub.get("must_answer"), "avoid": rub.get("avoid")}
+    key = {"model_answer": r.model_answer, "must_answer": rub.get("must_answer"), "avoid": rub.get("avoid"),
+           "evidence": rub.get("evidence") or []}
     if r.kind == "choice":
         key["correct"] = rub["choices"][rub["correct"]]
     return key
@@ -155,6 +156,9 @@ How to mark:
 - If the question asks for evidence, two reasons or two examples, each missing one costs points.
 - Watch negations ("ne... pas", "not"): answering the opposite of the question is wrong.
 - "avoid" lists a common mistake for that question; if she made it, name it.
+- "evidence" lists the passages of the book that hold the answer (chapter + exact quote). Check her answer against
+  them: a detail they don't support is invented, unless it is right elsewhere in the book. When she misses a
+  point, tell her which chapter to look in (she can open the passage from her answer).
 - Spelling and grammar do not cost points, but you may point out at most one important error (agreement, a verb
   form, an anglicism such as "je suis 11 ans").
 - "writing" items: mark content and organisation against "must_answer"; reward full sentences.
@@ -194,7 +198,7 @@ def grading_export(child_id: int, regrade: bool = False, user: User = Depends(re
             "chapter": r.chapter_seq, "kind": r.kind, "question": r.prompt,
             "skill": (r.rubric or {}).get("skill"), "points": points_of(r.rubric),
             "must_answer": (r.rubric or {}).get("must_answer"), "avoid": (r.rubric or {}).get("avoid"),
-            "model_answer": r.model_answer, "answer": r.body,
+            "evidence": (r.rubric or {}).get("evidence") or [], "model_answer": r.model_answer, "answer": r.body,
         } for r in rows],
     }
 

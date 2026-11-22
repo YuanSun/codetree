@@ -42,16 +42,30 @@ dictionary → create accounts → import and publish the book → bookmark it o
 
 ## Every week: a new article
 
-1. Transcribe or paste the text into `content/<name>.txt` (format in `tools/text2pack.py`; `## n Titre` starts a
-   chapter, blank lines separate paragraphs) and write `content/<name>.questions.json`: one question per chapter
-   (`chapters`) and the end-of-reading set (`questions`, each with `model_answer` and a `rubric` of
-   `skill`, `points`, `must_answer`, `avoid`). A closed question is
-   `{"kind": "choice", "prompt": "Vrai ou faux ? …", "model_answer": "why", "rubric": {"points": 1,
-   "choices": ["Vrai", "Faux"], "correct": 1}}`; the importer refuses one without valid options.
-2. `python3 tools/text2pack.py content/<name>.txt content/<name>.questions.json -o content/<name>.pack.json`
-3. `cd backend && uv run python -m importer.article import ../content/<name>.pack.json`. It prints coverage and the
-   unmatched words (full report in `import-reports/`), and the article is a **draft**.
-4. Log in as a parent and read it once, then `uv run python -m importer.article publish <slug>`.
+1. Give Claude the book (PDF, photos or text) and say "new book for Lecture Magique". The skill in
+   [`docs/skills/lecture-magique-weekly/SKILL.md`](docs/skills/lecture-magique-weekly/SKILL.md) tells it exactly what
+   to make: `content/<book>.txt`, the pictures in `content/images/<book>/`, and `content/<book>.questions.json`
+   (one question per chapter, 6 closed questions, 8 open + 1 writing, each with `evidence` quotes from the text).
+   It hands you one zip, `<book>-week.zip`.
+2. On the Mac:
+
+   ```bash
+   tools/weekly.sh ~/Downloads/<book>-week.zip
+   ```
+
+   It unpacks the zip into `content/`, builds the pack (stopping on any evidence quote not found in the text),
+   imports the book as a draft, prints the word coverage and unmatched words (full report in `import-reports/`), and
+   asks whether to publish. `--publish` publishes without asking, `--draft` leaves it as a draft.
+   Already in `content/`? `tools/weekly.sh <book>`. On a book Grace has already started, it refreshes only the
+   questions and pictures and keeps her taps and answers.
+
+The formats are in `tools/text2pack.py` (text) and the skill (questions). A closed question is
+`{"kind": "choice", "prompt": "Vrai ou faux ? …", "model_answer": "why", "rubric": {"points": 1,
+"choices": ["Vrai", "Faux"], "correct": 1}}`. Evidence is `"evidence": [{"chapter": 4, "quote": "exact words"}]` in a
+question's `rubric`: copied from one paragraph of that chapter, no `[…]`.
+
+To add the skill to Claude: zip the `docs/skills/lecture-magique-weekly/` folder and upload it under claude.ai →
+Settings → Capabilities → Skills.
 
 The first book, *Méga trouille au château*, is already transcribed from the PDF scan as
 `content/mega-trouille.pack.json` (6 chapters, ~5,700 words, one reflection question per chapter + 5 whole-book

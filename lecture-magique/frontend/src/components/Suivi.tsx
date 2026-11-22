@@ -156,6 +156,9 @@ export default function Suivi({ theme, self = false }: { theme: [ThemePref, (t: 
                   <p className="ans-body">{a.body}</p>
                   {a.model_answer && <p className="ans-model small">Réponse modèle : {a.model_answer}</p>}
                   {a.must_answer && <p className="small muted">Doit contenir : {a.must_answer}</p>}
+                  {a.evidence?.map((e, i) => (
+                    <p key={i} className="small muted">📍 Chapitre {e.chapter} : « {e.quote} »</p>
+                  ))}
                   {a.grade?.feedback && <p className="ans-feedback small">💬 {a.grade.feedback}</p>}
                 </div>
               ))}

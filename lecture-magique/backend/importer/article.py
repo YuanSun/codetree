@@ -342,10 +342,42 @@ def replace_images(conn: Connection, pack: dict, base: Path | None) -> int:
     return images.store(conn, art, pack, base)
 
 
+def norm_quote(s: str) -> str:
+    """For finding a quote in the text: spaces (incl. the narrow no-break ones), apostrophes and case don't count.
+    Same rule as normQuote in frontend/src/components/Questions.tsx."""
+    s = s.translate(QUOTE_CHARS).lower()
+    return " ".join(s.split())
+
+
+QUOTE_CHARS = str.maketrans({"\u00a0": " ", "\u202f": " ", "\u2009": " ", "\u2019": "'", "\u2018": "'", "\u02bc": "'",
+                             "\u201c": '"', "\u201d": '"'})
+
+
+def check_evidence(pack: dict, q: dict) -> None:
+    """rubric.evidence: [{"chapter": 4, "quote": "exact words from that chapter"}], the passages that hold the answer.
+    Shown to her after she answers (highlighted in the text) and sent with the Claude export."""
+    ev = (q.get("rubric") or {}).get("evidence")
+    if ev is None:
+        return
+    texts = {ch["seq"]: norm_quote(" ".join(ch["paragraphs"])) for ch in pack["chapters"]}
+    if not isinstance(ev, list):
+        raise ImportRefused(f"{pack['slug']}: rubric.evidence of {q['prompt'][:50]!r} must be a list")
+    for e in ev:
+        if not isinstance(e, dict) or e.get("chapter") not in texts or not str(e.get("quote") or "").strip():
+            raise ImportRefused(f"{pack['slug']}: evidence {e!r} of {q['prompt'][:50]!r} needs a chapter of the book "
+                                f"and a quote")
+        # within one paragraph, so the reader can highlight it
+        if not any(norm_quote(e["quote"]) in norm_quote(p) for ch in pack["chapters"] if ch["seq"] == e["chapter"]
+                   for p in ch["paragraphs"]):
+            raise ImportRefused(f"{pack['slug']}: quote {e['quote'][:60]!r} is not in one paragraph of chapter "
+                                f"{e['chapter']} (copy it exactly, without […])")
+
+
 def check_questions(pack: dict) -> None:
-    """Closed questions need their options and the index of the right one."""
+    """Closed questions need their options and the index of the right one; evidence quotes must be in the text."""
     qs = [ch["question"] for ch in pack["chapters"] if ch.get("question")] + pack.get("questions", [])
     for q in qs:
+        check_evidence(pack, q)
         if q.get("kind") != "choice":
             continue
         rub = q.get("rubric") or {}
