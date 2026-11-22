@@ -61,8 +61,11 @@ That is acceptable for the academy and math lab on your home Wi-Fi, but not for 
 | **Small VPS** | Machine that never sleeps | Same files; use Caddy's automatic HTTPS (remove `auto_https off` and the `http://` prefix). |
 
 - The host machine must stay awake and online (`caffeinate -s ./run.sh` helps on macOS; a Mac mini or Raspberry Pi is ideal).
-- MathCompetition and the academy store progress in each browser's `localStorage`, which is per device and per address, so
-  changing the address you use starts progress afresh.
+- The academy stores progress in each browser's `localStorage`, which is per device and per address, so changing the address
+  you use starts progress afresh. MathCompetition does too **until you set up its child/parent profiles**
+  ([MathCompetition/README.md](../MathCompetition/README.md#profiles-child-and-parent-accounts-optional-postgres)): then progress
+  is saved in Postgres under each profile and follows the child to every device and address. Its `.env` is read by the app
+  itself, and `psycopg` must be installed for the `python3` that `run.sh` starts.
 
 ## 4. Start on login (macOS)
 

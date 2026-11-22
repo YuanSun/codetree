@@ -22,6 +22,12 @@ Routes
     /study/<id>/...            same three routes as /week/<id>/ for a study unit
     /static/<file>             shared css/js
     /api/weeks, /api/study     JSON list of units (handy for scripts)
+
+Accounts (optional — only when DATABASE_URL, SESSION_SECRET and psycopg are set, see accounts.py)
+    /login                     sign in (child or parent profile)
+    /parent/                   parents: every child's points, finished items and where they needed hints
+    /api/session.js            tiny script the pages load first: who is signed in + their saved progress
+    /api/login, /api/logout, /api/progress (GET/PUT), /api/progress/import, /api/parent/...
 """
 
 from __future__ import annotations
@@ -36,7 +42,9 @@ import sys
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import unquote, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
+
+import accounts
 
 ROOT = Path(__file__).resolve().parent
 WEEKS_DIR = ROOT / "weeks"
@@ -59,6 +67,15 @@ def set_base_path(value: str) -> None:
 def rebase(text: str) -> str:
     """Prefix root-relative href/src attributes with BASE_PATH (no-op when served at the root)."""
     return ABS_LINK_RE.sub(lambda m: f"{m.group(1)}{BASE_PATH}/", text) if BASE_PATH else text
+
+
+CORE_TAG = '<script src="/static/js/core.js"></script>'
+SESSION_TAG = '<script src="/api/session.js"></script>'
+
+
+def with_session(text: str) -> str:
+    """Make every page that loads core.js load the session script first (so progress is known synchronously)."""
+    return text.replace(CORE_TAG, SESSION_TAG + CORE_TAG, 1) if SESSION_TAG not in text else text
 
 
 # Floating links added to standalone pages (bottom-left: the top-left and bottom-right corners are
@@ -309,6 +326,41 @@ def exam_page(week: dict, page: dict) -> str:
     )
 
 
+def login_page(next_url: str) -> str:
+    return render(
+        "layout.html",
+        title="Sign in · Math Lab",
+        body_attrs='data-page="login"',
+        head='<link rel="stylesheet" href="/static/css/account.css">',
+        body='<section class="account-card"><div class="account-emoji">🔑</div><h1>Who is playing?</h1>'
+        '<p class="muted">Sign in and your stars, points and badges follow you to every device.</p>'
+        '<form id="login-form" autocomplete="on">'
+        '<label>Name<input id="u" name="username" autocomplete="username" autocapitalize="none" required></label>'
+        '<label>Password<input id="p" name="password" type="password" autocomplete="current-password" required></label>'
+        '<button class="btn" type="submit">Let’s go ➜</button><div id="login-msg" class="account-msg" role="status"></div></form>'
+        '<p class="muted small"><a id="skip" href="/">Skip — save on this device only</a></p></section>',
+        scripts=f'<script>window.MC_NEXT={json_for_script(next_url)};</script>\n<script src="/static/js/account.js"></script>',
+    )
+
+
+def parent_page() -> str:
+    return render(
+        "layout.html",
+        title="Parents · Math Lab",
+        body_attrs='data-page="parent"',
+        head='<link rel="stylesheet" href="/static/css/account.css">',
+        body='<section class="hero"><h1>👪 Parent view</h1><p>How every child is doing, and where they needed help.</p></section>'
+        '<div id="parent-root" class="parent-root"><p class="muted">Loading…</p></div>',
+        scripts='<script src="/static/js/parent.js"></script>',
+    )
+
+
+def safe_next(value: str) -> str:
+    """Only ever send people back to a path on this site (no open redirects)."""
+    value = (value or "").strip()
+    return value if value.startswith("/") and not value.startswith("//") and "\\" not in value else f"{BASE_PATH}/"
+
+
 # ------------------------------------------------------------------------- handler
 
 
@@ -327,6 +379,45 @@ class Handler(BaseHTTPRequestHandler):
 
     def _html(self, text: str, status: int = 200) -> None:
         self._send(status, rebase(text).encode("utf-8"), "text/html; charset=utf-8", self.command == "HEAD")
+
+    def _json(self, obj: object, status: int = 200, headers: dict | None = None) -> None:
+        body = json.dumps(obj, ensure_ascii=False, default=str).encode("utf-8")
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
+        for k, v in (headers or {}).items():
+            self.send_header(k, v)
+        self.end_headers()
+        if self.command != "HEAD":
+            self.wfile.write(body)
+
+    def _body(self) -> dict | None:
+        """The JSON request body. Anything not sent as application/json is refused: a cross-site <form> can
+        only send other types, so this (with SameSite=Lax cookies) is the CSRF guard."""
+        if not (self.headers.get("Content-Type") or "").lower().startswith("application/json"):
+            return None
+        try:
+            n = int(self.headers.get("Content-Length") or 0)
+            if not 0 < n <= 2_000_000:
+                return None
+            data = json.loads(self.rfile.read(n))
+        except (ValueError, OSError):
+            return None
+        return data if isinstance(data, dict) else None
+
+    def _session(self) -> tuple[dict | None, bool]:
+        """(signed-in user or None, database_ok). A database outage must never break the pages."""
+        if not accounts.enabled():
+            return None, True
+        try:
+            return accounts.user_from_cookie(self.headers.get("Cookie")), True
+        except Exception as exc:  # noqa: BLE001
+            sys.stderr.write(f"  accounts: database unavailable ({exc})\n")
+            return None, False
+
+    def _cookie(self, token: str, max_age: int) -> dict:
+        return {"Set-Cookie": f"{accounts.COOKIE}={token}; Path={BASE_PATH or '/'}; Max-Age={max_age}; HttpOnly; SameSite=Lax"}
 
     def _redirect(self, location: str) -> None:
         self.send_response(301)
@@ -356,8 +447,8 @@ class Handler(BaseHTTPRequestHandler):
         if ctype.startswith("text/") or ctype in ("application/javascript", "application/json"):
             ctype += "; charset=utf-8"
         body = target.read_bytes()
-        if BASE_PATH and ctype.startswith("text/html"):
-            body = rebase(body.decode("utf-8")).encode("utf-8")
+        if ctype.startswith("text/html"):
+            body = rebase(with_session(body.decode("utf-8"))).encode("utf-8")
         self._send(200, body, ctype, self.command == "HEAD")
 
     def _standalone(self, week: dict, page: dict) -> None:
@@ -375,6 +466,107 @@ class Handler(BaseHTTPRequestHandler):
         text = text.replace("</body>", pill + "\n</body>", 1) if "</body>" in text else text + pill
         self._html(text)
 
+    # -- accounts
+    def _session_js(self) -> None:
+        user, db_ok = self._session()
+        info = {"enabled": accounts.enabled(), "dbDown": not db_ok, "user": user, "state": None}
+        if user:
+            try:
+                info["state"] = accounts.load_state(user["id"])
+            except Exception:  # noqa: BLE001
+                info["user"], info["dbDown"] = None, True
+        body = ("window.MC_SESSION=" + json_for_script(info) + ";").encode("utf-8")
+        self._send(200, body, "application/javascript; charset=utf-8", self.command == "HEAD")
+
+    def _need(self, role: str | None = None) -> dict | None:
+        """The signed-in user, or send a 401/403 and return None."""
+        if not accounts.enabled():
+            self._json({"error": "accounts are not set up"}, 404)
+            return None
+        user, db_ok = self._session()
+        if not db_ok:
+            self._json({"error": "database unavailable"}, 503)
+        elif not user:
+            self._json({"error": "sign in first"}, 401)
+        elif role and user["role"] != role:
+            self._json({"error": "parents only"}, 403)
+        else:
+            return user
+        return None
+
+    def _account_get(self, path: str) -> bool:
+        """GET /api/progress and /api/parent/…  Returns True when it answered."""
+        try:
+            if path == "/api/progress":
+                if user := self._need():
+                    self._json(accounts.load_state(user["id"]))
+                return True
+            if path == "/api/parent/overview":
+                if self._need("parent"):
+                    self._json({"children": accounts.children_overview()})
+                return True
+            m = re.match(r"^/api/parent/child/(\d+)$", path)
+            if m:
+                if self._need("parent"):
+                    detail = accounts.child_detail(int(m.group(1)))
+                    self._json(detail if detail else {"error": "no such child"}, 200 if detail else 404)
+                return True
+        except Exception as exc:  # noqa: BLE001
+            sys.stderr.write(f"  accounts: {exc}\n")
+            self._json({"error": "database error"}, 500)
+            return True
+        return False
+
+    def do_POST(self) -> None:  # noqa: N802
+        path = unquote(urlparse(self.path).path)
+        if not path.startswith("/api/"):
+            return self._not_found()
+        if not accounts.enabled():
+            return self._json({"error": "accounts are not set up"}, 404)
+        body = self._body()
+        if body is None:
+            return self._json({"error": "send JSON"}, 400)
+        try:
+            if path == "/api/login":
+                try:
+                    user, token = accounts.login(str(body.get("username", "")), str(body.get("password", "")))
+                except accounts.AuthError as exc:
+                    return self._json({"error": exc.message}, exc.status)
+                state = accounts.load_state(user["id"])
+                return self._json({"user": user, "empty": accounts.is_empty(state)},
+                                  headers=self._cookie(token, accounts.SESSION_DAYS * 86400))
+            if path == "/api/logout":
+                return self._json({"ok": True}, headers=self._cookie("", 0))
+            if path == "/api/progress/import":
+                if user := self._need():
+                    return self._json({"added": accounts.import_state(user["id"], body)})
+                return None
+        except ValueError as exc:
+            return self._json({"error": str(exc)}, 400)
+        except Exception as exc:  # noqa: BLE001
+            sys.stderr.write(f"  accounts: {exc}\n")
+            return self._json({"error": "database error"}, 500)
+        return self._not_found()
+
+    def do_PUT(self) -> None:  # noqa: N802
+        path = unquote(urlparse(self.path).path)
+        if path != "/api/progress":
+            return self._not_found()
+        user = self._need()
+        if not user:
+            return None
+        body = self._body()
+        if body is None:
+            return self._json({"error": "send JSON"}, 400)
+        try:
+            accounts.apply_ops(user["id"], body)
+            return self._json({"ok": True})
+        except ValueError as exc:
+            return self._json({"error": str(exc)}, 400)
+        except Exception as exc:  # noqa: BLE001
+            sys.stderr.write(f"  accounts: {exc}\n")
+            return self._json({"error": "database error"}, 500)
+
     # -- routing
     def do_HEAD(self) -> None:  # noqa: N802
         self.do_GET()
@@ -382,6 +574,17 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:  # noqa: N802
         path = unquote(urlparse(self.path).path)
 
+        if path == "/api/session.js":
+            return self._session_js()
+        if path == "/login":
+            q = parse_qs(urlparse(self.path).query)
+            return self._html(login_page(safe_next((q.get("next") or [""])[0])))
+        if path in ("/parent", "/parent/"):
+            if not path.endswith("/"):
+                return self._redirect(f"{BASE_PATH}/parent/")
+            return self._html(parent_page())
+        if path.startswith("/api/") and path not in ("/api/weeks", "/api/study") and self._account_get(path):
+            return
         if path == "/":
             return self._html(home_page("week"))
         if path == "/study":
@@ -438,6 +641,7 @@ def main() -> None:
         print(f"{t['name']} — {len(units)} unit(s) found" + ("" if track == "week" else "  (under /study/)"))
         for w in units:
             print(f"  • {w['label']}: {w['title']}")
+    print("Accounts: " + ("on (Postgres, schema mathlab)" if accounts.enabled() else f"off — {accounts.why_disabled()}; progress stays in each browser"))
     print(f"\nOpen  http://{'localhost' if args.host in ('127.0.0.1', '0.0.0.0') else args.host}:{args.port}   (Ctrl+C to stop)")
     try:
         httpd.serve_forever()

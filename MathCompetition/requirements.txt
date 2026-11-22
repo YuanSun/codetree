@@ -1,0 +1,2 @@
+# Only needed for child/parent profiles (see README). The site runs without it.
+psycopg[binary]>=3.2
