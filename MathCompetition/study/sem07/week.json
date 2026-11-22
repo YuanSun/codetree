@@ -1,0 +1,34 @@
+{
+  "number": 7,
+  "label": "Sem 7",
+  "title": "PPCM, Means, Fractions & Clauses",
+  "tagline": "Prime bricks for PPCM / PGCD, means with missing numbers, a fraction of a fraction, and the three kinds of subordinate clauses.",
+  "level": "School study · Hu Education",
+  "emoji": "🧬",
+  "skills": [
+    "PPCM / PGCD",
+    "Means",
+    "Fractions",
+    "Subordonnées"
+  ],
+  "credit": "Based on Hu Education · 190-Grace · Sem-7 class sheet (retyped for personal study).",
+  "pages": [
+    {
+      "slug": "lesson",
+      "type": "html",
+      "file": "lesson.html",
+      "title": "The Quest",
+      "emoji": "🗺️",
+      "desc": "Play with each idea first — factor machine, level the bars, fraction grid, clause detective — then solve the sheet step by step.",
+      "tasks": 12
+    },
+    {
+      "slug": "practice",
+      "type": "quiz",
+      "file": "exercises.json",
+      "title": "Class Sheet",
+      "emoji": "🏋️",
+      "desc": "28 questions: every item of the Sem-7 sheet, with hints, trap-spotting and full solutions."
+    }
+  ]
+}

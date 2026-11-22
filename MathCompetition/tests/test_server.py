@@ -68,10 +68,10 @@ class ServerTests(unittest.TestCase):
         status, study, _ = self.get("/study/")
         self.assertEqual(status, 200)
         self.assertIn('data-track="study"', study)
-        for unit in ("sem0506", "sem06", "sem05"):
+        for unit in ("sem08", "sem07", "sem0506", "sem06", "sem05"):
             self.assertIn(f'href="/study/{unit}/"', study)
         self.assertNotIn("/week/week0", study)
-        self.assertEqual([w["id"] for w in json.loads(self.get("/api/study")[1])], ["sem0506", "sem06", "sem05"])
+        self.assertEqual([w["id"] for w in json.loads(self.get("/api/study")[1])], ["sem08", "sem07", "sem0506", "sem06", "sem05"])
 
     def test_study_pages(self):
         for path in ("/study/sem05/", "/study/sem05/lesson", "/study/sem05/practice", "/study/sem06/lesson", "/study/sem06/practice",
@@ -86,6 +86,29 @@ class ServerTests(unittest.TestCase):
         self.assertIn('href="/study/sem0506/"', page)
         self.assertIn("Parcours d'étude", page)
         self.assertEqual(self.get("/study/sem99/")[0], 404)
+
+    def test_sem07_sem08_units(self):
+        for unit, tasks, nq in (("sem07", 12, 28), ("sem08", 11, 43)):
+            for path in (f"/study/{unit}/", f"/study/{unit}/lesson", f"/study/{unit}/practice", f"/study/{unit}/lesson.js"):
+                with self.subTest(path=path):
+                    self.assertEqual(self.get(path)[0], 200)
+            _, lesson, _ = self.get(f"/study/{unit}/lesson")
+            self.assertIn('data-track="study"', lesson)
+            self.assertIn(f'data-week="{unit}"', lesson)
+            self.assertEqual(lesson.count('id="'), len(set(re.findall(r'id="([^"]+)"', lesson))))      # no duplicate mount ids
+            meta = json.loads((ROOT / "study" / unit / "week.json").read_text(encoding="utf-8"))
+            self.assertEqual(meta["pages"][0]["tasks"], tasks)
+            js = (ROOT / "study" / unit / "lesson.js").read_text(encoding="utf-8")
+            self.assertEqual(len(set(re.findall(rf"'(s{unit[-1]}\.[a-z0-9]+)'", js))), tasks)           # one task id per guided block / game
+            data = json.loads((ROOT / "study" / unit / "exercises.json").read_text(encoding="utf-8"))
+            self.assertEqual(len(data["questions"]), nq)
+        key7 = {q["id"]: q["choices"][q["answer"]] for q in json.loads((ROOT / "study" / "sem07" / "exercises.json").read_text(encoding="utf-8"))["questions"]}
+        self.assertEqual([key7[f"s7_{i:02d}"] for i in range(1, 9)], ["60", "112", "210", "4", "24", "6", "210", "14"])     # PPCM / PGCD sheet items
+        self.assertEqual([key7[f"s7_{i:02d}"] for i in range(10, 17)], ["10", "72", "48.5", "65 and 66", "52", "4.1 °C", "5 720"])   # means
+        key8 = {q["id"]: q["choices"][q["answer"]] for q in json.loads((ROOT / "study" / "sem08" / "exercises.json").read_text(encoding="utf-8"))["questions"]}
+        self.assertEqual([key8[f"s8_{i:02d}"] for i in range(1, 9)], ["−3", "−2", "2", "−24", "−6", "−5", "−252", "91"])
+        self.assertEqual([key8[f"s8_{i:02d}"] for i in range(9, 15)], ["−32", "−32", "33", "−12", "19", "0"])                  # Exercice 2
+        self.assertEqual([key8[f"s8_{i:02d}"] for i in range(15, 21)], ["=", "<", ">", ">", "26", "40"])                       # comparisons + timeline
 
     def test_study_redirects(self):
         status, _, headers = self.get("/study")

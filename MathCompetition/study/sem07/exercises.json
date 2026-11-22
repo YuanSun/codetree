@@ -1,0 +1,851 @@
+{
+  "eyebrow": "Sem 7 · PPCM, PGCD, moyenne, subordonnées",
+  "title": "Class Sheet — Sem 7",
+  "intro": "Every question from the Sem-7 sheet: **PPCM / PGCD**, **means** (simple and weighted), the fractions review and the **subordonnée circonstancielle**. Do them on paper first, then check here.",
+  "groups": [
+    {
+      "id": "ppcm",
+      "label": "PPCM",
+      "emoji": "🔔",
+      "color": "#8b5cf6"
+    },
+    {
+      "id": "pgcd",
+      "label": "PGCD",
+      "emoji": "🎒",
+      "color": "#10b981"
+    },
+    {
+      "id": "moy",
+      "label": "Moyenne",
+      "emoji": "📊",
+      "color": "#f59e0b"
+    },
+    {
+      "id": "frac",
+      "label": "Révision",
+      "emoji": "🥤",
+      "color": "#ec6f9a"
+    },
+    {
+      "id": "gram",
+      "label": "Subordonnées",
+      "emoji": "🔗",
+      "color": "#3b82f6"
+    }
+  ],
+  "questions": [
+    {
+      "id": "s7_01",
+      "skill": "ppcm",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-7 · 1a",
+      "text": "**1) a)  PPCM (12, 20) = ?**",
+      "choices": [
+        "4",
+        "60",
+        "120",
+        "240"
+      ],
+      "answer": 1,
+      "hints": [
+        "The PPCM is the first number that is in BOTH multiplication tables. List the multiples of 20: 20, 40, 60 … is it in the 12 table?",
+        "Primes: 12 = 2² × 3 and 20 = 2² × 5. Keep the BIGGEST power of every prime.",
+        "2² × 3 × 5"
+      ],
+      "traps": {
+        "0": "4 is the PGCD (biggest number that divides both). The PPCM is a multiple of both numbers.",
+        "2": "120 is a common multiple, but not the smallest: 60 already works.",
+        "3": "240 = 12 × 20 is a common multiple, but the shared 2² is counted twice. Not the smallest."
+      },
+      "solution": [
+        "12 = 2² × 3",
+        "20 = 2² × 5",
+        "PPCM: biggest power of each prime → 2² × 3 × 5 = **60**",
+        "Check: 60 ÷ 12 = 5 and 60 ÷ 20 = 3 ✅"
+      ],
+      "idea": "PPCM = all the prime bricks, highest power."
+    },
+    {
+      "id": "s7_02",
+      "skill": "ppcm",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-7 · 1b",
+      "text": "**1) b)  PPCM (14, 16) = ?**",
+      "choices": [
+        "2",
+        "56",
+        "112",
+        "224"
+      ],
+      "answer": 2,
+      "hints": [
+        "List multiples of 16: 16, 32, 48, 64, 80, 96, 112 … which one is also in the 14 table?",
+        "14 = 2 × 7 and 16 = 2⁴.",
+        "2⁴ × 7"
+      ],
+      "traps": {
+        "0": "2 is the PGCD. The PPCM is a multiple of both numbers.",
+        "1": "56 ÷ 16 = 3.5 — 16 does not fit a whole number of times.",
+        "3": "224 = 14 × 16 is a common multiple but not the smallest: the shared 2 is counted twice."
+      },
+      "solution": [
+        "14 = 2 × 7",
+        "16 = 2⁴",
+        "PPCM → 2⁴ × 7 = 16 × 7 = **112**",
+        "Check: 112 ÷ 14 = 8 and 112 ÷ 16 = 7 ✅"
+      ],
+      "idea": "PPCM = all the prime bricks, highest power."
+    },
+    {
+      "id": "s7_03",
+      "skill": "ppcm",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-7 · 1c",
+      "text": "**1) c)  PPCM (10, 21, 30) = ?**",
+      "choices": [
+        "30",
+        "105",
+        "210",
+        "6300"
+      ],
+      "answer": 2,
+      "hints": [
+        "Three numbers: the PPCM must be in all three tables.",
+        "10 = 2 × 5, 21 = 3 × 7, 30 = 2 × 3 × 5. Take every prime that appears, with its biggest power.",
+        "2 × 3 × 5 × 7"
+      ],
+      "traps": {
+        "0": "30 is a multiple of 10 and 30 but 30 ÷ 21 is not a whole number.",
+        "1": "105 is a multiple of 21 but 105 ÷ 10 = 10.5. The 2 from 10 and 30 is missing.",
+        "3": "6300 = 10 × 21 × 30 is a common multiple, not the smallest."
+      },
+      "solution": [
+        "10 = 2 × 5",
+        "21 = 3 × 7",
+        "30 = 2 × 3 × 5",
+        "Primes that appear: 2, 3, 5, 7 (all with power 1) → 2 × 3 × 5 × 7 = **210**"
+      ],
+      "idea": "With three numbers, the same rule: every prime, biggest power."
+    },
+    {
+      "id": "s7_04",
+      "skill": "pgcd",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-7 · 2a",
+      "text": "**2) a)  PGCD (12, 20) = ?**",
+      "choices": [
+        "2",
+        "4",
+        "6",
+        "60"
+      ],
+      "answer": 1,
+      "hints": [
+        "The PGCD is the biggest number that divides BOTH. Divisors of 12: 1, 2, 3, 4, 6, 12. Which ones divide 20?",
+        "12 = 2² × 3 and 20 = 2² × 5. Keep only the SHARED primes, with the smallest power.",
+        "2²"
+      ],
+      "traps": {
+        "0": "2 divides both, but 4 does too — and 4 is bigger.",
+        "2": "6 divides 12 but 20 ÷ 6 is not a whole number.",
+        "3": "60 is the PPCM (smallest common multiple). The PGCD is a divisor."
+      },
+      "solution": [
+        "12 = 2² × 3",
+        "20 = 2² × 5",
+        "Shared bricks: 2 and 2 → 2² = **4**",
+        "Check: 12 ÷ 4 = 3 and 20 ÷ 4 = 5 ✅"
+      ],
+      "idea": "PGCD = only the SHARED bricks, lowest power."
+    },
+    {
+      "id": "s7_05",
+      "skill": "pgcd",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-7 · 2b",
+      "text": "**2) b)  PGCD (48, 72) = ?**",
+      "choices": [
+        "12",
+        "36",
+        "24",
+        "144"
+      ],
+      "answer": 2,
+      "hints": [
+        "Find the biggest number that goes into 48 AND 72.",
+        "48 = 2⁴ × 3 and 72 = 2³ × 3². Shared: 2³ and one 3.",
+        "2³ × 3"
+      ],
+      "traps": {
+        "0": "12 divides both, but 24 does too.",
+        "1": "36 divides 72 but 48 ÷ 36 is not a whole number.",
+        "3": "144 is the PPCM of 48 and 72, not the PGCD."
+      },
+      "solution": [
+        "48 = 2⁴ × 3",
+        "72 = 2³ × 3²",
+        "Shared bricks: 2³ (the smaller power) and 3 (the smaller power) → 2³ × 3 = **24**",
+        "Check: 48 ÷ 24 = 2 and 72 ÷ 24 = 3 ✅"
+      ],
+      "idea": "PGCD = only the SHARED bricks, lowest power."
+    },
+    {
+      "id": "s7_06",
+      "skill": "pgcd",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-7 · 2c",
+      "text": "**2) c)  PGCD (12, 30, 42) = ?**",
+      "choices": [
+        "2",
+        "3",
+        "6",
+        "12"
+      ],
+      "answer": 2,
+      "hints": [
+        "Three numbers: the PGCD must divide all three.",
+        "12 = 2² × 3, 30 = 2 × 3 × 5, 42 = 2 × 3 × 7. Which primes are in ALL three?",
+        "2 × 3"
+      ],
+      "traps": {
+        "0": "2 divides all three but 6 does too.",
+        "1": "3 divides all three but 6 does too.",
+        "3": "12 does not divide 30 (30 ÷ 12 = 2.5)."
+      },
+      "solution": [
+        "12 = 2² × 3",
+        "30 = 2 × 3 × 5",
+        "42 = 2 × 3 × 7",
+        "Primes in all three: 2 and 3 (power 1) → 2 × 3 = **6**"
+      ],
+      "idea": "PGCD with three numbers: only primes found in ALL of them."
+    },
+    {
+      "id": "s7_07",
+      "skill": "ppcm",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-7 · 3",
+      "text": "**3) PPCM (70, 42) = ?**",
+      "choices": [
+        "14",
+        "210",
+        "420",
+        "2940"
+      ],
+      "answer": 1,
+      "hints": [
+        "70 = 2 × 5 × 7 and 42 = 2 × 3 × 7.",
+        "Every prime, biggest power: 2, 3, 5, 7.",
+        "2 × 3 × 5 × 7"
+      ],
+      "traps": {
+        "0": "14 is the PGCD of 70 and 42 (they share 2 × 7).",
+        "2": "420 is a common multiple but 210 is smaller and works too (210 ÷ 70 = 3, 210 ÷ 42 = 5).",
+        "3": "2940 = 70 × 42. They share 2 × 7, so multiplying double-counts it."
+      },
+      "solution": [
+        "70 = 2 × 5 × 7",
+        "42 = 2 × 3 × 7",
+        "PPCM → 2 × 3 × 5 × 7 = **210**"
+      ],
+      "idea": "PPCM = all the prime bricks, highest power."
+    },
+    {
+      "id": "s7_08",
+      "skill": "pgcd",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-7 · 4",
+      "text": "**4) PGCD (70, 42) = ?**",
+      "choices": [
+        "2",
+        "7",
+        "14",
+        "210"
+      ],
+      "answer": 2,
+      "hints": [
+        "70 = 2 × 5 × 7 and 42 = 2 × 3 × 7.",
+        "Shared primes: 2 and 7.",
+        "2 × 7"
+      ],
+      "traps": {
+        "0": "2 divides both but 14 does too.",
+        "1": "7 divides both but 14 does too.",
+        "3": "210 is the PPCM — a multiple, not a divisor."
+      },
+      "solution": [
+        "70 = 2 × 5 × 7",
+        "42 = 2 × 3 × 7",
+        "Shared bricks: 2 and 7 → 2 × 7 = **14**",
+        "Bonus: PPCM × PGCD = 210 × 14 = 2940 = 70 × 42 ✅ (true for two numbers)"
+      ],
+      "idea": "PGCD = only the SHARED bricks."
+    },
+    {
+      "id": "s7_09",
+      "skill": "ppcm",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-7 · 5",
+      "text": "**5)** Jacob, Nathan et Juliette se rencontrent à la plage aujourd’hui. Jacob va à la plage tous les **3 jours**, Nathan s’y rend tous les **5 jours** et Juliette s’y rend tous les **12 jours**. Dans combien de jours se rencontreront-ils à nouveau à la plage ?",
+      "choices": [
+        "15 days",
+        "36 days",
+        "60 days",
+        "180 days"
+      ],
+      "answer": 2,
+      "hints": [
+        "“Meet again” → which tool: PPCM or PGCD?",
+        "3 = 3, 5 = 5, 12 = 2² × 3. Every prime, biggest power.",
+        "2² × 3 × 5"
+      ],
+      "traps": {
+        "0": "15 = PPCM (3, 5) — Juliette is missing: 15 ÷ 12 is not a whole number.",
+        "1": "36 is a multiple of 3 and 12, but 36 ÷ 5 = 7.2: Nathan is not at the beach.",
+        "3": "180 = 3 × 5 × 12 is a day they all meet, but it is not the first one."
+      },
+      "solution": [
+        "“Meet **again**” → PPCM (3, 5, 12).",
+        "3 = 3, 5 = 5, 12 = 2² × 3",
+        "2² × 3 × 5 = **60 days**",
+        "Check: 60 ÷ 3 = 20, 60 ÷ 5 = 12, 60 ÷ 12 = 5 ✅"
+      ],
+      "idea": "Meet again = PPCM."
+    },
+    {
+      "id": "s7_10",
+      "skill": "moy",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-7 · 2 A) No 1 a",
+      "text": "**No 1 a)** La moyenne des nombres suivants est de 15 : 12, 16, 22 et ____.",
+      "choices": [
+        "8",
+        "10",
+        "15",
+        "16"
+      ],
+      "answer": 1,
+      "hints": [
+        "Mean = total ÷ how many. If the mean of 4 numbers is 15, what is the total?",
+        "4 × 15 = 60. The three numbers you know add to 50.",
+        "60 − 50"
+      ],
+      "traps": {
+        "2": "15 is the MEAN, not the missing number. Find the total first (4 × 15), then subtract what you have.",
+        "3": "16 does not make the total 60: 12 + 16 + 22 + 16 = 66."
+      },
+      "solution": [
+        "4 numbers with mean 15 → total = 4 × 15 = 60",
+        "12 + 16 + 22 = 50",
+        "Missing = 60 − 50 = **10**",
+        "Check: (12 + 16 + 22 + 10) ÷ 4 = 60 ÷ 4 = 15 ✅"
+      ],
+      "idea": "Mean × how many = total."
+    },
+    {
+      "id": "s7_11",
+      "skill": "moy",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-7 · 2 A) No 1 b",
+      "text": "**No 1 b)** La moyenne des nombres suivants est de 48 : 43, 51, 26 et ____.",
+      "choices": [
+        "48",
+        "62",
+        "72",
+        "96"
+      ],
+      "answer": 2,
+      "hints": [
+        "Total of 4 numbers with mean 48?",
+        "4 × 48 = 192. Known: 43 + 51 + 26 = 120.",
+        "192 − 120"
+      ],
+      "traps": {
+        "0": "48 is the MEAN. The missing number must bring the total to 4 × 48 = 192.",
+        "1": "Check: 43 + 51 + 26 + 62 = 182, and 182 ÷ 4 = 45.5, not 48."
+      },
+      "solution": [
+        "Total = 4 × 48 = 192",
+        "43 + 51 + 26 = 120",
+        "Missing = 192 − 120 = **72**"
+      ],
+      "idea": "Mean × how many = total."
+    },
+    {
+      "id": "s7_12",
+      "skill": "moy",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-7 · 2 A) No 1 c",
+      "text": "**No 1 c)** La moyenne est de 56 et les deux nombres manquants sont **égaux** : 52, 61, 70, ____ et ____.",
+      "choices": [
+        "48",
+        "97",
+        "48.5",
+        "56"
+      ],
+      "answer": 2,
+      "hints": [
+        "5 numbers, mean 56 → total? Then take away 52 + 61 + 70.",
+        "5 × 56 = 280, and 52 + 61 + 70 = 183. The two missing add to 97.",
+        "Equal numbers → share 97 in two."
+      ],
+      "traps": {
+        "1": "97 is what the TWO numbers add to. They are equal, so each one is half of it.",
+        "0": "97 ÷ 2 = 48.5 exactly — no rounding. (48 + 48 + 183 = 279, not 280.)",
+        "3": "56 is the mean, not the missing number."
+      },
+      "solution": [
+        "Total = 5 × 56 = 280",
+        "52 + 61 + 70 = 183 → the two missing numbers add to 280 − 183 = 97",
+        "They are equal → 97 ÷ 2 = **48.5** each"
+      ],
+      "idea": "Total − known = the missing ones together. Then share."
+    },
+    {
+      "id": "s7_13",
+      "skill": "moy",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-7 · 2 A) No 1 d",
+      "text": "**No 1 d)** La moyenne est de 75 et les deux nombres manquants sont **consécutifs** : 73, 85, 90, 62, 84, ____ et ____.",
+      "choices": [
+        "64 and 65",
+        "66 and 67",
+        "65 and 67",
+        "65 and 66"
+      ],
+      "answer": 3,
+      "hints": [
+        "7 numbers, mean 75 → total? Then take away the five you know.",
+        "7 × 75 = 525 and 73 + 85 + 90 + 62 + 84 = 394. The two missing add to 131.",
+        "Consecutive: n and n + 1 → 2n + 1 = 131."
+      ],
+      "traps": {
+        "0": "64 + 65 = 129, not 131.",
+        "1": "66 + 67 = 133, not 131.",
+        "2": "65 + 67 = 132 — and they are not consecutive (66 is between them)."
+      },
+      "solution": [
+        "Total = 7 × 75 = 525",
+        "73 + 85 + 90 + 62 + 84 = 394 → the two add to 525 − 394 = 131",
+        "Consecutive: n + (n + 1) = 131 → 2n = 130 → n = 65",
+        "The numbers are **65 and 66**."
+      ],
+      "idea": "Consecutive: one apart. Sum = 2n + 1."
+    },
+    {
+      "id": "s7_14",
+      "skill": "moy",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-7 · 2 A) No 1 e",
+      "text": "**No 1 e)** La somme d’un ensemble de nombres identiques est 3 900 et leur moyenne est de 75. Quel est ce nombre ?",
+      "choices": [
+        "75",
+        "52",
+        "3 825",
+        "292 500"
+      ],
+      "answer": 1,
+      "hints": [
+        "Mean = total ÷ how many numbers. You know the total and the mean. What is missing?",
+        "The question asks how many numbers there are (“quel est ce nombre ?” = the count).",
+        "3 900 ÷ 75"
+      ],
+      "traps": {
+        "0": "75 is the value of each number (the mean). We want how MANY there are.",
+        "2": "3 900 − 75: a mean is found by dividing, not subtracting.",
+        "3": "3 900 × 75: you need to divide."
+      },
+      "solution": [
+        "Mean = total ÷ count → count = total ÷ mean",
+        "3 900 ÷ 75 = **52** numbers",
+        "Check: 52 × 75 = 3 900 ✅"
+      ],
+      "idea": "Count = total ÷ mean."
+    },
+    {
+      "id": "s7_15",
+      "skill": "moy",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-7 · 2 A) No 2",
+      "text": "**No 2)** Au mois de mars, il y a eu **13 jours** de pluie où la température moyenne fut de **5 °C**, **7 jours** de neige de **0 °C**, et finalement **10 jours** de gros soleil où la température a atteint **5,8 °C**. Trouve la température moyenne du mois de mars.",
+      "choices": [
+        "3.6 °C",
+        "4.1 °C",
+        "5.4 °C",
+        "10.8 °C"
+      ],
+      "answer": 1,
+      "hints": [
+        "The three kinds of days do not have the same number of days — a weighted mean.",
+        "Total of temperatures = 13 × 5 + 7 × 0 + 10 × 5.8. Then divide by the number of days.",
+        "123 ÷ 30"
+      ],
+      "traps": {
+        "0": "3.6 = (5 + 0 + 5.8) ÷ 3 — the mean of the three means. 13 rainy days count more than 7 snow days!",
+        "2": "5.4 = (5 + 5.8) ÷ 2 leaves the snow days out. They count, with 0 °C.",
+        "3": "10.8 = 5 + 0 + 5.8: that is a sum of the three means, not a mean."
+      },
+      "solution": [
+        "Rain: 13 × 5 = 65",
+        "Snow: 7 × 0 = 0",
+        "Sun: 10 × 5.8 = 58",
+        "Total = 65 + 0 + 58 = 123 over 13 + 7 + 10 = 30 days",
+        "123 ÷ 30 = **4.1 °C**"
+      ],
+      "idea": "Weighted mean = Σ(days × value) ÷ Σ days."
+    },
+    {
+      "id": "s7_16",
+      "skill": "moy",
+      "difficulty": "hard",
+      "source": "Hu Education 190-Grace · Sem-7 · 2 A) No 3",
+      "text": "**No 3)** Chaque jour, Julie-Anne s’amuse à un jeu vidéo. Après **18 parties**, sa moyenne est de **4 960** points. Elle aimerait bien que sa moyenne passe à **5 000**. Combien de points doit-elle obtenir à la prochaine partie ?",
+      "choices": [
+        "5 000",
+        "5 720",
+        "5 040",
+        "95 000"
+      ],
+      "answer": 1,
+      "hints": [
+        "Work with the TOTAL points, not the means. What total does she have now?",
+        "18 × 4 960 = 89 280. For a mean of 5 000 over 19 games she needs 19 × 5 000 = 95 000.",
+        "95 000 − 89 280"
+      ],
+      "traps": {
+        "0": "Scoring exactly 5 000 would keep her mean below 5 000: the 18 old games average only 4 960.",
+        "2": "5 040 only adds the missing 40 once. But 18 old games each sit 40 below 5 000.",
+        "3": "95 000 is the total needed after 19 games, not the score of the next game."
+      },
+      "solution": [
+        "Points now: 18 × 4 960 = 89 280",
+        "Needed for 19 games at mean 5 000: 19 × 5 000 = 95 000",
+        "Next game: 95 000 − 89 280 = **5 720**",
+        "Check: the 19th game must also pull the 18 old games up by 40 each: 5 000 + 18 × 40 = 5 720 ✅"
+      ],
+      "idea": "Mean × how many = total. Compare totals."
+    },
+    {
+      "id": "s7_17",
+      "skill": "frac",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-7 · Révision 1",
+      "text": "**Révision 1)** Au retour d’une randonnée à bicyclette, 4 amis boivent à eux tous **4 bouteilles de [[1/3]] de litre** de jus d’orange et **3 bouteilles de [[1/2]] litre** de jus de pomme. Si les 4 amis boivent la même quantité de boisson, quelle est la quantité bue par chacun d’eux ?",
+      "choices": [
+        "[[17/6]] L",
+        "[[17/24]] L",
+        "[[7/5]] L",
+        "[[17/12]] L"
+      ],
+      "answer": 1,
+      "hints": [
+        "First the TOTAL drunk: 4 bottles of [[1/3]] L and 3 bottles of [[1/2]] L.",
+        "4 × [[1/3]] = [[4/3]] and 3 × [[1/2]] = [[3/2]]. Common denominator 6 to add them.",
+        "Then share the total between 4 friends: divide by 4."
+      ],
+      "traps": {
+        "0": "[[17/6]] L is what ALL four friends drank together. Each one drank a quarter of it.",
+        "2": "You added the tops (4 + 3) and the bottoms (3 + 2) separately. Fractions need a common denominator first.",
+        "3": "You divided by 2 instead of by 4 — there are 4 friends."
+      },
+      "solution": [
+        "Orange: 4 × [[1/3]] = [[4/3]] L",
+        "Apple: 3 × [[1/2]] = [[3/2]] L",
+        "Total: [[8/6]] + [[9/6]] = [[17/6]] L",
+        "Each of the 4 friends: [[17/6]] ÷ 4 = [[17/24]] L"
+      ],
+      "idea": "Total first, then share equally."
+    },
+    {
+      "id": "s7_18",
+      "skill": "frac",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-7 · Révision 2",
+      "text": "**Révision 2)** Sur la table de la cuisine, il ne reste que les [[3/4]] d’un gâteau. Tu décides de manger les [[2/3]] **de ce qui reste** de ce gâteau. Quelle fraction du gâteau auras-tu mangé ?",
+      "choices": [
+        "[[1/12]]",
+        "[[17/12]]",
+        "[[1/2]]",
+        "[[2/3]]"
+      ],
+      "answer": 2,
+      "hints": [
+        "“A fraction OF a fraction” is a multiplication.",
+        "[[2/3]] × [[3/4]]",
+        "Simplify: [[6/12]]"
+      ],
+      "traps": {
+        "0": "[[3/4]] − [[2/3]] subtracts. “Of” means multiply.",
+        "1": "[[3/4]] + [[2/3]] adds — and the answer is bigger than the whole cake! “Of” means multiply.",
+        "3": "[[2/3]] would be of the WHOLE cake. You eat [[2/3]] of what is left, which is only [[3/4]]."
+      },
+      "solution": [
+        "“[[2/3]] **of** what is left” → [[2/3]] × [[3/4]]",
+        "= [[6/12]] = **[[1/2]]** of the whole cake",
+        "Picture: 4 columns × 3 rows = 12 pieces. 3 columns are left (9 pieces); you eat 2 of every 3 → 6 pieces = [[6/12]]."
+      ],
+      "idea": "Fraction OF a fraction = multiply."
+    },
+    {
+      "id": "s7_19",
+      "skill": "gram",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-7 · EXERCICE 1",
+      "text": "**1.** De quel type de proposition s’agit-il ? <br>Je suppose **qu’elle est allée faire des courses.**",
+      "choices": [
+        "relative",
+        "complétive",
+        "circonstancielle"
+      ],
+      "answer": 1,
+      "hints": [
+        "Three tests: does the clause DESCRIBE a noun (relative)? Can you replace it with *ça* (complétive)? Does it start with a conjunction of time / purpose / cause (circonstancielle)?",
+        "Look at the word that introduces the clause: *qui, que, dont, duquel* (relative)… or a conjunction from the list (circonstancielle).",
+        "After a verb of thinking (*je suppose*), the clause answers “what?”. You can replace it by *ça*: *Je suppose ça.* → complétive."
+      ],
+      "traps": {
+        "0": "*que* here does not replace a noun — there is no noun to describe. Try replacing the clause by *ça*.",
+        "2": "No conjunction of time, purpose or cause: the clause is the thing that is supposed / believed / noticed."
+      },
+      "solution": [
+        "After a verb of thinking (*je suppose*), the clause answers “what?”. You can replace it by *ça*: *Je suppose ça.* → complétive."
+      ],
+      "idea": "Relative = describes a noun. Complétive = replaced by *ça*. Circonstancielle = conjunction (time, purpose, cause…)."
+    },
+    {
+      "id": "s7_20",
+      "skill": "gram",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-7 · EXERCICE 2",
+      "text": "**2.** De quel type de proposition s’agit-il ? <br>L’auteur **dont tu m’as parlé** est célèbre.",
+      "choices": [
+        "relative",
+        "complétive",
+        "circonstancielle"
+      ],
+      "answer": 0,
+      "hints": [
+        "Three tests: does the clause DESCRIBE a noun (relative)? Can you replace it with *ça* (complétive)? Does it start with a conjunction of time / purpose / cause (circonstancielle)?",
+        "Look at the word that introduces the clause: *qui, que, dont, duquel* (relative)… or a conjunction from the list (circonstancielle).",
+        "*dont* replaces *l’auteur* (“tu m’as parlé de l’auteur”) and describes the noun → relative."
+      ],
+      "traps": {
+        "1": "Look at what comes before: a NOUN (*l’auteur, l’enfant, le village*). The clause describes it → relative.",
+        "2": "It does not tell when / why / how: it describes a noun, and *dont / que / duquel* replace that noun."
+      },
+      "solution": [
+        "*dont* replaces *l’auteur* (“tu m’as parlé de l’auteur”) and describes the noun → relative."
+      ],
+      "idea": "Relative = describes a noun. Complétive = replaced by *ça*. Circonstancielle = conjunction (time, purpose, cause…)."
+    },
+    {
+      "id": "s7_21",
+      "skill": "gram",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-7 · EXERCICE 3",
+      "text": "**3.** De quel type de proposition s’agit-il ? <br>Elle crie très fort **afin que quelqu’un l’entende.**",
+      "choices": [
+        "relative",
+        "complétive",
+        "circonstancielle"
+      ],
+      "answer": 2,
+      "hints": [
+        "Three tests: does the clause DESCRIBE a noun (relative)? Can you replace it with *ça* (complétive)? Does it start with a conjunction of time / purpose / cause (circonstancielle)?",
+        "Look at the word that introduces the clause: *qui, que, dont, duquel* (relative)… or a conjunction from the list (circonstancielle).",
+        "*afin que* gives the PURPOSE (why she shouts) and is in the list of conjunctions (subjonctif) → circonstancielle."
+      ],
+      "traps": {
+        "0": "There is no noun to describe: the clause gives a circumstance (time or purpose).",
+        "1": "It does not complete a verb of thinking or saying: it adds a time or a purpose and starts with a conjunction from the list."
+      },
+      "solution": [
+        "*afin que* gives the PURPOSE (why she shouts) and is in the list of conjunctions (subjonctif) → circonstancielle."
+      ],
+      "idea": "Relative = describes a noun. Complétive = replaced by *ça*. Circonstancielle = conjunction (time, purpose, cause…)."
+    },
+    {
+      "id": "s7_22",
+      "skill": "gram",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-7 · EXERCICE 4",
+      "text": "**4.** De quel type de proposition s’agit-il ? <br>Les deux hommes discutaient **pendant que Rémi les écoutait.**",
+      "choices": [
+        "relative",
+        "complétive",
+        "circonstancielle"
+      ],
+      "answer": 2,
+      "hints": [
+        "Three tests: does the clause DESCRIBE a noun (relative)? Can you replace it with *ça* (complétive)? Does it start with a conjunction of time / purpose / cause (circonstancielle)?",
+        "Look at the word that introduces the clause: *qui, que, dont, duquel* (relative)… or a conjunction from the list (circonstancielle).",
+        "*pendant que* gives the TIME → circonstancielle (indicatif)."
+      ],
+      "traps": {
+        "0": "There is no noun to describe: the clause gives a circumstance (time or purpose).",
+        "1": "It does not complete a verb of thinking or saying: it adds a time or a purpose and starts with a conjunction from the list."
+      },
+      "solution": [
+        "*pendant que* gives the TIME → circonstancielle (indicatif)."
+      ],
+      "idea": "Relative = describes a noun. Complétive = replaced by *ça*. Circonstancielle = conjunction (time, purpose, cause…)."
+    },
+    {
+      "id": "s7_23",
+      "skill": "gram",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-7 · EXERCICE 5",
+      "text": "**5.** De quel type de proposition s’agit-il ? <br>Je crois **qu’il ne reviendra plus.**",
+      "choices": [
+        "relative",
+        "complétive",
+        "circonstancielle"
+      ],
+      "answer": 1,
+      "hints": [
+        "Three tests: does the clause DESCRIBE a noun (relative)? Can you replace it with *ça* (complétive)? Does it start with a conjunction of time / purpose / cause (circonstancielle)?",
+        "Look at the word that introduces the clause: *qui, que, dont, duquel* (relative)… or a conjunction from the list (circonstancielle).",
+        "*Je crois ça.* The clause completes the verb *croire* → complétive."
+      ],
+      "traps": {
+        "0": "*que* here does not replace a noun — there is no noun to describe. Try replacing the clause by *ça*.",
+        "2": "No conjunction of time, purpose or cause: the clause is the thing that is supposed / believed / noticed."
+      },
+      "solution": [
+        "*Je crois ça.* The clause completes the verb *croire* → complétive."
+      ],
+      "idea": "Relative = describes a noun. Complétive = replaced by *ça*. Circonstancielle = conjunction (time, purpose, cause…)."
+    },
+    {
+      "id": "s7_24",
+      "skill": "gram",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-7 · EXERCICE 6",
+      "text": "**6.** De quel type de proposition s’agit-il ? <br>L’enfant **que tu as vu** est sérieux.",
+      "choices": [
+        "relative",
+        "complétive",
+        "circonstancielle"
+      ],
+      "answer": 0,
+      "hints": [
+        "Three tests: does the clause DESCRIBE a noun (relative)? Can you replace it with *ça* (complétive)? Does it start with a conjunction of time / purpose / cause (circonstancielle)?",
+        "Look at the word that introduces the clause: *qui, que, dont, duquel* (relative)… or a conjunction from the list (circonstancielle).",
+        "*que* replaces *l’enfant* (“tu as vu l’enfant”) and describes the noun → relative."
+      ],
+      "traps": {
+        "1": "Look at what comes before: a NOUN (*l’auteur, l’enfant, le village*). The clause describes it → relative.",
+        "2": "It does not tell when / why / how: it describes a noun, and *dont / que / duquel* replace that noun."
+      },
+      "solution": [
+        "*que* replaces *l’enfant* (“tu as vu l’enfant”) and describes the noun → relative."
+      ],
+      "idea": "Relative = describes a noun. Complétive = replaced by *ça*. Circonstancielle = conjunction (time, purpose, cause…)."
+    },
+    {
+      "id": "s7_25",
+      "skill": "gram",
+      "difficulty": "medium",
+      "source": "Hu Education 190-Grace · Sem-7 · EXERCICE 7",
+      "text": "**7.** De quel type de proposition s’agit-il ? <br>Je remarque **que tu n’as pas fait ton devoir.**",
+      "choices": [
+        "relative",
+        "complétive",
+        "circonstancielle"
+      ],
+      "answer": 1,
+      "hints": [
+        "Three tests: does the clause DESCRIBE a noun (relative)? Can you replace it with *ça* (complétive)? Does it start with a conjunction of time / purpose / cause (circonstancielle)?",
+        "Look at the word that introduces the clause: *qui, que, dont, duquel* (relative)… or a conjunction from the list (circonstancielle).",
+        "*Je remarque ça.* It completes the verb *remarquer* → complétive."
+      ],
+      "traps": {
+        "0": "*que* here does not replace a noun — there is no noun to describe. Try replacing the clause by *ça*.",
+        "2": "No conjunction of time, purpose or cause: the clause is the thing that is supposed / believed / noticed."
+      },
+      "solution": [
+        "*Je remarque ça.* It completes the verb *remarquer* → complétive."
+      ],
+      "idea": "Relative = describes a noun. Complétive = replaced by *ça*. Circonstancielle = conjunction (time, purpose, cause…)."
+    },
+    {
+      "id": "s7_26",
+      "skill": "gram",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-7 · EXERCICE 8",
+      "text": "**8.** De quel type de proposition s’agit-il ? <br>La porte était fermée avec un cadenas **afin que l’enfant ne puisse pas manger.**",
+      "choices": [
+        "relative",
+        "complétive",
+        "circonstancielle"
+      ],
+      "answer": 2,
+      "hints": [
+        "Three tests: does the clause DESCRIBE a noun (relative)? Can you replace it with *ça* (complétive)? Does it start with a conjunction of time / purpose / cause (circonstancielle)?",
+        "Look at the word that introduces the clause: *qui, que, dont, duquel* (relative)… or a conjunction from the list (circonstancielle).",
+        "*afin que* gives the PURPOSE → circonstancielle (subjonctif: *puisse*)."
+      ],
+      "traps": {
+        "0": "There is no noun to describe: the clause gives a circumstance (time or purpose).",
+        "1": "It does not complete a verb of thinking or saying: it adds a time or a purpose and starts with a conjunction from the list."
+      },
+      "solution": [
+        "*afin que* gives the PURPOSE → circonstancielle (subjonctif: *puisse*)."
+      ],
+      "idea": "Relative = describes a noun. Complétive = replaced by *ça*. Circonstancielle = conjunction (time, purpose, cause…)."
+    },
+    {
+      "id": "s7_27",
+      "skill": "gram",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-7 · EXERCICE 9",
+      "text": "**9.** De quel type de proposition s’agit-il ? <br>Il fallait atteindre la ville **avant que le soir ne tombe.**",
+      "choices": [
+        "relative",
+        "complétive",
+        "circonstancielle"
+      ],
+      "answer": 2,
+      "hints": [
+        "Three tests: does the clause DESCRIBE a noun (relative)? Can you replace it with *ça* (complétive)? Does it start with a conjunction of time / purpose / cause (circonstancielle)?",
+        "Look at the word that introduces the clause: *qui, que, dont, duquel* (relative)… or a conjunction from the list (circonstancielle).",
+        "*avant que* gives the TIME → circonstancielle (subjonctif: *tombe*)."
+      ],
+      "traps": {
+        "0": "There is no noun to describe: the clause gives a circumstance (time or purpose).",
+        "1": "It does not complete a verb of thinking or saying: it adds a time or a purpose and starts with a conjunction from the list."
+      },
+      "solution": [
+        "*avant que* gives the TIME → circonstancielle (subjonctif: *tombe*)."
+      ],
+      "idea": "Relative = describes a noun. Complétive = replaced by *ça*. Circonstancielle = conjunction (time, purpose, cause…)."
+    },
+    {
+      "id": "s7_28",
+      "skill": "gram",
+      "difficulty": "easy",
+      "source": "Hu Education 190-Grace · Sem-7 · EXERCICE 10",
+      "text": "**10.** De quel type de proposition s’agit-il ? <br>Le village, **duquel nous sommes partis**, est très loin de la ville.",
+      "choices": [
+        "relative",
+        "complétive",
+        "circonstancielle"
+      ],
+      "answer": 0,
+      "hints": [
+        "Three tests: does the clause DESCRIBE a noun (relative)? Can you replace it with *ça* (complétive)? Does it start with a conjunction of time / purpose / cause (circonstancielle)?",
+        "Look at the word that introduces the clause: *qui, que, dont, duquel* (relative)… or a conjunction from the list (circonstancielle).",
+        "*duquel* replaces *le village* (“nous sommes partis du village”) → relative."
+      ],
+      "traps": {
+        "1": "Look at what comes before: a NOUN (*l’auteur, l’enfant, le village*). The clause describes it → relative.",
+        "2": "It does not tell when / why / how: it describes a noun, and *dont / que / duquel* replace that noun."
+      },
+      "solution": [
+        "*duquel* replaces *le village* (“nous sommes partis du village”) → relative."
+      ],
+      "idea": "Relative = describes a noun. Complétive = replaced by *ça*. Circonstancielle = conjunction (time, purpose, cause…)."
+    }
+  ]
+}
