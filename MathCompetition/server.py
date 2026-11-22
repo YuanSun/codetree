@@ -280,7 +280,7 @@ def quiz_page(week: dict, page: dict) -> str:
     t = TRACKS[week["track"]]
     data = json.loads((t["dir"] / week["id"] / page["file"]).read_text(encoding="utf-8"))
     extra = "".join(
-        f'<script src="{t["prefix"]}/{esc(week["id"])}/{esc(s)}"></script>' for s in page.get("scripts", [])
+        script_tag(t, week, s) for s in page.get("scripts", [])
     )
     return render(
         "layout.html",
@@ -305,7 +305,7 @@ def exam_page(week: dict, page: dict) -> str:
     t = TRACKS[week["track"]]
     data = json.loads((t["dir"] / week["id"] / page["file"]).read_text(encoding="utf-8"))
     extra = "".join(
-        f'<script src="{t["prefix"]}/{esc(week["id"])}/{esc(s)}"></script>' for s in page.get("scripts", [])
+        script_tag(t, week, s) for s in page.get("scripts", [])
     )
     return render(
         "layout.html",
@@ -353,6 +353,13 @@ def parent_page() -> str:
         '<div id="parent-root" class="parent-root"><p class="muted">Loading…</p></div>',
         scripts='<script src="/static/js/parent.js"></script>',
     )
+
+
+def script_tag(track: dict, week: dict, name: str) -> str:
+    """A page's extra script: a file of the unit, or a shared one (/static/js/…, e.g. the 3D viewer)."""
+    if name.startswith("/static/js/") and ".." not in name:
+        return f'<script src="{esc(name)}"></script>'
+    return f'<script src="{track["prefix"]}/{esc(week["id"])}/{esc(name)}"></script>'
 
 
 def safe_next(value: str) -> str:

@@ -21,6 +21,7 @@
       "desc": "Build stacks, read their views, count hidden cubes, then box surfaces, glued cubes, scaling and tilting — play with each idea, then solve step by step.",
       "tasks": 10,
       "scripts": [
+        "/static/js/view3d.js",
         "figures.js"
       ]
     },
@@ -29,6 +30,7 @@
       "type": "quiz",
       "file": "practice.json",
       "scripts": [
+        "/static/js/view3d.js",
         "figures.js"
       ],
       "title": "Practice",

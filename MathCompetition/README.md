@@ -102,6 +102,16 @@ link to each other. Behind the hosting gateway the study track lives at `/math/s
 The Sem-5/6 Quests and Class Sheets keep the sheet's original French in the questions; help text is in English.
 Shared lesson styling lives in `static/css/lesson-common.css` (new lessons can link it instead of copying Week 8's CSS).
 
+## 3D viewer (`static/js/view3d.js`)
+
+Geometry weeks can show solids as a real 3D object that the child turns with a finger or mouse, like a product viewer:
+`MC.view3d(el, { voxels: [[a,b,z],…] })` or `{ boxes: [{ a, b, z }] }` (canvas, no libraries). Drag to turn it (it keeps gliding),
+pinch or ＋/－ to zoom, double-tap to reset, **front / right / top / corner** buttons fly to the standard views, and optional
+tools: x-ray, *pull the cubes apart*, and **tap faces to mark them** (surface area counted by hand, including the hidden bottom).
+Week 11 uses it in every stack and box lab through `showSolid()` in its `figures.js` (a "Flat picture / Turn it in 3D" switch
+on each drawing; the labs start in 3D, the question figures start flat). Load it from a page with
+`"scripts": ["/static/js/view3d.js", "figures.js"]` in `week.json` (or a `<script>` tag in a hand-built lesson).
+
 ## Layout
 
 ```

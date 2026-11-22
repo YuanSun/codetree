@@ -125,6 +125,34 @@
     return svg('svg', { viewBox: `0 0 ${W.toFixed(1)} ${H.toFixed(1)}`, style: `width:100%;max-width:${Math.round(W * (o.k || 1))}px;height:auto;display:block;margin:4px auto` }, g);
   }
 
+  /** A holder that shows the flat picture AND (when /static/js/view3d.js is loaded) a real 3D viewer you can turn with your finger.
+   *  scene = {voxels|boxes, tint, labels, grid, xray}; o = {flat: () => svg, start3d, v3: view3d options, tip}. Call again on every redraw. */
+  function showSolid(holder, scene, o = {}) {
+    let st = holder._w3;
+    if (!st) {
+      st = holder._w3 = { three: !!(o.start3d && MC.view3d), viewer: null, flat: h('div'), stage: h('div') };
+      const set = (on) => { st.three = on; st.bf.classList.toggle('on', !on); st.b3.classList.toggle('on', on); render(); };
+      st.bf = chip('🖼 Flat picture', false, () => set(false)); st.b3 = chip('🧊 Turn it in 3D', false, () => set(true), { 'data-3d': '1' });
+      st.bar = h('div', { class: 'v3d-switch' }, st.bf, st.b3);
+      if (!MC.view3d) st.bar.style.display = 'none';
+      holder.replaceChildren(st.bar, st.flat, st.stage);
+      st.render = render;
+      st.bf.classList.toggle('on', !st.three); st.b3.classList.toggle('on', st.three);
+    }
+    st.scene = scene; st.o = o;
+    st.render();
+    return st;
+    function render() {
+      const { scene: sc, o: op } = st;
+      st.flat.style.display = st.three ? 'none' : ''; st.stage.style.display = st.three ? '' : 'none';
+      if (!st.three) { if (op.flat) MC.fill(st.flat, op.flat()); return; }
+      if (!st.viewer) st.viewer = MC.view3d(st.stage, Object.assign({ height: 300, views: true }, op.v3 || {}));
+      st.viewer.set(sc);
+    }
+  }
+  const dimLabels = (l, w, hh, txt) => [
+    { at: [l / 2, -0.35, w + 0.4], text: txt ? txt.l : `${l}` }, { at: [l + 0.4, -0.35, w / 2], text: txt ? txt.w : `${w}` }, { at: [-0.4, hh / 2, w + 0.4], text: txt ? txt.h : `${hh}` }];
+
   /** The flat FRONT / RIGHT picture: cols = heights left→right. */
   function viewSvg(cols, o = {}) {
     const cell = o.cell || 26, maxH = o.maxH || Math.max(1, ...cols), n = cols.length, pad = 6, lab = o.label ? 20 : 0;
@@ -204,7 +232,8 @@
     function draw() {
       const vox = planVox(plan), n = vox.length, fv = frontView(plan), rv = rightView(plan);
       pt.cells.forEach(({ r, c, val, minus, plus }) => { val.textContent = String(plan[r][c]); minus.disabled = plan[r][c] <= 0; plus.disabled = plan[r][c] >= max; });
-      MC.fill(iso, isoSvg(vox, { u: cfg.u || 30, xray, k: 1.15 }));
+      showSolid(iso, { voxels: vox, xray }, { flat: () => isoSvg(vox, { u: cfg.u || 30, xray, k: 1.15 }), start3d: cfg.start3d !== false,
+        v3: mode === 'glue' ? { explode: true, count: true, countHint: 'Tap every face you can see to mark it — then turn the solid over (or pull the cubes apart) to find the rest.' } : {} });
       if (mode !== 'glue') MC.fill(views, viewBlock(fv, 'FRONT view', 'tallest stack in each column', { maxH: max }), viewBlock(rv, 'RIGHT view', 'front row is on the left', { maxH: max, fill: PAL.right }));
       if (mode === 'views') {
         const seen = seenCount(vox);
@@ -226,7 +255,9 @@
 
   /* ============================================================ the stack (figure) */
   MC.widgets.stack = (el, cfg) => {
-    const plan = cfg.plan, kids = cfg.iso === false ? [] : [isoSvg(cfg.voxels || planVox(plan), { u: cfg.u || 30, k: cfg.k || 1.1, tint: cfg.tint })];
+    const plan = cfg.plan, vox0 = cfg.voxels || planVox(plan), holder = h('div');
+    const kids = cfg.iso === false ? [] : [holder];
+    if (kids.length) showSolid(holder, { voxels: vox0, tint: cfg.tint }, { flat: () => isoSvg(vox0, { u: cfg.u || 30, k: cfg.k || 1.1, tint: cfg.tint }), start3d: false });
     const side = [];
     if (cfg.table) side.push(planTable(plan).el);
     if (cfg.views) side.push(h('div', { class: 'w11-split' }, viewBlock(frontView(plan), 'FRONT view'), viewBlock(rightView(plan), 'RIGHT view', 'front on the left', { fill: PAL.right })));
@@ -308,7 +339,8 @@
     const s = slider('Layers shown', 1, H, 1, H, (v) => draw(v), (v) => `${v} of ${H}`);
     el.append(h('div', { class: 'w11' }, s.row, iso, out));
     function draw(k) {
-      MC.fill(iso, isoSvg(vox.filter((v) => v[2] < k), { u: cfg.u || 30, k: 1.1, tint: (v) => v[2] === k - 1 }));
+      const shown = vox.filter((v) => v[2] < k), top = (v) => v[2] === k - 1;
+      showSolid(iso, { voxels: shown, tint: top }, { flat: () => isoSvg(shown, { u: cfg.u || 30, k: 1.1, tint: top }), start3d: true });
       const so = sum(per.slice(0, k));
       MC.fill(out, note(`Layer ${k} (gold) has **${per[k - 1]}** cube${per[k - 1] === 1 ? '' : 's'}. Layers 1 to ${k} together: ${per.slice(0, k).join(' + ')} = **${so}**.`, k === H ? 'good' : ''),
         k === H ? note(`Bottom up: ${per.join(' + ')} = **${sum(per)}** cubes. No cube is left out — even the hidden ones.`) : null);
@@ -327,7 +359,7 @@
     el.append(h('div', { class: 'w11' }, iso, btns, out));
     function draw() {
       const extra = [0, 1, 2].flatMap((z) => (added[z] ? fillOf(z) : [])), vox = cross.concat(extra), isNew = (v) => !has(...v);
-      MC.fill(iso, isoSvg(vox, { u: 34, k: 1.1, tint: isNew, xray: false }));
+      showSolid(iso, { voxels: vox, tint: isNew }, { flat: () => isoSvg(vox, { u: 34, k: 1.1, tint: isNew, xray: false }), start3d: true });
       const n = sum(added.map((x, z) => (x ? missing[z] : 0)));
       MC.fill(out, note(`Each layer of the big cube has 9 spots. George already has: bottom **1**, middle **5**, top **1**. Missing: bottom **${missing[0]}**, middle **${missing[1]}**, top **${missing[2]}**.`),
         note(`Cubes you added so far: **${n}**${added.every(Boolean) ? ` → 7 + ${n} = **${7 + n}** = 3 × 3 × 3 ✅` : ''}`, added.every(Boolean) ? 'good' : ''));
@@ -338,7 +370,11 @@
   /** figure: one solid box, optionally with water. cfg:{l,w,h,u,labels:false|true,water} */
   MC.widgets.box = (el, cfg) => {
     const lab = cfg.labels === false ? undefined : { l: `${cfg.l} cm`, w: `${cfg.w} cm`, h: `${cfg.h} cm` };
-    el.append(h('div', { class: 'w11' }, isoBox(cfg.l, cfg.w, cfg.h, { u: cfg.u || 24, labels: lab, water: cfg.water, k: 1.2 })));
+    const holder = h('div');
+    el.append(h('div', { class: 'w11' }, holder));
+    const flat = () => isoBox(cfg.l, cfg.w, cfg.h, { u: cfg.u || 24, labels: lab, water: cfg.water, k: 1.2 });
+    if (cfg.water != null) MC.fill(holder, flat());           // water is only drawn in the flat picture
+    else showSolid(holder, { boxes: [{ a: cfg.w, b: cfg.l, z: cfg.h }], labels: lab ? dimLabels(cfg.l, cfg.w, cfg.h, { l: `${cfg.l} cm`, w: `${cfg.w} cm`, h: `${cfg.h} cm` }) : null }, { flat, start3d: false });
   };
 
   /* ============================================================ the box: three pairs of faces */
@@ -349,7 +385,9 @@
     const gb = chip('▦ Show the 1 cm squares', false, () => { grid = !grid; gb.classList.toggle('on', grid); draw(); });
     el.append(h('div', { class: 'w11' }, sl.row, sw.row, sh.row, gb, view, out));
     function draw() {
-      MC.fill(view, isoBox(l, w, hh, { u: 20, grid, labels: { l: `l = ${l}`, w: `w = ${w}`, h: `h = ${hh}` }, k: 1.2 }));
+      showSolid(view, { boxes: [{ a: w, b: l, z: hh }], grid, labels: dimLabels(l, w, hh, { l: `l = ${l}`, w: `w = ${w}`, h: `h = ${hh}` }) },
+        { flat: () => isoBox(l, w, hh, { u: 20, grid, labels: { l: `l = ${l}`, w: `w = ${w}`, h: `h = ${hh}` }, k: 1.2 }), start3d: true,
+          v3: { count: true, countHint: 'Tap a face to add its area. A box has 6 faces — find them all (turn it over for the bottom!).' } });
       const a = l * w, b = l * hh, c = w * hh, sa = 2 * (a + b + c);
       MC.fill(out, h('div', { class: 'w11-pairs' },
         h('span', { style: 'background:#eef2fb', html: `top & bottom: 2 × ${l} × ${w} = <b>${2 * a}</b>` }), h('span', { style: 'background:#c8d5f0', html: `front & back: 2 × ${l} × ${hh} = <b>${2 * b}</b>` }), h('span', { style: 'background:#98aedb', html: `left & right: 2 × ${w} × ${hh} = <b>${2 * c}</b>` })),
@@ -365,7 +403,7 @@
     const s = slider('Edge', 1, 5, 1, k, (v) => { k = v; draw(); }, (v) => v + ' cm');
     el.append(h('div', { class: 'w11' }, s.row, view, out));
     function draw() {
-      MC.fill(view, isoBox(k, k, k, { u: Math.round(110 / (k + 1)), grid: true, k: 1.2 }));
+      showSolid(view, { boxes: [{ a: k, b: k, z: k }], grid: true }, { flat: () => isoBox(k, k, k, { u: Math.round(110 / (k + 1)), grid: true, k: 1.2 }), start3d: true });
       const rowsHtml = [1, 2, 3, 4, 5].map((e) => `<tr style="${e === k ? 'background:#e6e9ff' : ''}"><td>${e}</td><td>${e}×</td><td>6 × ${e}² = <b>${6 * e * e}</b></td><td>${e}³ = <b>${e ** 3}</b></td></tr>`).join('');
       MC.fill(out, note(`A cube with edge **${k}** is made of ${k}×${k}×${k} = **${k ** 3}** little cubes. Each face is ${k}×${k} = ${k * k} squares. Surface area = 6 × ${k * k} = **${6 * k * k}**.`, 'good'),
         h('table', { class: 'w11-grid', html: `<tr><th>edge</th><th>lengths</th><th>surface area</th><th>volume</th></tr>${rowsHtml}` }),
@@ -414,7 +452,7 @@
     function draw() {
       const gone = order.slice(0, k), vox = [];
       for (let a = 0; a < 3; a++) for (let b = 0; b < 3; b++) for (let z = 0; z < 3; z++) if (!gone.some((c) => c[0] === a && c[1] === b && c[2] === z)) vox.push([a, b, z]);
-      MC.fill(view, isoSvg(vox, { u: 36, k: 1.1 }));
+      showSolid(view, { voxels: vox }, { flat: () => isoSvg(vox, { u: 36, k: 1.1 }), start3d: true });
       MC.fill(out, note(`The cube had **6** faces. Every cut-out corner **adds 3 new faces** (the 3 little squares inside the notch) and the 3 old faces just get a notch — they are still **one face each**.`),
         note(`${k} cut${k === 1 ? '' : 's'}: 6 + 3 × ${k} = **${6 + 3 * k}** faces.${k === 8 ? ' All 8 corners → **30** faces ✅' : ''}`, k === 8 ? 'good' : ''));
     }
