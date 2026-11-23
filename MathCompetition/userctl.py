@@ -10,6 +10,8 @@ Create or change them with its CLI, e.g.  cd lecture-magique/backend && uv run p
 Settings come from MathCompetition/.env (see .env.example).
 """
 
+from __future__ import annotations
+
 import argparse
 import sys
 
