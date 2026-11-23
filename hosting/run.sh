@@ -29,7 +29,10 @@ pids=()
 cleanup() { for p in "${pids[@]:-}"; do kill "$p" 2>/dev/null || true; done; }
 trap cleanup EXIT INT TERM
 
-( cd "$REPO/MathCompetition" && exec python3 server.py --host 127.0.0.1 --port "$MATH_PORT" --base-path /math ) &
+# MathCompetition: prefers its own .venv (where `pip install -r requirements.txt` put psycopg + argon2-cffi for profiles).
+MATH_DIR="$REPO/MathCompetition"
+if [ -x "$MATH_DIR/.venv/bin/python" ]; then MATH_PY="$MATH_DIR/.venv/bin/python"; else MATH_PY="python3"; fi
+( cd "$MATH_DIR" && exec "$MATH_PY" server.py --host 127.0.0.1 --port "$MATH_PORT" --base-path /math ) &
 pids+=($!)
 
 # Family budget dashboard: needs its Python deps (prefers its own .venv) and the Postgres in its .env.

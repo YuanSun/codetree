@@ -34,10 +34,12 @@ with its own `mathlab_app` role. That role can read just five columns of `lectur
 password hash, role) and nothing else of Lecture's.
 
 ```bash
-pip install -r requirements.txt                    # psycopg + argon2-cffi, only for profiles
+python3.13 -m venv .venv                           # any Python 3.9+; hosting/run.sh uses .venv automatically
+.venv/bin/python -m pip install -r requirements.txt    # psycopg + argon2-cffi, only for profiles
 psql -d postgres -v app_password="'pick-a-password'" -f db/init_role.sql     # once, as your Postgres admin: role + schema
 cp .env.example .env                               # fill in DATABASE_URL, DATABASE_ADMIN_URL, SESSION_SECRET
-python3 userctl.py migrate                         # progress tables + grants (re-run any time; also after Lecture's schema exists)
+# from here on use .venv/bin/python (or `source .venv/bin/activate`) instead of python3
+.venv/bin/python userctl.py migrate                # progress tables + grants (re-run any time; also after Lecture's schema exists)
 python3 userctl.py list-users                      # who can sign in, and as what
 python3 server.py                                  # startup says: Accounts: on (Postgres, schema mathlab)
 ```
