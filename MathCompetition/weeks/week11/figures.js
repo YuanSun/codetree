@@ -369,12 +369,12 @@
 
   /** figure: one solid box, optionally with water. cfg:{l,w,h,u,labels:false|true,water} */
   MC.widgets.box = (el, cfg) => {
-    const lab = cfg.labels === false ? undefined : { l: `${cfg.l} cm`, w: `${cfg.w} cm`, h: `${cfg.h} cm` };
+    const lab = cfg.labels === false ? undefined : Object.assign({ l: `${cfg.l} cm`, w: `${cfg.w} cm`, h: `${cfg.h} cm` }, typeof cfg.labels === 'object' ? cfg.labels : {});   // labels:{h:'x cm'} hides a length
     const holder = h('div');
     el.append(h('div', { class: 'w11' }, holder));
     const flat = () => isoBox(cfg.l, cfg.w, cfg.h, { u: cfg.u || 24, labels: lab, water: cfg.water, k: 1.2 });
     if (cfg.water != null) MC.fill(holder, flat());           // water is only drawn in the flat picture
-    else showSolid(holder, { boxes: [{ a: cfg.w, b: cfg.l, z: cfg.h }], labels: lab ? dimLabels(cfg.l, cfg.w, cfg.h, { l: `${cfg.l} cm`, w: `${cfg.w} cm`, h: `${cfg.h} cm` }) : null }, { flat, start3d: false });
+    else showSolid(holder, { boxes: [{ a: cfg.w, b: cfg.l, z: cfg.h }], labels: lab ? dimLabels(cfg.l, cfg.w, cfg.h, lab) : null }, { flat, start3d: false });
   };
 
   /* ============================================================ the box: three pairs of faces */
@@ -482,6 +482,52 @@
       const totals = opts.map((o) => mask.reduce((s2, rw, r) => s2 + [...rw].reduce((s3, ch, c) => s3 + (ch === '#' ? o[2][o[1] === 'cols' ? c : r] : 0), 0), 0));
       MC.fill(out, note(`Side view from the **${nm}**: every shaded square gets the biggest height its line of sight allows → total **${tot}** cubes.`, tot === Math.max(...totals) ? 'good' : ''),
         note(`All four possible sides give: ${opts.map((o, i) => `${o[0]} **${totals[i]}**`).join(' · ')}. The largest is **${Math.max(...totals)}**.`));
+    }
+    draw();
+  };
+
+
+  /* ============================================================ homework: digits 1–9 make a box (Gauss 2023 Q23) */
+  /** cfg:{} — pick the three side lengths (digits), see the three face areas, and check that all nine digits 1–9 are used exactly once. */
+  MC.widgets.digitbox = (el) => {
+    const dims = { l: 2, w: 3, h: 4 }, tools = row(), out = h('div'), board = h('div', { class: 'w11-pairs' }), view = h('div');
+    const steppers = {};
+    for (const [k, name] of [['l', 'length l'], ['w', 'width w'], ['h', 'height h']]) {
+      const val = h('b', { class: 'w11-big' }, String(dims[k]));
+      const step = (d) => { dims[k] = Math.max(1, Math.min(9, dims[k] + d)); draw(); };
+      steppers[k] = val;
+      tools.append(h('div', { class: 'w11-cellbtns', style: 'flex-direction:column;gap:4px;margin-right:12px' }, h('span', { class: 'w11-sub' }, name),
+        h('div', { class: 'w11-cellbtns' }, h('button', { type: 'button', onclick: () => step(-1), 'aria-label': `${name} minus` }, '−'), val, h('button', { type: 'button', onclick: () => step(1), 'aria-label': `${name} plus` }, '+'))));
+    }
+    el.append(h('div', { class: 'w11' }, note('Choose the three one-digit side lengths. The faces’ areas are two-digit numbers. All **six** numbers together must use the digits **1 to 9, each exactly once**.'), tools, view, board, out));
+    function draw() {
+      const { l, w, h: hh } = dims, areas = [l * w, l * hh, w * hh], nums = [l, w, hh, ...areas];
+      for (const k of Object.keys(dims)) steppers[k].textContent = String(dims[k]);
+      const count = Array(10).fill(0); nums.forEach((n) => String(n).split('').forEach((c) => { count[+c]++; }));
+      showSolid(view, { boxes: [{ a: w, b: l, z: hh }] }, { flat: () => isoBox(l, w, hh, { u: 14, k: 1 }), start3d: false });
+      MC.fill(board, ...[1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => h('span', { style: `background:${count[d] === 1 ? '#d8f2e4' : count[d] > 1 ? '#ffe4e1' : '#fff'};min-width:34px;text-align:center` }, `${d}${count[d] > 1 ? ' ×' + count[d] : count[d] === 0 ? ' ·' : ' ✓'}`)));
+      const zero = nums.some((n) => String(n).includes('0')), oneDigitArea = areas.some((a) => a < 10), good = count.slice(1).every((c) => c === 1) && count[0] === 0 && !zero;
+      MC.fill(out, note(`Areas: ${l}×${w} = **${areas[0]}**, ${l}×${hh} = **${areas[1]}**, ${w}×${hh} = **${areas[2]}**.${oneDigitArea ? ' Careful — an area must be a **two-digit** number.' : ''}`),
+        good ? note(`✅ Every digit once! Surface area = 2 × (${areas.join(' + ')}) = 2 × ${sum(areas)} = **${2 * sum(areas)}**.`, 'good') : note(`Digits used: ${count.slice(1).map((c, i) => (c === 1 ? '' : `${i + 1} ${c ? 'twice' : 'missing'}`)).filter(Boolean).join(', ') || '—'}. Keep trying — change one side at a time.`, 'warn'));
+    }
+    draw();
+  };
+
+  /* ============================================================ homework: 8 × 8 × n, when is B / A a whole number? (Gauss 2019 Q25) */
+  MC.widgets.prismratio = (el) => {
+    let n = 2; const view = h('div'), out = h('div'), grid = h('div', { class: 'w11-pairs' });
+    const sl = slider('Height n', 1, 50, 1, n, (v) => { n = v; draw(); }, (v) => String(v));
+    const works = []; for (let k = 1; k <= 50; k++) if ((384 * k) % (128 + 32 * k) === 0) works.push(k);
+    el.append(h('div', { class: 'w11' }, sl.row, view, out, note('Tap a number to try it. **Green** = B ÷ A is a whole number.'), grid));
+    function draw() {
+      sl.inp.value = n; sl.sync();
+      const A = 128 + 32 * n, B = 384 * n, whole = B % A === 0;
+      showSolid(view, { boxes: [{ a: 8, b: 8, z: n }] }, { flat: () => isoBox(8, 8, n, { u: Math.max(3, Math.round(150 / (8 + Math.max(n, 8)))), k: 1 }), start3d: false });
+      MC.fill(grid, ...Array.from({ length: 50 }, (_, i) => i + 1).map((k) => h('button', { type: 'button', class: 'w11-chip' + (k === n ? ' on' : ''), style: `min-width:36px;padding:4px 6px;${works.includes(k) ? 'background:#d8f2e4;border-color:#2e9b66' : ''}`, onclick: () => { n = k; draw(); } }, String(k))));
+      MC.fill(out, note(`8 × 8 × ${n}: surface area **A** = 2(64 + 8n + 8n) = 2(64 + ${16 * n}) = **${A}**.`),
+        note(`It is made of 64 × ${n} = ${64 * n} little cubes, each with surface area 6, so **B** = 6 × ${64 * n} = **${B}**.`),
+        note(`B ÷ A = ${B} ÷ ${A} = **${(B / A).toFixed(whole ? 0 : 2)}**${whole ? ' — a whole number ✅' : ' — not a whole number'}. (Simplified: 12n ÷ (n + 4).)`, whole ? 'good' : ''),
+        note(`Whole numbers for n = ${works.join(', ')} → sum = **${sum(works)}**. (Rewrite it as 12 − 48 ÷ (n + 4): n + 4 must divide 48.)`));
     }
     draw();
   };

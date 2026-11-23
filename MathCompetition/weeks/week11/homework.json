@@ -1,0 +1,396 @@
+{
+  "eyebrow": "Week 11 · Homework",
+  "title": "Views & Surface Area — Homework",
+  "intro": "The six homework questions: views, volume and surface area. Do each on paper first, then check here — and play with the lab that unlocks after you solve it.",
+  "groups": [
+    {
+      "id": "views",
+      "label": "Views",
+      "emoji": "🔭",
+      "color": "#3b82f6"
+    },
+    {
+      "id": "volume",
+      "label": "Volume",
+      "emoji": "🧊",
+      "color": "#f59e0b"
+    },
+    {
+      "id": "surface",
+      "label": "Surface area",
+      "emoji": "📦",
+      "color": "#10b981"
+    }
+  ],
+  "questions": [
+    {
+      "id": "hw1",
+      "skill": "views",
+      "difficulty": "easy",
+      "source": "Homework 11 — Q1 · Views",
+      "skillLabel": "Stack plan",
+      "title": "Views of a Stack",
+      "text": "The numbers show how many cubes are stacked on each square of the base (**BACK** at the top of the plan, **FRONT** at the bottom). Do the drawings on paper first: the **FRONT view** and the **RIGHT view** (front row on the left). Then pick the line that has both views right **and** the number of cubes in all.",
+      "figure": {
+        "type": "stack",
+        "plan": [
+          [
+            1,
+            3,
+            0
+          ],
+          [
+            2,
+            1,
+            2
+          ],
+          [
+            0,
+            2,
+            1
+          ]
+        ],
+        "table": true
+      },
+      "explorer": {
+        "type": "stackbuilder",
+        "mode": "views",
+        "plan": [
+          [
+            1,
+            3,
+            0
+          ],
+          [
+            2,
+            1,
+            2
+          ],
+          [
+            0,
+            2,
+            1
+          ]
+        ],
+        "rows": 3,
+        "cols": 3,
+        "max": 4
+      },
+      "choices": [
+        "Front **2, 3, 2** · Right **3, 2, 2** · **12** cubes",
+        "Front **2, 3, 2** · Right **2, 2, 3** · **12** cubes",
+        "Front **2, 3, 2** · Right **2, 2, 3** · **9** cubes",
+        "Front **2, 2, 3** · Right **2, 3, 2** · **12** cubes"
+      ],
+      "answer": 1,
+      "hints": [
+        "FRONT view: stand at the front. In each **column** of the plan only the tallest stack shows.",
+        "Columns, left to right: (1, 2, 0), (3, 1, 2), (0, 2, 1) → the tallest in each. For the RIGHT view use each **row**, starting with the **front** row (the bottom row of the plan): 0 2 1, then 2 1 2, then 1 3 0.",
+        "Front view **2, 3, 2**. Right view **2, 2, 3**. For the number of cubes, add all nine numbers in the plan."
+      ],
+      "traps": {
+        "0": "This right view reads the rows from the **back** row first. Looking from the right side, the **front** row is on your left, so start with the front row (0 2 1 → 2).",
+        "2": "9 is the number of **squares** in the base. The numbers are stack heights — add them: 1 + 3 + 0 + 2 + 1 + 2 + 0 + 2 + 1.",
+        "3": "Here the front view was built from the **rows** and the right view from the **columns**. The other way round: FRONT = tallest in each column, RIGHT = tallest in each row."
+      },
+      "solution": [
+        "FRONT view (tallest in each column, left to right): column 1 → 2, column 2 → 3, column 3 → 2. So **2, 3, 2**.",
+        "RIGHT view (tallest in each row, front row first): front row → 2, middle row → 2, back row → 3. So **2, 2, 3**.",
+        "Cubes in all: 1 + 3 + 0 + 2 + 1 + 2 + 0 + 2 + 1 = **12** → second line."
+      ],
+      "idea": "Front = tallest of each column. Right = tallest of each row, front row first. Cubes = add the plan."
+    },
+    {
+      "id": "hw2",
+      "skill": "volume",
+      "difficulty": "easy",
+      "source": "Gauss 2016, Grade 7 — Q13",
+      "skillLabel": "Scaling",
+      "title": "Half the Edges",
+      "text": "A larger cube has volume 64 cm³. A smaller cube has edges that are **half** the length of the edges of the larger cube. What is the volume of the smaller cube?",
+      "explorer": {
+        "type": "scale",
+        "k": 4
+      },
+      "choices": [
+        "24 cm³",
+        "48 cm³",
+        "8 cm³",
+        "16 cm³",
+        "27 cm³"
+      ],
+      "answer": 2,
+      "hints": [
+        "Start with the larger cube: which number multiplied by itself three times makes 64?",
+        "The larger edge is 4 cm. Half of it is 2 cm.",
+        "Volume of the small cube = 2 × 2 × 2."
+      ],
+      "traps": {
+        "3": "16 is 64 ÷ 4 — that is what happens to an **area** when the edges are halved (two lengths halve). A volume has **three** lengths, so it is divided by 2 three times."
+      },
+      "solution": [
+        "4 × 4 × 4 = 64, so the larger edge is **4 cm**.",
+        "Half of 4 is **2 cm**, so the volume is 2 × 2 × 2 = **8 cm³**.",
+        "Shortcut: every edge × ½ means volume × ½ × ½ × ½ = × ⅛, and 64 ÷ 8 = 8."
+      ],
+      "idea": "Edges × k → area × k², volume × k³."
+    },
+    {
+      "id": "hw3",
+      "skill": "volume",
+      "difficulty": "easy",
+      "source": "Gauss 2017, Grade 8 — Q11",
+      "skillLabel": "Box volume",
+      "title": "A Missing Edge",
+      "text": "The volume of the rectangular prism shown is 60 cm³. What is the value of *x*?",
+      "figure": {
+        "type": "box",
+        "l": 4,
+        "w": 5,
+        "h": 2.5,
+        "u": 24,
+        "labels": {
+          "h": "x cm"
+        }
+      },
+      "explorer": {
+        "type": "boxsa",
+        "l": 4,
+        "w": 5,
+        "h": 1
+      },
+      "choices": [
+        "1",
+        "4",
+        "6",
+        "3",
+        "2"
+      ],
+      "answer": 3,
+      "hints": [
+        "Volume of a box = length × width × height. The three lengths are 4, 5 and *x*.",
+        "4 × 5 × *x* = 60. First do 4 × 5.",
+        "20 × *x* = 60. What do you multiply 20 by to get 60?"
+      ],
+      "traps": {
+        "0": "Check it: if *x* were 1, the volume would be 4 × 5 × 1 = 20 cm³, not 60.",
+        "1": "Check it: if *x* were 4, the volume would be 4 × 5 × 4 = 80 cm³, not 60.",
+        "2": "Check it: if *x* were 6, the volume would be 4 × 5 × 6 = 120 cm³, not 60.",
+        "4": "Check it: if *x* were 2, the volume would be 4 × 5 × 2 = 40 cm³, not 60."
+      },
+      "solution": [
+        "V = 4 × 5 × *x* = 20 × *x*.",
+        "20 × *x* = 60, so *x* = 60 ÷ 20 = **3**.",
+        "Check: 4 × 5 × 3 = 60 ✅"
+      ],
+      "idea": "Volume = l × w × h — divide to find the missing length."
+    },
+    {
+      "id": "hw4",
+      "skill": "surface",
+      "difficulty": "medium",
+      "source": "Homework 11 — Q4 · Surface area",
+      "skillLabel": "Remove a cube",
+      "title": "A Corner Removed",
+      "text": "A 3 × 3 × 3 cube is built from 27 small cubes with edge 1 cm. **One corner cube is removed**, as shown. What is the surface area of the new solid?",
+      "figure": {
+        "type": "stack",
+        "plan": [
+          [
+            3,
+            3,
+            3
+          ],
+          [
+            3,
+            3,
+            3
+          ],
+          [
+            3,
+            3,
+            2
+          ]
+        ],
+        "u": 30
+      },
+      "explorer": {
+        "type": "stackbuilder",
+        "mode": "glue",
+        "rows": 3,
+        "cols": 3,
+        "max": 3,
+        "plan": [
+          [
+            3,
+            3,
+            3
+          ],
+          [
+            3,
+            3,
+            3
+          ],
+          [
+            3,
+            3,
+            2
+          ]
+        ],
+        "presets": [
+          {
+            "label": "Full 3×3×3 cube",
+            "plan": [
+              [
+                3,
+                3,
+                3
+              ],
+              [
+                3,
+                3,
+                3
+              ],
+              [
+                3,
+                3,
+                3
+              ]
+            ]
+          },
+          {
+            "label": "Corner removed",
+            "plan": [
+              [
+                3,
+                3,
+                3
+              ],
+              [
+                3,
+                3,
+                3
+              ],
+              [
+                3,
+                3,
+                2
+              ]
+            ]
+          },
+          {
+            "label": "Two corners removed",
+            "plan": [
+              [
+                3,
+                3,
+                2
+              ],
+              [
+                3,
+                3,
+                3
+              ],
+              [
+                3,
+                3,
+                2
+              ]
+            ]
+          }
+        ],
+        "extra": "Full cube: 54. Take a corner away: **3 faces disappear** from the outside, but **3 new faces** show inside the notch — so the surface area stays the same. Try removing a second corner!"
+      },
+      "choices": [
+        "48 cm²",
+        "51 cm²",
+        "54 cm²",
+        "57 cm²",
+        "60 cm²"
+      ],
+      "answer": 2,
+      "hints": [
+        "First find the surface area of the **full** 3 × 3 × 3 cube: 6 faces, each 3 × 3.",
+        "The corner cube showed **3** of its faces on the outside. Those 3 squares are gone now.",
+        "But taking the cube away uncovers **3 new** squares inside the notch (the faces of the three neighbouring cubes that used to touch it). Gone 3, new 3 — what happens to the total?"
+      ],
+      "traps": {
+        "1": "51 = 54 − 3: you took away the 3 outside faces of the removed cube, but forgot the **3 new faces** inside the notch.",
+        "3": "57 = 54 + 3: you counted the 3 new faces inside the notch, but forgot that the removed cube also took its **3 outside faces** away."
+      },
+      "solution": [
+        "Full cube: 6 × (3 × 3) = **54 cm²**.",
+        "Remove one corner cube: its 3 outside faces vanish (−3).",
+        "Its 3 neighbours now show a face inside the notch (+3).",
+        "54 − 3 + 3 = **54 cm²** — the same surface area, even though the solid lost a cube.",
+        "Check by gluing: 26 cubes × 6 = 156 faces; joints 54 − 3 = 51; 156 − 2 × 51 = 54 ✅"
+      ],
+      "idea": "Surface area counts faces you can touch: lose 3, gain 3."
+    },
+    {
+      "id": "hw5",
+      "skill": "surface",
+      "difficulty": "hard",
+      "source": "Gauss 2023, Grade 7 — Q23",
+      "skillLabel": "Digit puzzle",
+      "title": "Nine Digits, One Box",
+      "text": "The digits from 1 to 9 are each used exactly once to write three one-digit integers and three two-digit integers. The one-digit integers are equal to the length, width and height of a rectangular prism. The two-digit integers are equal to the areas of the faces of the same prism. What is the surface area of the rectangular prism?",
+      "explorer": {
+        "type": "digitbox"
+      },
+      "choices": [
+        "176",
+        "184",
+        "186",
+        "198",
+        "212"
+      ],
+      "answer": 3,
+      "hints": [
+        "Surface area = 2 × (the three face areas), so first find the three side lengths (one-digit numbers).",
+        "Which digits **cannot** be a side? A side of **1** gives a one-digit area. A side of **5** gives areas ending in 5 or 0 — a second 5 repeats the digit, and 0 is not allowed.",
+        "Try the sides **3, 6 and 9**. Their face areas are 3 × 6, 3 × 9 and 6 × 9. Do the six numbers use every digit from 1 to 9 once?"
+      ],
+      "solution": [
+        "Sides **3, 6, 9** → face areas 3 × 6 = **18**, 3 × 9 = **27**, 6 × 9 = **54**.",
+        "Digits used: 3, 6, 9, 1, 8, 2, 7, 5, 4 — every digit from 1 to 9, once each ✅.",
+        "Surface area = 2 × (18 + 27 + 54) = 2 × 99 = **198**.",
+        "(Trying every possible triple of sides on a computer shows this is the only box that works.)"
+      ],
+      "idea": "Surface area = 2(lw + lh + wh). Use the digit rules to rule out sides."
+    },
+    {
+      "id": "hw6",
+      "skill": "surface",
+      "difficulty": "hard",
+      "source": "Gauss 2019, Grade 7 — Q25",
+      "skillLabel": "Cubes vs prism",
+      "title": "B over A",
+      "text": "An 8 × 8 × *n* rectangular prism is made up from 1 × 1 × 1 cubes. Suppose that *A* is the surface area of the prism and *B* is the **combined** surface area of the 1 × 1 × 1 cubes that make up the prism. What is the sum of the values of *n* for which [[B/A]] is an integer?",
+      "explorer": {
+        "type": "prismratio"
+      },
+      "choices": [
+        "86",
+        "90",
+        "70",
+        "78",
+        "96"
+      ],
+      "answer": 1,
+      "hints": [
+        "Write *A* with *n*: the prism has two 8 × 8 squares and four 8 × *n* rectangles.",
+        "*B*: the prism has 8 × 8 × *n* = 64*n* little cubes, and each cube has surface area 6.",
+        "*A* = 128 + 32*n* and *B* = 384*n*. Divide both by 32: [[B/A]] = 12*n* ÷ (*n* + 4) = 12 − 48 ÷ (*n* + 4). When is 48 ÷ (*n* + 4) a whole number?"
+      ],
+      "solution": [
+        "*A* = 2 × 64 + 4 × 8*n* = 128 + 32*n*.",
+        "*B* = 64*n* cubes × 6 = 384*n*.",
+        "[[B/A]] = 384*n* ÷ (128 + 32*n*) = 12*n* ÷ (*n* + 4) = 12 − 48 ÷ (*n* + 4).",
+        "That is a whole number exactly when *n* + 4 divides 48. Since *n* ≥ 1, *n* + 4 can be 6, 8, 12, 16, 24 or 48.",
+        "So *n* = 2, 4, 8, 12, 20, 44 and the sum is **90**. (Check *n* = 2: *A* = 192, *B* = 768, 768 ÷ 192 = 4 ✅)"
+      ],
+      "idea": "Write both areas with *n*, simplify the fraction, then ask which divisors work."
+    }
+  ]
+}

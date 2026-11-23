@@ -3,3 +3,4 @@ weeks/*/source/
 __pycache__/
 *.pyc
 .env
+.venv/
