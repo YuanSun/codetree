@@ -36,6 +36,18 @@
       "title": "Practice",
       "emoji": "📝",
       "desc": "Every question from the slides — Together and Your turn — with a hands-on lab after each one. Do them on paper first, then check here."
+    },
+    {
+      "slug": "homework",
+      "type": "quiz",
+      "file": "homework.json",
+      "scripts": [
+        "/static/js/view3d.js",
+        "figures.js"
+      ],
+      "title": "Homework",
+      "emoji": "🏠",
+      "desc": "The six homework questions — views, volume and surface area — with a lab after each one that shows why."
     }
   ]
 }

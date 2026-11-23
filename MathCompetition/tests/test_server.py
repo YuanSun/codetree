@@ -146,6 +146,24 @@ class ServerTests(unittest.TestCase):
         self.assertIn("Exam 2", home)
         self.assertIn("Exam 3", home)
 
+    def test_week11_homework_keys(self):
+        status, body, _ = self.get("/week/week11/homework")
+        self.assertEqual(status, 200)
+        data = json.loads((ROOT / "weeks" / "week11" / "homework.json").read_text(encoding="utf-8"))
+        qs = {q["id"]: q for q in data["questions"]}
+        self.assertEqual(len(qs), 6)
+        want = {"hw2": "8 cm³", "hw3": "3", "hw4": "54 cm²", "hw5": "198", "hw6": "90"}      # computed independently
+        for qid, text in want.items():
+            self.assertEqual(qs[qid]["choices"][qs[qid]["answer"]], text, qid)
+        self.assertEqual(qs["hw1"]["choices"][qs["hw1"]["answer"]].replace("**", ""), "Front 2, 3, 2 · Right 2, 2, 3 · 12 cubes")
+        # the numbers behind hw5 / hw6 (brute force)
+        import itertools
+        sols = {(l, w, h) for l, w, h in itertools.combinations(range(1, 10), 3)
+                if all(10 <= x <= 99 for x in (l * w, l * h, w * h))
+                and sorted(int(c) for c in f"{l}{w}{h}{l * w}{l * h}{w * h}") == list(range(1, 10))}
+        self.assertEqual(sols, {(3, 6, 9)})
+        self.assertEqual(sum(n for n in range(1, 500) if (384 * n) % (128 + 32 * n) == 0), 90)
+
     def test_week11_pages_and_key(self):
         for path in ("/week/week11/", "/week/week11/lesson", "/week/week11/practice", "/week/week11/figures.js", "/week/week11/lesson.js"):
             with self.subTest(path=path):
