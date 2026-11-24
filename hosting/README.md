@@ -7,6 +7,7 @@ address and one port. Reach it by whatever name the machine has (`mac-studio.loc
 |---|---|---|
 | `http://<machine>:12999/` | Portal page linking to everything | static (`portal/`) |
 | `/fund/` | [Fund Accounting Academy](../fund-accounting-academy) | static files |
+| `/kb/` | [CFA knowledge base](../cfa-knowledge): searchable concept explanations | static files from `cfa-knowledge/build.py`; **same login as the notes** |
 | `/math/` | [MathCompetition](../MathCompetition) — the **Math Contest Lab** (CJMC / Gauss prep) | reverse proxy to its Python server on `127.0.0.1:12998`, started with `--base-path /math` |
 | `/math/study/` | the same project's **School Study** track (normal class sheets, not contest prep) | same server and proxy rule as `/math/`; it has its own portal card, colours and navigation |
 | `/notes/` | Family Obsidian vault | static site built by [Quartz](https://quartz.jzhao.xyz); **password-protected** |
