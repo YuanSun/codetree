@@ -42,6 +42,16 @@ http://:{$GATEWAY_PORT:12999} {
 		file_server
 	}
 
+	# CFA Level I tracker (built by cfa-academy/build.py into sites/cfa; behind the same login)
+	redir /cfa /cfa/
+	handle_path /cfa/* {
+		basic_auth {
+			{$NOTES_USER} {$NOTES_HASH}
+		}
+		root * {$HOSTING_DIR}/sites/cfa
+		file_server
+	}
+
 	# MathCompetition: the prefix is stripped here; the app is started with --base-path /math
 	# so the links it generates point back under /math/.
 	redir /math /math/
