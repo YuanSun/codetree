@@ -5,7 +5,7 @@
 #     /math/   MathCompetition (contest lab; /math/study/ = school study)        /notes/  family notes (password)
 #     /budget/ family budget dashboard (Streamlit + Postgres, password)
 #     /lecture/ Lecture Magique French reading site (its own login)
-#     /cfa/    CFA study tracker (password)     /kb/  CFA knowledge base (password)
+#     /kb/     CFA knowledge base (password; /cfa/ redirects here)
 # TLS is NOT handled here: Cloudflare Tunnel / Tailscale terminate it, so Caddy speaks plain HTTP.
 {
 	auto_https off
@@ -43,15 +43,9 @@ http://:{$GATEWAY_PORT:12999} {
 		file_server
 	}
 
-	# CFA Level I tracker (built by cfa-academy/build.py into sites/cfa; behind the same login)
-	redir /cfa /cfa/
-	handle_path /cfa/* {
-		basic_auth {
-			{$NOTES_USER} {$NOTES_HASH}
-		}
-		root * {$HOSTING_DIR}/sites/cfa
-		file_server
-	}
+	# Old CFA study tracker (retired): send bookmarks to the knowledge base
+	redir /cfa /kb/
+	redir /cfa/* /kb/
 
 	# CFA knowledge base (built by cfa-knowledge/build.py into sites/cfa-kb; behind the same login)
 	redir /kb /kb/

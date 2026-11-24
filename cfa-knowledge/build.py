@@ -6,7 +6,7 @@
   python3 build.py --out /some/dir       # anywhere else
   python3 build.py --obsidian ~/Vault/CFA   # also write one Obsidian note per concept (aliases in front matter)
 
-If ../cfa-academy/content/curriculum.json exists (made by cfa-academy/extract.py from your own Schweser PDFs),
+If content/curriculum.json exists (made by extract.py from your own Schweser PDFs),
 readings also get their learning outcomes, modules, book pages and the books' index terms. Without it the site
 still works; it just has no book page references.
 
@@ -27,7 +27,7 @@ Note format (one file per topic):
 import argparse, html, json, pathlib, re, shutil, sys
 
 HERE = pathlib.Path(__file__).resolve().parent
-CURRICULUM = HERE.parent / "cfa-academy" / "content" / "curriculum.json"
+CURRICULUM = HERE / "content" / "curriculum.json"
 
 LEVELS = {"L1": "Level I", "L2": "Level II"}
 # topic order and exam weight (approximate midpoints) per level

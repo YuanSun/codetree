@@ -4,7 +4,7 @@ A searchable reference of CFA concepts for looking things up at work: what a ter
 how it shows up in practice, and where to read more in your Schweser books. Level I is done (353 concepts across all
 10 topics and all 102 readings); Level II comes next. Served at `/kb/` by the hosting gateway.
 
-Unlike [cfa-academy](../cfa-academy) (a study tracker), this is a reference: every page is one concept.
+It replaces the old `cfa-academy` study tracker; `/cfa/` now redirects to `/kb/`.
 
 - **Forgiving search**: abbreviations (WACC, YTM, DV01), typos (`duratoin`, `convexty`), plain questions
   ("how sensitive is a bond to rates", "what drives credit spreads") and synonyms (vol → standard deviation). Each concept
@@ -16,11 +16,10 @@ Unlike [cfa-academy](../cfa-academy) (a study tracker), this is a reference: eve
 - Keyboard: `/` focuses search, arrows + Enter pick a result.
 
 The explanations in `notes/` are written for this site; the books' text is not copied. Learning outcomes, page
-numbers and index terms come from `../cfa-academy/content/curriculum.json` (made by `cfa-academy/extract.py` from your own
-PDFs, git-ignored); without it the site still builds, just without book references.
+numbers and index terms come from `content/curriculum.json` (made by `extract.py` from your own PDFs, git-ignored); without it the site still builds, just without book references.
 
 ```bash
-python3 ../cfa-academy/extract.py --l1 "/folder/with/Level I books"   # once, if curriculum.json is missing (pip install pymupdf)
+python3 extract.py --l1 "/folder/with/Level I books"   # once (pip install pymupdf); add --l2 "/folder" for Level II
 python3 build.py                                                     # -> ../hosting/sites/cfa-kb (served at /kb/)
 python3 build.py --obsidian ~/Vault/CFA                              # also export one Obsidian note per concept
 ```

@@ -224,5 +224,5 @@ hosting/sites/
 hosting/.quartz/
 # exam-prep-site: private exported notes
 exam-prep-site/content/
-# cfa-academy: curriculum extracted from the user's own Schweser PDFs
-cfa-academy/content/
+# cfa-knowledge: curriculum extracted from the user's own Schweser PDFs
+cfa-knowledge/content/
