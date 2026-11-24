@@ -25,6 +25,13 @@ export NOTES_USER="${NOTES_USER:-family}"
 mkdir -p "$HERE/sites/notes"
 [ -e "$HERE/sites/notes/index.html" ] || echo "<p>Notes not built yet. Run hosting/build-notes.sh</p>" > "$HERE/sites/notes/index.html"
 
+# CFA knowledge base: plain Python, no dependencies, builds in a second, so rebuild it on every start.
+if ! python3 "$REPO/cfa-knowledge/build.py" --out "$HERE/sites/cfa-kb"; then
+  echo "Could not build /kb/ (see the error above); serving a placeholder." >&2
+  mkdir -p "$HERE/sites/cfa-kb"
+  [ -e "$HERE/sites/cfa-kb/index.html" ] || echo "<p>CFA knowledge base not built yet. Run: python3 cfa-knowledge/build.py</p>" > "$HERE/sites/cfa-kb/index.html"
+fi
+
 pids=()
 cleanup() { for p in "${pids[@]:-}"; do kill "$p" 2>/dev/null || true; done; }
 trap cleanup EXIT INT TERM
@@ -60,5 +67,5 @@ else
   echo "Skipping /lecture/: need uv, $LECTURE_DIR/.env and a built front end (see lecture-magique/SETUP.md)." >&2
 fi
 
-echo "Gateway on port $GATEWAY_PORT: http://<this-machine>:$GATEWAY_PORT/  (/fund/  /math/  /math/study/  /notes/  /budget/  /lecture/)"
+echo "Gateway on port $GATEWAY_PORT: http://<this-machine>:$GATEWAY_PORT/  (/fund/  /math/  /math/study/  /notes/  /budget/  /lecture/  /kb/)"
 caddy run --config "$HERE/Caddyfile" --adapter caddyfile
