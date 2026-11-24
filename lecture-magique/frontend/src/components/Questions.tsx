@@ -7,10 +7,10 @@ import ThemeButton from "./ThemeButton";
 
 // Unsaved text survives a closed tab (per question, this browser only); cleared once saved.
 const draftKey = (id: number) => `lm.qdraft.${id}`;
-const readDraft = (id: number) => {
+export const readDraft = (id: number) => {
   try { return window.localStorage.getItem(draftKey(id)); } catch { return null; }
 };
-const writeDraft = (id: number, v: string | null) => {
+export const writeDraft = (id: number, v: string | null) => {
   try {
     if (v === null) window.localStorage.removeItem(draftKey(id));
     else window.localStorage.setItem(draftKey(id), v);
@@ -51,7 +51,7 @@ function seqList(seqs: number[]): string {
   return out.join(", ");
 }
 
-function KeyBox({ k, lang }: { k: AnswerKey; lang: Lang }) {
+export function KeyBox({ k, lang }: { k: AnswerKey; lang: Lang }) {
   const t = strings(lang);
   return (
     <div className="cq-key">
@@ -64,7 +64,7 @@ function KeyBox({ k, lang }: { k: AnswerKey; lang: Lang }) {
 }
 
 /** After she has answered: the passages that hold the answer; a tap opens the text there, highlighted. */
-function EvidenceLinks({ ev, lang, onGo }: { ev: Evidence[]; lang: Lang; onGo: (e: Evidence) => void }) {
+export function EvidenceLinks({ ev, lang, onGo }: { ev: Evidence[]; lang: Lang; onGo: (e: Evidence) => void }) {
   const t = strings(lang);
   const short = (q: string) => (q.length > 70 ? `${q.slice(0, 67).trimEnd()}…` : q);
   return (
@@ -72,7 +72,7 @@ function EvidenceLinks({ ev, lang, onGo }: { ev: Evidence[]; lang: Lang; onGo: (
       <p className="small muted">{t.qEvidence}</p>
       {ev.map((e, i) => (
         <button key={i} className="cq-ev" onClick={() => onGo(e)}>
-          <b>{t.qEvidenceGo(e.chapter)}</b> <span>« {short(e.quote)} »</span>
+          <b>{t.qEvidenceGo(e.chapter)}</b> <span>{lang === "fr" ? `« ${short(e.quote)} »` : `“${short(e.quote)}”`}</span>
         </button>
       ))}
     </div>

@@ -1,15 +1,29 @@
 import { CSSProperties, Fragment, memo, MouseEvent, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { api, ChapterData, Illustration, TokenTuple, WordState } from "../api";
+import { api, ChapterData, ChapterQuestion as CQ, Evidence, Illustration, TokenTuple, WordState } from "../api";
 import { go } from "../App";
 import { usePref, ThemePref } from "../prefs";
 import { lookupQueue, uuid4 } from "../queue";
 import { speak } from "../speech";
 import { strings } from "../i18n";
+import ChapterQuestion from "./ChapterQuestion";
+import { findQuote } from "./Questions";
 import ThemeButton from "./ThemeButton";
 import WordCard, { CardInfo, Rating } from "./WordCard";
 
 const IDLE_MS = 120_000; // reading time stops counting after 2 minutes without any interaction
 const REPORT_MS = 30_000;
+const EV_KEY = "lm.evidence"; // a passage to highlight when the reader opens another chapter (sessionStorage)
+
+/** Highlight the paragraph that holds the quote and bring it to the middle of the screen. */
+function showEvidence(root: HTMLElement | null, quote: string): boolean {
+  const paras = Array.from(root?.querySelectorAll<HTMLElement>("p[data-seq]") ?? []);
+  const hit = paras.find((p) => findQuote(p.textContent ?? "", quote));
+  paras.forEach((p) => p.classList.remove("ev-flash"));
+  if (!hit) return false;
+  hit.classList.add("ev-flash");
+  hit.scrollIntoView({ block: "center", behavior: "smooth" });
+  return true;
+}
 
 /** One paragraph: the original text with each word wrapped in <span data-t>. Gaps are copied verbatim. */
 const Paragraph = memo(function Paragraph({ seq, text, tokens, seen, active, underline }: {
@@ -59,6 +73,7 @@ export default function Reader({ articleId, seq, theme }: {
   const [underline, setUnderline] = usePref("lm.underline", true);
   const [done, setDone] = useState<null | { next: number | null; finished: boolean }>(null);
   const [completing, setCompleting] = useState(false);
+  const [cq, setCq] = useState<CQ | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -77,10 +92,27 @@ export default function Reader({ articleId, seq, theme }: {
       tokenIndex.current = new Map(d.paragraphs.flatMap((p) => p.tokens.map((t) => [t[0], t] as const)));
       setWords(d.words);
       setData(d);
+      setCq(d.chapter_question ?? null);
       document.title = `${d.article.title} · ${seq}`;
     }, (e) => setError(e.message));
     window.scrollTo(0, 0);
   }, [articleId, seq]);
+
+  // A passage asked for from another chapter's question (see onEvidence).
+  useEffect(() => {
+    if (!data) return;
+    let want: { a: number; seq: number; quote: string } | null = null;
+    try { want = JSON.parse(window.sessionStorage.getItem(EV_KEY) ?? "null"); window.sessionStorage.removeItem(EV_KEY); }
+    catch { want = null; }
+    if (want && want.a === articleId && want.seq === seq) window.setTimeout(() => showEvidence(textRef.current, want!.quote), 120);
+  }, [data, articleId, seq]);
+
+  const onEvidence = (e: Evidence) => {
+    if (e.chapter === seq) { showEvidence(textRef.current, e.quote); return; }
+    try { window.sessionStorage.setItem(EV_KEY, JSON.stringify({ a: articleId, seq: e.chapter, quote: e.quote })); }
+    catch { /* no storage: just open the chapter */ }
+    go(`/lire/${articleId}/${e.chapter}`);
+  };
 
   // Resume where she stopped in this chapter.
   useLayoutEffect(() => {
@@ -211,8 +243,8 @@ export default function Reader({ articleId, seq, theme }: {
     return () => window.removeEventListener("keydown", onKey);
   }, [data, seq, articleId, closeCard]);
 
-  async function complete() {
-    if (!data) return;
+  async function complete(): Promise<boolean> {
+    if (!data) return false;
     setCompleting(true);
     closeCard("unknown");
     await lookupQueue.flush(); // exposures must not count words tapped in this reading
@@ -220,8 +252,10 @@ export default function Reader({ articleId, seq, theme }: {
       const r = await api.complete(data.chapter.id, openedAt.current);
       finishedAt.current = { chapter: r.next_seq ?? seq };
       setDone({ next: r.next_seq, finished: r.finished });
+      return true;
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erreur");
+      return false;
     } finally {
       setCompleting(false);
     }
@@ -235,6 +269,8 @@ export default function Reader({ articleId, seq, theme }: {
   const total = data.chapters.length;
   const alreadyDone = data.progress?.chapters_done.includes(seq);
   const pics = new Map((data.illustrations ?? []).map((i) => [i.after, i]));
+  // a question to answer here: the main action is "save and finish", finishing alone is the quiet option
+  const answerFirst = !!cq && cq.kind !== "choice" && !cq.answer && !alreadyDone;
 
   return (
     <div className="reader" ref={rootRef} onClick={onClick} lang={lang}>
@@ -268,7 +304,10 @@ export default function Reader({ articleId, seq, theme }: {
         </div>
 
         <footer className="chapter-end">
-          {data.question && (
+          {cq && cq.kind !== "choice" ? (
+            <ChapterQuestion key={cq.id} q={cq} lang={lang} chapterDone={!!(done || alreadyDone)} finish={complete}
+                             onSaved={setCq} onEvidence={onEvidence} />
+          ) : data.question && (
             <div className="card think">
               <div className="think-title">{t.think}</div>
               <p>{data.question}</p>
@@ -291,8 +330,8 @@ export default function Reader({ articleId, seq, theme }: {
               )}
             </div>
           ) : (
-            <button className="btn primary big" onClick={complete} disabled={completing}>
-              {alreadyDone ? t.rereadChapter : t.finishChapter}
+            <button className={answerFirst ? "btn ghost" : "btn primary big"} onClick={complete} disabled={completing}>
+              {alreadyDone ? t.rereadChapter : answerFirst ? t.finishWithout : t.finishChapter}
             </button>
           )}
           <nav className="ch-nav">

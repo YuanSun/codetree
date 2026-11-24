@@ -307,7 +307,12 @@ cd backend && uv run python -m importer.article questions ../content/pepite.pack
 answers. Old questions nobody answered are removed.
 Answered ones are hidden from the questions page, but her answers stay in Suivi.
 
-Grace sees a chapter's question once she has finished that chapter, and the end-of-reading questions once she has
+At the end of each chapter, the reader shows that chapter's question with an answer box: **Save my answer and
+finish** saves it and marks the chapter as read, then shows the model answer and the 📍 passages (a tap highlights
+the passage in the chapter). **Finish without answering** is still there. Her answer is the same one as on the
+questions page, so she can improve it there later, and it goes to Suivi and the Claude marking as usual.
+
+On the questions page, Grace sees a chapter's question once she has finished that chapter, and the end-of-reading questions once she has
 finished every chapter (the page says what is still locked), so a long book read over several weeks doesn't give
 its ending away. A question she has already answered always stays visible. Parents see everything.
 
