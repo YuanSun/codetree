@@ -24,7 +24,7 @@ Note format (one file per topic):
     First paragraph = the one-line summary shown in search results. Then Markdown: ### headings, lists,
     tables, > callouts, **bold**, `code`, display math $$...$$ and inline math \\( ... \\).
 """
-import argparse, html, json, pathlib, re, shutil, sys
+import argparse, html, json, os, pathlib, re, shutil, sys
 
 HERE = pathlib.Path(__file__).resolve().parent
 CURRICULUM = HERE / "content" / "curriculum.json"
@@ -161,6 +161,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=str(HERE.parent / "hosting" / "sites" / "cfa-kb"))
     ap.add_argument("--obsidian", help="also export one Markdown note per concept into this folder")
+    ap.add_argument("--books-l1", default=os.environ.get("CFA_BOOKS_L1"), help="folder with your Level I PDFs (*Book*.pdf): "
+                    "adds 'open in your book' links. For your own server only; never committed")
+    ap.add_argument("--books-l2", default=os.environ.get("CFA_BOOKS_L2"), help="folder with your Level II PDFs (*V1.pdf ... *V5.pdf)")
     a = ap.parse_args()
 
     topics, concepts = [], []
@@ -253,9 +256,10 @@ def main():
         page.replace("<!--STYLE-->", f"<style>\n{css}</style>").replace("<!--SCRIPT-->", f"<script>\n{js}</script>"), encoding="utf-8")
     (tmp / "data.json").write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     shutil.rmtree(out, ignore_errors=True)
+    nbooks = add_books(tmp, a.books_l1, a.books_l2)
     tmp.rename(out)
     print(f"Built {len(out_concepts)} concepts in {len(topics)} topics, {len(readings)} readings, "
-          f"{len(index_terms)} book index terms -> {out}")
+          f"{len(index_terms)} book index terms{f', {nbooks} books readable' if nbooks else ''} -> {out}")
 
     if a.obsidian:
         vault = pathlib.Path(a.obsidian).expanduser()
@@ -273,6 +277,32 @@ def main():
             safe = re.sub(r'[\\/:*?"<>|]', "-", c["title"])
             (vault / f"{safe}.md").write_text(text, encoding="utf-8")
         print(f"Wrote {len(concepts)} Obsidian notes -> {vault}")
+
+
+def add_books(site, l1, l2):
+    """Your own PDFs, for your own server only: link each one into <site>/books/ so concept and reading pages can
+    open the book at the right page. Nothing is extracted from them; the site folder is git-ignored, and the
+    claude.ai artifact never receives the books."""
+    if not (l1 or l2):
+        return 0
+    from extract import book_files
+    books, avail = site / "books", []
+    books.mkdir()
+    for lv, folder, pat in (("L1", l1, "*Book*.pdf"), ("L2", l2, "*V[0-9].pdf")):
+        if not folder:
+            continue
+        files = book_files(folder, pat)
+        if not files:
+            print(f"  warning: no {pat} files in {folder}")
+        for n, f in enumerate(files, 1):
+            dest = books / f"{lv}-B{n}.pdf"
+            try:
+                dest.symlink_to(pathlib.Path(f).resolve())
+            except OSError:
+                shutil.copy(f, dest)
+            avail.append(f"{lv}-B{n}")
+    (books / "available.json").write_text(json.dumps(avail), encoding="utf-8")
+    return len(avail)
 
 
 if __name__ == "__main__":

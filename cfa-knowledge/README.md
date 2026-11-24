@@ -18,6 +18,10 @@ It replaces the old `cfa-academy` study tracker; `/cfa/` now redirects to `/kb/`
   other level.
 - **Reading pages**: the concepts it covers, its learning outcomes, module pages and index terms.
 - Keyboard: `/` focuses search, arrows + Enter pick a result.
+- **Open in your book** (home server only): set `CFA_BOOKS_L1` / `CFA_BOOKS_L2` in `hosting/.env` to the folders with
+  your PDFs (or pass `--books-l1` / `--books-l2` to `build.py`). Concept and reading pages then get links that open your
+  own PDF at the right page. The PDFs are only linked into the git-ignored site folder; nothing is extracted from them,
+  and they're never part of the claude.ai artifact.
 
 The explanations in `notes/` are written for this site; the books' text is not copied. Learning outcomes, page
 numbers and index terms come from `content/curriculum.json` (made by `extract.py` from your own PDFs, git-ignored); without it the site still builds, just without book references.

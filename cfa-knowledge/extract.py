@@ -106,8 +106,15 @@ def slug(s):
     return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
 
 
+def book_files(folder, pattern):
+    """The level's PDFs in book order, by the number in the name (Book_2, V3), not alphabetically."""
+    files = glob.glob(str(pathlib.Path(folder).expanduser() / pattern))
+    num = lambda f: int(m[1]) if (m := re.search(r"(?:Book|V)[_ ]?(\d+)\.pdf$", f, re.I)) else 999
+    return sorted(files, key=lambda f: (num(f), f))
+
+
 def level_data(level, folder, pattern):
-    files = sorted(glob.glob(str(pathlib.Path(folder).expanduser() / pattern)))
+    files = book_files(folder, pattern)
     if not files:
         sys.exit(f"No files matching {pattern} in {folder}")
     topics, raw_index = {}, []
