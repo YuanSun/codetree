@@ -33,3 +33,12 @@ details.reading>summary::-webkit-details-marker{display:none}
 .tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
 .hit{padding:8px 0;border-bottom:1px solid var(--line)}mark{background:#ffe066;color:#000;border-radius:3px}
 @media(max-width:600px){main{padding:12px}}
+.levels{display:flex;gap:4px}.levels button.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn{display:inline-block;padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card);text-decoration:none;color:var(--ink)}.btn:hover{border-color:var(--brand)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.cchip{display:inline-block;padding:3px 11px;border-radius:99px;border:1px solid var(--line);background:var(--card);text-decoration:none;font-size:14px;color:var(--ink)}
+.cchip:hover,.cchip.on{border-color:var(--brand);background:var(--brand);color:#fff}
+.where{padding-left:18px}.where li{margin:6px 0}
+.graph{width:100%;height:auto;max-height:440px}.graph line{stroke:var(--line);stroke-width:1.5}
+.graph circle{fill:var(--brand);opacity:.7}.graph .hub{opacity:1;fill:var(--ok)}
+.graph text{fill:var(--ink);font-size:12px}.graph .hubt{font-weight:700;font-size:14px}.graph a{cursor:pointer}.graph a:hover text{fill:var(--brand)}
