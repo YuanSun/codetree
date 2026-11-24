@@ -152,6 +152,10 @@
   const app = document.getElementById("app"), rail = document.getElementById("rail"), q = document.getElementById("q"), drop = document.getElementById("drop");
   let D, C = {}, CE, IE, byTopic = {}, byReading = {}, topicName = {}, back = {};
   let lvFilter = "all";
+  // Your own books (home server only): books/<L1-B2>.pdf linked by build.py --books-l1/--books-l2.
+  let BOOKS = null;
+  const bookUrl = (lv, b, p) => `books/${lv}-B${b}.pdf#page=${p}`;
+  const openLink = (lv, b, p, label) => BOOKS && BOOKS.has(`${lv}-B${b}`) ? `<a class="chip open" href="${bookUrl(lv, b, p)}" target="_blank" rel="noopener">${label || "Open p." + p} ↗</a>` : "";
   const store = {
     get(k, d) { try { return JSON.parse(localStorage.getItem("cfakb:" + k)) ?? d; } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem("cfakb:" + k, JSON.stringify(v)); } catch (e) { /* storage blocked: fine */ } },
@@ -268,10 +272,10 @@
     const idx = D.index.filter(([, l, hits]) => l === lv && hits.some((h) => String(h[0]) === String(n))).map(([term]) => term);
     app.innerHTML = `<div class="crumbs"><a href="#home">Home</a> › ${LV[lv]} › ${tp ? `<a href="#t-${tp}">${esc(topicName[tp])}</a> ›` : ""} Reading ${n}</div>
       <h1 style="font-size:28px">${r ? esc(r.title) : "Reading " + n}</h1>
-      ${r ? `<p class="ref" style="margin-top:8px">Reading ${n} · ${pageRef(r.book, r.page)}</p>` : ""}
+      ${r ? `<p class="ref" style="margin-top:8px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">Reading ${n} · ${pageRef(r.book, r.page)} ${openLink(lv, r.book, r.page, "Open in book")}</p>` : ""}
       <div class="sec"><h2>Concepts explained here</h2><div class="list">${cs.map((c) => `<a href="#c-${c.id}"><div class="lt">${esc(c.t)}</div><div class="ls">${esc(c.sum.slice(0, 170))}${c.sum.length > 170 ? "…" : ""}</div></a>`).join("") || '<div class="mute">None yet.</div>'}</div></div>
       ${r && r.los.length ? `<div class="sec"><h2>Learning outcomes</h2><ol class="los" type="a">${r.los.map((l) => `<li>${esc(l)}</li>`).join("")}</ol></div>` : ""}
-      ${r && r.modules.length ? `<div class="sec"><h2>Modules in your book</h2><div class="list mods">${r.modules.map(([id, t, p]) => `<div><b>${esc(id)}</b> ${esc(t)} <span class="ref">· p.${p}</span></div>`).join("")}</div></div>` : ""}
+      ${r && r.modules.length ? `<div class="sec"><h2>Modules in your book</h2><div class="list mods">${r.modules.map(([id, t, p]) => `<div><b>${esc(id)}</b> ${esc(t)} <span class="ref">· p.${p}</span> ${openLink(lv, r.book, p)}</div>`).join("")}</div></div>` : ""}
       ${idx.length ? `<div class="sec"><h2>Terms from the book index</h2><div class="chips">${idx.map((t) => `<a class="chip" href="#q-${slug(t)}">${esc(t)}</a>`).join("")}</div></div>` : ""}`;
   }
 
@@ -288,9 +292,9 @@
     const list = byTopic[c.tp], k = list.indexOf(c), prev = list[k - 1], next = list[k + 1];
     const reads = c.r.map((n) => {
       const r = D.readings[rKey(c.lv, n)];
-      return `<div class="row">${rLink(c.lv, n, `Reading ${n}${r ? ": " + esc(r.title) : ""}`)}${r ? `<span class="ref">${pageRef(r.book, r.page)}</span>` : ""}</div>`;
+      return `<div class="row">${rLink(c.lv, n, `Reading ${n}${r ? ": " + esc(r.title) : ""}`)}${r ? `<span class="ref">${pageRef(r.book, r.page)}</span>${openLink(c.lv, r.book, r.page, "Open in book")}` : ""}</div>`;
     }).join("");
-    const pages = c.pg.length ? `<div class="row"><span class="mute">Indexed on</span> ${c.pg.map(([r, b, p]) => `<a class="chip" href="#r-${c.lv}-${r}" title="Reading ${r}">${pageRef(b, p)}</a>`).join("")}</div>` : "";
+    const pages = c.pg.length ? `<div class="row"><span class="mute">Indexed on</span> ${c.pg.map(([r, b, p]) => BOOKS && BOOKS.has(`${c.lv}-B${b}`) ? `<a class="chip open" href="${bookUrl(c.lv, b, p)}" target="_blank" rel="noopener" title="Reading ${r}">${pageRef(b, p)} ↗</a>` : `<a class="chip" href="#r-${c.lv}-${r}" title="Reading ${r}">${pageRef(b, p)}</a>`).join("")}</div>` : "";
     app.innerHTML = `<article class="concept">
       <div class="crumbs"><a href="#home">Home</a> › ${LV[c.lv]} › ${topicChip(c.tp)} ${c.r.length ? "› " + c.r.map((n) => rLink(c.lv, n)).join(", ") : ""}</div>
       <h1>${esc(c.t)}</h1>
@@ -389,6 +393,9 @@
   window.addEventListener("hashchange", route);
 
   app.innerHTML = '<div class="empty">Loading the knowledge base…</div>';
-  fetch("data.json").then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); }).then((data) => { prepare(data); route(); })
+  fetch("data.json").then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); }).then((data) => {
+      prepare(data); route();
+      fetch("books/available.json").then((r) => (r.ok ? r.json() : null)).then((b) => { if (b) { BOOKS = new Set(b); route(); } }).catch(() => { /* no books here: fine */ });
+    })
     .catch((e) => { app.innerHTML = `<div class="empty">Could not load data.json (${esc(e.message)}). Run <code>python3 build.py</code> and serve the output folder.</div>`; });
 })();

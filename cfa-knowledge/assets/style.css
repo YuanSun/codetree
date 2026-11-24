@@ -94,6 +94,7 @@ main { min-width: 0; }
   color: var(--muted); background: var(--panel); white-space: nowrap; }
 a.chip:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
 .chip.topic { color: var(--tc); border-color: color-mix(in srgb, var(--tc) 40%, var(--line)); }
+.chip.open { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
 .lvb { font: 600 10px var(--f-mono); letter-spacing: .04em; opacity: .8; }
 .seg { display: inline-flex; margin: 12px 0 4px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--panel); }
 .seg button { font: 13px var(--f-body); border: 0; background: none; color: var(--ink); padding: 6px 12px; cursor: pointer; border-right: 1px solid var(--line); }
