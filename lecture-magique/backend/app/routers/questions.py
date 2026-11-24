@@ -100,6 +100,32 @@ def list_questions(article_id: int, user: User = Depends(current_user), conn: Co
     }
 
 
+def chapter_question(conn: Connection, user: User, chapter_id: int) -> dict | None:
+    """The chapter's question for the end of the chapter in the reader, with her latest answer (and then the key and
+    her latest grade). She answers it there right after reading; saving it finishes the chapter first, which unlocks it."""
+    r = conn.execute(text(f"""
+        SELECT q.id, q.kind, q.prompt, q.model_answer, q.rubric, a.id AS answer_id, a.body, a.submitted_at,
+               g.id AS graded_id, g.score, g.feedback
+        FROM lecture.question q
+        LEFT JOIN LATERAL (SELECT id, body, submitted_at FROM lecture.answer WHERE question_id = q.id AND user_id = :u
+                           ORDER BY submitted_at DESC, id DESC LIMIT 1) a ON true
+        LEFT JOIN LATERAL (SELECT id, score, feedback FROM lecture.answer
+                           WHERE question_id = q.id AND user_id = :u AND score IS NOT NULL
+                           ORDER BY submitted_at DESC, id DESC LIMIT 1) g ON true
+        WHERE q.chapter_id = :c AND {NOT_RETIRED} ORDER BY q.seq LIMIT 1"""), {"c": chapter_id, "u": user.id}).first()
+    if not r:
+        return None
+    return {
+        "id": r.id, "kind": r.kind, "prompt": r.prompt, "choices": _choices(r),
+        "skill": (r.rubric or {}).get("skill"), "points": (r.rubric or {}).get("points"),
+        "answer": None if r.body is None else {"body": r.body, "submitted_at": r.submitted_at.isoformat()},
+        "key": _key(r) if r.body is not None else None,
+        "grade": None if r.graded_id is None else {
+            "score": float(r.score), "points": points_of(r.rubric), "feedback": r.feedback,
+            "for_latest": r.graded_id == r.answer_id},
+    }
+
+
 class AnswerIn(BaseModel):
     body: str = Field(min_length=1, max_length=5000)
 

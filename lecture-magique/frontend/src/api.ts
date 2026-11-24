@@ -48,6 +48,8 @@ export type ChapterData = {
   senses: Record<string, Sense>;
   words: Record<string, WordState>;
   question: string | null;
+  /** the chapter's question, to answer at the end of the chapter (null: none) */
+  chapter_question?: ChapterQuestion | null;
   progress: null | { last_chapter: number; last_paragraph: number; chapters_done: number[] };
 };
 
@@ -91,6 +93,7 @@ export type Question = {
   /** Latest mark (by Claude or a parent); for_latest=false: it was for an earlier version of her answer. */
   grade: null | { score: number; points: number; feedback: string | null; for_latest: boolean };
 };
+export type ChapterQuestion = Omit<Question, "chapter">;
 export type ChildAnswer = AnswerKey & {
   question_id: number; article: { id: number; title: string; lang: Lang }; chapter_seq: number | null;
   kind: string; prompt: string; choices: string[] | null; skill: string | null; points: number | null;

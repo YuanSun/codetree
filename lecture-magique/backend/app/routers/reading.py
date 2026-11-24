@@ -112,8 +112,8 @@ def get_chapter(article_id: int, seq: int, user: User = Depends(current_user), c
                  FROM lecture.user_word WHERE user_id = :u AND lemma_id = ANY(:ids)
                  AND status <> 'ignored'"""),
                                    {"u": user.id, "ids": lemma_ids})}
-    q = conn.execute(text("SELECT prompt FROM lecture.question WHERE chapter_id = :c ORDER BY seq LIMIT 1"),
-                     {"c": ch.id}).scalar()
+    from .questions import chapter_question  # questions.py imports this module
+    cq = chapter_question(conn, user, ch.id)
     pics = conn.execute(text("""SELECT id, after_seq, width, height, caption FROM lecture.illustration
         WHERE chapter_id = :c ORDER BY after_seq"""), {"c": ch.id}).all()
     prog = conn.execute(text("SELECT last_chapter, last_paragraph, chapters_done FROM lecture.reading_progress "
@@ -128,7 +128,8 @@ def get_chapter(article_id: int, seq: int, user: User = Depends(current_user), c
         "lemmas": lemmas,
         "senses": senses,
         "words": words,
-        "question": q,
+        "question": cq["prompt"] if cq else None,
+        "chapter_question": cq,
         "progress": {"last_chapter": prog.last_chapter, "last_paragraph": prog.last_paragraph,
                      "chapters_done": sorted(prog.chapters_done)} if prog else None,
     }

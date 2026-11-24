@@ -257,3 +257,27 @@ def test_questions_unlock_chapter_by_chapter(world):
     r = g.get(f"/api/articles/{aid}/questions").json()
     assert len(r["questions"]) == 3 and r["locked"] == {"chapters": [], "end": 0}
     assert g.post(f"/api/questions/{end_q['id']}/answer", json={"body": "Maintenant oui."}).status_code == 200
+
+
+def test_chapter_question_in_the_reader(world):
+    """The reader sends the chapter's question with her answer; finishing the chapter unlocks it, then she answers
+    right there and gets the key (with its evidence) back. Re-opening the chapter shows her answer."""
+    aid = world["aid"]
+    with world["db"].begin() as c:
+        set_status(c, PACK["slug"], "published")
+        c.execute(text("DELETE FROM lecture.reading_progress"))
+    g = login(world, "grace")
+    d = g.get(f"/api/articles/{aid}/chapters/1").json()
+    cq = d["chapter_question"]
+    assert cq["kind"] == "open" and cq["prompt"] == d["question"] and cq["answer"] is None and cq["key"] is None
+    assert g.get(f"/api/articles/{aid}/chapters/2").json()["chapter_question"] is None  # no question for chapter 2
+
+    assert g.post(f"/api/questions/{cq['id']}/answer", json={"body": "Trop tôt"}).status_code == 403  # not finished
+    assert g.post(f"/api/chapters/{d['chapter']['id']}/complete", json={}).status_code == 200
+    r = g.post(f"/api/questions/{cq['id']}/answer", json={"body": "On ne sait presque rien de lui."})
+    assert r.status_code == 200 and r.json()["key"]["model_answer"] == "On ne sait rien de lui."
+
+    again = g.get(f"/api/articles/{aid}/chapters/1").json()["chapter_question"]
+    assert again["answer"]["body"] == "On ne sait presque rien de lui." and again["key"]["model_answer"]
+    # another child's answer never shows
+    assert login(world, "lea").get(f"/api/articles/{aid}/chapters/1").json()["chapter_question"]["answer"] is None
