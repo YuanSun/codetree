@@ -10,7 +10,16 @@
       fi: { short: "Fixed Income", w: "11–14%" }, deriv: { short: "Derivatives", w: "5–8%" }, alt: { short: "Alternatives", w: "7–10%" },
       pm: { short: "Portfolio Mgmt", w: "8–12%" },
     },
+    L2: {
+      ethics2: { short: "Ethics", w: "10–15%" }, quant2: { short: "Quant", w: "5–10%" }, econ2: { short: "Economics", w: "5–10%" },
+      corp2: { short: "Corporate Issuers", w: "5–10%" }, fsa2: { short: "FSA", w: "10–15%" }, equity2: { short: "Equity Valuation", w: "10–15%" },
+      fi2: { short: "Fixed Income", w: "10–15%" }, deriv2: { short: "Derivatives", w: "5–10%" }, alt2: { short: "Alternatives", w: "5–10%" },
+      pm2: { short: "Portfolio Mgmt", w: "10–15%" },
+    },
   };
+  const LV = { L1: "Level I", L2: "Level II" };
+  const TI = (tp) => TOPICS.L1[tp] || TOPICS.L2[tp] || {};
+  const twin = (tp) => (tp.endsWith("2") ? tp.slice(0, -1) : tp + "2");
   const STOP = new Set("a an the of to in for and or is are be on with by at as it its what how do does did i my me we you your can could should would which when why where who whom this that these those vs versus between from into about than then there their them they get got use used using mean means meaning definition define explain tell show give find calculate compute work works".split(" "));
   STOP.delete("mean"); // "mean" is a statistics concept: keep it searchable
   const SYN = {
@@ -125,6 +134,7 @@
       for (const [i, s] of score) {
         const d = this.docs[i], c = (cover.get(i) || 0) / main.length;
         let v = s * (0.2 + 0.8 * c * c);
+        if (d.tt && main.every((t) => d.tt.has(t))) v += Math.max(4, 14 - d.tt.size * 1.5);
         if (d.ph) {
           if (d.ph[0] === qn) v += 40;
           else if (d.ph.some((p) => p === qn)) v += 30;
@@ -140,7 +150,8 @@
 
   // ---------- state ----------
   const app = document.getElementById("app"), rail = document.getElementById("rail"), q = document.getElementById("q"), drop = document.getElementById("drop");
-  let D, C = {}, CE, IE, byTopic = {}, byReading = {}, topicName = {};
+  let D, C = {}, CE, IE, byTopic = {}, byReading = {}, topicName = {}, back = {};
+  let lvFilter = "all";
   const store = {
     get(k, d) { try { return JSON.parse(localStorage.getItem("cfakb:" + k)) ?? d; } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem("cfakb:" + k, JSON.stringify(v)); } catch (e) { /* storage blocked: fine */ } },
@@ -153,13 +164,15 @@
       C[c.id] = c; byTopic[c.tp].push(c);
       c.r.forEach((r) => { const k = c.lv + ":" + r; (byReading[k] = byReading[k] || []).push(c); });
     });
-    const order = (D.topicOrder.L1 || []);
+    D.concepts.forEach((c) => new Set([...c.see, ...c.links]).forEach((x) => { if (C[x] && x !== c.id) (back[x] = back[x] || new Set()).add(c.id); }));
+    try { lvFilter = JSON.parse(localStorage.getItem("cfakb:lv")) || "all"; } catch (e) { lvFilter = "all"; }
+    const order = [...(D.topicOrder.L1 || []), ...(D.topicOrder.L2 || [])];
     D.topics.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
     CE = new Engine(D.concepts.map((c) => {
       const rd = c.r.map((r) => (D.readings[c.lv + ":" + r] || {}).title || "").join(" ");
       const acr = [c.t, ...c.aka].flatMap(acronyms);
       return {
-        c, ph: [norm(c.t), norm(c.t.replace(/\(.*?\)/g, "")), ...c.aka.map(norm)].map((p) => toks(p, true).join(" ")),
+        c, tt: new Set(toks(c.t)), ph: [norm(c.t), norm(c.t.replace(/\(.*?\)/g, "")), ...c.aka.map(norm)].map((p) => toks(p, true).join(" ")),
         f: { t: toks(c.t), aka: c.aka.flatMap((a) => toks(a)), acr: acr.map(stem), ctx: toks(topicName[c.tp] + " " + rd), body: toks(c.txt) },
       };
     }), { t: 10, aka: 6, acr: 9, ctx: 1.2, body: 0.6 });
@@ -168,7 +181,8 @@
 
   // ---------- rendering helpers ----------
   const tc = (tp) => `style="--tc:var(--t-${tp})"`;
-  const topicChip = (tp) => `<a class="chip topic" ${tc(tp)} href="#t-${tp}"><span class="dot"></span>${esc(TOPICS.L1[tp]?.short || topicName[tp])}</a>`;
+  const lvOf = (tp) => (TOPICS.L2[tp] ? "L2" : "L1");
+  const topicChip = (tp) => `<a class="chip topic" ${tc(tp)} href="#t-${tp}"><span class="dot"></span><b class="lvb">${lvOf(tp)}</b>${esc(TI(tp).short || topicName[tp])}</a>`;
   const rKey = (lv, n) => lv + ":" + n;
   const rLink = (lv, n, label) => `<a href="#r-${lv}-${n}">${label || "Reading " + n}</a>`;
   const pageRef = (b, p) => `Book ${b} · p.${p}`;
@@ -192,27 +206,27 @@
   }
 
   function renderRail(active) {
-    rail.innerHTML = `<div class="lv">Level I</div>` + D.topics.filter((t) => t.level === "L1").map((t) =>
-      `<a href="#t-${t.id}" ${tc(t.id)} class="${active === t.id ? "on" : ""}"><span class="dot"></span>${esc(t.name)}<span class="n">${byTopic[t.id].length}</span></a>`).join("") +
-      `<div class="lv" style="margin-top:18px">Level II</div><div class="soon">Coming next</div>`;
+    rail.innerHTML = ["L1", "L2"].map((lv, i) => `<div class="lv"${i ? ' style="margin-top:18px"' : ""}>${LV[lv]}</div>` +
+      D.topics.filter((t) => t.level === lv).map((t) =>
+        `<a href="#t-${t.id}" ${tc(t.id)} class="${active === t.id ? "on" : ""}"><span class="dot"></span>${esc(t.name)}<span class="n">${byTopic[t.id].length}</span></a>`).join("")).join("");
   }
 
   // ---------- views ----------
   function viewHome() {
     const recent = store.get("recent", []).filter((id) => C[id]).slice(0, 10);
-    const tries = ["how sensitive is a bond to rates", "wacc", "cost of equity", "ebitda multiple", "option value volatility", "fifo lifo inflation", "insider info", "sharpe vs treynor", "irr npv conflict", "deferred tax"];
+    const tries = ["how sensitive is a bond to rates", "wacc", "ebitda multiple", "fifo lifo inflation", "insider info", "sharpe vs treynor", "h model", "callable bond volatility", "current rate method", "fundamental law", "unit root", "cds pricing"];
     renderRail();
     app.innerHTML = `<section class="hero"><h1>Look it up, understand it, get back to work.</h1>
-      <p>${D.concepts.length} CFA Level I concepts explained in plain language, with formulas, examples and where to read more in your books. Search the way you'd ask a colleague: abbreviations, half-remembered terms and typos are fine.</p>
+      <p>${D.concepts.length} CFA Level I and II concepts explained in plain language, with formulas, examples and where to read more in your books. Search the way you'd ask a colleague: abbreviations, half-remembered terms and typos are fine.</p>
       <div class="big"><svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input id="bigq" type="search" placeholder="e.g. price sensitivity to yield, ROE breakdown, insider trading" autocomplete="off" aria-label="Search the knowledge base"></div>
       <div class="tries">Try: ${tries.map((t) => `<a href="#q-${slug(t)}">${esc(t)}</a>`).join(" · ")}</div></section>
       ${recent.length ? `<div class="sec"><h2>Recently viewed</h2><div class="recent">${recent.map((id) => `<a class="chip" href="#c-${id}">${esc(C[id].t)}</a>`).join("")}</div></div>` : ""}
-      <div class="sec"><h2>Level I topics</h2><div class="grid">${D.topics.filter((t) => t.level === "L1").map((t) => {
+      ${["L1", "L2"].map((lv) => `<div class="sec"><h2>${LV[lv]} topics</h2><div class="grid">${D.topics.filter((t) => t.level === lv).map((t) => {
         const cs = byTopic[t.id];
-        return `<a class="tcard" ${tc(t.id)} href="#t-${t.id}"><h3>${esc(t.name)}</h3><div class="meta">${cs.length} concepts · exam weight ≈ ${TOPICS.L1[t.id]?.w || "?"}</div>
+        return `<a class="tcard" ${tc(t.id)} href="#t-${t.id}"><h3>${esc(t.name)}</h3><div class="meta">${cs.length} concepts · exam weight ≈ ${TI(t.id).w || "?"}</div>
           <div class="ex">${cs.slice(0, 4).map((c) => esc(c.t.replace(/\s*\(.*?\)/, ""))).join(" · ")}</div></a>`;
-      }).join("")}</div></div>`;
+      }).join("")}</div></div>`).join("")}`;
     const big = document.getElementById("bigq");
     big.addEventListener("input", () => { q.value = big.value; liveDrop(big.value, big); });
     big.addEventListener("keydown", (e) => dropKeys(e, big));
@@ -226,8 +240,9 @@
     const rs = Object.values(D.readings).filter((r) => r.level === t.level && (byReading[rKey(t.level, r.n)] || []).some((c) => c.tp === tp));
     rs.sort((a, b) => a.n - b.n);
     const listed = new Set();
-    let html = `<div class="crumbs"><a href="#home">Home</a> › Level I</div><h1 style="font-size:30px">${esc(t.name)}</h1>
-      <p class="mute">${byTopic[tp].length} concepts · approx. exam weight ${TOPICS.L1[tp]?.w || "?"}</p>`;
+    const tw = topicName[twin(tp)] ? twin(tp) : null;
+    let html = `<div class="crumbs"><a href="#home">Home</a> › ${LV[t.level]}</div><h1 style="font-size:30px">${esc(t.name)}</h1>
+      <p class="mute">${byTopic[tp].length} concepts · approx. exam weight ${TI(tp).w || "?"}${tw ? ` · <a href="#t-${tw}">Same topic in ${LV[lvOf(tw)]} →</a>` : ""}</p>`;
     const block = (title, ref, cs) => `<div class="rd"><h3>${title}${ref}</h3><div class="list">${cs.map((c) =>
       `<a href="#c-${c.id}"><div class="lt">${esc(c.t)}</div><div class="ls">${esc(c.sum.length > 170 ? c.sum.slice(0, 168) + "…" : c.sum)}</div></a>`).join("")}</div></div>`;
     if (rs.length) {
@@ -251,7 +266,7 @@
     const tp = cs[0]?.tp;
     renderRail(tp);
     const idx = D.index.filter(([, l, hits]) => l === lv && hits.some((h) => String(h[0]) === String(n))).map(([term]) => term);
-    app.innerHTML = `<div class="crumbs"><a href="#home">Home</a> › ${tp ? `<a href="#t-${tp}">${esc(topicName[tp])}</a> ›` : ""} Reading ${n}</div>
+    app.innerHTML = `<div class="crumbs"><a href="#home">Home</a> › ${LV[lv]} › ${tp ? `<a href="#t-${tp}">${esc(topicName[tp])}</a> ›` : ""} Reading ${n}</div>
       <h1 style="font-size:28px">${r ? esc(r.title) : "Reading " + n}</h1>
       ${r ? `<p class="ref" style="margin-top:8px">Reading ${n} · ${pageRef(r.book, r.page)}</p>` : ""}
       <div class="sec"><h2>Concepts explained here</h2><div class="list">${cs.map((c) => `<a href="#c-${c.id}"><div class="lt">${esc(c.t)}</div><div class="ls">${esc(c.sum.slice(0, 170))}${c.sum.length > 170 ? "…" : ""}</div></a>`).join("") || '<div class="mute">None yet.</div>'}</div></div>
@@ -266,7 +281,9 @@
     renderRail(c.tp);
     const recent = store.get("recent", []).filter((x) => x !== id); recent.unshift(id); store.set("recent", recent.slice(0, 20));
     const aka = c.aka.filter((a) => !norm(c.t).includes(norm(a)));
-    const related = [...new Set([...c.see, ...c.links])].filter((x) => x !== id && C[x]);
+    const linked = [...new Set([...c.see, ...c.links, ...(back[id] || [])])].filter((x) => x !== id && C[x]);
+    const related = linked.filter((x) => C[x].lv === c.lv);
+    const cross = linked.filter((x) => C[x].lv !== c.lv);
     const siblings = c.r.flatMap((r) => byReading[rKey(c.lv, r)] || []).filter((x) => x.id !== id && !related.includes(x.id));
     const list = byTopic[c.tp], k = list.indexOf(c), prev = list[k - 1], next = list[k + 1];
     const reads = c.r.map((n) => {
@@ -275,11 +292,13 @@
     }).join("");
     const pages = c.pg.length ? `<div class="row"><span class="mute">Indexed on</span> ${c.pg.map(([r, b, p]) => `<a class="chip" href="#r-${c.lv}-${r}" title="Reading ${r}">${pageRef(b, p)}</a>`).join("")}</div>` : "";
     app.innerHTML = `<article class="concept">
-      <div class="crumbs"><a href="#home">Home</a> › ${topicChip(c.tp)} ${c.r.length ? "› " + c.r.map((n) => rLink(c.lv, n)).join(", ") : ""}</div>
+      <div class="crumbs"><a href="#home">Home</a> › ${LV[c.lv]} › ${topicChip(c.tp)} ${c.r.length ? "› " + c.r.map((n) => rLink(c.lv, n)).join(", ") : ""}</div>
       <h1>${esc(c.t)}</h1>
       ${aka.length ? `<div class="aka"><b>Also searched as</b>${aka.map(esc).join(" · ")}</div>` : ""}
       <div class="body">${c.html}</div>
       <div class="sec"><h2>Where in your books</h2><div class="where">${reads}${pages}</div></div>
+      ${cross.length ? `<div class="sec cross"><h2>${c.lv === "L1" ? "Goes deeper in Level II" : "Level I foundation"}</h2><div class="list">${cross.map((x) =>
+        `<a href="#c-${x}"><div class="lt">${esc(C[x].t)}</div><div class="ls">${esc(C[x].sum.length > 150 ? C[x].sum.slice(0, 148) + "…" : C[x].sum)}</div><div class="lm">${topicChip(C[x].tp).replace("<a ", "<span ").replace("</a>", "</span>")}</div></a>`).join("")}</div></div>` : ""}
       ${related.length ? `<div class="sec"><h2>Related concepts</h2><div class="chips">${related.map((x) => `<a class="chip" href="#c-${x}">${esc(C[x].t)}</a>`).join("")}</div></div>` : ""}
       ${siblings.length ? `<div class="sec"><h2>Same reading</h2><div class="chips">${siblings.map((x) => `<a class="chip" href="#c-${x.id}">${esc(x.t)}</a>`).join("")}</div></div>` : ""}
       <nav class="pager">${prev ? `<a href="#c-${prev.id}">← ${esc(prev.t)}</a>` : "<span></span>"}${next ? `<a class="r" href="#c-${next.id}">${esc(next.t)} →</a>` : ""}</nav>
@@ -290,10 +309,14 @@
   function viewSearch(query) {
     renderRail();
     q.value = query;
-    const res = CE.search(query), ix = IE.search(query, { limit: 12 });
+    const res = CE.search(query), ix = IE.search(query, { limit: 30 });
+    const n = { all: res.hits.length, L1: res.hits.filter((h) => h.d.c.lv === "L1").length, L2: res.hits.filter((h) => h.d.c.lv === "L2").length };
+    if (lvFilter !== "all") { res.hits = res.hits.filter((h) => h.d.c.lv === lvFilter); ix.hits = ix.hits.filter((h) => h.d.lv === lvFilter); }
     const top = res.hits.slice(0, 40), terms = res.terms;
+    const seg = `<div class="seg" role="group" aria-label="Level">${[["all", "All levels"], ["L1", "Level I"], ["L2", "Level II"]].map(([k, l]) =>
+      `<button data-lv="${k}" class="${lvFilter === k ? "on" : ""}" aria-pressed="${lvFilter === k}">${l} <span>${n[k]}</span></button>`).join("")}</div>`;
     const fix = res.fixes.length && (!top.length || top[0].s < 8) ? `<div class="hint">Searched with the closest terms: <b>${esc(res.fixes.join(", "))}</b>.</div>` : "";
-    app.innerHTML = `<div class="crumbs"><a href="#home">Home</a> › Search</div><h1 style="font-size:26px">“${esc(query)}”</h1>
+    app.innerHTML = `<div class="crumbs"><a href="#home">Home</a> › Search</div><h1 style="font-size:26px">“${esc(query)}”</h1>${seg}
       <p class="sq">${top.length ? `${res.hits.length} concept${res.hits.length === 1 ? "" : "s"} matched${res.hits.length > 40 ? ", top 40 shown" : ""}` : "No concepts matched."}</p>${fix}
       ${top.length ? `<div class="list">${top.map(({ d }) => {
         const c = d.c, inTitle = toks(c.t).some((t) => terms.includes(t));
@@ -303,7 +326,12 @@
           <div class="lm">${topicChip(c.tp).replace("<a ", "<span ").replace("</a>", "</span>")}${why ? `<span class="ref">matched “${esc(why)}”</span>` : ""}${c.r.length ? `<span class="ref">R${c.r.join(", R")}</span>` : ""}</div></a>`;
       }).join("")}</div>` : `<div class="empty">Try fewer words, an abbreviation (WACC, YTM, EPS) or a related idea.</div>`}
       ${ix.hits.length ? `<div class="sec"><h2>In the book indexes</h2><div class="list">${ix.hits.filter((h) => h.s > 3).slice(0, 10).map(({ d }) =>
-        `<div><span class="lt">${highlight(d.term, ix.terms)}</span> <span class="mute">—</span> ${d.hits.slice(0, 6).map(([r, b, p]) => `<a class="chip" href="#r-${d.lv}-${r}">R${r} · ${pageRef(b, p)}</a>`).join(" ")}</div>`).join("")}</div></div>` : ""}`;
+        `<div><span class="lt">${highlight(d.term, ix.terms)}</span> <span class="ref">${d.lv}</span> <span class="mute">—</span> ${d.hits.slice(0, 6).map(([r, b, p]) => `<a class="chip" href="#r-${d.lv}-${r}">R${r} · ${pageRef(b, p)}</a>`).join(" ")}</div>`).join("")}</div></div>` : ""}`;
+    app.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => {
+      lvFilter = b.dataset.lv;
+      try { localStorage.setItem("cfakb:lv", JSON.stringify(lvFilter)); } catch (e) { /* fine */ }
+      viewSearch(query);
+    }));
   }
 
   // ---------- live dropdown ----------
@@ -313,7 +341,7 @@
     if (!text.trim()) { drop.hidden = true; return; }
     const hits = CE.search(text, { limit: 8 }).hits, terms = CE.search(text).terms;
     dropSel = -1;
-    drop.innerHTML = hits.map(({ d }) => `<a href="#c-${d.c.id}"><span class="dt">${highlight(d.c.t, terms)}</span><span class="ds">${esc(TOPICS.L1[d.c.tp]?.short || "")} · ${esc(d.c.sum)}</span></a>`).join("") +
+    drop.innerHTML = hits.map(({ d }) => `<a href="#c-${d.c.id}"><span class="dt">${highlight(d.c.t, terms)}</span><span class="ds">${d.c.lv} · ${esc(TI(d.c.tp).short || "")} · ${esc(d.c.sum)}</span></a>`).join("") +
       `<a href="#q-${slug(text)}" class="all">See all results for “${esc(text)}” ↵</a>`;
     const box = input.getBoundingClientRect(), top = q.closest(".sbox").getBoundingClientRect();
     drop.style.cssText = input === q ? "" : `left:${box.left - top.left}px;right:auto;width:${box.width}px;top:${box.bottom - top.top + 6}px`;

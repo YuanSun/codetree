@@ -33,6 +33,7 @@ LEVELS = {"L1": "Level I", "L2": "Level II"}
 # topic order and exam weight (approximate midpoints) per level
 TOPIC_ORDER = {
     "L1": ["ethics", "quant", "econ", "corp", "fsa", "equity", "fi", "deriv", "alt", "pm"],
+    "L2": ["ethics2", "quant2", "econ2", "corp2", "fsa2", "equity2", "fi2", "deriv2", "alt2", "pm2"],
 }
 
 
@@ -172,6 +173,19 @@ def main():
         if c["id"] in known:
             sys.exit(f"duplicate concept id {c['id']}")
         known[c["id"]] = c
+
+    # notes/crosslinks.md: "concept-id: other-id; other-id" ties a concept to related ones in the other level
+    xl = HERE / "notes" / "crosslinks.md"
+    if xl.is_file():
+        for line in xl.read_text(encoding="utf-8").splitlines():
+            if (m := re.match(r"^([a-z0-9-]+):\s*(.+)$", line.strip())):
+                if m[1] not in known:
+                    print(f"  warning: crosslinks.md names unknown concept '{m[1]}'"); continue
+                for x in (y.strip() for y in m[2].split(";")):
+                    if x not in known:
+                        print(f"  warning: crosslinks.md: {m[1]} -> unknown '{x}'")
+                    elif x not in known[m[1]]["see"]:
+                        known[m[1]]["see"].append(x)
 
     cur = json.loads(CURRICULUM.read_text(encoding="utf-8")) if CURRICULUM.is_file() else None
     readings, index_terms = {}, []
