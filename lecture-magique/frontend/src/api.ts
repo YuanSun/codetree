@@ -168,7 +168,9 @@ export const api = {
     call<ChildReport>("GET", `/parent/children/${childId}/report?weeks=${weeks}&lang=${lang}`),
   questions: (articleId: number) =>
     call<{ article: { id: number; title: string; lang: Lang }; chapters: { seq: number; title: string | null }[];
-           questions: Question[] }>("GET", `/articles/${articleId}/questions`),
+           questions: Question[];
+           /** waiting for her to finish these chapters (seqs) / the whole text (count of end questions) */
+           locked: { chapters: number[]; end: number } }>("GET", `/articles/${articleId}/questions`),
   saveAnswer: (questionId: number, body: string) =>
     call<{ answer: { body: string; submitted_at: string }; key: AnswerKey; grade: Question["grade"] }>(
       "POST", `/questions/${questionId}/answer`, { body }),
