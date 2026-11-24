@@ -38,6 +38,9 @@ def world(db):
         for name, role in (("grace", "student"), ("lea", "student"), ("ryan", "parent")):
             c.execute(text("INSERT INTO lecture.app_user (username, display_name, password_hash, role) "
                            "VALUES (:u, :u, :h, :r)"), {"u": name, "h": hash_password(PW), "r": role})
+        # both children have read the whole text, so every question is open to them (see test_questions_unlock_*)
+        c.execute(text("""INSERT INTO lecture.reading_progress (user_id, article_id, last_chapter, last_paragraph, chapters_done)
+            SELECT id, :a, 2, 1, ARRAY[1, 2] FROM lecture.app_user WHERE role = 'student'"""), {"a": rep["article_id"]})
     from app.main import app
     return {"app": app, "db": db, "aid": rep["article_id"], "pack": pack}
 
@@ -227,3 +230,30 @@ def test_evidence_must_be_in_the_text(db):
         pack["questions"][0]["rubric"]["evidence"] = [bad]
         with pytest.raises(ImportRefused):
             check_questions(pack)
+
+
+def test_questions_unlock_chapter_by_chapter(world):
+    """A long book is read over weeks: a chapter's question appears once she has finished that chapter, the
+    end-of-reading questions once she has finished them all; parents see everything."""
+    aid = world["aid"]
+    with world["db"].begin() as c:
+        set_status(c, PACK["slug"], "published")
+        c.execute(text("DELETE FROM lecture.reading_progress"))
+    g = login(world, "grace")
+    r = g.get(f"/api/articles/{aid}/questions").json()
+    assert r["questions"] == [] and r["locked"] == {"chapters": [1], "end": 2}
+    papa_view = login(world, "ryan").get(f"/api/articles/{aid}/questions").json()
+    assert len(papa_view["questions"]) == 3 and papa_view["locked"] == {"chapters": [], "end": 0}
+    end_q = next(q for q in papa_view["questions"] if q["chapter"] is None)
+    assert g.post(f"/api/questions/{end_q['id']}/answer", json={"body": "trop tôt"}).status_code == 403
+
+    chapters = g.get(f"/api/articles/{aid}/chapters/1").json()
+    assert g.post(f"/api/chapters/{chapters['chapter']['id']}/complete", json={}).status_code == 200
+    r = g.get(f"/api/articles/{aid}/questions").json()
+    assert [q["chapter"]["seq"] for q in r["questions"]] == [1] and r["locked"] == {"chapters": [], "end": 2}
+
+    ch2 = g.get(f"/api/articles/{aid}/chapters/2").json()
+    g.post(f"/api/chapters/{ch2['chapter']['id']}/complete", json={})
+    r = g.get(f"/api/articles/{aid}/questions").json()
+    assert len(r["questions"]) == 3 and r["locked"] == {"chapters": [], "end": 0}
+    assert g.post(f"/api/questions/{end_q['id']}/answer", json={"body": "Maintenant oui."}).status_code == 200

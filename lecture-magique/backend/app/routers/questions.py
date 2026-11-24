@@ -8,7 +8,10 @@ it no longer appears in the questions page, only in the parents' list of answers
 
 Closed questions (kind "choice": multiple choice or vrai/faux) keep their options in rubric.choices and the right
 one's index in rubric.correct. The options are sent with the question, the right answer only after she has
-answered. She gets one try: it is marked at once (graded_by "auto") and never goes to the Claude export."""
+answered. She gets one try: it is marked at once (graded_by "auto") and never goes to the Claude export.
+
+A child sees a chapter's question once that chapter is in her reading_progress.chapters_done, and the end-of-reading
+questions once every chapter is (no spoilers in a book read over weeks); answering a locked question is refused."""
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy import Connection, text
@@ -39,6 +42,25 @@ def _choices(r) -> list[str] | None:
     return (r.rubric or {}).get("choices") if r.kind == "choice" else None
 
 
+def _chapters_done(conn: Connection, user: User, article_id: int) -> set[int] | None:
+    """The chapter seqs she has finished; None for parents, who see every question."""
+    if user.role == "parent":
+        return None
+    done = conn.execute(text("SELECT chapters_done FROM lecture.reading_progress WHERE user_id = :u AND article_id = :a"),
+                        {"u": user.id, "a": article_id}).scalar()
+    return set(done or [])
+
+
+def _unlocked(chapter_seq: int | None, done: set[int] | None, n_chapters: int, answered: bool) -> bool:
+    """A chapter's question shows once she has finished that chapter, the end-of-reading ones once she has finished
+    every chapter, so a long book read over weeks doesn't give its ending away. One she has answered always shows."""
+    if done is None or answered:
+        return True
+    if chapter_seq is not None:
+        return chapter_seq in done
+    return len(done) >= n_chapters
+
+
 @router.get("/articles/{article_id}/questions")
 def list_questions(article_id: int, user: User = Depends(current_user), conn: Connection = Depends(get_conn)):
     art = _article(conn, user, article_id)
@@ -56,9 +78,15 @@ def list_questions(article_id: int, user: User = Depends(current_user), conn: Co
         ORDER BY c.seq IS NULL, c.seq, q.seq"""), {"a": article_id, "u": user.id}).all()
     chapters = conn.execute(text("SELECT seq, title FROM lecture.chapter WHERE article_id = :a ORDER BY seq"),
                             {"a": article_id}).all()
+    done = _chapters_done(conn, user, article_id)
+    shown = [r for r in rows if _unlocked(r.chapter_seq, done, len(chapters), r.body is not None)]
+    hidden = [r for r in rows if r.id not in {x.id for x in shown}]
     return {
         "article": {"id": art.id, "title": art.title, "lang": art.lang},
         "chapters": [{"seq": c.seq, "title": c.title} for c in chapters],
+        # questions waiting for her to finish a chapter (chapter seqs) or the whole text (end)
+        "locked": {"chapters": sorted({r.chapter_seq for r in hidden if r.chapter_seq is not None}),
+                   "end": sum(1 for r in hidden if r.chapter_seq is None)},
         "questions": [{
             "id": r.id, "kind": r.kind, "prompt": r.prompt, "choices": _choices(r),
             "chapter": None if r.chapter_seq is None else {"seq": r.chapter_seq, "title": r.chapter_title},
@@ -68,7 +96,7 @@ def list_questions(article_id: int, user: User = Depends(current_user), conn: Co
             "grade": None if r.graded_id is None else {
                 "score": float(r.score), "points": points_of(r.rubric), "feedback": r.feedback,
                 "for_latest": r.graded_id == r.answer_id},
-        } for r in rows],
+        } for r in shown],
     }
 
 
@@ -83,6 +111,12 @@ def save_answer(question_id: int, a: AnswerIn, user: User = Depends(current_user
     if not q:
         raise HTTPException(404, "Question introuvable")
     _article(conn, user, q.article_id)  # a child can only answer questions of published articles
+    meta = conn.execute(text("""SELECT c.seq, (SELECT count(*) FROM lecture.chapter WHERE article_id = :a) AS n,
+        EXISTS (SELECT 1 FROM lecture.answer WHERE question_id = :q AND user_id = :u) AS answered
+        FROM (SELECT 1) one LEFT JOIN lecture.question qq ON qq.id = :q LEFT JOIN lecture.chapter c ON c.id = qq.chapter_id"""),
+                        {"a": q.article_id, "q": question_id, "u": user.id}).first()
+    if not _unlocked(meta.seq, _chapters_done(conn, user, q.article_id), meta.n, meta.answered):
+        raise HTTPException(403, "Finis d’abord le chapitre")
     body = a.body.strip()
     if not body:
         raise HTTPException(422, "Réponse vide")

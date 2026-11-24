@@ -39,6 +39,18 @@ export function findQuote(para: string, quote: string): [number, number] | null 
 
 export type Mark = { seq: number; quote: string };
 
+/** [4, 5, 6, 9] → "4–6, 9" */
+function seqList(seqs: number[]): string {
+  const out: string[] = [];
+  for (let i = 0; i < seqs.length; i++) {
+    let j = i;
+    while (j + 1 < seqs.length && seqs[j + 1] === seqs[j] + 1) j++;
+    out.push(j > i ? `${seqs[i]}–${seqs[j]}` : `${seqs[i]}`);
+    i = j;
+  }
+  return out.join(", ");
+}
+
 function KeyBox({ k, lang }: { k: AnswerKey; lang: Lang }) {
   const t = strings(lang);
   return (
@@ -275,14 +287,16 @@ function QuestionCard({ q, n, lang, onSaved, onText }: {
 /** End-of-reading comprehension: the chapter questions, then closed questions (multiple choice, vrai/faux, marked at
  *  once), then open questions about the whole text. The text can be opened beside the questions to look for evidence. */
 export default function Questions({ articleId, theme }: { articleId: number; theme: [ThemePref, (t: ThemePref) => void, boolean] }) {
-  const [data, setData] = useState<{ title: string; lang: Lang; chapters: Chapter[]; questions: Question[] } | null>(null);
+  const [data, setData] = useState<{ title: string; lang: Lang; chapters: Chapter[]; questions: Question[];
+                                     locked: { chapters: number[]; end: number } } | null>(null);
   const [error, setError] = useState("");
   const [pane, setPane] = useState<number | null>(null);
   const [mark, setMark] = useState<Mark | null>(null);
 
   useEffect(() => {
     api.questions(articleId).then((r) => setData({ title: r.article.title, lang: r.article.lang, chapters: r.chapters,
-                                                   questions: r.questions }), (e) => setError(e.message));
+                                                   questions: r.questions, locked: r.locked ?? { chapters: [], end: 0 } }),
+                                     (e) => setError(e.message));
   }, [articleId]);
 
   const lang = data?.lang ?? "fr";
@@ -329,7 +343,13 @@ export default function Questions({ articleId, theme }: { articleId: number; the
           <div className="cq-list">
             <h1 className="page-title">{t.qTitle}</h1>
             <p className="cq-book">{data.title}</p>
-            {qs.length === 0 ? <p className="muted">{t.qEmpty}</p> : (
+            {(data.locked.chapters.length > 0 || data.locked.end > 0) && (
+              <div className="card cq-locked small">
+                {data.locked.chapters.length > 0 && <p>{t.qLockedChapters(seqList(data.locked.chapters))}</p>}
+                {data.locked.end > 0 && <p>{t.qLockedEnd(data.locked.end)}</p>}
+              </div>
+            )}
+            {qs.length === 0 ? (data.locked.chapters.length || data.locked.end ? null : <p className="muted">{t.qEmpty}</p>) : (
               <>
                 <p className="muted">{t.qIntro}</p>
                 <div className="cq-progress">
