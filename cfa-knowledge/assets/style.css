@@ -17,6 +17,8 @@
   --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
   --t-ethics: #8a5a00; --t-quant: #2f6db5; --t-econ: #2a8a7a; --t-corp: #6a4bb0; --t-fsa: #b0453a;
   --t-equity: #2e7d32; --t-fi: #a0526b; --t-deriv: #b06f10; --t-alt: #5f6f2a; --t-pm: #316a8c;
+  /* Level II topics reuse their Level I hue */
+  --t-ethics2: var(--t-ethics); --t-quant2: var(--t-quant); --t-econ2: var(--t-econ); --t-corp2: var(--t-corp); --t-fsa2: var(--t-fsa); --t-equity2: var(--t-equity); --t-fi2: var(--t-fi); --t-deriv2: var(--t-deriv); --t-alt2: var(--t-alt); --t-pm2: var(--t-pm);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -92,6 +94,13 @@ main { min-width: 0; }
   color: var(--muted); background: var(--panel); white-space: nowrap; }
 a.chip:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
 .chip.topic { color: var(--tc); border-color: color-mix(in srgb, var(--tc) 40%, var(--line)); }
+.lvb { font: 600 10px var(--f-mono); letter-spacing: .04em; opacity: .8; }
+.seg { display: inline-flex; margin: 12px 0 4px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--panel); }
+.seg button { font: 13px var(--f-body); border: 0; background: none; color: var(--ink); padding: 6px 12px; cursor: pointer; border-right: 1px solid var(--line); }
+.seg button:last-child { border-right: 0; }
+.seg button span { font: 11px var(--f-mono); color: var(--muted); margin-left: 4px; }
+.seg button.on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.sec.cross .list { border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); }
 .ref { font: 12px var(--f-mono); color: var(--muted); }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .mute { color: var(--muted); }
