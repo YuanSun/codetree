@@ -1,0 +1,10 @@
+{
+  "title": "Sample piece (made-up data, for testing the build)",
+  "date": "2026-10-15",
+  "words": 160,
+  "target_words": 150,
+  "ratings": {"organisation": 3, "consigne": 3, "vocabulaire": 2, "syntaxe": 2, "accords": 2},
+  "errors": {"pronoms": 3, "genre": 2, "accord": 3, "vocabulaire": 4},
+  "recurring": ["accord"],
+  "priorities": ["Accord des adjectifs"]
+}

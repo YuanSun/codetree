@@ -224,5 +224,7 @@ hosting/sites/
 hosting/.quartz/
 # exam-prep-site: private exported notes
 exam-prep-site/content/
+# writing-tracker: Grace's corrected writing (reports + scorecards)
+writing-tracker/content/
 # cfa-knowledge: curriculum extracted from the user's own Schweser PDFs
 cfa-knowledge/content/

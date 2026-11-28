@@ -32,6 +32,13 @@ if ! python3 "$REPO/cfa-knowledge/build.py" --out "$HERE/sites/cfa-kb"; then
   [ -e "$HERE/sites/cfa-kb/index.html" ] || echo "<p>CFA knowledge base not built yet. Run: python3 cfa-knowledge/build.py</p>" > "$HERE/sites/cfa-kb/index.html"
 fi
 
+# Writing progress: rebuilt on every start from writing-tracker/content (or WRITING_DIR in .env). Stdlib only.
+WRITING_SRC="${WRITING_DIR:-$REPO/writing-tracker/content}"
+if ! python3 "$REPO/writing-tracker/build.py" "$WRITING_SRC" "$HERE/sites/writing"; then
+  mkdir -p "$HERE/sites/writing"
+  [ -e "$HERE/sites/writing/index.html" ] || echo "<p>No writing scorecards yet. See writing-tracker/README.md</p>" > "$HERE/sites/writing/index.html"
+fi
+
 pids=()
 cleanup() { for p in "${pids[@]:-}"; do kill "$p" 2>/dev/null || true; done; }
 trap cleanup EXIT INT TERM
@@ -67,5 +74,5 @@ else
   echo "Skipping /lecture/: need uv, $LECTURE_DIR/.env and a built front end (see lecture-magique/SETUP.md)." >&2
 fi
 
-echo "Gateway on port $GATEWAY_PORT: http://<this-machine>:$GATEWAY_PORT/  (/fund/  /math/  /math/study/  /notes/  /budget/  /lecture/  /kb/)"
+echo "Gateway on port $GATEWAY_PORT: http://<this-machine>:$GATEWAY_PORT/  (/fund/  /math/  /math/study/  /notes/  /budget/  /lecture/  /kb/  /writing/)"
 caddy run --config "$HERE/Caddyfile" --adapter caddyfile
